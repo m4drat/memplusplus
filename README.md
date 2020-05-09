@@ -25,6 +25,13 @@
 20. Different examples of memory allocators: https://github.com/mtrebi/memory-allocators
 21. Microsoft version of malloc: https://github.com/microsoft/mimalloc
 22. Implementation of malloc: https://github.com/jterrazz/42-malloc
-23. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
-24. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
-25. Cmake library example project: https://github.com/YansonTech/Introduction-to-libraries-with-CMake
+23. Scaling the Go page allocator (about bitmaps): https://go.googlesource.com/proposal/+/refs/changes/57/202857/2/design/35112-scaling-the-page-allocator.md
+---
+24. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
+25. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
+26. Cmake library example project: https://github.com/YansonTech/Introduction-to-libraries-with-CMake
+27. How to structurize project: https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html
+-----
+28. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
+29. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
+30. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version
