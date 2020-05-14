@@ -1,23 +1,28 @@
 # mem++
 
+### Технологии:
+1. cmake  - build system
+2. sphnix - documentation
+3. g++    - compiler
+
 ### Этапы разработки:
-1. Основные структуры (chunk, arena)
+1. Основные структуры (chunk, arena) + Документация!
 2. Системный аллокатор (враппер над mmap)
-3. Базовый менеджмент free'd блоков (LinkedList + first-fit с разделением чанков) 
+3. Базовый менеджмент free'd блоков (LinkedList + first-fit с разделением чанков) + Документация!
 4. Ручная реализация ф-ции free
-5. __Тесты для пунктов 1-4__
-6. Advanced менеджмент free'd блоков (segregated-fit)
+5. __Тесты для пунктов 1-4 + Документация__
+6. Advanced менеджмент free'd блоков (segregated-fit/best-fit)
 7. Реализация умных указателей для GC
-8. Базовая версия GC (ф-ция вида gc.collect())
-9. __Тесты для пунктов 6-8__
+8. Базовая версия GC (ф-ция вида gc.collect(), строит граф связей объектов + удаляет те, на которые нету ссылок)
+9. __Тесты для пунктов 6-8 + Документация__
 10. Advanced версия GC - распознование структур (Уметь находить Связные списки, Деревья поиска)
 11. Advanced версия GC - менеджмент свободных чанков (Во время копирования структуры (например linked list): необходимо попытаться разместить его ноды в памяти друг за другом)
 12. Advanced версия GC - доработка для работы с другими структурами (деревья поиска)
-13. __Тесты для пунктов 10-12__
+13. __Тесты для пунктов 10-12 + Документация__
 
 ### Техническая спецификация
-1. Free-list аллокатор памяти (или построенный на bitmap). Аллокатор сам по себе типа: best-fit/segregated-fit.
-2. умный GC типа "mark and sweep", или "reference count", который будет пытаться распределить объекты в памяти опираясь на тип структуры, которую они реализуют.
+1. Free-list аллокатор памяти. Аллокатор сам по себе типа: best-fit/segregated-fit.
+2. умный GC типа "mark-compact" + "mark and sweep", который будет пытаться распределить объекты в памяти опираясь на тип структуры, которую они реализуют.
 
 ### Ссылки
 1. Custom allocator in c++: http://dmitrysoshnikov.com/compilers/writing-a-memory-allocator/
@@ -43,13 +48,18 @@
 21. Microsoft version of malloc: https://github.com/microsoft/mimalloc
 22. Implementation of malloc: https://github.com/jterrazz/42-malloc
 23. Scaling the Go page allocator (about bitmaps): https://go.googlesource.com/proposal/+/refs/changes/57/202857/2/design/35112-scaling-the-page-allocator.md
+24. https://en.wikipedia.org/wiki/Mark-compact_algorithm
+25. https://stackoverflow.com/questions/2663292/how-does-heap-compaction-work-quickly
+26. https://hacks.mozilla.org/2015/07/compacting-garbage-collection-in-spidermonkey/
 ---
-24. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
-25. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
-26. Cmake library example project: https://github.com/YansonTech/Introduction-to-libraries-with-CMake
-27. How to structurize project: https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html
-28. Structure of cmake project: https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
+1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
+2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
+3. Cmake library example project: https://github.com/YansonTech/Introduction-to-libraries-with-CMake
+4. How to structurize project: https://cliutils.gitlab.io/modern-cmake/chapters/basics/structure.html
+5. Structure of cmake project: https://pabloariasal.github.io/2018/02/19/its-time-to-do-cmake-right/
+6. Cmake template project: https://github.com/Barthelemy/CppProjectTemplate
+7. Cmake simple example: https://www.jetbrains.com/help/clion/quick-cmake-tutorial.html
 -----
-29. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
-30. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
-31. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version
+1. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
+2. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
+3. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version

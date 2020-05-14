@@ -1,6 +1,6 @@
-set(FILES "")
-set(SUBDIRECTORIES "mpp")
-set(RELATIVE_PATH "src")
+set(FILES "${CMAKE_CURRENT_SOURCE_DIR}/mpp.cpp")
+set(SUBDIRECTORIES "")
+set(RELATIVE_PATH "src/mpp")
 
 # add all subdirectories
 foreach(VAR ${SUBDIRECTORIES})

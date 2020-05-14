@@ -1,6 +1,6 @@
 set(FILES "")
 set(SUBDIRECTORIES "mpp")
-set(RELATIVE_PATH "src")
+set(RELATIVE_PATH "include")
 
 # add all subdirectories
 foreach(VAR ${SUBDIRECTORIES})
