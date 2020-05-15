@@ -2,6 +2,9 @@
 # Created by https://www.gitignore.io/api/c,c++,linux,macos,cmake,windows,visualstudio,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=c,c++,linux,macos,cmake,windows,visualstudio,visualstudiocode
 
+### CMake builds ###
+/build*
+
 ### C ###
 # Prerequisites
 *.d

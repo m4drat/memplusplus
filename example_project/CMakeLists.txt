@@ -1,5 +1,11 @@
-cmake_minimum_required(VERSION 3.10)
+project(example_project)
 
-project(memplusplus VERSION 1.0)
+add_executable(${PROJECT_NAME} src/main.cpp)
 
-set(CMAKE_CXX_STANDARD 17)
+target_include_directories( ${PROJECT_NAME}
+	PUBLIC ${PROJECT_SOURCE_DIR}/include
+)
+
+target_link_libraries( ${PROJECT_NAME}
+	lib::libmpp
+)
