@@ -1,5 +1,6 @@
 #include "mpplib/mpp.hpp"
 #include <iostream>
+#include <vector>
 
 void init()
 {
