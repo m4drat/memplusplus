@@ -24,7 +24,7 @@
                 }
             ],
             "preLaunchTask": "build",
-            "miDebuggerPath": "/usr/bin/gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
         },
         {
             "name": "g++-7 - Build and debug active file",
