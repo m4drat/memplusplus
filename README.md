@@ -63,11 +63,11 @@
 6. Cmake template project: https://github.com/Barthelemy/CppProjectTemplate
 7. Cmake simple example: https://www.jetbrains.com/help/clion/quick-cmake-tutorial.html
 8. Configure VScode to debug cmake projects: https://medium.com/audelabs/c-development-using-visual-studio-code-cmake-and-lldb-d0f13d38c563
------
+---
 1. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
 2. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
 3. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version
------
+---
 1. Doxygen directives: https://breathe.readthedocs.io/en/latest/directives.html
 2. Doxygen advanced directives: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 3. c++ and sphinx: https://stackoverflow.com/questions/835043/has-anyone-used-sphinx-to-document-a-c-project
