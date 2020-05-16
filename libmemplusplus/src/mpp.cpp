@@ -1,8 +1,9 @@
-#include "mpplib/mpp.hpp"
 #include <iostream>
 #include <vector>
 
-void init()
+#include "mpplib/mpp.hpp"
+
+void GC::init()
 {
     std::cout << "In init()" << std::endl;
 }

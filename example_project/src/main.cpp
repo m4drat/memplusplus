@@ -1,8 +1,9 @@
-#include "mpplib/mpp.hpp"
 #include <iostream>
+
+#include "mpplib/mpp.hpp"
 
 int main(int argc, char *argv[])
 {
-    init();
+    GC* gc = new GC();
     std::cout << "In main()" << std::endl;
 }
