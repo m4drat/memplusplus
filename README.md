@@ -51,9 +51,9 @@
 21. Microsoft version of malloc: https://github.com/microsoft/mimalloc
 22. Implementation of malloc: https://github.com/jterrazz/42-malloc
 23. Scaling the Go page allocator (about bitmaps): https://go.googlesource.com/proposal/+/refs/changes/57/202857/2/design/35112-scaling-the-page-allocator.md
-24. https://en.wikipedia.org/wiki/Mark-compact_algorithm
-25. https://stackoverflow.com/questions/2663292/how-does-heap-compaction-work-quickly
-26. https://hacks.mozilla.org/2015/07/compacting-garbage-collection-in-spidermonkey/
+24. Mark-compact alggorithm description: https://en.wikipedia.org/wiki/Mark-compact_algorithm
+25. About heap-compaction: https://stackoverflow.com/questions/2663292/how-does-heap-compaction-work-quickly
+26. About mozilla spidermonkey GC: https://hacks.mozilla.org/2015/07/compacting-garbage-collection-in-spidermonkey/
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
@@ -69,7 +69,7 @@
 3. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version
 -----
 1. Doxygen directives: https://breathe.readthedocs.io/en/latest/directives.html
-2. https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
+2. Doxygen advanced directives: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 3. c++ and sphinx: https://stackoverflow.com/questions/835043/has-anyone-used-sphinx-to-document-a-c-project
 4. basic commenting example (sphinx): https://breathe.readthedocs.io/en/latest/
 5. markups (1): https://breathe.readthedocs.io/en/latest/markups.html
