@@ -3,7 +3,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch2/catch.hpp"
 
-TEST_CASE("positive difference")
+TEST_CASE("negative difference")
 {
     GC gc;
 
@@ -14,7 +14,7 @@ TEST_CASE("positive difference")
     REQUIRE(diff < 0);
 }
 
-TEST_CASE("negative difference")
+TEST_CASE("positive difference")
 {
     GC gc;
 

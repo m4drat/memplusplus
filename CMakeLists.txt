@@ -7,6 +7,9 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries/bin)
 project(memplusplus VERSION 1.0.0
 					 LANGUAGES CXX)
 
+# enable CTest testing
+enable_testing()
+
 option(BUILD_SHARED_LIBS "Request build of shared libraries." OFF)
 
 if(NOT BUILD_SHARED_LIBS)
