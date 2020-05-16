@@ -16,4 +16,4 @@ set_target_properties( "${PROJECT_NAME}" PROPERTIES
 	RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
 )
 
-# add_subdirectory(tests)
+add_subdirectory(tests)

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include <iostream>
+#include <stddef.h>
 
 /**
 	Global GC class
