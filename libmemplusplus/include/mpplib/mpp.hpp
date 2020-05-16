@@ -1,6 +1,5 @@
 #pragma once
 
-
 /**
 	Global GC class
 */

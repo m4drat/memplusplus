@@ -67,3 +67,13 @@
 1. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
 2. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
 3. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version
+-----
+1. Doxygen directives: https://breathe.readthedocs.io/en/latest/directives.html
+2. https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
+3. c++ and sphinx: https://stackoverflow.com/questions/835043/has-anyone-used-sphinx-to-document-a-c-project
+4. basic commenting example (sphinx): https://breathe.readthedocs.io/en/latest/
+5. markups (1): https://breathe.readthedocs.io/en/latest/markups.html
+6. latex math (2): https://breathe.readthedocs.io/en/latest/latexmath.html
+7. groups (3): https://breathe.readthedocs.io/en/latest/groups.html
+8. lists (4): https://breathe.readthedocs.io/en/latest/lists.html
+9. __Breathe Full documentation__: https://readthedocs.org/projects/breathe/downloads/pdf/latest/
