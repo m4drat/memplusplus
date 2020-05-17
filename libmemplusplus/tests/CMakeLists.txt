@@ -11,4 +11,4 @@ target_link_libraries(${PROJECT_NAME}
     Catch2::Test
 )
 
-add_test(test_all ${CMAKE_BINARY_DIR}/binaries/bin/${PROJECT_NAME})
+add_test(test_all ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME})
