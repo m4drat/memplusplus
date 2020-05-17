@@ -5,6 +5,18 @@ file(GLOB_RECURSE
      *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI]
      )
 
+set(EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} "/CMakeFiles/" "cmake" "build" "3rd_party" ".git")
+
+# Delete exclude patterns
+foreach (SOURCE_FILE ${ALL_CXX_SOURCE_FILES}) 
+    foreach (EXCLUDE_PATTERN ${EXCLUDE_PATTERNS})
+        string(FIND ${SOURCE_FILE} ${EXCLUDE_PATTERN} EXCLUDE_FOUND) 
+        if (NOT ${EXCLUDE_FOUND} EQUAL -1) 
+            list(REMOVE_ITEM ALL_CXX_SOURCE_FILES ${SOURCE_FILE})
+        endif () 
+    endforeach ()
+endforeach ()
+
 # Adding clang-format target if executable is found
 find_program(CLANG_FORMAT "clang-format")
 if(CLANG_FORMAT)
