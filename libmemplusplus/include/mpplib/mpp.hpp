@@ -17,7 +17,7 @@ public:
     /**
      * Calculate disatance between two pointers
      */
-    ptrdiff_t CalcDist(void* ptr1, void* ptr2);
+    ptrdiff_t CalcDist(void *ptr1, void *ptr2);
 
     /**
      * Default constructor
