@@ -1,12 +1,12 @@
 # mem++
 
 ### Технологии:
-1. cmake  - build system
-2. sphnix - documentation
-3. g++    - compiler
-4. clang-format
-5. clang-tidy
-6. unit-testing (Google/Boost/...?)
+1. cmake - build system
+2. sphnix/doxygen - documentation
+3. clang/g++ - compiler
+4. clang-format - formatting tool
+5. clang-tidy - linting tool
+6. catch2 - unit-testing
 
 ### Этапы разработки:
 1. Основные структуры (chunk, arena) + Документация!

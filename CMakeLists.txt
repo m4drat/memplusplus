@@ -18,6 +18,11 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
+# update all includes
+set(EXAMPLE_PROJECT_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/example_project/include)
+set(FUZZING_HARNESS_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/fuzzing_harness/include)
+set(LIBMEMPLUSPLUS_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/libmemplusplus/include)
+
 add_subdirectory(example_project)
 add_subdirectory(fuzzing_harness)
 add_subdirectory(libmemplusplus)

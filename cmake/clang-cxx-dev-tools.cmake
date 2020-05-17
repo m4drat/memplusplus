@@ -5,7 +5,7 @@ file(GLOB_RECURSE
      *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI]
      )
 
-set(EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} "/CMakeFiles/" "cmake" "build" "3rd_party" ".git")
+set(EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} "/CMakeFiles/" "cmake" "build" "3rd_party" ".git" "tests")
 
 # Delete exclude patterns
 foreach (SOURCE_FILE ${ALL_CXX_SOURCE_FILES}) 
@@ -36,11 +36,12 @@ if(CLANG_TIDY)
         clang-tidy
         COMMAND ${CLANG_TIDY}
         ${ALL_CXX_SOURCE_FILES}
+        -checks=*
         --
         -std=c++17
-        ${INCLUDE_DIRECTORIES}
-        # -I/mnt/c/Users/madrat/Desktop/projects/memplusplus/libmemplusplus/include/ 
-        # -I/usr/lib/gcc/x86_64-linux-gnu/7/include/ #
+        -I${EXAMPLE_PROJECT_INCLUDES}
+        -I${FUZZING_HARNESS_INCLUDES}
+        -I${LIBMEMPLUSPLUS_INCLUDES}
     )
 endif()
 
