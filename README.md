@@ -63,6 +63,8 @@
 6. Cmake template project: https://github.com/Barthelemy/CppProjectTemplate
 7. Cmake simple example: https://www.jetbrains.com/help/clion/quick-cmake-tutorial.html
 8. Configure VScode to debug cmake projects: https://medium.com/audelabs/c-development-using-visual-studio-code-cmake-and-lldb-d0f13d38c563
+9. c++ best practices: https://lefticus.gitbooks.io/cpp-best-practices/03-Style.html
+10. c++ core guidelines: https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md 
 ---
 1. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
 2. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
