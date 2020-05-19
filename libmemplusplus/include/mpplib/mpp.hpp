@@ -12,28 +12,26 @@ public:
     /**
      * Init method
      */
-    void init();
+    static void init();
 
     /**
      * Calculate disatance between two pointers
      */
-    ptrdiff_t CalcDist(void *ptr1, void *ptr2);
+    static auto CalcDist(void* ptr1, void* ptr2);
 
     /**
      * Default constructor
      */
     GC()
-        : m_references(0), m_references2(0), m_references3(1), m_references4(1),
-          m_references5(1)
     {
         std::cout << "In GC constructor" << std::endl;
         init();
     };
 
 private:
-    int m_references;
-    int m_references2;
-    int m_references3;
-    int m_references4;
-    int m_references5;
+    int m_references{ 0 };
+    int m_references2{ 0 };
+    int m_references3{ 0 };
+    int m_references4{ 0 };
+    int m_references5{ 0 };
 };

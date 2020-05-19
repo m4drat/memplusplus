@@ -1,9 +1,10 @@
 #include <iostream>
+#include <memory>
 
 #include "mpplib/mpp.hpp"
 
-int main(int argc, char *argv[])
+auto main() -> int
 {
-    GC *gc = new GC();
+    auto gc = std::make_unique<GC>();
     std::cout << "In main()" << std::endl;
 }

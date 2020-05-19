@@ -53,7 +53,12 @@
 23. Scaling the Go page allocator (about bitmaps): https://go.googlesource.com/proposal/+/refs/changes/57/202857/2/design/35112-scaling-the-page-allocator.md
 24. Mark-compact alggorithm description: https://en.wikipedia.org/wiki/Mark-compact_algorithm
 25. About heap-compaction: https://stackoverflow.com/questions/2663292/how-does-heap-compaction-work-quickly
-26. About mozilla spidermonkey GC: https://hacks.mozilla.org/2015/07/compacting-garbage-collection-in-spidermonkey/
+26. About mozilla's spidermonkey compacting GC: https://hacks.mozilla.org/2015/07/compacting-garbage-collection-in-spidermonkey/
+27. Info about GC's: https://plumbr.io/handbook/what-is-garbage-collection
+28. Detailed description of mark-compact: https://stackoverflow.com/questions/59044616/whats-the-mark-compact-algorithm-used-by-hotspot
+29. Amazing presentation about mark-compact: http://www.cs.tau.ac.il/~maon/teaching/2014-2015/seminar/seminar1415a-lec2-mark-sweep-mark-compact.pdf
+30. c++ profiler: https://github.com/yse/easy_profiler
+31. custom c++ profiler: https://www.youtube.com/watch?v=xlAH4dbMVnU&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb&index=81
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
@@ -65,6 +70,7 @@
 8. Configure VScode to debug cmake projects: https://medium.com/audelabs/c-development-using-visual-studio-code-cmake-and-lldb-d0f13d38c563
 9. c++ best practices: https://lefticus.gitbooks.io/cpp-best-practices/03-Style.html
 10. c++ core guidelines: https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md 
+11. c++ guide: https://www.youtube.com/watch?v=18c3MTX0PK0&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb
 ---
 1. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
 2. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
