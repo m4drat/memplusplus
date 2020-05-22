@@ -12,21 +12,58 @@
 ```c++
 auto rawPtr = MemoryManager::Allocate(sizeof(UserData));
 // ============================ {
+    constexpr ARENA_SIZE = 16mb;
+    
+    class MemoryManager
+    {
+    private:
+        ...
+    public:
+        static std::vector<Arena*> g_ArenaList; // sorted by addresses list
+        ...
+    }
+
+    struct Chunk
+    {
+        ...
+    }
+
+    struct Arena
+    {
+        ...
+
+        std::vector<Chunk*> ChunkList; // sorted by addresses list
+
+        void* begin{ nullptr };
+        void* end{ nullptr };
+
+        auto Init() -> void;
+        auto GetChunk(std::size_t) -> Chunk*;
+
+        ...
+    };
+
     auto MemoryManager::Allocate(std::size_t size) -> void* 
     {
-        constexpr ARENA_SIZE = 16mb;
-        if (size > ARENA_SIZE) {
-            Arena = mmap(size)
-            chunk = (Chunk*)
+        if (size > ARENA_SIZE) 
+        {
+            Arena newArena = (Arena*)mmap(size + sizeof(ArenaMetadata));
+            newArena->Init();
+            Chunk* chunk = newArena->GetChunk(size);
+            // Add info about chunk to ChunkList;
+            return static_cast<void*>(chunk+sizeof(ChunkMetadata));
         }
-        if (Юзер выделяет size байтов в первый раз)
-            Выделение памяти под Arena - глобальный блок - mmap(NULL, ARENA_SIZE)
-            инициализация std::vector<Arena_t*> g_ArenaList // sorted list
-            инициализация std::vector<Chunk_t*> g_ChunkList // sorted list
-            Добавить в MemoryManager::g_ArenaList информацию о созданной арене: Arena.begin, Arena.end
-        Выделить память под Chunk размера N+метадата из свободной арены: MemoryManager::GetArenaWithAtLeastNFreeBytes()
-        Добавить в MemoryManager::g_ChunkList информацию о созданном чанке: Chunk.begin
-        Вернуть указатель на начало Chunk+sizeof(метадата)
+        if (First allocation)
+        {
+            InitEverythingThatWeNeed();
+            Arena newArena = (Arena*)mmap(size + sizeof(ArenaMetadata));
+            newArena->Init();
+            g_ArenaList.push_back(newArena);
+        }
+        Arena* foundArena = GetArenaWithAtLeastNFreeBytes(size);
+        Chunk* chunk = foundArena->GetChunk(size);
+        GetCorrespondingArena(chunk)->ChunkList.push_back(chunk);
+        return static_cast<void*>(chunk+sizeof(ChunkMetadata));
     }
 // } ============================
 
