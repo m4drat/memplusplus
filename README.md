@@ -113,7 +113,9 @@ GC::collect();
                 graph.deleteNode(chunk)
             else
                 chunk.markBit = 0
-            
+// } ========================================================
+
+// ======================================================== {
         // easy compact
         for(chunk : MemoryManager::g_ChunkList)
             MoveChunkToTheLeftSide(chunk)
@@ -121,6 +123,8 @@ GC::collect();
                 if chunk.start <= gcPtr <= chunk.end
                     UpdateSmartPointer(chunk)
 // } ========================================================
+
+OR
 
 // ======================================================== {
     // Smart compact
