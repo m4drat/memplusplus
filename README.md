@@ -10,7 +10,7 @@
 
 ### Псевдокод алгоритма:
 ```c++
-auto rawPtr = MemoryManager::Allocate(sizeof(UserData));
+auto rawPtr = MemoryAllocator::Allocate(sizeof(UserData));
 // ======================================================== {
     constexpr ARENA_SIZE = 16mb;
     
@@ -22,7 +22,16 @@ auto rawPtr = MemoryManager::Allocate(sizeof(UserData));
         static std::vector<Arena*> g_ArenaList; // sorted by addresses list
         ...
     }
-
+    
+    class MemoryAllocator : public MemoryManager
+    {
+    private:
+        ...
+    public:
+        auto Allocate(std::size_t) -> void*;
+        ...
+    }
+    
     struct Chunk
     {
         ...
