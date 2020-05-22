@@ -8,6 +8,107 @@
 5. clang-tidy - linting tool
 6. catch2 - unit-testing
 
+### Псевдокод алгоритма:
+```c++
+auto rawPtr = MemoryManager::Allocate(sizeof(UserData));
+// ============================ {
+    auto MemoryManager::Allocate(std::size_t size) -> void* 
+    {
+        constexpr ARENA_SIZE = 16mb;
+        if (size > ARENA_SIZE) {
+            Arena = mmap(size)
+            chunk = (Chunk*)
+        }
+        if (Юзер выделяет size байтов в первый раз)
+            Выделение памяти под Arena - глобальный блок - mmap(NULL, ARENA_SIZE)
+            инициализация std::vector<Arena_t*> g_ArenaList // sorted list
+            инициализация std::vector<Chunk_t*> g_ChunkList // sorted list
+            Добавить в MemoryManager::g_ArenaList информацию о созданной арене: Arena.begin, Arena.end
+        Выделить память под Chunk размера N+метадата из свободной арены: MemoryManager::GetArenaWithAtLeastNFreeBytes()
+        Добавить в MemoryManager::g_ChunkList информацию о созданном чанке: Chunk.begin
+        Вернуть указатель на начало Chunk+sizeof(метадата)
+    }
+// } ============================
+
+GcPtr<UserData> smartPtr = GcPtr<UserData>(rawPtr);
+// ============================ {
+    template <class T>
+    GcPtr(T rawPtr) :
+        m_ptrToObj{ rawPtr }
+    {
+        std::vector<GcPtr*>gcPtrs.push_back(this) // sorted list
+        // мы всегда будем знать к какому чанку относится указатель, даже если он сдвинут, т.к. g_ChunkList
+        rawPtr->T() // Вызвать конструкто юзер объекта
+        Вернуть умный указатель на объект юзеру
+    }
+// } ============================
+
+smartPtr->~GcPtr(); // Destructor gets called
+// ============================ {
+    template <class T>
+    ~GcPtr()
+    {
+        std::vector<GcPtr*>gcPtrs.pop(this); // Удаляем себя из вектора GcPtrs 
+        m_ptrToObj->~T() // Вызываем деструктор объекта
+    }
+// } ============================
+
+
+GC::collect()
+// ============================ {
+    static auto GC::collect() -> void
+    {
+        Graph graph = new Graph();
+        // mark
+        for (gcPtr : gcPtrs)
+            correspondingChunk = MemoryManager::FindChunk(gcPtr.ptrToData)
+            markObject(correspondingChunk)
+            graph.AddInfoAboutGraph(correspondingChunk)
+            /** Как проверять, что указатель в чанке указывает 
+             * 1. Ptr in Heap Range 
+             * 2. Ptr in GcPtrs
+             */ 
+
+        // sweep
+        for(chunk : MemoryManager::g_ChunkList)
+            if (chunk.markBit != 1)
+                MemoryManager::g_ChunkList.pop(chunk)
+                graph.deleteNode(chunk)
+            else
+                chunk.markBit = 0
+            
+        // easy compact
+        for(chunk : MemoryManager::g_ChunkList)
+            MoveChunkToTheLeftSide(chunk)
+            for(gcPtr : GcPtrs)
+                if chunk.start <= gcPtr <= chunk.end
+                    UpdateSmartPointer(chunk)
+// } ============================
+
+// ============================ {
+    // Smart compact
+    // Группы объектов, например LinkedList
+        std::vector<Group> groups = Heuristics::FindStructures(graph)
+        for(group : groups) 
+        {
+            switch (group)
+            {
+                case Structures::LinkedList:
+                    SmartMoveChunksToTheLeftSideAndUpdatePtrs(group);
+                    break;
+                case Structures::BinaryTree:
+                    SmartMoveChunksToTheLeftSideAndUpdatePtrs(group);
+                    break;
+                case ...:
+                    for (chunk : group)
+                        MoveChunkToTheLeftSideAndUpdatePtrs(chunk)
+                    break;
+            }
+        }
+    }
+// } ============================
+```
+
 ### Этапы разработки:
 1. Основные структуры (chunk, arena) + Документация!
 2. Системный аллокатор (враппер над mmap)
@@ -59,6 +160,7 @@
 29. Amazing presentation about mark-compact: http://www.cs.tau.ac.il/~maon/teaching/2014-2015/seminar/seminar1415a-lec2-mark-sweep-mark-compact.pdf
 30. c++ profiler: https://github.com/yse/easy_profiler
 31. custom c++ profiler: https://www.youtube.com/watch?v=xlAH4dbMVnU&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb&index=81
+32. c++ GC: http://www.devx.com/assets/sourcecode/9928.pdf
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
@@ -85,3 +187,7 @@
 7. groups (3): https://breathe.readthedocs.io/en/latest/groups.html
 8. lists (4): https://breathe.readthedocs.io/en/latest/lists.html
 9. __Breathe Full documentation__: https://readthedocs.org/projects/breathe/downloads/pdf/latest/
+10. How to document using doxygen: https://developer.lsst.io/cpp/api-docs.html
+11. Doxygen examples: https://caiorss.github.io/C-Cpp-Notes/Doxygen-documentation.html
+12. Doxygen manual: http://www.doxygen.nl/manual/docblocks.html#specialblock
+13. __Doxygen doc-comment quick intro__: https://github.com/stan-dev/stan/wiki/How-to-Write-Doxygen-Doc-Comments
