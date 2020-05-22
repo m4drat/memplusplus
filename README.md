@@ -11,7 +11,7 @@
 ### Псевдокод алгоритма:
 ```c++
 auto rawPtr = MemoryManager::Allocate(sizeof(UserData));
-// ============================ {
+// ======================================================== {
     constexpr ARENA_SIZE = 16mb;
     
     class MemoryManager
@@ -65,10 +65,10 @@ auto rawPtr = MemoryManager::Allocate(sizeof(UserData));
         GetCorrespondingArena(chunk)->ChunkList.push_back(chunk);
         return static_cast<void*>(chunk+sizeof(ChunkMetadata));
     }
-// } ============================
+// } ========================================================
 
 GcPtr<UserData> smartPtr = GcPtr<UserData>(rawPtr);
-// ============================ {
+// ======================================================== {
     template <class T>
     GcPtr(T rawPtr) :
         m_ptrToObj{ rawPtr }
@@ -78,21 +78,21 @@ GcPtr<UserData> smartPtr = GcPtr<UserData>(rawPtr);
         rawPtr->T() // Вызвать конструкто юзер объекта
         Вернуть умный указатель на объект юзеру
     }
-// } ============================
+// } ========================================================
 
 smartPtr->~GcPtr(); // Destructor gets called
-// ============================ {
+// ======================================================== {
     template <class T>
     ~GcPtr()
     {
         std::vector<GcPtr*>gcPtrs.pop(this); // Удаляем себя из вектора GcPtrs 
         m_ptrToObj->~T() // Вызываем деструктор объекта
     }
-// } ============================
+// } ========================================================
 
 
-GC::collect()
-// ============================ {
+GC::collect();
+// ======================================================== {
     static auto GC::collect() -> void
     {
         Graph graph = new Graph();
@@ -120,9 +120,9 @@ GC::collect()
             for(gcPtr : GcPtrs)
                 if chunk.start <= gcPtr <= chunk.end
                     UpdateSmartPointer(chunk)
-// } ============================
+// } ========================================================
 
-// ============================ {
+// ======================================================== {
     // Smart compact
     // Группы объектов, например LinkedList
         std::vector<Group> groups = Heuristics::FindStructures(graph)
@@ -143,7 +143,7 @@ GC::collect()
             }
         }
     }
-// } ============================
+// } ========================================================
 ```
 
 ### Этапы разработки:
