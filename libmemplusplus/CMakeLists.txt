@@ -2,7 +2,7 @@ project(mpp)
 
 add_library(${PROJECT_NAME} 
 	src/mpp.cpp
-	src/memorymanager.cpp
+	src/memallocator.cpp
 )
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 
