@@ -1,7 +1,8 @@
 project(mpp)
 
-add_library(${PROJECT_NAME} 	
+add_library(${PROJECT_NAME} 
 	src/gcptr.cpp
+	src/memallocator.cpp
 )
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 
