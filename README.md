@@ -220,10 +220,11 @@ OR
 26. About mozilla's spidermonkey compacting GC: https://hacks.mozilla.org/2015/07/compacting-garbage-collection-in-spidermonkey/
 27. Info about GC's: https://plumbr.io/handbook/what-is-garbage-collection
 28. Detailed description of mark-compact: https://stackoverflow.com/questions/59044616/whats-the-mark-compact-algorithm-used-by-hotspot
-29. Amazing presentation about mark-compact: http://www.cs.tau.ac.il/~maon/teaching/2014-2015/seminar/seminar1415a-lec2-mark-sweep-mark-compact.pdf
+29. __Amazing presentation about mark-compact__: http://www.cs.tau.ac.il/~maon/teaching/2014-2015/seminar/seminar1415a-lec2-mark-sweep-mark-compact.pdf
 30. c++ profiler: https://github.com/yse/easy_profiler
 31. custom c++ profiler: https://www.youtube.com/watch?v=xlAH4dbMVnU&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb&index=81
-32. c++ GC: http://www.devx.com/assets/sourcecode/9928.pdf
+32. __c++ GC__: http://www.devx.com/assets/sourcecode/9928.pdf
+33. __Compacting garbage collector implementation in C++0x__: https://stackoverflow.com/questions/4558473/compacting-garbage-collector-implementation-in-c0x
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
