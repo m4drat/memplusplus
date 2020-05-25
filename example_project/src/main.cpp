@@ -1,10 +1,13 @@
 #include <iostream>
-#include <memory>
 
-//#include "mpplib/mpp.hpp"
+#include "mpplib/gcptr.hpp"
 
-auto main() -> int
+int main(int argc, char* argv[])
 {
     // auto gc = std::make_unique<GC>();
-    // std::cout << "In main()" << std::endl;
+    std::cout << "In main()" << std::endl;
+    std::cout << "In main()" << std::endl;
+    std::cout << "In main()" << std::endl;
+    std::cout << "In main()" << std::endl;
+    return 0;
 }

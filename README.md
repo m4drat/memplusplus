@@ -225,6 +225,7 @@ OR
 31. custom c++ profiler: https://www.youtube.com/watch?v=xlAH4dbMVnU&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb&index=81
 32. __c++ GC__: http://www.devx.com/assets/sourcecode/9928.pdf
 33. __Compacting garbage collector implementation in C++0x__: https://stackoverflow.com/questions/4558473/compacting-garbage-collector-implementation-in-c0x
+34. Example allocators: https://github.com/tiagovcosta/aquaengine/tree/master/AquaEngine/Core/Allocators
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY

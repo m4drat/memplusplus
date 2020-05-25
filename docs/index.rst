@@ -18,9 +18,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-
-Docs
-====
-
-.. doxygenclass:: GC
-   :members:
