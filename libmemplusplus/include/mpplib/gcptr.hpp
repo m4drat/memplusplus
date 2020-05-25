@@ -1,10 +1,9 @@
 #pragma once
 
-namespace mpp
-{
-    class GcPtr 
+namespace mpp {
+    class GcPtr
     {
-        public:
-        private:
+    public:
+    private:
     };
 }
