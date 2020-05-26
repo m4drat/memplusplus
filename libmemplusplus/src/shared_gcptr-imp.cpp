@@ -8,6 +8,7 @@ namespace mpp {
     template<class T, class... Args>
     SharedGcPtr<T> MakeSharedGcPtr(Args&&... args)
     {
+        // TODO
         return SharedGcPtr<T>();
     }
 }
