@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g2")
+# I dont know why, but without this flags (even if I specify debug build) 
+# Cmake doesn't set -g2 flag, so I can't debug executables
+set(CMAKE_C_FLAGS_DEBUG "-g2 -DDEBUG")
+set(CMAKE_CXX_FLAGS_DEBUG "-g2 -DDEBUG")
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries/lib)

@@ -1,7 +1,5 @@
 #include <iostream>
 
-#include "mpplib/gcptr.hpp"
-
 int main(int argc, char* argv[])
 {
     // auto gc = std::make_unique<GC>();
