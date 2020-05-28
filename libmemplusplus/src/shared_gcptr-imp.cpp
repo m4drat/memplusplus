@@ -2,8 +2,8 @@
 
 #include "mpplib/shared_gcptr.hpp"
 
-#include <type_traits>
 #include <iostream>
+#include <type_traits>
 
 namespace mpp {
     template<class T, class... Args>
