@@ -14,12 +14,16 @@ namespace mpp {
         uint32_t* m_references{ nullptr };
 
     public:
-        SharedGcPtr(Type* obj = nullptr)
+        explicit SharedGcPtr(Type* obj)
         try : m_objectPtr {
             obj
         }
-        , m_references{ new uint32_t(obj != nullptr) }
+        , m_references{ new uint32_t(1) }
         {
+#ifdef DEBUG
+            std::cout << "[SharedGcPtr] Ptr created! References: "
+                      << *m_references << std::endl;
+#endif
             // TODO: add current GcPtr eto vector with GcPtrs
         }
         catch (...)
@@ -31,22 +35,6 @@ namespace mpp {
                 m_objectPtr->~Type();
 
             throw;
-        }
-
-        // Define copy constructor
-        SharedGcPtr(const SharedGcPtr<Type>& another)
-            : m_objectPtr{ another.m_objectPtr }
-            , m_references{ another.m_references }
-        {
-            if (m_references) {
-                ++(*m_references);
-
-#ifdef DEBUG
-                std::cout << "[SharedGcPtr] Ptr copied! References: "
-                          << *m_references << std::endl;
-#endif
-                // TODO: add copied GcPtr to vector with GcPtrs
-            }
         }
 
         ~SharedGcPtr()
@@ -71,6 +59,22 @@ namespace mpp {
                     m_references = nullptr;
                     m_objectPtr = nullptr;
                 }
+            }
+        }
+
+        // Define copy constructor
+        SharedGcPtr(const SharedGcPtr<Type>& another)
+            : m_objectPtr{ another.m_objectPtr }
+            , m_references{ another.m_references }
+        {
+            if (m_references) {
+                ++(*m_references);
+
+#ifdef DEBUG
+                std::cout << "[SharedGcPtr] Ptr copied! References: "
+                          << *m_references << std::endl;
+#endif
+                // TODO: add copied GcPtr to vector with GcPtrs
             }
         }
 
@@ -103,7 +107,6 @@ namespace mpp {
         Type& operator*() const { return *m_objectPtr; }
 
         Type* get() const { return m_objectPtr; }
-        explicit operator bool() const { return m_objectPtr; }
 
         uint32_t UseCount() { return *m_references; }
     };
