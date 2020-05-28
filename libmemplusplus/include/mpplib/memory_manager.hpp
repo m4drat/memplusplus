@@ -10,6 +10,6 @@ namespace mpp {
     private:
         /* data */
     public:
-        static std::vector<Arena*> s_ArenaList; 
+        static std::vector<Arena*> s_ArenaList;
     };
 }
