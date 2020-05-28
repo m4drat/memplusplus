@@ -4,7 +4,9 @@ project(unit_tests)
 add_subdirectory(3rd_party/catch2)
 
 # Add a testing executable
-add_executable(unit_tests unit_tests.cpp)
+add_executable(unit_tests 
+    shared_gcptr_tests.cpp
+)
 
 target_link_libraries(${PROJECT_NAME}
     lib::mpp

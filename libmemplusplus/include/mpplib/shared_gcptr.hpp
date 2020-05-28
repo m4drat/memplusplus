@@ -14,7 +14,7 @@ namespace mpp {
         uint32_t* m_references{ nullptr };
 
     public:
-        explicit SharedGcPtr(Type* obj)
+        explicit SharedGcPtr(Type* obj = nullptr)
         try : m_objectPtr {
             obj
         }
@@ -41,12 +41,10 @@ namespace mpp {
         {
             if (m_references) {
                 --(*m_references);
-
 #ifdef DEBUG
                 std::cout << "[SharedGcPtr] Ptr destroyed! References: "
                           << *m_references << std::endl;
 #endif
-
                 // Destroy shared ptr and object
                 if (*m_references == 0) {
                     delete m_references;

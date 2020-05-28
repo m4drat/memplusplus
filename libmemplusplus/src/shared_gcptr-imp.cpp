@@ -10,6 +10,7 @@ namespace mpp {
     SharedGcPtr<T> MakeSharedGcPtr(Args&&... args)
     {
         // TODO
+        // return new (malloc(sizeof(T))) T(std::forward<Args>(args)...);
         return SharedGcPtr<T>();
     }
 }
