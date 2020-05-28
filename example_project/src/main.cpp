@@ -36,11 +36,14 @@ int main(int argc, char* argv[])
 
     // mpp::SharedGcPtr<UserData> ptr6(ptr3);
 
-    UserData* rawPtr = new UserData(1337);
-    mpp::SharedGcPtr<UserData> ptr7(rawPtr);
-    ptr7 = rawPtr;
+    mpp::SharedGcPtr<char> ptr7(nullptr);
+    ptr7 = new char[20];
 
-    foo(ptr7);
+    // if (true) {
+    //     ptr7 = new UserData(1337);
+    // } else {
+    //     ptr7 = new UserData(1337);
+    // }
 
     return 0;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cmath>
 #include "mpplib/memory_manager.hpp"
+#include <cmath>
 
 namespace mpp {
 
