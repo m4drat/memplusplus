@@ -2,7 +2,7 @@ project(mpp)
 
 add_library(${PROJECT_NAME} 
 	src/shared_gcptr.cpp
-	src/memallocator.cpp
+	src/memory_allocator.cpp
 )
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 
