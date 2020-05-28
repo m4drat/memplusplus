@@ -4,14 +4,15 @@
 #include <vector>
 
 namespace mpp {
-
     struct Arena
     {
-        std::vector<ChunkPrototype::Chunk*> chunkList;
+        std::vector<Chunk*> chunksInUse;
         std::size_t size{ 0 };
         std::size_t freeSpace{ 0 };
+        std::size_t maxAvailableChunkSize{ 0 };
         void* begin{ nullptr };
         void* end{ nullptr };
+
         Arena(std::size_t t_size, void* t_begin, void* t_end)
         {
             size = t_size;
@@ -19,6 +20,8 @@ namespace mpp {
             begin = t_begin;
             end = t_end;
         };
-    };
 
+        Chunk* AllocateChunk(std::size_t t_chunkSize);
+        void DeAllocateChunk(Chunk* t_chunk);
+    };
 }

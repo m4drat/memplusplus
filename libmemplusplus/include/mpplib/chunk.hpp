@@ -2,24 +2,26 @@
 
 namespace mpp {
 
-    class ChunkPrototype
+    struct Chunk
     {
-    public:
-        struct Chunk
+        struct ChunkHeader_t
         {
             unsigned int chunkHeader;
-        };
+        } ChunkHeader;
 
-        bool GetSize(Chunk* chunk) { return (chunk->chunkHeader >> 4) << 4; };
+        bool GetSize(Chunk* chunk) 
+        { 
+            return (chunk->ChunkHeader.chunkHeader >> 4) << 4; 
+        };
 
         void* GetUserData(Chunk* chunk)
         {
-            return chunk + sizeof(Chunk::chunkHeader);
+            return chunk + sizeof(Chunk::ChunkHeader);
         };
 
         bool IsUsed(Chunk* chunk)
         {
-            return (chunk->chunkHeader & 0b1111) >> 3;
+            return (chunk->ChunkHeader.chunkHeader & 0b1111) >> 3;
         };
     };
 
