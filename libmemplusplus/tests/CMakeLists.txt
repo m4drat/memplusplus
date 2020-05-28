@@ -5,6 +5,7 @@ add_subdirectory(3rd_party/catch2)
 
 # Add a testing executable
 add_executable(unit_tests 
+    test_main.cpp
     shared_gcptr_tests.cpp
 )
 

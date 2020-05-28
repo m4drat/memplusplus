@@ -109,6 +109,7 @@ namespace mpp {
         uint32_t UseCount() { return *m_references; }
     };
 
+    // TODO
     template<class T, class... Args>
     SharedGcPtr<T> MakeSharedGcPtr(Args&&... args);
 };

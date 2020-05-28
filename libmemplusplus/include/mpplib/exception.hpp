@@ -1,6 +1,7 @@
 #pragma once
 
-#include <exeption>
+#include <exception>
+#include <string>
 
 namespace mpp {
     class Exception : public std::exception
@@ -17,7 +18,7 @@ namespace mpp {
         {
             return m_msg.c_str();
         }
-    }
+    };
 
     class NoMemoryException : public Exception
     {
@@ -31,5 +32,5 @@ namespace mpp {
         {
             return m_msg.c_str();
         }
-    }
+    };
 }

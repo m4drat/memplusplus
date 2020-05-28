@@ -1,4 +1,4 @@
-#include "main_config.hpp"
+#include "catch2/catch.hpp"
 #include "mpplib/shared_gcptr.hpp"
 
 TEST_CASE("Nullptr references")

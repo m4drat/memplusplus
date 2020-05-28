@@ -4,7 +4,7 @@
 
 namespace mpp {
 
-    size_t MemoryAllocator::Align(std::size_t t_size, int t_allignment)
+    std::size_t MemoryAllocator::Align(std::size_t t_size, int t_allignment)
     {
         return t_size + (t_allignment - (t_size % t_allignment));
     };
@@ -12,14 +12,15 @@ namespace mpp {
     void* MemoryAllocator::SysAlloc(std::size_t t_size)
     {
         void* rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, 0, 0);
-        if (rawPtr == -1)
+        if (rawPtr == MAP_FAILED)
         { 
             throw NoMemoryException();
         }
         return rawPtr;
     };
 
-    void MemoryAllocator::SysDealloc(void* ptr)
+    // TODO
+    void MemoryAllocator::SysDealloc(const std::pair<void* ptr, std::size_t>& page)
     {
 
     };
@@ -34,16 +35,17 @@ namespace mpp {
         return arena;
     }
 
+    // TODO
     Arena* MemoryAllocator::GetSuitableArena(std::size_t t_realSize)
-    {   ///////////////////////////////////////
+    {   ////////////////////////////GetSuit///////////
         //               WARNING             //
         ///////////////////////////////////////
         for (auto* arena : s_ArenaList) 
         {
-            if (arena->freeSpace >= t_realSize)
+            if (arena->rightSpace >= t_realSize || arena->maxBetweenSpace >= t_realSize)
             {
-                return arena
-            }
+                return arena;
+            };
         }
         return nullptr;
         ////////////////////////////////////////
@@ -79,8 +81,9 @@ namespace mpp {
         return (arena->AllocateChunk(realChunkSize) + sizeof(Chunk::ChunkHeader));
     };
     
-    void MemoryAllocator::Deallocate(void* chunkPtr)
+    // TODO
+    void MemoryAllocator::Deallocate(void* t_chunkPtr)
     {
-        // unsigned int ChunkSize  
+        
     }
 }
