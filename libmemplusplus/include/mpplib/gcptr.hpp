@@ -13,5 +13,5 @@ namespace mpp {
     {
     public:
         virtual ~GcPtr(){};
-    }
+    };
 }

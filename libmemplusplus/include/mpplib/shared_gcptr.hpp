@@ -2,8 +2,6 @@
 
 #include "mpplib/gcptr.hpp"
 
-#include <type_traits>
-
 namespace mpp {
     template<class Type>
     class SharedGcPtr : public GcPtr
@@ -13,9 +11,8 @@ namespace mpp {
         unsigned int* m_references{ nullptr };
 
     public:
-
         // Define explicit constructor 
-        explicit SharedGcPtr(Type* obj)
+        explicit SharedGcPtr(Type* obj = nullptr)
         try {
             : m_objectPtr(obj)
             , m_references(new int(1))
@@ -47,13 +44,44 @@ namespace mpp {
         }
 
         // Define copy constructor
-        SharedGcPtr(SharedGcPtr const& another)
+        SharedGcPtr(const SharedGcPtr<T>& another)
             : m_objectPtr{ another.m_objectPtr }
             , m_references{ another.m_references }
         {
             ++(*m_references);
             // TODO: add copied GcPtr to vector with GcPtrs
         }
+
+        SharedGcPtr<T>& operator=(SharedGcPtr other)
+        {
+            other.swap(*this);
+            return *this;
+        }
+
+        SharedGcPtr<T>& operator=(SharedGcPtr &&other) noexcept
+        {
+            swap(other);
+            return *this;
+        }
+
+        SharedGcPtr<T>& operator=(T* newData)
+        {
+            SharedGcPtr tmp(newData);
+            tmp.swap(*this);
+            return *this;
+        }
+
+        void swap(SharedGcPtr& other) noexcept
+        {
+            std::swap(m_objectPtr,  other.m_objectPtr);
+            std::swap(m_references, other.m_references);
+        }
+
+        T* operator->() const { return data; }
+        T& operator*()  const { return *data; }
+
+        T* get() const { return data; }
+        explicit operator bool() const { return data; }
     };
 
     template<class T, class... Args>
