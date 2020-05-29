@@ -24,10 +24,21 @@ namespace mpp {
     class NoMemoryException : public Exception
     {
     private:
-        std::string errorMessage{ "no memory avaliable" };
+        std::string errorMessage{ "No memory avaliable" };
 
     public:
         NoMemoryException()
+            : Exception(errorMessage) 
+        {}
+    };
+
+    class UnmapMemoryException : public Exception
+    {
+    private:
+        std::string errorMessage{ "Cannot unmap memory" };
+
+    public:
+        UnmapMemoryException()
             : Exception(errorMessage) 
         {}
     };

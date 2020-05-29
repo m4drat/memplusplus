@@ -19,10 +19,14 @@ namespace mpp {
         return rawPtr;
     };
 
-    // TODO
-    void MemoryAllocator::SysDealloc(const std::pair<void*, std::size_t>& page)
+    bool MemoryAllocator::SysDealloc(void* ptr, std::size_t pageSize)
     {
+        if (bool result = munmap(ptr, pageSize) != -1)
+        {
+            throw UnmapMemoryException();
+        };
 
+        return true;
     };
 
     Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)

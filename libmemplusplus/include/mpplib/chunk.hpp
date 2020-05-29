@@ -17,10 +17,15 @@ namespace mpp {
             uint32_t chunkHeader;
         } ChunkHeader;
 
-        bool GetSize() 
+        std::size_t GetSize() 
         { 
-            return (this->ChunkHeader.chunkHeader >> 4) << 4; 
+            return (this->ChunkHeader.chunkHeader >> 4) << 4;
         };
+
+        void SetSize(std::size_t size)
+        {
+            this->ChunkHeader.chunkHeader = size;
+        }
 
         void* GetUserData()
         {

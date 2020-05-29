@@ -1,49 +1,36 @@
 #include <iostream>
 
 #include "mpplib/shared_gcptr.hpp"
-
-class UserData
-{
-private:
-    int m_data;
-
-public:
-    UserData(int data)
-        : m_data{ data }
-    {
-        std::cout << "UserData()" << std::endl;
-    };
-
-    ~UserData() { std::cout << "~UserData()" << std::endl; };
-
-    void PrintData() { std::cout << m_data << std::endl; }
-};
-
-void foo(mpp::SharedGcPtr<UserData>& data)
-{
-    std::cout << data.UseCount() << std::endl;
-}
+#include "mpplib/containers/chunk_treap.hpp"
 
 int main(int argc, char* argv[])
 {
-    // mpp::SharedGcPtr<UserData> ptr(new UserData(1337));
-    // mpp::SharedGcPtr<UserData> ptr2(ptr);
-    // mpp::SharedGcPtr<UserData> ptr3(ptr);
-    // mpp::SharedGcPtr<UserData> ptr4(ptr3);
+    using namespace mpp;
 
-    // mpp::SharedGcPtr<UserData> ptr5(ptr);
-    // ptr4 = ptr5;
+    ChunkTreap* cTreap = new ChunkTreap();
 
-    // mpp::SharedGcPtr<UserData> ptr6(ptr3);
+    Chunk* ch1 = (Chunk*)malloc(128);
+    Chunk* ch2 = (Chunk*)malloc(128);
+    Chunk* ch3 = (Chunk*)malloc(128);
+    Chunk* ch4 = (Chunk*)malloc(128);
+    Chunk* ch5 = (Chunk*)malloc(128);
+    Chunk* ch6 = (Chunk*)malloc(128);
+    Chunk* ch7 = (Chunk*)malloc(128);
+    Chunk* ch8 = (Chunk*)malloc(128);
+    Chunk* ch9 = (Chunk*)malloc(128);
+    
+    ch1->SetSize(16);
+    std::cout << ch1 << std::endl;
+    ch2->SetSize(16);
 
-    mpp::SharedGcPtr<char> ptr7(nullptr);
-    ptr7 = new char[20];
+    cTreap->InsertChunk(ch1);
+    cTreap->InsertChunk(ch2);
 
-    // if (true) {
-    //     ptr7 = new UserData(1337);
-    // } else {
-    //     ptr7 = new UserData(1337);
-    // }
+    // Print(cTreap->GetRoot());
+
+    cTreap->RemoveChunk(ch1);
+
+    // Print(cTreap->GetRoot());
 
     return 0;
 }

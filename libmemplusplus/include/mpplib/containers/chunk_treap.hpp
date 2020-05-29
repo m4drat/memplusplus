@@ -3,9 +3,12 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/node.hpp"
 
+#include <iostream>
+
 namespace mpp {
     class ChunkTreap final
     {
+    public:
         // default constructor
         ChunkTreap();
         
@@ -21,20 +24,15 @@ namespace mpp {
         Chunk* MinSizeChunk() const;
         Chunk* MaxSizeChunk() const;
 
-        // TODO
-        template<class... Args>
-        void EmplaceElement(Args&&... t_arguments);
+        // template<class... Args>
+        // void EmplaceChunk(Args&&... t_arguments);
 
-        // TODO
-        void InsertElement(const NumberType& t_element);
-        // TODO
-        void InsertElement(NumberType&& t_element);
+        void InsertChunk(Chunk* t_chunk);
+        // void InsertChunk(NumberType&& t_element);
 
-        void RemoveElement(const NumberType& t_element);
+        void RemoveChunk(Chunk* t_chunk);
 
-        const NumberType& FirstGreaterOrEqualThan(const NumberType& t_element) const;
-
-        bool HasElement(const NumberType& t_element) const;
+        Chunk* FirstGreaterOrEqualThan(std::size_t t_desiredChunkSize) const;
 
     private:
         Node* m_root;
@@ -48,7 +46,7 @@ namespace mpp {
             Node* t_root,
             Node*& t_left,
             Node*& t_right,
-            const NumberType& t_element
+            Chunk* t_chunk
         );
     };
 
@@ -111,46 +109,51 @@ namespace mpp {
         return currentNode->chunk;
     }
 
-    template<class... Args>
-    void ChunkTreap::EmplaceElement(Args&&... t_args) {
-        InsertNode(new Node(std::forward<ArgumentTypes>(t_args)...));
-    }
-
-    void ChunkTreap::InsertElement(Chunk* t_chunk) {
+    void ChunkTreap::InsertChunk(Chunk* t_chunk) {
         InsertNode(new Node(t_chunk));
-    }
-
-    void ChunkTreap::InsertElement(Chunk&& t_chunk) {
-        InsertNode(new Node(std::move(t_chunk)));
     }
 
     void ChunkTreap::InsertNode(Node* t_node) {
         Node* leftSubtree = nullptr;
         Node* rightSubtree = nullptr;
 
-        SplitNodesByElement(m_root, leftSubtree, rightSubtree, t_node->element);
+        SplitNodesByElement(m_root, leftSubtree, rightSubtree, t_node->chunk);
         MergeNodes(leftSubtree, t_node, leftSubtree);
         MergeNodes(leftSubtree, rightSubtree, m_root);
     }
 
-    void ChunkTreap::RemoveElement(Chunk* t_chunk) {
+    void ChunkTreap::RemoveChunk(Chunk* t_chunk) { 
         Node* leftSubtree = nullptr;
-        Node* elementNode = nullptr;
         Node* rightSubtree = nullptr;
 
         SplitNodesByElement(m_root, leftSubtree, rightSubtree, t_chunk);
-        SplitNodesByElement(rightSubtree, elementNode, rightSubtree, t_chunk + 1);
-        MergeNodes(leftSubtree, rightSubtree, m_root);
+        
+        Node* parent = rightSubtree;
+        Node* nodeToRemove = rightSubtree;
+        for (
+            ;
+            nodeToRemove->leftChild;
+            parent = nodeToRemove, nodeToRemove = nodeToRemove->leftChild
+        );
 
-        delete elementNode;
+        if (nodeToRemove == rightSubtree)
+        {
+            rightSubtree = nodeToRemove->rightChild;
+        } else {
+            parent->leftChild = nodeToRemove->rightChild;
+        }
+        nodeToRemove->rightChild = nullptr;
+
+        delete nodeToRemove;
+
+        MergeNodes(leftSubtree, rightSubtree, m_root);
     }
 
-    // TODO
     Chunk* ChunkTreap::FirstGreaterOrEqualThan(std::size_t desiredChunkSize) const {
         Node* currentNode = m_root;
 
         while (currentNode) {
-            if (currentNode->chunk-> < desiredChunkSize) {
+            if (currentNode->chunk->GetSize() < desiredChunkSize) {
                 currentNode = currentNode->rightChild;
             } else {
                 if (currentNode->leftChild && currentNode->leftChild->chunk->GetSize() >= desiredChunkSize) {
@@ -164,39 +167,38 @@ namespace mpp {
         return nullptr;
     }
 
-    bool ChunkTreap::HasElement(const NumberType& t_element) const {
-        return FirstGreaterOrEqualThan(t_element) == t_element;
-    }
-
     void ChunkTreap::MergeNodes(Node* t_left, Node* t_right, Node*& t_root) {
         if (!t_left || !t_right) {
-            root = t_left ? t_left : t_right;
+            t_root = t_left ? t_left : t_right;
             return;
         }
 
         if (t_left->priority > t_right->priority) {
             MergeNodes(t_left->rightChild, t_right, t_left->rightChild);
-            root = t_left;
+            t_root = t_left;
         } else {
             MergeNodes(t_left, t_right->leftChild, t_right->leftChild);
-            root = t_right;
+            t_root = t_right;
         }
     }
 
     void ChunkTreap::SplitNodesByElement(Node* t_root, Node*& t_left, 
-                                         Node*& t_right, const NumberType& t_element)
+                                         Node*& t_right, Chunk* t_chunk)
     {
-        if (!root) {
-            left = right = nullptr;
+        if (!t_root) {
+            t_left = t_right = nullptr;
             return;
         }
 
-        if (root->element < element) {
-            SplitNodesByElement(root->rightChild, root->rightChild, right, element);
-            left = root;
+        if ((t_root->chunk->GetSize() < t_chunk->GetSize()) || 
+           ((t_root->chunk->GetSize() == t_chunk->GetSize()) &&
+             t_root->chunk < t_chunk)) 
+        {
+            SplitNodesByElement(t_root->rightChild, t_root->rightChild, t_right, t_chunk);
+            t_left = t_root;
         } else {
-            SplitNodesByElement(root->leftChild, left, root->leftChild, element);
-            right = root;
+            SplitNodesByElement(t_root->leftChild, t_left, t_root->leftChild, t_chunk);
+            t_right = t_root;
         }
     }
 }

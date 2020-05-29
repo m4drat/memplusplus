@@ -3,7 +3,7 @@
 
 namespace mpp {
     Chunk* Arena::AllocateChunk(std::size_t t_chunkSize)
-    {
+    {/*
         if (this->rightSpace >= t_chunkSize)
         {
             Chunk* chunk = new Chunk()
@@ -23,14 +23,14 @@ namespace mpp {
                     return chunk
                 }
             }
-        }
+        }*/
     }
 
     void Arena::DeallocateChunk(Chunk* t_chunk)
     {
-        t_chunk->SetIsUsed(t_chunk, 0);
-        // WARNING: check if it's actually work
-        this->chunksInUse.erase(t_chunk);
+        // t_chunk->SetIsUsed(t_chunk, 0);
+        // // WARNING: check if it's actually work
+        // this->chunksInUse.erase(t_chunk);
         //this->chunksInUse.erase(this->chunksInUse.begin() + this->chunksInUse.find(t_chunk));
     }
 }

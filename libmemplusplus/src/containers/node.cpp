@@ -1,3 +1,5 @@
 #include "mpplib/containers/node.hpp"
 
-namespace mpp {}
+namespace mpp {
+
+}

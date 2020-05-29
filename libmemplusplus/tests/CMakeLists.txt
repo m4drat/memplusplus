@@ -7,6 +7,7 @@ add_subdirectory(3rd_party/catch2)
 add_executable(unit_tests 
     test_main.cpp
     shared_gcptr_tests.cpp
+    chunk_treap_test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

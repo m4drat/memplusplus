@@ -1,6 +1,8 @@
 project(mpp)
 
-add_library(${PROJECT_NAME} 
+add_library(${PROJECT_NAME}
+	src/containers/chunk_treap.cpp
+	src/containers/node.cpp
 	src/shared_gcptr.cpp
 	src/memory_allocator.cpp
 	src/graph.cpp
