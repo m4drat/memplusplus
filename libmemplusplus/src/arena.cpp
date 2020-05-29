@@ -1,5 +1,3 @@
-#pragma once
-
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 
@@ -14,7 +12,7 @@ namespace mpp {
         
         //currentChunkSize = Chunk::GetSize( static_cast<Chunk*>(i) );
         size_t currentChunkSize;
-        for (int i; i < (this->end - this->rightSpace); i + currentChunkSize )
+        for (i; i < (this->end - this->rightSpace); i + currentChunkSize )
         {
             currentChunkSize = Chunk::GetSize( static_cast<Chunk*>(i) );
             if (!Chunk::IsUsed(static_cast<Chunk*>(i)))

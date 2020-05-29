@@ -4,7 +4,7 @@
 
 namespace mpp {
 
-    std::size_t MemoryAllocator::Align(std::size_t t_size, int t_allignment)
+    std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_allignment)
     {
         return t_size + (t_allignment - (t_size % t_allignment));
     };

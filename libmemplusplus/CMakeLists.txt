@@ -3,6 +3,8 @@ project(mpp)
 add_library(${PROJECT_NAME} 
 	src/shared_gcptr.cpp
 	src/memory_allocator.cpp
+	src/graph.cpp
+	src/arena.cpp
 )
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 

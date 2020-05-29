@@ -1,14 +1,14 @@
 #pragma once
 
 #include "mpplib/memory_manager.hpp"
+#include <cstdint>
 #include <cmath>
 
 namespace mpp {
-
     class MemoryAllocator : public MemoryManager
     {
     private:
-        static inline std::size_t Align(std::size_t t_size, int t_allignment);
+        static inline std::size_t Align(std::size_t t_size, int32_t t_allignment);
         static void* SysAlloc(std::size_t t_size);
         static void SysDealloc(const std::pair<void*, std::size_t>& page);
         static Arena* CreateArena(std::size_t t_arenaSize);
