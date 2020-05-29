@@ -6,10 +6,15 @@ namespace mpp {
 
     struct Chunk
     {
+
+        /**
+         * What we shoul have here?
+         * 1. InUse bit
+         * 2. Should we have pointer to the next freed chunk?
+         */
         struct ChunkHeader_t
         {
             uint32_t chunkHeader;
-            // in_use bit
         } ChunkHeader;
 
         bool GetSize(Chunk* chunk) 
@@ -31,7 +36,6 @@ namespace mpp {
         {
             if (opt) { chunk->ChunkHeader.chunkHeader |= opt << 3; }
             else     { chunk->ChunkHeader.chunkHeader &= opt << 3; }
-            
         };  
     };
 }
