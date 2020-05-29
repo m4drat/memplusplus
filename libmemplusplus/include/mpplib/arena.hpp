@@ -9,7 +9,7 @@ namespace mpp {
         /**
          * What we should use to save information about freed/in-use blocks?
          * Should we save all active blocks + all freed blocks, or we just need to save one list?
-         * Requrements dor data structure:
+         * Requrements for data structure:
          *     1. Find max element
          *     2. Fast insert/delete
          *     3. Fast exact search

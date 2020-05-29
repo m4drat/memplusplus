@@ -8,7 +8,7 @@ namespace mpp {
     {
 
         /**
-         * What we shoul have here?
+         * What we should have here?
          * 1. InUse bit
          * 2. Should we have pointer to the next freed chunk?
          */
@@ -17,25 +17,25 @@ namespace mpp {
             uint32_t chunkHeader;
         } ChunkHeader;
 
-        bool GetSize(Chunk* chunk) 
+        bool GetSize() 
         { 
-            return (chunk->ChunkHeader.chunkHeader >> 4) << 4; 
+            return (this->ChunkHeader.chunkHeader >> 4) << 4; 
         };
 
-        void* GetUserData(Chunk* chunk)
+        void* GetUserData()
         {
-            return chunk + sizeof(Chunk::ChunkHeader);
+            return this + sizeof(Chunk::ChunkHeader);
         };
 
-        bool IsUsed(Chunk* chunk)
+        bool IsUsed()
         {
-            return (chunk->ChunkHeader.chunkHeader & 0b1111) >> 3;
+            return (this->ChunkHeader.chunkHeader & 0b1111) >> 3;
         };
 
-        void SetIsUsed(Chunk* chunk, uint8_t opt)
+        void SetIsUsed(uint8_t opt)
         {
-            if (opt) { chunk->ChunkHeader.chunkHeader |= opt << 3; }
-            else     { chunk->ChunkHeader.chunkHeader &= opt << 3; }
+            if (opt) { this->ChunkHeader.chunkHeader |= opt << 3; }
+            else     { this->ChunkHeader.chunkHeader &= opt << 3; }
         };  
     };
 }
