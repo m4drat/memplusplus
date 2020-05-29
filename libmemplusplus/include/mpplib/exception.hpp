@@ -4,33 +4,31 @@
 #include <string>
 
 namespace mpp {
-    class Exception : public std::exception
+    class Exception : virtual public std::exception
     {
     private:
-        std::string m_msg;
+        std::string errorMessage;
 
     public:
         Exception(const std::string& msg)
-            : m_msg(msg)
+            : errorMessage(msg)
         {}
 
-        virtual const char* what() const noexcept override
-        {
-            return m_msg.c_str();
+        virtual ~Exception() throw () {}
+
+        virtual const char* what() const throw () {
+            return errorMessage.c_str();
         }
     };
 
     class NoMemoryException : public Exception
     {
     private:
-        std::string m_msg{ "no memory avaliable" };
+        std::string errorMessage{ "no memory avaliable" };
 
     public:
-        NoMemoryException() {}
-
-        virtual const char* what() const noexcept override
-        {
-            return m_msg.c_str();
-        }
+        NoMemoryException()
+            : Exception(errorMessage) 
+        {}
     };
 }

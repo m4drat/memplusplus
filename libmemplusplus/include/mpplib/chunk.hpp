@@ -1,14 +1,16 @@
 #pragma once
 
+#include <cstdint>
+
 namespace mpp {
 
     struct Chunk
     {
-        struct ChunkHeader
+        struct ChunkHeader_t
         {
             uint32_t chunkHeader;
             // in_use bit
-        };
+        } ChunkHeader;
 
         bool GetSize(Chunk* chunk) 
         { 
@@ -32,5 +34,4 @@ namespace mpp {
             
         };  
     };
-
 }

@@ -20,7 +20,7 @@ namespace mpp {
     };
 
     // TODO
-    void MemoryAllocator::SysDealloc(const std::pair<void* ptr, std::size_t>& page)
+    void MemoryAllocator::SysDealloc(const std::pair<void*, std::size_t>& page)
     {
 
     };
@@ -30,7 +30,7 @@ namespace mpp {
         void* arenaSpace = SysAlloc(t_arenaSize);
         Arena* arena = new Arena(t_arenaSize, 
                                     arenaSpace, 
-                                    arenaSpace + t_arenaSize);
+                                    reinterpret_cast<void*>((std::size_t)arenaSpace + t_arenaSize));
         s_ArenaList.push_back(arena);
         return arena;
     }
