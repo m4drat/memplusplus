@@ -14,24 +14,33 @@ namespace mpp {
          *     2. Fast insert/delete
          *     3. Fast exact search
          *     4. Find bigger or equal element
-         *      ===> Treap / AVL-tree
+         *      ===> Treap
          */
         std::vector<Chunk*> chunksInUse;
         std::size_t size{ 0 };
         std::size_t rightSpace{ 0 };
-        std::size_t maxBetweenSpace{ 0 };
+        //std::size_t maxBetweenSpace{ 0 };
         void* begin{ nullptr };
+        void* rightSpaceStart{ nullptr };
         void* end{ nullptr };
 
-        Arena(std::size_t t_size, void* t_begin, void* t_end)
+        Arena(std::size_t t_size, void* t_begin)//, void* t_end)
         {
             size = t_size;
-            rightSpace = t_size;
+            rightSpaceStart = t_begin;
             begin = t_begin;
-            end = t_end;
+            end = reinterpret_cast<void*>((std::size_t)t_begin + t_size);
         };
 
-        Chunk* AllocateChunk(std::size_t t_chunkSize);
+        // Find chunk in ChunkTreap (tree of freed chunks)
+        Chunk* MaxSizeChunk();
+        Chunk* GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize);
+        // Use already found chunk of suitable size, and split it if needed
+        Chunk* ReuseChunk(Chunk* t_chunk, std::size_t t_chunkSize);
+        // Just allocate from right side
+        Chunk* AllocateChunkFromRightSpace(std::size_t t_chunkSize);
+        // merge all consequently placed freed chunks
+        void MergeNeighborsChunks(Chunk* t_chunk);
         void DeallocateChunk(Chunk* t_chunk);
     };
 }

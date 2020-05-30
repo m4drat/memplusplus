@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/chunk.hpp"
 
 #include <cmath>
 #include <cstdint>
@@ -17,7 +18,7 @@ namespace mpp {
         static bool SysDealloc(void* ptr, std::size_t pageSize);
         static Arena* CreateArena(std::size_t t_arenaSize);
         static void* AllocateBigChunk(std::size_t t_userDataSize);
-        static Arena* GetSuitableArena(std::size_t t_realSize);
+        static Chunk* GetSuitableChunk(std::size_t t_realSize);
 
     public:
         static void* Allocate(std::size_t t_userDataSize);

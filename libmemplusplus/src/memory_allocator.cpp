@@ -1,5 +1,6 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/exception.hpp"
+
 #include <sys/mman.h>
 
 namespace mpp {
@@ -31,27 +32,34 @@ namespace mpp {
     Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
     {
         void* arenaSpace = SysAlloc(t_arenaSize);
-        Arena* arena = new Arena(
-          t_arenaSize,
-          arenaSpace,
-          reinterpret_cast<void*>((std::size_t)arenaSpace + t_arenaSize));
+        Arena* arena = new Arena(t_arenaSize, arenaSpace);
+          //reinterpret_cast<void*>((std::size_t)arenaSpace + t_arenaSize));
         s_ArenaList.push_back(arena);
         return arena;
     }
 
     // TODO
-    Arena* MemoryAllocator::GetSuitableArena(std::size_t t_realSize)
-    { ////////////////////////////GetSuit///////////
-        //               WARNING             //
-        ///////////////////////////////////////
+    Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
+    {
+        // If we have enough space in right space of arena
         for (auto* arena : s_ArenaList) {
-            if (arena->rightSpace >= t_realSize ||
-                arena->maxBetweenSpace >= t_realSize) {
-                return arena;
-            };
+            if (t_realSize <= ((std::size_t)(arena->end) - (std::size_t)(arena->rightSpaceStart))) {
+                return arena->AllocateChunkFromRightSpace(t_realSize);
+            }
         }
+
+        // If we cant find arena with enough right space, we will
+        // iterate through ChunkTreap to find chunk to reuse
+        for (auto* arena : s_ArenaList)
+        {
+            Chunk* chunk = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
+            if (t_realSize <= chunk->GetSize())  
+            {
+                return arena->ReuseChunk(chunk, t_realSize);
+            }  
+        }
+        
         return nullptr;
-        ////////////////////////////////////////
     }
 
     void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
@@ -59,7 +67,7 @@ namespace mpp {
         std::size_t realSize =
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_PAGE_SIZE);
         Arena* arena = CreateArena(realSize);
-        return (arena->AllocateChunk(realSize) + sizeof(Chunk::ChunkHeader));
+        return (arena->AllocateChunkFromRightSpace(realSize) + sizeof(Chunk::ChunkHeader));
     }
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
@@ -75,10 +83,9 @@ namespace mpp {
             CreateArena(g_DEFAULT_ARENA_SIZE);
         }
 
-        Arena* arena = GetSuitableArena(realChunkSize);
-        if (arena != nullptr) {
-            return (arena->AllocateChunk(realChunkSize) +
-                    sizeof(Chunk::ChunkHeader));
+        Chunk* chunk = GetSuitableChunk(realChunkSize);
+        if (chunk != nullptr) {
+            return chunk;
         }
         arena = CreateArena(g_DEFAULT_ARENA_SIZE);
         return (arena->AllocateChunk(realChunkSize) +
