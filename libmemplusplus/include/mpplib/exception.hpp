@@ -14,9 +14,11 @@ namespace mpp {
             : errorMessage(msg)
         {}
 
-        virtual ~Exception() throw () {}
+        virtual ~Exception() throw()
+        {}
 
-        virtual const char* what() const throw () {
+        virtual const char* what() const throw()
+        {
             return errorMessage.c_str();
         }
     };
@@ -28,7 +30,7 @@ namespace mpp {
 
     public:
         NoMemoryException()
-            : Exception(errorMessage) 
+            : Exception(errorMessage)
         {}
     };
 
@@ -39,7 +41,7 @@ namespace mpp {
 
     public:
         UnmapMemoryException()
-            : Exception(errorMessage) 
+            : Exception(errorMessage)
         {}
     };
 }

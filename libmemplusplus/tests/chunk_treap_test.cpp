@@ -2,6 +2,43 @@
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/chunk.hpp"
 
+TEST_CASE("Check that chunk to delete is in the middle of another chunks")
+{
+    using namespace mpp;
+    
+    ChunkTreap* cTreap = new ChunkTreap();
+
+    Chunk* ch1 = (Chunk*)malloc(128);
+    Chunk* ch2 = (Chunk*)malloc(128);
+    Chunk* ch3 = (Chunk*)malloc(128);
+
+    assert(((std::size_t)ch1 < (std::size_t)ch2) && 
+           ((std::size_t)ch2 < (std::size_t)ch3));
+
+    ch1->SetSize(16);
+    ch2->SetSize(16);
+    ch3->SetSize(16);
+
+    cTreap->InsertChunk(ch1);
+    cTreap->InsertChunk(ch2);
+    cTreap->InsertChunk(ch3);
+
+    cTreap->RemoveChunk(ch2);
+
+    if (cTreap->GetRootNode()->leftChild != nullptr)
+    {
+        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) ||
+                 (cTreap->GetRootNode()->chunk == ch3))); 
+        REQUIRE(((cTreap->GetRootNode()->leftChild->chunk == ch1) || 
+                 (cTreap->GetRootNode()->leftChild->chunk == ch3))); 
+    } else {
+        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) ||
+                 (cTreap->GetRootNode()->chunk == ch3))); 
+        REQUIRE(((cTreap->GetRootNode()->rightChild->chunk == ch1) || 
+                 (cTreap->GetRootNode()->rightChild->chunk == ch3))); 
+    }
+}
+
 TEST_CASE("Check big tree")
 {
     using namespace mpp;

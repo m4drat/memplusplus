@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "mpplib/shared_gcptr.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
+#include "mpplib/shared_gcptr.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     Chunk* ch7 = (Chunk*)malloc(128);
     Chunk* ch8 = (Chunk*)malloc(128);
     Chunk* ch9 = (Chunk*)malloc(128);
-    
+
     ch1->SetSize(16);
     std::cout << ch1 << std::endl;
     ch2->SetSize(16);
