@@ -4,6 +4,10 @@
 
 namespace mpp {
 
+    
+    /**
+     * Basic allocator structure
+     */
     struct Chunk
     {
         /*
@@ -18,8 +22,42 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         struct ChunkHeader_t
         {
-            uint32_t chunkHeader;
+            std::size_t prevChunkSize;
+            std::size_t chunkHeader;
         } ChunkHeader;
+
+        Chunk* ConstructChunk(void* t_newChunkPtr, std::size_t t_prevSize, std::size_t t_chunkSize, uint8_t t_isInUse, uint8_t t_isPrevInUse)
+        {
+            Chunk* newChunk = (Chunk*)t_newChunkPtr;
+            newChunk->SetPrevSize(t_prevSize);
+            newChunk->SetSize(t_chunkSize);
+            newChunk->SetIsUsed(t_isInUse);
+            newChunk->SetIsPrevInUse(t_isPrevInUse);
+
+            return newChunk;
+        }
+
+        Chunk* GetPrevChunk(Chunk* t_chunk)
+        {
+            // 1. Compute prev chunk pointer
+            // 2. Call IsUsed for this pointer 
+           return ((Chunk*)((std::size_t)t_chunk - t_chunk->GetPrevSize()));
+        }
+
+        Chunk* GetNextChunk(Chunk* t_chunk)
+        {
+           return (Chunk*)((std::size_t)t_chunk + t_chunk->GetSize());
+        }
+
+        std::size_t GetPrevSize()
+        {
+            return (this->ChunkHeader.prevChunkSize >> 4) << 4;
+        };
+
+        void SetPrevSize(std::size_t size)
+        {
+            this->ChunkHeader.prevChunkSize = size;
+        }
 
         std::size_t GetSize()
         {

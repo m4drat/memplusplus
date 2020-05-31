@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/chunk.hpp"
 #include <vector>
 
@@ -16,18 +17,17 @@ namespace mpp {
          *     4. Find bigger or equal element
          *      ===> Treap
          */
+        ChunkTreap freedChunks;
         std::vector<Chunk*> chunksInUse;
         std::size_t size{ 0 };
-        std::size_t rightSpace{ 0 };
-        //std::size_t maxBetweenSpace{ 0 };
+        Chunk* topChunk{ nullptr };
         void* begin{ nullptr };
-        void* rightSpaceStart{ nullptr };
         void* end{ nullptr };
 
         Arena(std::size_t t_size, void* t_begin)//, void* t_end)
         {
             size = t_size;
-            rightSpaceStart = t_begin;
+            topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
             begin = t_begin;
             end = reinterpret_cast<void*>((std::size_t)t_begin + t_size);
         };
@@ -36,11 +36,13 @@ namespace mpp {
         Chunk* MaxSizeChunk();
         Chunk* GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize);
         // Use already found chunk of suitable size, and split it if needed
-        Chunk* ReuseChunk(Chunk* t_chunk, std::size_t t_chunkSize);
+        Chunk* AllocateFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize);
         // Just allocate from right side
-        Chunk* AllocateChunkFromRightSpace(std::size_t t_chunkSize);
+        Chunk* AllocateFromTopChunk(std::size_t t_chunkSize);
         // merge all consequently placed freed chunks
         void MergeNeighborsChunks(Chunk* t_chunk);
         void DeallocateChunk(Chunk* t_chunk);
+        Chunk* SplitChunkFromFreeList(Chunk* chunk, std::size_t t_chunkSize);
+        Chunk* SplitTopChunk(std::size_t t_chunkSize);
     };
 }
