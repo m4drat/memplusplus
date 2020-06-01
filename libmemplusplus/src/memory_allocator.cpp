@@ -38,7 +38,6 @@ namespace mpp {
         return arena;
     }
 
-    // TODO
     Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
     {
         // If we have enough space in topChunk
@@ -65,7 +64,7 @@ namespace mpp {
         return nullptr;
     }
 
-    // WARNING: it doesn't work
+    // FIXME
     void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
     {
         std::size_t realSize =
