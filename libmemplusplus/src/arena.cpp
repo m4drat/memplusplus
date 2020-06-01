@@ -145,6 +145,12 @@ namespace mpp {
     // to point to new chunk
     Chunk* Arena::MergeNeighborsChunks(Chunk* t_chunk)
     {
+        /*
+        1. T
+        2. FDT
+        3. ADT
+        4. DT
+        */
         if (
             ((topChunk == nullptr) && (((void*)(std::size_t)t_chunk + t_chunk->GetSize()) == end))
             || (Chunk::GetNextChunk(t_chunk) == topChunk)
@@ -153,31 +159,39 @@ namespace mpp {
             return MergeWithTop(t_chunk);
         }
 
+        /*
+            1. DA
+            2. DF
+            3. FDA
+            4. ADF
+            5. FDF
+            6. ADA
+        */
         Chunk* newChunk{ t_chunk };
+
+        // Merge forward
         if (Chunk::GetNextChunk(t_chunk)->IsUsed() == 0)
         {
             newChunk = MergeTwoSequnceChunks(newChunk, Chunk::GetNextChunk(t_chunk));
         }
 
-        if (Chunk::GetPrevChunk(newChunk)->IsUsed() == 0)
+        // Merge backwards
+        if (((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
         {
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
         }
         
         if (newChunk != begin)
         {
-            newChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize())
-            newChunk->SetIsPrevInUse(1);
-            newChunk->SetIsUsed(0);
-            return newChunk;
+            newChunk->SetPrevSize(Chunk::GetPrevChunk(newChunk)->GetSize())
         }
         else
         {
             newChunk->SetPrevSize(0);
-            newChunk->SetIsPrevInUse(1);
-            newChunk->SetIsUsed(0);
-            return newChunk;
         }
+        Chunk::GetNextChunk(newChunk)->SetPrevIsUsed(1);
+        newChunk->SetIsPrevInUse(1);
+        newChunk->SetIsUsed(0);
 
         return newChunk;
     }
@@ -185,7 +199,7 @@ namespace mpp {
     Chunk* Arena::MergeWithTop(Chunk* t_chunk)
     {
         Chunk* newChunk{ t_chunk };
-        if (Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
+        if ( ((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
         {
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
         }
@@ -193,21 +207,18 @@ namespace mpp {
         if (topChunk == nullptr)
         {
             topChunk = newChunk;
-            if (topChunk != begin)
+            if ((void*)topChunk != begin)
             {
                 topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize())
-                topChunk->SetIsPrevInUse(1);
-                topChunk->SetIsUsed(1);
-                return topChunk;
             }
             else
             {
                 //ChunkSize is already set by MergeTwoSequnceChunks function
                 topChunk->SetPrevSize(0);
-                topChunk->SetIsPrevInUse(1);
-                topChunk->SetIsUsed(1);
             }
-            
+            topChunk->SetIsPrevInUse(1);
+            topChunk->SetIsUsed(1);
+            return topChunk;
         }
         else
         {
