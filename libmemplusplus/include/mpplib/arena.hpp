@@ -3,6 +3,7 @@
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/chunk.hpp"
 #include <vector>
+#include <set>
 
 namespace mpp {
     struct Arena
@@ -18,7 +19,10 @@ namespace mpp {
          *      ===> Treap
          */
         ChunkTreap freedChunks;
-        std::vector<Chunk*> chunksInUse;
+
+        // TODO: check if we don't need specific comparator
+        // Add 
+        std::set<Chunk*> chunksInUse;
         std::size_t size{ 0 };
         Chunk* topChunk{ nullptr };
         void* begin{ nullptr };
@@ -40,9 +44,11 @@ namespace mpp {
         // Just allocate from right side
         Chunk* AllocateFromTopChunk(std::size_t t_chunkSize);
         // merge all consequently placed freed chunks
-        void MergeNeighborsChunks(Chunk* t_chunk);
+        Chunk* MergeNeighborsChunks(Chunk* t_chunk);
         void DeallocateChunk(Chunk* t_chunk);
         Chunk* SplitChunkFromFreeList(Chunk* chunk, std::size_t t_chunkSize);
         Chunk* SplitTopChunk(std::size_t t_chunkSize);
+        Chunk* MergeTwoChunks(Chunk* t_chunk1, Chunk* t_chunk2);
+        void Arena::MergeWithTop(Chunk* t_chunk);
     };
 }

@@ -37,6 +37,16 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             return newChunk;
         }
 
+        static void* GetUserDataPtr(Chunk* t_chunk)
+        {
+            return (void*)((std::size_t)t_chunk + sizeof(Chunk::ChunkHeader))
+        }
+
+        static Chunk* GetHeaderPtr(void* t_userData)
+        {
+            return (Chunk*)((std::size_t)t_userData - sizeof(Chunk::ChunkHeader))
+        }
+
         Chunk* GetPrevChunk(Chunk* t_chunk)
         {
             // 1. Compute prev chunk pointer

@@ -71,7 +71,7 @@ namespace mpp {
         std::size_t realSize =
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_PAGE_SIZE);
         Arena* arena = CreateArena(realSize);
-        return (arena->topChunk + sizeof(Chunk::ChunkHeader));
+        return (arena->topChunk->GetUserDataPtr());
     }
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
@@ -89,7 +89,7 @@ namespace mpp {
 
         Chunk* chunk = GetSuitableChunk(realChunkSize);
         if (chunk != nullptr) {
-            return chunk;
+            return Chunk::GetUserDataPtr(chunk);
         }
         
         // arena = CreateArena(g_DEFAULT_ARENA_SIZE);
@@ -97,7 +97,17 @@ namespace mpp {
         //        sizeof(Chunk::ChunkHeader));
     };
 
-    // TODO
+    // TODO 
     void MemoryAllocator::Deallocate(void* t_chunkPtr)
-    {}
+    {
+        // Find arena, to which chunk belongs
+        for (auto* arena : s_ArenaList)
+        {
+            if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end)
+            {
+                arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
+                break;
+            }
+        }
+    }
 }

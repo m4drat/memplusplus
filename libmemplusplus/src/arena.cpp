@@ -4,17 +4,8 @@ namespace mpp {
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)
     {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
+        chunksInUse.insert(chunk);
         return chunk;
-    }
-
-    // Remember to set isPrevInUse to 1 when deallocating
-    // Also remember to check if topChunk is nullptr
-    // if it is, then we must check that deallocated chunk
-    // is top, and after merging everything, we should update topChunk
-    // to point to new chunk
-    void Arena::DeallocateChunk(Chunk* t_chunk)
-    {
-        return;
     }
 
     // WARNING
@@ -44,6 +35,7 @@ namespace mpp {
     Chunk* Arena::AllocateFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize);
     {
         Chunk* chunk = SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize);
+        chunksInUse.insert(chunk);
         return chunk;
     }
     
@@ -104,8 +96,134 @@ namespace mpp {
         }
     }
     
-    void Arena::MergeNeighborsChunks(Chunk* t_chunk)
+    // Remember to set isPrevInUse to 1 when deallocating
+    void Arena::DeallocateChunk(Chunk* t_chunk)
     {
+        // set fields
+        // merge
+        // add to chunk treap
+        // RightMostChunk
 
+        /*
+        F - freed
+        A - allocated
+        D - to deallocate
+        T - top (can be nullptr)
+
+        General case:
+            FDF
+            FDA
+            ADF
+            ADA
+        
+        Starting case:
+            DA
+            DF
+
+        Top case:
+            FDT
+            ADT
+            DT
+            T
+
+        5,6->7->10
+        
+        */
+
+        newChunk = MergeNeighborsChunks(t_chunk);
+        if (newChunk != topChunk)
+        {
+            freedChunks.InsertChunk(newChunk);
+        }
+        return;
+    }
+
+  
+    // Remember to check if topChunk is nullptr
+    // if it is, then we must check that chunk
+    // is top, and after merging everything, we should update topChunk
+    // to point to new chunk
+    Chunk* Arena::MergeNeighborsChunks(Chunk* t_chunk)
+    {
+        if (
+            ((topChunk == nullptr) && (((void*)(std::size_t)t_chunk + t_chunk->GetSize()) == end))
+            || (Chunk::GetNextChunk(t_chunk) == topChunk)
+           )
+        {
+            return MergeWithTop(t_chunk);
+        }
+
+        Chunk* newChunk{ t_chunk };
+        if (Chunk::GetNextChunk(t_chunk)->IsUsed() == 0)
+        {
+            newChunk = MergeTwoSequnceChunks(newChunk, Chunk::GetNextChunk(t_chunk));
+        }
+
+        if (Chunk::GetPrevChunk(newChunk)->IsUsed() == 0)
+        {
+            newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
+        }
+        
+        if (newChunk != begin)
+        {
+            newChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize())
+            newChunk->SetIsPrevInUse(1);
+            newChunk->SetIsUsed(0);
+            return newChunk;
+        }
+        else
+        {
+            newChunk->SetPrevSize(0);
+            newChunk->SetIsPrevInUse(1);
+            newChunk->SetIsUsed(0);
+            return newChunk;
+        }
+
+        return newChunk;
+    }
+
+    Chunk* Arena::MergeWithTop(Chunk* t_chunk)
+    {
+        Chunk* newChunk{ t_chunk };
+        if (Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
+        {
+            newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
+        }
+
+        if (topChunk == nullptr)
+        {
+            topChunk = newChunk;
+            if (topChunk != begin)
+            {
+                topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize())
+                topChunk->SetIsPrevInUse(1);
+                topChunk->SetIsUsed(1);
+                return topChunk;
+            }
+            else
+            {
+                //ChunkSize is already set by MergeTwoSequnceChunks function
+                topChunk->SetPrevSize(0);
+                topChunk->SetIsPrevInUse(1);
+                topChunk->SetIsUsed(1);
+            }
+            
+        }
+        else
+        {
+            topChunk = MergeTwoSequnceChunks(newChunk, topChunk);
+            return topChunk;
+        }
+    }
+
+    // Note that MergeTwoSequnceChunks doesn't check order of the
+    // chunks. Also it doesn't update any flags, and/or any chunk fields
+    // excluding chunk size
+    Chunk* Arena::MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
+    {
+        Chunk* tmpChunk = Chunk::ConstructChunk(t_chunk1, t_chunk1->GetPrevSize(), 
+                                        t_chunk1->GetSize() + t_chunk2->GetSize(), 
+                                        0, 0);
+        return tmpChunk;
     }
 }
