@@ -48,7 +48,7 @@ namespace mpp {
         void DeallocateChunk(Chunk* t_chunk);
         Chunk* SplitChunkFromFreeList(Chunk* chunk, std::size_t t_chunkSize);
         Chunk* SplitTopChunk(std::size_t t_chunkSize);
-        Chunk* MergeTwoChunks(Chunk* t_chunk1, Chunk* t_chunk2);
-        void Arena::MergeWithTop(Chunk* t_chunk);
+        Chunk* MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
+        Chunk* MergeWithTop(Chunk* t_chunk);
     };
 }

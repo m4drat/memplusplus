@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 
 #include <cmath>

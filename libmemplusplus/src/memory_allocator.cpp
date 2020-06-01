@@ -7,7 +7,7 @@ namespace mpp {
 
     std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
     {
-        return t_size + (t_allignment - (t_size % t_allignment));
+        return t_size + (t_alignment - (t_size % t_alignment));
     };
 
     void* MemoryAllocator::SysAlloc(std::size_t t_size)
@@ -52,7 +52,7 @@ namespace mpp {
 
         // If we cant find arena with enough right space, we will
         // iterate through ChunkTreap to find chunk to reuse
-        for (auto* arena : s_ArenaList)
+        for (Arena* arena : s_ArenaList)
         {
             Chunk* chunk = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
             if (chunk == nullptr) 
@@ -71,7 +71,7 @@ namespace mpp {
         std::size_t realSize =
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_PAGE_SIZE);
         Arena* arena = CreateArena(realSize);
-        return (arena->topChunk->GetUserDataPtr());
+        return (Chunk::GetUserDataPtr(arena->topChunk));
     }
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
@@ -97,7 +97,6 @@ namespace mpp {
         //        sizeof(Chunk::ChunkHeader));
     };
 
-    // TODO 
     void MemoryAllocator::Deallocate(void* t_chunkPtr)
     {
         // Find arena, to which chunk belongs

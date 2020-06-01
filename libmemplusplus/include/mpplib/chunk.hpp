@@ -26,7 +26,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             std::size_t chunkHeader;
         } ChunkHeader;
 
-        Chunk* ConstructChunk(void* t_newChunkPtr, std::size_t t_prevSize, std::size_t t_chunkSize, uint8_t t_isInUse, uint8_t t_isPrevInUse)
+        static Chunk* ConstructChunk(void* t_newChunkPtr, std::size_t t_prevSize, std::size_t t_chunkSize, uint8_t t_isInUse, uint8_t t_isPrevInUse)
         {
             Chunk* newChunk = (Chunk*)t_newChunkPtr;
             newChunk->SetPrevSize(t_prevSize);
@@ -39,22 +39,22 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         static void* GetUserDataPtr(Chunk* t_chunk)
         {
-            return (void*)((std::size_t)t_chunk + sizeof(Chunk::ChunkHeader))
+            return (void*)((std::size_t)t_chunk + sizeof(Chunk::ChunkHeader));
         }
 
         static Chunk* GetHeaderPtr(void* t_userData)
         {
-            return (Chunk*)((std::size_t)t_userData - sizeof(Chunk::ChunkHeader))
+            return (Chunk*)((std::size_t)t_userData - sizeof(Chunk::ChunkHeader));
         }
 
-        Chunk* GetPrevChunk(Chunk* t_chunk)
+        static Chunk* GetPrevChunk(Chunk* t_chunk)
         {
             // 1. Compute prev chunk pointer
             // 2. Call IsUsed for this pointer 
            return ((Chunk*)((std::size_t)t_chunk - t_chunk->GetPrevSize()));
         }
 
-        Chunk* GetNextChunk(Chunk* t_chunk)
+        static Chunk* GetNextChunk(Chunk* t_chunk)
         {
            return (Chunk*)((std::size_t)t_chunk + t_chunk->GetSize());
         }

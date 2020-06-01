@@ -1,6 +1,11 @@
 #include "mpplib/arena.hpp"
 
 namespace mpp {
+    Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize)
+    {
+        return freedChunks.FirstGreaterOrEqualThan(t_desiredChunkSize);
+    }
+    
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)
     {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
@@ -26,15 +31,15 @@ namespace mpp {
         std::size_t newTopChunkSize = topChunk->GetSize() - t_chunkSize;
         //(*) chunk->GetPrevSize() == 0 <=> chunk == this->begin
         Chunk* chunk = Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
-        topChunk = Chunk::ConstructChunk(static_cast<Chunk*>((std::size_t)topChunk + t_chunkSize), 
+        topChunk = Chunk::ConstructChunk(reinterpret_cast<Chunk*>((std::size_t)topChunk + t_chunkSize), 
                                   t_chunkSize, newTopChunkSize, 1, 1);
         //(!) Add testcase with splitting topchunk to the minimal size (16)
         return chunk;
     }
 
-    Chunk* Arena::AllocateFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize);
+    Chunk* Arena::AllocateFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
     {
-        Chunk* chunk = SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize);
+        Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
         chunksInUse.insert(chunk);
         return chunk;
     }
@@ -72,7 +77,7 @@ namespace mpp {
             // Split free (deallocated) chunk
             if (t_chunk->GetSize() == t_chunkSize)
             {
-                Chunk* chunk = Chunk::ConstractChunk(t_chunk,
+                Chunk* chunk = Chunk::ConstructChunk(t_chunk,
                                               Chunk::GetPrevChunk(t_chunk)->GetSize(),
                                               t_chunkSize,
                                               1, 1);
@@ -130,7 +135,7 @@ namespace mpp {
         
         */
 
-        newChunk = MergeNeighborsChunks(t_chunk);
+        Chunk* newChunk = MergeNeighborsChunks(t_chunk);
         if (newChunk != topChunk)
         {
             freedChunks.InsertChunk(newChunk);
@@ -152,7 +157,7 @@ namespace mpp {
         4. DT
         */
         if (
-            ((topChunk == nullptr) && (((void*)(std::size_t)t_chunk + t_chunk->GetSize()) == end))
+            ((topChunk == nullptr) && ((void*)((std::size_t)t_chunk + t_chunk->GetSize()) == end))
             || (Chunk::GetNextChunk(t_chunk) == topChunk)
            )
         {
@@ -183,13 +188,13 @@ namespace mpp {
         
         if (newChunk != begin)
         {
-            newChunk->SetPrevSize(Chunk::GetPrevChunk(newChunk)->GetSize())
+            newChunk->SetPrevSize(Chunk::GetPrevChunk(newChunk)->GetSize());
         }
         else
         {
             newChunk->SetPrevSize(0);
         }
-        Chunk::GetNextChunk(newChunk)->SetPrevIsUsed(1);
+        Chunk::GetNextChunk(newChunk)->SetIsPrevInUse(1);
         newChunk->SetIsPrevInUse(1);
         newChunk->SetIsUsed(0);
 
@@ -209,7 +214,7 @@ namespace mpp {
             topChunk = newChunk;
             if ((void*)topChunk != begin)
             {
-                topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize())
+                topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize());
             }
             else
             {
