@@ -13,5 +13,15 @@ namespace mpp {
     {
     public:
         virtual ~GcPtr(){};
+ 
+        virtual std::ostream& Print(std::ostream& t_out) const
+	    {
+		    return t_out;
+	    }
+
+        friend std::ostream& operator<<(std::ostream& t_out, const GcPtr &t_gcPtr)
+        {
+            return t_gcPtr.Print(t_out);
+        } 
     };
 }

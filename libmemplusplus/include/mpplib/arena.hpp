@@ -12,16 +12,14 @@ namespace mpp {
          * What we should use to save information about freed/in-use blocks?
          * Should we save all active blocks + all freed blocks, or we just need
          * to save one list? Requrements for data structure:
-         *     1. Find max element
-         *     2. Fast insert/delete
-         *     3. Fast exact search
-         *     4. Find bigger or equal element
+         *     1. Fast Find max element - O(logN)
+         *     2. Fast insert/delete - O(logN)
+         *     3. Fast exact search - O(logN)
+         *     4. Find bigger or equal element - O(logN)
          *      ===> Treap
          */
         ChunkTreap freedChunks;
 
-        // TODO: check if we don't need specific comparator
-        // Add 
         std::set<Chunk*> chunksInUse;
         std::size_t size{ 0 };
         Chunk* topChunk{ nullptr };
@@ -50,5 +48,7 @@ namespace mpp {
         Chunk* SplitTopChunk(std::size_t t_chunkSize);
         Chunk* MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
         Chunk* MergeWithTop(Chunk* t_chunk);
+
+        static std::ostream& DumpArena( std::ostream& t_out, Arena* t_arena );
     };
 }

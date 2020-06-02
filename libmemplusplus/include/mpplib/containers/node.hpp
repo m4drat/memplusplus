@@ -25,6 +25,8 @@ namespace mpp {
 
         ~Node();
 
+        static std::ostream& DumpNode(std::ostream& t_out, Node* t_node);
+        friend std::ostream& operator<<(std::ostream& t_out, Node* t_node);
     private:
         void Delete();
     };

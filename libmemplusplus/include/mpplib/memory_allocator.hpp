@@ -13,12 +13,8 @@ namespace mpp {
     class MemoryAllocator : public MemoryManager
     {
     private:
-        //////////////////////////////////////////////////////////////
-        //                        WARNING                           //
-        //////////////////////////////////////////////////////////////
-        /**/static inline std::size_t Align(std::size_t t_size,   /**/
-        /**/                                int32_t t_alignment);/**/
-        //////////////////////////////////////////////////////////////
+        static inline std::size_t Align(std::size_t t_size,
+                                        int32_t t_alignment);
         static void* SysAlloc(std::size_t t_size);
         static bool SysDealloc(void* ptr, std::size_t pageSize);
         static Arena* CreateArena(std::size_t t_arenaSize);
@@ -40,7 +36,7 @@ namespace mpp {
         {
             if (std::is_destructible<T>::value)
                 t_objPtr->~T();
-            Deallocate(static_cast<void*>(t_objPtr));
+            Deallocate(reinterpret_cast<void*>(t_objPtr));
         }
     };
 }

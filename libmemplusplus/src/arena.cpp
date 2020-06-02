@@ -1,5 +1,7 @@
 #include "mpplib/arena.hpp"
 
+#include <functional>
+
 namespace mpp {
     Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize)
     {
@@ -135,6 +137,9 @@ namespace mpp {
         
         */
 
+        // Delete chunk from active chunks
+        chunksInUse.erase(t_chunk);
+
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
         if (newChunk != topChunk)
         {
@@ -241,5 +246,46 @@ namespace mpp {
                                         t_chunk1->GetSize() + t_chunk2->GetSize(), 
                                         0, 0);
         return tmpChunk;
+    }
+
+    std::ostream& Arena::DumpArena( std::ostream& t_out, Arena* t_arena ) 
+    {
+        t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
+        
+        t_out << "\tsize: " << t_arena->size << std::endl;
+        
+        t_out << "\ttopChunk: ";
+        if (t_arena->topChunk)
+            Chunk::DumpChunk(t_out, t_arena->topChunk);
+        else
+            t_out << "nullptr";
+        t_out << std::endl;
+        
+        t_out << "\tbegin: " << t_arena->begin << std::endl;
+        t_out << "\tend: " << t_arena->end << std::endl;
+        
+        t_out << "\tfreedChunks nodes: " << std::endl;
+        int32_t idx1 = 0;
+        std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node)
+        {
+            if (!node)
+                return;
+            
+            Iterate(out, node->rightChild);
+            out << "\t\t" << idx1 << ". " << node << std::endl;
+            idx1++;
+            Iterate(out, node->leftChild);
+        };
+        Iterate(std::cout, t_arena->freedChunks.GetRootNode());
+
+        t_out << "\tchunksInUse: "<< std::endl;
+        int32_t idx2 = 0;
+        for (auto ch : t_arena->chunksInUse)
+        {
+            t_out << "\t\t" << idx2 << ". ";
+            Chunk::DumpChunk(t_out, ch) << std::endl;
+            idx2++;
+        }
+        return t_out;
     }
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <iostream>
 
 namespace mpp {
 
@@ -111,5 +112,13 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
                 this->ChunkHeader.chunkHeader &= opt << 3;
             }
         };
+
+        static std::ostream& DumpChunk( std::ostream& t_out, Chunk* t_ch ) {
+            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", " << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed() << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+        }
+
+        friend std::ostream& operator<<( std::ostream& t_out, Chunk* t_ch ) {
+            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", " << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed() << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+        }
     };
 }
