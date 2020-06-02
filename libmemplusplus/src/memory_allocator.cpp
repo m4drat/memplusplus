@@ -7,17 +7,15 @@ namespace mpp {
 
     std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
     {
+        if (t_size != 0 && t_size % t_alignment == 0)
+            return t_size;
         return t_size + (t_alignment - (t_size % t_alignment));
     };
 
     void* MemoryAllocator::SysAlloc(std::size_t t_size)
     {
-        void* rawPtr = mmap(NULL,
-                            t_size,
-                            PROT_READ | PROT_WRITE,
-                            MAP_PRIVATE | MAP_ANONYMOUS,
-                            -1,
-                            0);
+        void* rawPtr =
+          mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (rawPtr == MAP_FAILED) {
             throw NoMemoryException();
         }

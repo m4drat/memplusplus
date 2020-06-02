@@ -21,8 +21,7 @@ namespace mpp {
     // exists only to make possible running of unit-tests
     bool MemoryManager::ResetAllocatorState()
     {
-        for (int32_t i = 0; i < s_ArenaList.size(); ++i)
-        {
+        for (int32_t i = 0; i < s_ArenaList.size(); ++i) {
             delete s_ArenaList.at(i);
         }
         s_ArenaList.clear();

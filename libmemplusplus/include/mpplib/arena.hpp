@@ -57,7 +57,7 @@ namespace mpp {
         Chunk* MergeWithTop(Chunk* t_chunk);
 
         // TODO: Find the chunk that the current pointer belongs to
-        Chunk* GetInUseChunkByPtr(void *t_ptr);
+        Chunk* GetInUseChunkByPtr(void* t_ptr);
 
         static std::ostream& DumpArena(std::ostream& t_out, Arena* t_arena);
     };

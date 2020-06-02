@@ -111,8 +111,7 @@ namespace mpp {
         MergeNodes(leftSubtree, rightSubtree, m_root);
     }
 
-    Chunk* ChunkTreap::FirstGreaterOrEqualThan(
-      std::size_t desiredChunkSize) const
+    Chunk* ChunkTreap::FirstGreaterOrEqualThan(std::size_t desiredChunkSize) const
     {
         Node* currentNode = m_root;
 
@@ -121,8 +120,7 @@ namespace mpp {
                 currentNode = currentNode->rightChild;
             } else {
                 if (currentNode->leftChild &&
-                    currentNode->leftChild->chunk->GetSize() >=
-                      desiredChunkSize) {
+                    currentNode->leftChild->chunk->GetSize() >= desiredChunkSize) {
                     currentNode = currentNode->leftChild;
                 } else {
                     return currentNode->chunk;
@@ -162,12 +160,10 @@ namespace mpp {
         if ((t_root->chunk->GetSize() < t_chunk->GetSize()) ||
             ((t_root->chunk->GetSize() == t_chunk->GetSize()) &&
              t_root->chunk < t_chunk)) {
-            SplitNodesByElement(
-              t_root->rightChild, t_root->rightChild, t_right, t_chunk);
+            SplitNodesByElement(t_root->rightChild, t_root->rightChild, t_right, t_chunk);
             t_left = t_root;
         } else {
-            SplitNodesByElement(
-              t_root->leftChild, t_left, t_root->leftChild, t_chunk);
+            SplitNodesByElement(t_root->leftChild, t_left, t_root->leftChild, t_chunk);
             t_right = t_root;
         }
     }

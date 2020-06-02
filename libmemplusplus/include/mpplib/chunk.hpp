@@ -48,8 +48,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         static Chunk* GetHeaderPtr(void* t_userData)
         {
-            return (Chunk*)((std::size_t)t_userData -
-                            sizeof(Chunk::ChunkHeader));
+            return (Chunk*)((std::size_t)t_userData - sizeof(Chunk::ChunkHeader));
         }
 
         static Chunk* GetPrevChunk(Chunk* t_chunk)

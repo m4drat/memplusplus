@@ -55,9 +55,9 @@ int main(int argc, char* argv[])
 
     void* ch1 = MemoryAllocator::Allocate(128);
     void* ch2 = MemoryAllocator::Allocate(128);
-    
+
     Arena* currentArena = MemoryManager::GetArenaList().at(0);
-    
+
     ((ch1 != nullptr && ch2 != nullptr));
     (ch1 < ch2);
 

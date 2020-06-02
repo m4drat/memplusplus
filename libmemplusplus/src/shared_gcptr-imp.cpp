@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mpplib/shared_gcptr.hpp"
 #include "mpplib/memory_allocator.hpp"
+#include "mpplib/shared_gcptr.hpp"
 
 #include <iostream>
 #include <type_traits>
@@ -35,8 +35,8 @@ namespace mpp {
         if (m_references) {
             --(*m_references);
 #ifdef DEBUG
-            std::cout << "[SharedGcPtr] Ptr destroyed! References: "
-                      << *m_references << std::endl;
+            std::cout << "[SharedGcPtr] Ptr destroyed! References: " << *m_references
+                      << std::endl;
 #endif
             // Destroy shared ptr and object
             if (*m_references == 0) {
@@ -59,8 +59,8 @@ namespace mpp {
             ++(*m_references);
 
 #ifdef DEBUG
-            std::cout << "[SharedGcPtr] Ptr copied! References: "
-                      << *m_references << std::endl;
+            std::cout << "[SharedGcPtr] Ptr copied! References: " << *m_references
+                      << std::endl;
 #endif
             // TODO: add copied GcPtr to vector with GcPtrs
         }
@@ -74,8 +74,7 @@ namespace mpp {
     }
 
     template<class Type>
-    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(
-      SharedGcPtr&& other) noexcept
+    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr&& other) noexcept
     {
         swap(other);
         return *this;
@@ -99,6 +98,7 @@ namespace mpp {
     template<class T, class... Args>
     SharedGcPtr<T> MakeSharedGcPtr(Args&&... t_args)
     {
-        return SharedGcPtr<T>(MemoryAllocator::Allocate<T>(std::forward<Args>(t_args)...));
+        return SharedGcPtr<T>(
+          MemoryAllocator::Allocate<T>(std::forward<Args>(t_args)...));
     }
 }
