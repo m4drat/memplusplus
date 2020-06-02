@@ -161,6 +161,7 @@ namespace mpp {
         3. ADT
         4. DT
         */
+        
         if (
             ((topChunk == nullptr) && ((void*)((std::size_t)t_chunk + t_chunk->GetSize()) == end))
             || (Chunk::GetNextChunk(t_chunk) == topChunk)
@@ -182,12 +183,14 @@ namespace mpp {
         // Merge forward
         if (Chunk::GetNextChunk(t_chunk)->IsUsed() == 0)
         {
+            freedChunks.RemoveChunk(Chunk::GetNextChunk(t_chunk));
             newChunk = MergeTwoSequnceChunks(newChunk, Chunk::GetNextChunk(t_chunk));
         }
 
         // Merge backwards
         if (((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
         {
+            freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
         }
         
@@ -199,18 +202,24 @@ namespace mpp {
         {
             newChunk->SetPrevSize(0);
         }
-        Chunk::GetNextChunk(newChunk)->SetIsPrevInUse(1);
+        Chunk::GetNextChunk(newChunk)->SetIsPrevInUse(0);
+        Chunk::GetNextChunk(newChunk)->SetPrevSize(newChunk->GetSize());
         newChunk->SetIsPrevInUse(1);
         newChunk->SetIsUsed(0);
-
+        
         return newChunk;
     }
 
     Chunk* Arena::MergeWithTop(Chunk* t_chunk)
     {
+        if (topChunk != nullptr)
+            freedChunks.RemoveChunk(t_chunk);
+        
         Chunk* newChunk{ t_chunk };
         if ( ((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
         {
+            //freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
+            //freedChunks.RemoveChunk(t_chunk);
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
         }
 
@@ -242,10 +251,10 @@ namespace mpp {
     // excluding chunk size
     Chunk* Arena::MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
     {
-        Chunk* tmpChunk = Chunk::ConstructChunk(t_chunk1, t_chunk1->GetPrevSize(), 
+        Chunk* chunk = Chunk::ConstructChunk(t_chunk1, t_chunk1->GetPrevSize(), 
                                         t_chunk1->GetSize() + t_chunk2->GetSize(), 
                                         0, 0);
-        return tmpChunk;
+        return chunk;
     }
 
     std::ostream& Arena::DumpArena( std::ostream& t_out, Arena* t_arena ) 

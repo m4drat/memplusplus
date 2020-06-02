@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
+#include "mpplib/memory_allocator.hpp"
 #include "mpplib/chunk.hpp"
 
 TEST_CASE("Check that chunk to delete is in the middle of another chunks")
@@ -8,12 +9,12 @@ TEST_CASE("Check that chunk to delete is in the middle of another chunks")
     
     ChunkTreap* cTreap = new ChunkTreap();
 
-    Chunk* ch1 = (Chunk*)malloc(128);
-    Chunk* ch2 = (Chunk*)malloc(128);
-    Chunk* ch3 = (Chunk*)malloc(128);
+    Chunk* ch1 = (Chunk*)MemoryAllocator::Allocate(50);
+    Chunk* ch2 = (Chunk*)MemoryAllocator::Allocate(50);
+    Chunk* ch3 = (Chunk*)MemoryAllocator::Allocate(50);
 
-    assert(((std::size_t)ch1 < (std::size_t)ch2) && 
-           ((std::size_t)ch2 < (std::size_t)ch3));
+    REQUIRE((((std::size_t)ch1 < (std::size_t)ch2) && 
+             ((std::size_t)ch2 < (std::size_t)ch3)));
 
     ch1->SetSize(16);
     ch2->SetSize(16);
@@ -55,15 +56,15 @@ TEST_CASE("Check big tree")
     Chunk* ch8 = (Chunk*)malloc(128);
     Chunk* ch9 = (Chunk*)malloc(128);
     
-    ch1->SetSize(16);
-    ch2->SetSize(32);
-    ch3->SetSize(48);
-    ch4->SetSize(64);
-    ch5->SetSize(80);
-    ch6->SetSize(96);
-    ch7->SetSize(112);
-    ch8->SetSize(128);
-    ch9->SetSize(144);
+    ch1->SetSize(32);
+    ch2->SetSize(64);
+    ch3->SetSize(96);
+    ch4->SetSize(128);
+    ch5->SetSize(160);
+    ch6->SetSize(192);
+    ch7->SetSize(224);
+    ch8->SetSize(256);
+    ch9->SetSize(288);
 
     cTreap->InsertChunk(ch1);
     cTreap->InsertChunk(ch2);
@@ -78,8 +79,8 @@ TEST_CASE("Check big tree")
     cTreap->RemoveChunk(ch1);
     cTreap->RemoveChunk(ch9);
 
-    REQUIRE(cTreap->MaxSizeChunk()->GetSize() == 128); 
-    REQUIRE(cTreap->MinSizeChunk()->GetSize() == 32);
+    REQUIRE(cTreap->MaxSizeChunk()->GetSize() == 256); 
+    REQUIRE(cTreap->MinSizeChunk()->GetSize() == 64);
 }
 
 TEST_CASE("Check for correct chunk insertion")
@@ -111,9 +112,9 @@ TEST_CASE("Check for nonexistent large chunk")
     Chunk* chunk2 = (Chunk*)malloc(64);
     Chunk* chunk3 = (Chunk*)malloc(64);
 
-    chunk1->SetSize(16);
-    chunk2->SetSize(32);
-    chunk3->SetSize(64);
+    chunk1->SetSize(32);
+    chunk2->SetSize(64);
+    chunk3->SetSize(96);
 
     cTreap->InsertChunk(chunk1);
     cTreap->InsertChunk(chunk2);
@@ -137,17 +138,17 @@ TEST_CASE("Check basic functions")
     Chunk* ch3 = (Chunk*)malloc(64);
     Chunk* ch4 = (Chunk*)malloc(64);
     
-    ch1->SetSize(16);
-    ch2->SetSize(16);
-    ch3->SetSize(16);
-    ch4->SetSize(16);
+    ch1->SetSize(32);
+    ch2->SetSize(32);
+    ch3->SetSize(32);
+    ch4->SetSize(32);
 
     cTreap->InsertChunk(ch1);
     cTreap->InsertChunk(ch2);
     cTreap->InsertChunk(ch3);
     cTreap->InsertChunk(ch4);
 
-    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 16 && cTreap->MinSizeChunk()->GetSize() == 16 ));
+    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32 ));
 }
 
 TEST_CASE("Check delete many")
@@ -161,10 +162,10 @@ TEST_CASE("Check delete many")
     Chunk* ch3 = (Chunk*)malloc(128);
     Chunk* ch4 = (Chunk*)malloc(128);
     
-    ch1->SetSize(16);
-    ch2->SetSize(16);
-    ch3->SetSize(16);
-    ch4->SetSize(16);
+    ch1->SetSize(32);
+    ch2->SetSize(32);
+    ch3->SetSize(32);
+    ch4->SetSize(32);
 
     cTreap->InsertChunk(ch1);
     cTreap->InsertChunk(ch2);
@@ -174,5 +175,5 @@ TEST_CASE("Check delete many")
     cTreap->RemoveChunk(ch2);
     cTreap->RemoveChunk(ch3);
 
-    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 16 && cTreap->MinSizeChunk()->GetSize() == 16 ));
+    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32 ));
 }

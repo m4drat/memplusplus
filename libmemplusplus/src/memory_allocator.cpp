@@ -67,10 +67,9 @@ namespace mpp {
     // FIXME
     void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
     {
-        std::size_t realSize =
-          Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_PAGE_SIZE);
-        Arena* arena = CreateArena(realSize);
-        return (Chunk::GetUserDataPtr(arena->topChunk));
+        Arena* arena = CreateArena(t_userDataSize);
+        Chunk* bigChungus = arena->AllocateFromTopChunk(t_userDataSize);
+        return Chunk::GetUserDataPtr(bigChungus);
     }
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
@@ -79,7 +78,7 @@ namespace mpp {
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
 
         if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
-            return AllocateBigChunk(realChunkSize);
+            return AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
         }
 
         if (s_ArenaList.empty()) {

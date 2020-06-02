@@ -5,27 +5,39 @@
 int main(int argc, char* argv[])
 {
     using namespace mpp;
+    // std::cout << "================================================================================================" << std::endl;
+    // void* block1 = MemoryAllocator::Allocate(50);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
+    // void* block2 = MemoryAllocator::Allocate(50);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
+    // void* block3 = MemoryAllocator::Allocate(50);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
+    // void* block4 = MemoryAllocator::Allocate(50);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
 
-    void* block1 = MemoryAllocator::Allocate(50);
-    void* block2 = MemoryAllocator::Allocate(50);
-    void* block3 = MemoryAllocator::Allocate(50);
-    void* block4 = MemoryAllocator::Allocate(50);
-    std::cout << "[1]" << block1 << std::endl;
-    std::cout << "[2]" << block2 << std::endl;
-    std::cout << "[3]" << block3 << std::endl;
-    std::cout << "[4]" << block4 << std::endl;
-
-    MemoryAllocator::Deallocate(block3);
-    MemoryAllocator::Deallocate(block1);    
-    MemoryAllocator::Deallocate(block2);
-    MemoryAllocator::Deallocate(block4);
-
-    MemoryManager::DumpStats(std::cout);
+    // MemoryAllocator::Deallocate(block3);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
+    // MemoryAllocator::Deallocate(block1);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
+    // MemoryAllocator::Deallocate(block2);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
+    // MemoryAllocator::Deallocate(block4);
+    // MemoryManager::DumpStats(std::cout);
+    // std::cout << "================================================================================================" << std::endl;
 
     void* block5 = MemoryAllocator::Allocate(50331648);
-        
+    MemoryManager::DumpStats(std::cout);
+    std::cout << "================================================================================================" << std::endl;
     // FIXME
     MemoryAllocator::Deallocate(block5);
+    MemoryManager::DumpStats(std::cout);
 
     return 0;
 }

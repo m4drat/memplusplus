@@ -13,7 +13,7 @@ namespace mpp {
     {
         /*
     chunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            |            Size of chunk, in bytes        |U|P|X|X|
+            |            Size of chunk, in bytes       |X|U|P|X|X|
       mem-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             |            User data starts here...               .
             .                                                   .
@@ -62,7 +62,7 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         std::size_t GetPrevSize()
         {
-            return (this->ChunkHeader.prevChunkSize >> 4) << 4;
+            return (this->ChunkHeader.prevChunkSize >> 5) << 5;
         };
 
         void SetPrevSize(std::size_t size)
@@ -72,12 +72,12 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         std::size_t GetSize()
         {
-            return (this->ChunkHeader.chunkHeader >> 4) << 4;
+            return (this->ChunkHeader.chunkHeader >> 5) << 5;
         };
 
         void SetSize(std::size_t size)
         {
-            this->ChunkHeader.chunkHeader = size;
+            this->ChunkHeader.chunkHeader = (size | (0b11111 & this->ChunkHeader.chunkHeader));
         }
 
         void* GetUserData()
@@ -98,18 +98,18 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         void SetIsPrevInUse(uint8_t opt)
         {
             if (opt) {
-                this->ChunkHeader.chunkHeader |= opt << 2;
+                this->ChunkHeader.chunkHeader |= 1UL << 2;
             } else {
-                this->ChunkHeader.chunkHeader &= opt << 2;
+                this->ChunkHeader.chunkHeader &= ~(1UL << 2);
             }
         };
 
         void SetIsUsed(uint8_t opt)
         {
             if (opt) {
-                this->ChunkHeader.chunkHeader |= opt << 3;
+                this->ChunkHeader.chunkHeader |= 1UL << 3;
             } else {
-                this->ChunkHeader.chunkHeader &= opt << 3;
+                this->ChunkHeader.chunkHeader &= ~(1UL << 3);
             }
         };
 
