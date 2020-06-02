@@ -47,9 +47,11 @@ namespace mpp {
         }
 
         std::ostream& Print(std::ostream& t_out) const override
-	    {
-		    return t_out << "[|SP|" << this << "]" << "(" << reinterpret_cast<void*>(m_objectPtr) << ", " << *m_references << ")" << std::endl;
-	    }
+        {
+            return t_out << "[|SP|" << this << "]"
+                         << "(" << reinterpret_cast<void*>(m_objectPtr) << ", "
+                         << *m_references << ")" << std::endl;
+        }
     };
 
     // TODO

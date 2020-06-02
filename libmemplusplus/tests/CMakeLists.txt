@@ -8,6 +8,7 @@ add_executable(unit_tests
     test_main.cpp
     shared_gcptr_tests.cpp
     chunk_treap_test.cpp
+    allocator_logic_tests.cpp
 )
 
 target_link_libraries(${PROJECT_NAME}

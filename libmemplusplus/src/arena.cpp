@@ -3,11 +3,12 @@
 #include <functional>
 
 namespace mpp {
-    Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize)
+    Chunk* Arena::GetFirstGreaterOrEqualThanChunk(
+      std::size_t t_desiredChunkSize)
     {
         return freedChunks.FirstGreaterOrEqualThan(t_desiredChunkSize);
     }
-    
+
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)
     {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
@@ -15,15 +16,14 @@ namespace mpp {
         return chunk;
     }
 
-    // WARNING
     Chunk* Arena::SplitTopChunk(std::size_t t_chunkSize)
     {
-        if (t_chunkSize == topChunk->GetSize())
-        {
-            Chunk* chunk = Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
-        
+        if (t_chunkSize == topChunk->GetSize()) {
+            Chunk* chunk = Chunk::ConstructChunk(
+              topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
+
             // make topChunk nullptr, to let allocator know, that we dont
-            // have any more space in current arena. This field can be 
+            // have any more space in current arena. This field can be
             // updated later in deallocate, if we managed to merge everything
             // on right side
             topChunk = nullptr;
@@ -32,9 +32,14 @@ namespace mpp {
 
         std::size_t newTopChunkSize = topChunk->GetSize() - t_chunkSize;
         //(*) chunk->GetPrevSize() == 0 <=> chunk == this->begin
-        Chunk* chunk = Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
-        topChunk = Chunk::ConstructChunk(reinterpret_cast<Chunk*>((std::size_t)topChunk + t_chunkSize), 
-                                  t_chunkSize, newTopChunkSize, 1, 1);
+        Chunk* chunk = Chunk::ConstructChunk(
+          topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
+        topChunk = Chunk::ConstructChunk(
+          reinterpret_cast<Chunk*>((std::size_t)topChunk + t_chunkSize),
+          t_chunkSize,
+          newTopChunkSize,
+          1,
+          1);
         //(!) Add testcase with splitting topchunk to the minimal size (16)
         return chunk;
     }
@@ -45,64 +50,74 @@ namespace mpp {
         chunksInUse.insert(chunk);
         return chunk;
     }
-    
-    Chunk* Arena::SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
-    {    
+
+    Chunk* Arena::SplitChunkFromFreeList(Chunk* t_chunk,
+                                         std::size_t t_chunkSize)
+    {
         // If we are working with the first chunk in arena memory
         freedChunks.RemoveChunk(t_chunk);
-        if (t_chunk == begin)
-        {
-            if (t_chunk->GetSize() == t_chunkSize)
-            {
-                // Set prevInUse to 1, because we don't want to merge it to the left 
-                // (cause we dont have anything on the left)
-                Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0,
-                                              t_chunkSize, 1, 1);
+        if (t_chunk == begin) {
+            if (t_chunk->GetSize() == t_chunkSize) {
+                // Set prevInUse to 1, because we don't want to merge it to the
+                // left (cause we dont have anything on the left)
+                Chunk* chunk =
+                  Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
                 Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
                 Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
                 return chunk;
             } else {
                 std::size_t toSplitChunkSize = t_chunk->GetSize();
-                Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0,
-                                              t_chunkSize, 1, 1);
+                Chunk* chunk =
+                  Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
 
-                Chunk* splittedChunk = Chunk::ConstructChunk((void*)((std::size_t)chunk + t_chunkSize),
-                                t_chunkSize, toSplitChunkSize - t_chunkSize,
-                                0, 1);
-                Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
+                Chunk* splittedChunk = Chunk::ConstructChunk(
+                  (void*)((std::size_t)chunk + t_chunkSize),
+                  t_chunkSize,
+                  toSplitChunkSize - t_chunkSize,
+                  0,
+                  1);
+                Chunk::GetNextChunk(splittedChunk)
+                  ->SetPrevSize(toSplitChunkSize - t_chunkSize);
                 // Chunk::GetNextChunk(splittedChunk)->SetIsPrevInUse(0);
                 freedChunks.InsertChunk(splittedChunk);
                 return chunk;
             }
         } else {
-        // if we are anywhere in arena, excluding begin chunk
+            // if we are anywhere in arena, excluding begin chunk
             // Split free (deallocated) chunk
-            if (t_chunk->GetSize() == t_chunkSize)
-            {
-                Chunk* chunk = Chunk::ConstructChunk(t_chunk,
-                                              Chunk::GetPrevChunk(t_chunk)->GetSize(),
-                                              t_chunkSize,
-                                              1, 1);
+            if (t_chunk->GetSize() == t_chunkSize) {
+                Chunk* chunk =
+                  Chunk::ConstructChunk(t_chunk,
+                                        Chunk::GetPrevChunk(t_chunk)->GetSize(),
+                                        t_chunkSize,
+                                        1,
+                                        1);
                 Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
                 Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
                 return chunk;
             } else {
                 std::size_t toSplitChunkSize = t_chunk->GetSize();
-                Chunk* chunk = Chunk::ConstructChunk(t_chunk,
-                                                     Chunk::GetPrevChunk(t_chunk)->GetSize(),
-                                                     t_chunkSize,
-                                                     1, 1);
-                Chunk* splittedChunk = Chunk::ConstructChunk((void*)((std::size_t)chunk + t_chunkSize),
-                                                             t_chunkSize, toSplitChunkSize - t_chunkSize,
-                                                             0, 1);
-                Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
+                Chunk* chunk =
+                  Chunk::ConstructChunk(t_chunk,
+                                        Chunk::GetPrevChunk(t_chunk)->GetSize(),
+                                        t_chunkSize,
+                                        1,
+                                        1);
+                Chunk* splittedChunk = Chunk::ConstructChunk(
+                  (void*)((std::size_t)chunk + t_chunkSize),
+                  t_chunkSize,
+                  toSplitChunkSize - t_chunkSize,
+                  0,
+                  1);
+                Chunk::GetNextChunk(splittedChunk)
+                  ->SetPrevSize(toSplitChunkSize - t_chunkSize);
                 // Chunk::GetNextChunk(splittedChunk)->SetIsPrevInUse(0);
                 freedChunks.InsertChunk(splittedChunk);
                 return chunk;
             }
         }
     }
-    
+
     // Remember to set isPrevInUse to 1 when deallocating
     void Arena::DeallocateChunk(Chunk* t_chunk)
     {
@@ -116,39 +131,18 @@ namespace mpp {
         A - allocated
         D - to deallocate
         T - top (can be nullptr)
-
-        General case:
-            FDF
-            FDA
-            ADF
-            ADA
-        
-        Starting case:
-            DA
-            DF
-
-        Top case:
-            FDT
-            ADT
-            DT
-            T
-
-        5,6->7->10
-        
         */
 
         // Delete chunk from active chunks
         chunksInUse.erase(t_chunk);
 
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
-        if (newChunk != topChunk)
-        {
+        if (newChunk != topChunk) {
             freedChunks.InsertChunk(newChunk);
         }
         return;
     }
 
-  
     // Remember to check if topChunk is nullptr
     // if it is, then we must check that chunk
     // is top, and after merging everything, we should update topChunk
@@ -161,12 +155,9 @@ namespace mpp {
         3. ADT
         4. DT
         */
-        
-        if (
-            ((topChunk == nullptr) && ((void*)((std::size_t)t_chunk + t_chunk->GetSize()) == end))
-            || (Chunk::GetNextChunk(t_chunk) == topChunk)
-           )
-        {
+        if (((topChunk == nullptr) &&
+             ((void*)((std::size_t)t_chunk + t_chunk->GetSize()) == end)) ||
+            (Chunk::GetNextChunk(t_chunk) == topChunk)) {
             return MergeWithTop(t_chunk);
         }
 
@@ -181,66 +172,58 @@ namespace mpp {
         Chunk* newChunk{ t_chunk };
 
         // Merge forward
-        if (Chunk::GetNextChunk(t_chunk)->IsUsed() == 0)
-        {
+        if (Chunk::GetNextChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetNextChunk(t_chunk));
-            newChunk = MergeTwoSequnceChunks(newChunk, Chunk::GetNextChunk(t_chunk));
+            newChunk =
+              MergeTwoSequnceChunks(newChunk, Chunk::GetNextChunk(t_chunk));
         }
 
         // Merge backwards
-        if (((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
-        {
+        if (((void*)t_chunk != begin) &&
+            Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
-            newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
+            newChunk =
+              MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
         }
-        
-        if (newChunk != begin)
-        {
+
+        if (newChunk != begin) {
             newChunk->SetPrevSize(Chunk::GetPrevChunk(newChunk)->GetSize());
-        }
-        else
-        {
+        } else {
             newChunk->SetPrevSize(0);
         }
         Chunk::GetNextChunk(newChunk)->SetIsPrevInUse(0);
         Chunk::GetNextChunk(newChunk)->SetPrevSize(newChunk->GetSize());
         newChunk->SetIsPrevInUse(1);
         newChunk->SetIsUsed(0);
-        
+
         return newChunk;
     }
 
     Chunk* Arena::MergeWithTop(Chunk* t_chunk)
     {
-        if (topChunk != nullptr)
-            freedChunks.RemoveChunk(t_chunk);
-        
+        // if (topChunk != nullptr)
+        //     freedChunks.RemoveChunk(t_chunk);
         Chunk* newChunk{ t_chunk };
-        if ( ((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0)
-        {
-            //freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
-            //freedChunks.RemoveChunk(t_chunk);
-            newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
+        if (((void*)t_chunk != begin) &&
+            Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+            freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
+            // freedChunks.RemoveChunk(t_chunk);
+            newChunk =
+              MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
         }
 
-        if (topChunk == nullptr)
-        {
+        if (topChunk == nullptr) {
             topChunk = newChunk;
-            if ((void*)topChunk != begin)
-            {
+            if ((void*)topChunk != begin) {
                 topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize());
-            }
-            else
-            {
-                //ChunkSize is already set by MergeTwoSequnceChunks function
+            } else {
+                // ChunkSize is already set by MergeTwoSequnceChunks function
                 topChunk->SetPrevSize(0);
             }
             topChunk->SetIsPrevInUse(1);
             topChunk->SetIsUsed(1);
             return topChunk;
-        }
-        else
-        {
+        } else {
             topChunk = MergeTwoSequnceChunks(newChunk, topChunk);
             return topChunk;
         }
@@ -251,46 +234,54 @@ namespace mpp {
     // excluding chunk size
     Chunk* Arena::MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
     {
-        Chunk* chunk = Chunk::ConstructChunk(t_chunk1, t_chunk1->GetPrevSize(), 
-                                        t_chunk1->GetSize() + t_chunk2->GetSize(), 
-                                        0, 0);
+        Chunk* chunk =
+          Chunk::ConstructChunk(t_chunk1,
+                                t_chunk1->GetPrevSize(),
+                                t_chunk1->GetSize() + t_chunk2->GetSize(),
+                                0,
+                                0);
         return chunk;
     }
 
-    std::ostream& Arena::DumpArena( std::ostream& t_out, Arena* t_arena ) 
+    // Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
+    // {
+    //     if (t_ptr <= begin || t_ptr >= end)
+    //         return nullptr;
+    // }
+
+    std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
     {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
-        
+
         t_out << "\tsize: " << t_arena->size << std::endl;
-        
+
         t_out << "\ttopChunk: ";
         if (t_arena->topChunk)
             Chunk::DumpChunk(t_out, t_arena->topChunk);
         else
             t_out << "nullptr";
         t_out << std::endl;
-        
+
         t_out << "\tbegin: " << t_arena->begin << std::endl;
         t_out << "\tend: " << t_arena->end << std::endl;
-        
+
         t_out << "\tfreedChunks nodes: " << std::endl;
         int32_t idx1 = 0;
-        std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node)
-        {
-            if (!node)
-                return;
-            
-            Iterate(out, node->rightChild);
-            out << "\t\t" << idx1 << ". " << node << std::endl;
-            idx1++;
-            Iterate(out, node->leftChild);
-        };
+        std::function<void(std::ostream&, Node*)> Iterate =
+          [&](std::ostream& out, Node* node) {
+              if (!node)
+                  return;
+
+              Iterate(out, node->rightChild);
+              out << "\t\t" << idx1 << ". " << node << std::endl;
+              idx1++;
+              Iterate(out, node->leftChild);
+          };
         Iterate(std::cout, t_arena->freedChunks.GetRootNode());
 
-        t_out << "\tchunksInUse: "<< std::endl;
+        t_out << "\tchunksInUse: " << std::endl;
         int32_t idx2 = 0;
-        for (auto ch : t_arena->chunksInUse)
-        {
+        for (auto ch : t_arena->chunksInUse) {
             t_out << "\t\t" << idx2 << ". ";
             Chunk::DumpChunk(t_out, ch) << std::endl;
             idx2++;

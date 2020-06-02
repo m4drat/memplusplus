@@ -5,7 +5,6 @@
 
 namespace mpp {
 
-    
     /**
      * Basic allocator structure
      */
@@ -27,7 +26,11 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             std::size_t chunkHeader;
         } ChunkHeader;
 
-        static Chunk* ConstructChunk(void* t_newChunkPtr, std::size_t t_prevSize, std::size_t t_chunkSize, uint8_t t_isInUse, uint8_t t_isPrevInUse)
+        static Chunk* ConstructChunk(void* t_newChunkPtr,
+                                     std::size_t t_prevSize,
+                                     std::size_t t_chunkSize,
+                                     uint8_t t_isInUse,
+                                     uint8_t t_isPrevInUse)
         {
             Chunk* newChunk = (Chunk*)t_newChunkPtr;
             newChunk->SetPrevSize(t_prevSize);
@@ -45,19 +48,20 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         static Chunk* GetHeaderPtr(void* t_userData)
         {
-            return (Chunk*)((std::size_t)t_userData - sizeof(Chunk::ChunkHeader));
+            return (Chunk*)((std::size_t)t_userData -
+                            sizeof(Chunk::ChunkHeader));
         }
 
         static Chunk* GetPrevChunk(Chunk* t_chunk)
         {
             // 1. Compute prev chunk pointer
-            // 2. Call IsUsed for this pointer 
-           return ((Chunk*)((std::size_t)t_chunk - t_chunk->GetPrevSize()));
+            // 2. Call IsUsed for this pointer
+            return ((Chunk*)((std::size_t)t_chunk - t_chunk->GetPrevSize()));
         }
 
         static Chunk* GetNextChunk(Chunk* t_chunk)
         {
-           return (Chunk*)((std::size_t)t_chunk + t_chunk->GetSize());
+            return (Chunk*)((std::size_t)t_chunk + t_chunk->GetSize());
         }
 
         std::size_t GetPrevSize()
@@ -77,7 +81,8 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
         void SetSize(std::size_t size)
         {
-            this->ChunkHeader.chunkHeader = (size | (0b11111 & this->ChunkHeader.chunkHeader));
+            this->ChunkHeader.chunkHeader =
+              (size | (0b11111 & this->ChunkHeader.chunkHeader));
         }
 
         void* GetUserData()
@@ -113,12 +118,20 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             }
         };
 
-        static std::ostream& DumpChunk( std::ostream& t_out, Chunk* t_ch ) {
-            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", " << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed() << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+        static std::ostream& DumpChunk(std::ostream& t_out, Chunk* t_ch)
+        {
+            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "]("
+                         << t_ch->GetPrevSize() << ", " << t_ch->GetSize()
+                         << "|InUse:" << t_ch->IsUsed()
+                         << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
         }
 
-        friend std::ostream& operator<<( std::ostream& t_out, Chunk* t_ch ) {
-            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", " << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed() << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+        friend std::ostream& operator<<(std::ostream& t_out, Chunk* t_ch)
+        {
+            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "]("
+                         << t_ch->GetPrevSize() << ", " << t_ch->GetSize()
+                         << "|InUse:" << t_ch->IsUsed()
+                         << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
         }
     };
 }

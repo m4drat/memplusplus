@@ -12,8 +12,12 @@ namespace mpp {
 
     void* MemoryAllocator::SysAlloc(std::size_t t_size)
     {
-        void* rawPtr =
-          mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        void* rawPtr = mmap(NULL,
+                            t_size,
+                            PROT_READ | PROT_WRITE,
+                            MAP_PRIVATE | MAP_ANONYMOUS,
+                            -1,
+                            0);
         if (rawPtr == MAP_FAILED) {
             throw NoMemoryException();
         }
@@ -51,16 +55,14 @@ namespace mpp {
 
         // If we cant find arena with enough right space, we will
         // iterate through ChunkTreap to find chunk to reuse
-        for (Arena* arena : s_ArenaList)
-        {
+        for (Arena* arena : s_ArenaList) {
             Chunk* chunk = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
-            if (chunk == nullptr) 
-            { 
+            if (chunk == nullptr) {
                 continue;
             }
-            return arena->AllocateFromFreeList(chunk, t_realSize); 
+            return arena->AllocateFromFreeList(chunk, t_realSize);
         }
-        
+
         return nullptr;
     }
 
@@ -89,7 +91,7 @@ namespace mpp {
         if (chunk != nullptr) {
             return Chunk::GetUserDataPtr(chunk);
         }
-        
+
         // arena = CreateArena(g_DEFAULT_ARENA_SIZE);
         // return (arena->AllocateChunk(realChunkSize) +
         //        sizeof(Chunk::ChunkHeader));
@@ -98,10 +100,8 @@ namespace mpp {
     void MemoryAllocator::Deallocate(void* t_chunkPtr)
     {
         // Find arena, to which chunk belongs
-        for (auto* arena : s_ArenaList)
-        {
-            if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end)
-            {
+        for (auto* arena : s_ArenaList) {
+            if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
                 arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
                 break;
             }

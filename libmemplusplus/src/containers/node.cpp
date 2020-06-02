@@ -74,13 +74,19 @@ namespace mpp {
 
     std::ostream& DumpNode(std::ostream& t_out, Node* t_node)
     {
-        t_out << "[" << reinterpret_cast<void*>(t_node) << "]" << "(" << t_node->priority << ", {" << t_node->chunk << "}, L:" << reinterpret_cast<void*>(t_node->leftChild) << ", R:" << reinterpret_cast<void*>(t_node->rightChild);
+        t_out << "[" << reinterpret_cast<void*>(t_node) << "]"
+              << "(" << t_node->priority << ", {" << t_node->chunk
+              << "}, L:" << reinterpret_cast<void*>(t_node->leftChild)
+              << ", R:" << reinterpret_cast<void*>(t_node->rightChild);
         return t_out;
     }
 
     std::ostream& operator<<(std::ostream& t_out, Node* t_node)
     {
-        t_out << "[" << reinterpret_cast<void*>(t_node) << "]" << "(" << t_node->priority << ", {" << t_node->chunk << "}, L:" << reinterpret_cast<void*>(t_node->leftChild) << ", R:" << reinterpret_cast<void*>(t_node->rightChild);
+        t_out << "[" << reinterpret_cast<void*>(t_node) << "]"
+              << "(" << t_node->priority << ", {" << t_node->chunk
+              << "}, L:" << reinterpret_cast<void*>(t_node->leftChild)
+              << ", R:" << reinterpret_cast<void*>(t_node->rightChild);
         return t_out;
     }
 }

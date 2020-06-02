@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/memory_allocator.hpp"
 
 #include <iostream>
 #include <type_traits>
@@ -17,15 +18,13 @@ namespace mpp {
         std::cout << "[SharedGcPtr] Ptr created! References: " << *m_references
                   << std::endl;
 #endif
-        // TODO: add current GcPtr eto vector with GcPtrs
+        // TODO: add current GcPtr to vector with GcPtrs
     }
     catch (...)
     {
         // exception occured (e.g. new throwed std::bad_alloc)
-        // TODO: call free method on m_objectPtr
-
-        if (m_objectPtr && std::is_destructible<Type>::value)
-            m_objectPtr->~Type();
+        // Delete object, and call it's destructor
+        MemoryAllocator::Deallocate<Type>(m_objectPtr);
 
         throw;
     }
@@ -43,10 +42,7 @@ namespace mpp {
             if (*m_references == 0) {
                 delete m_references;
                 // TODO: remove current GcPtr from vector with active GcPtrs
-                // TODO: call "free" on object
-
-                if (m_objectPtr && std::is_destructible<Type>::value)
-                    m_objectPtr->~Type();
+                MemoryAllocator::Deallocate<Type>(m_objectPtr);
 
                 m_references = nullptr;
                 m_objectPtr = nullptr;
@@ -101,10 +97,8 @@ namespace mpp {
     }
 
     template<class T, class... Args>
-    SharedGcPtr<T> MakeSharedGcPtr(Args&&... args)
+    SharedGcPtr<T> MakeSharedGcPtr(Args&&... t_args)
     {
-        // TODO
-        // return new (malloc(sizeof(T))) T(std::forward<Args>(args)...);
-        return SharedGcPtr<T>();
+        return SharedGcPtr<T>(MemoryAllocator::Allocate<T>(std::forward<Args>(t_args)...));
     }
 }

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/chunk.hpp"
-#include <vector>
+#include "mpplib/containers/chunk_treap.hpp"
 #include <set>
+#include <vector>
 
 namespace mpp {
     struct Arena
@@ -26,13 +26,20 @@ namespace mpp {
         void* begin{ nullptr };
         void* end{ nullptr };
 
-        Arena(std::size_t t_size, void* t_begin)//, void* t_end)
+        Arena(std::size_t t_size, void* t_begin) //, void* t_end)
         {
             size = t_size;
             topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
             begin = t_begin;
             end = reinterpret_cast<void*>((std::size_t)t_begin + t_size);
         };
+
+        ~Arena()
+        {
+            chunksInUse.clear();
+            // MemoryAllocator::SysDealloc(begin, (std::size_t)end - (std::size_t)begin);
+            // TODO: correctly destroy ChunkTreap
+        }
 
         // Find chunk in ChunkTreap (tree of freed chunks)
         Chunk* MaxSizeChunk();
@@ -49,6 +56,9 @@ namespace mpp {
         Chunk* MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
         Chunk* MergeWithTop(Chunk* t_chunk);
 
-        static std::ostream& DumpArena( std::ostream& t_out, Arena* t_arena );
+        // TODO: Find the chunk that the current pointer belongs to
+        Chunk* GetInUseChunkByPtr(void *t_ptr);
+
+        static std::ostream& DumpArena(std::ostream& t_out, Arena* t_arena);
     };
 }
