@@ -15,6 +15,8 @@ namespace mpp {
 
     public:
         static std::ostream& DumpStats(std::ostream& t_out);
+        static std::ostream& VisHeapLayout(std::ostream& t_out);
+
         static const std::vector<Arena*>& GetArenaList()
         {
             return s_ArenaList;
@@ -23,6 +25,7 @@ namespace mpp {
         // TODO: Find the arena that the current pointer belongs to
         static Arena* GetArenaByPtr(void* t_ptr);
 
+        // FIXME:
         static bool ResetAllocatorState();
 
         static const std::size_t g_MIN_CHUNK_SIZE = 32;

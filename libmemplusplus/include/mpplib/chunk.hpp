@@ -12,7 +12,7 @@ namespace mpp {
     {
         /*
     chunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-            |            Size of chunk, in bytes       |X|U|P|X|X|
+            |            Size of chunk, in bytes      |X|U|P|X|X|
       mem-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
             |            User data starts here...               .
             .                                                   .

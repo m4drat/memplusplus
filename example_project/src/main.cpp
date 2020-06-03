@@ -67,8 +67,13 @@ int main(int argc, char* argv[])
     (Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch1)) == Chunk::GetHeaderPtr(ch2));
     (Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch2)) == currentArena->topChunk);
 
+    MemoryManager::VisHeapLayout(std::cout) << std::endl;
+
     MemoryAllocator::Deallocate(ch1);
+    MemoryManager::VisHeapLayout(std::cout) << std::endl;
+
     MemoryAllocator::Deallocate(ch2);
+    MemoryManager::VisHeapLayout(std::cout) << std::endl;
 
     return 0;
 }

@@ -16,7 +16,7 @@ namespace mpp {
     public:
         explicit SharedGcPtr(Type* obj = nullptr);
 
-        ~SharedGcPtr();
+        ~SharedGcPtr() override;
 
         // Define copy constructor
         SharedGcPtr(const SharedGcPtr<Type>& another);
