@@ -14,10 +14,6 @@ namespace mpp {
     }
     , m_references{ new uint32_t(1) }
     {
-#ifdef DEBUG
-        std::cout << "[SharedGcPtr] Ptr created! References: " << *m_references
-                  << std::endl;
-#endif
         // TODO: add current GcPtr to vector with GcPtrs
     }
     catch (...)
@@ -34,10 +30,6 @@ namespace mpp {
     {
         if (m_references) {
             --(*m_references);
-#ifdef DEBUG
-            std::cout << "[SharedGcPtr] Ptr destroyed! References: " << *m_references
-                      << std::endl;
-#endif
             // Destroy shared ptr and object
             if (*m_references == 0) {
                 delete m_references;
@@ -58,10 +50,6 @@ namespace mpp {
         if (m_references) {
             ++(*m_references);
 
-#ifdef DEBUG
-            std::cout << "[SharedGcPtr] Ptr copied! References: " << *m_references
-                      << std::endl;
-#endif
             // TODO: add copied GcPtr to vector with GcPtrs
         }
     }

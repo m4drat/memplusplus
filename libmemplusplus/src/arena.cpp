@@ -34,7 +34,7 @@ namespace mpp {
         Chunk* chunk =
           Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
         topChunk = Chunk::ConstructChunk(
-          reinterpret_cast<Chunk*>((std::size_t)topChunk + t_chunkSize),
+          reinterpret_cast<Chunk*>(reinterpret_cast<size_t>(topChunk) + t_chunkSize),
           t_chunkSize,
           newTopChunkSize,
           1,
@@ -67,7 +67,7 @@ namespace mpp {
                 Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
 
                 Chunk* splittedChunk =
-                  Chunk::ConstructChunk((void*)((std::size_t)chunk + t_chunkSize),
+                  Chunk::ConstructChunk(reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
                                         t_chunkSize,
                                         toSplitChunkSize - t_chunkSize,
                                         0,
@@ -92,7 +92,7 @@ namespace mpp {
                 Chunk* chunk = Chunk::ConstructChunk(
                   t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
                 Chunk* splittedChunk =
-                  Chunk::ConstructChunk((void*)((std::size_t)chunk + t_chunkSize),
+                  Chunk::ConstructChunk(reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
                                         t_chunkSize,
                                         toSplitChunkSize - t_chunkSize,
                                         0,
@@ -139,7 +139,7 @@ namespace mpp {
         4. DT
         */
         if (((topChunk == nullptr) &&
-             ((void*)((std::size_t)t_chunk + t_chunk->GetSize()) == end)) ||
+             (reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) + t_chunk->GetSize()) == end)) ||
             (Chunk::GetNextChunk(t_chunk) == topChunk)) {
             return MergeWithTop(t_chunk);
         }
@@ -161,7 +161,7 @@ namespace mpp {
         }
 
         // Merge backwards
-        if (((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+        if ((reinterpret_cast<void*>(t_chunk) != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
         }
@@ -184,7 +184,7 @@ namespace mpp {
         // if (topChunk != nullptr)
         //     freedChunks.RemoveChunk(t_chunk);
         Chunk* newChunk{ t_chunk };
-        if (((void*)t_chunk != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+        if ((reinterpret_cast<void*>(t_chunk) != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             // freedChunks.RemoveChunk(t_chunk);
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
@@ -192,7 +192,7 @@ namespace mpp {
 
         if (topChunk == nullptr) {
             topChunk = newChunk;
-            if ((void*)topChunk != begin) {
+            if (reinterpret_cast<void*>(topChunk) != begin) {
                 topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize());
             } else {
                 // ChunkSize is already set by MergeTwoSequnceChunks function

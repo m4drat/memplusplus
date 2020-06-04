@@ -6,11 +6,10 @@
 #include <vector>
 
 namespace mpp {
-
     class MemoryManager
     {
     protected:
-        // TODO: refactor to worrk with std::unique_ptr
+        // TODO: refactor to work with std::unique_ptr
         static std::vector<Arena*> s_ArenaList;
 
     public:
@@ -22,10 +21,9 @@ namespace mpp {
             return s_ArenaList;
         }
 
-        // TODO: Find the arena that the current pointer belongs to
         static Arena* GetArenaByPtr(void* t_ptr);
 
-        // FIXME:
+        // TODO:
         static bool ResetAllocatorState();
 
         static const std::size_t g_MIN_CHUNK_SIZE = 32;

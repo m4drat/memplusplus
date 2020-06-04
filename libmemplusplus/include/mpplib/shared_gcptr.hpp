@@ -48,13 +48,16 @@ namespace mpp {
 
         std::ostream& Print(std::ostream& t_out) const override
         {
-            return t_out << "[|SP|" << this << "]"
-                         << "(" << reinterpret_cast<void*>(m_objectPtr) << ", "
-                         << *m_references << ")" << std::endl;
+            t_out << "|SP|[" << this << "]" << "(";
+            if (m_objectPtr)
+                t_out << reinterpret_cast<void*>(m_objectPtr);
+            else
+                t_out << "nullptr";
+            return t_out << ", "
+                         << *m_references << ")";
         }
     };
 
-    // TODO
     template<class T, class... Args>
     SharedGcPtr<T> MakeSharedGcPtr(Args&&... args);
 };

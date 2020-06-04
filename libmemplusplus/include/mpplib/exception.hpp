@@ -3,7 +3,6 @@
 #include <exception>
 #include <string>
 
-// FIXME
 namespace mpp {
     class Exception : virtual public std::exception
     {

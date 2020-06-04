@@ -64,7 +64,6 @@ namespace mpp {
         return nullptr;
     }
 
-    // FIXME
     void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
     {
         Arena* arena = CreateArena(t_userDataSize);

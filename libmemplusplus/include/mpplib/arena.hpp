@@ -3,6 +3,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
 #include <set>
+#include <cstddef>
 #include <vector>
 
 namespace mpp {

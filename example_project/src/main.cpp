@@ -1,79 +1,60 @@
 #include <iostream>
 
 #include "mpplib/memory_allocator.hpp"
+#include "mpplib/shared_gcptr.hpp"
+
+using namespace mpp;
+
+class UserData
+{
+private:
+    int m_data{ 0 };
+public:
+    UserData(int val) : m_data{ val }
+    {
+        std::cout << "Created!\n";
+    }
+
+    ~UserData()
+    {
+        std::cout << "Deleted!\n";
+    }
+};
+
+SharedGcPtr<UserData> foo()
+{
+    SharedGcPtr<UserData> p1 = MakeSharedGcPtr<UserData>(1337);
+    return p1;
+}
 
 int main(int argc, char* argv[])
 {
-    using namespace mpp;
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; void* block1 = MemoryAllocator::Allocate(50);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; void* block2 = MemoryAllocator::Allocate(50);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; void* block3 = MemoryAllocator::Allocate(50);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; void* block4 = MemoryAllocator::Allocate(50);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl;
-
-    // MemoryAllocator::Deallocate(block3);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; MemoryAllocator::Deallocate(block1);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; MemoryAllocator::Deallocate(block2);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl; MemoryAllocator::Deallocate(block4);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout <<
-    // "================================================================================================"
-    // << std::endl;
-
-    // void* block5 = MemoryAllocator::Allocate(50331648);
-    // MemoryManager::DumpStats(std::cout);
-    // std::cout << "============================================================="
-    //              "==================================="
-    //           << std::endl;
-    // MemoryAllocator::Deallocate(block5);
-    // MemoryManager::DumpStats(std::cout);
-
-    MemoryManager::ResetAllocatorState();
-
-    void* ch1 = MemoryAllocator::Allocate(128);
-    void* ch2 = MemoryAllocator::Allocate(128);
-
-    Arena* currentArena = MemoryManager::GetArenaList().at(0);
-
-    ((ch1 != nullptr && ch2 != nullptr));
-    (ch1 < ch2);
-
-    (currentArena->chunksInUse.size() == 2);
-    for (Chunk* chunk : currentArena->chunksInUse)
-        (chunk->GetSize() == 160);
-    (Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch1)) == Chunk::GetHeaderPtr(ch2));
-    (Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch2)) == currentArena->topChunk);
-
-    MemoryManager::VisHeapLayout(std::cout) << std::endl;
-
-    MemoryAllocator::Deallocate(ch1);
-    MemoryManager::VisHeapLayout(std::cout) << std::endl;
-
-    MemoryAllocator::Deallocate(ch2);
-    MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    SharedGcPtr<SharedGcPtr<UserData>> p0 = MakeSharedGcPtr<SharedGcPtr<UserData>>(MakeSharedGcPtr<UserData>(1337));
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // SharedGcPtr<UserData> p1 = foo();
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // SharedGcPtr<UserData> p2 = foo();
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // SharedGcPtr<UserData> p3 = foo();
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // SharedGcPtr<UserData> p4 = foo();
+    // SharedGcPtr<UserData> p5(p4);
+    // SharedGcPtr<UserData> p6 = p5;
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // std::cout << p1 << std::endl;
+    // std::cout << p2 << std::endl;
+    // std::cout << p3 << std::endl;
+    // std::cout << p4 << std::endl;
+    // std::cout << p5 << std::endl;
+    // std::cout << p6 << std::endl;
+    // p1 = nullptr;
+    // std::cout << p1 << std::endl;
+    // std::cout << p2 << std::endl;
+    // std::cout << p3 << std::endl;
+    // std::cout << p4 << std::endl;
+    // std::cout << p5 << std::endl;
+    // std::cout << p6 << std::endl;
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
 
     return 0;
 }
