@@ -1,24 +1,17 @@
 #pragma once
-#include <bits/stdc++.h>
+
 #include <vector>
+#include <cstdint>
 
 namespace mpp {
-
     class Graph
     {
-        using Pair = std::pair<int, int>;
-
-    private:
-        int m_NodesCount{ 0 };
-        std::vector<std::vector<Pair>> m_ColList;
-
-    public:
-        struct Edge
+        class Vertex; // 
+        class Edge;
+        struct Node
         {
-            int src, dest, weight;
+            uint32_t flags;
+            std::vector<Node*> Childs;
         };
-
-        Graph(std::vector<Edge> const& edges, int t_NodesCount);
-        void printGraph();
     };
 }

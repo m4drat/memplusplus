@@ -226,6 +226,9 @@ OR
 32. __c++ GC__: http://www.devx.com/assets/sourcecode/9928.pdf
 33. __Compacting garbage collector implementation in C++0x__: https://stackoverflow.com/questions/4558473/compacting-garbage-collector-implementation-in-c0x
 34. Example allocators: https://github.com/tiagovcosta/aquaengine/tree/master/AquaEngine/Core/Allocators
+35. Smart ptrs info: https://lokiastari.com/blog/2014/12/30/c-plus-plus-by-example-smart-pointer/index.html 
+36. Shared ptr implementation: https://codereview.stackexchange.com/questions/30398/yet-another-shared-pointer
+37. Shared ptr (one of the best): https://codereview.stackexchange.com/questions/49672/one-more-shared-pointer
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY

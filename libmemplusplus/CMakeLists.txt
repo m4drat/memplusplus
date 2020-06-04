@@ -8,6 +8,7 @@ add_library(${PROJECT_NAME}
 	src/memory_manager.cpp
 	src/graph.cpp
 	src/arena.cpp
+	src/gc.cpp
 )
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 

@@ -310,7 +310,7 @@ TEST_CASE("")
 
     REQUIRE(arena->GetInUseChunkByPtr(p6) == Chunk::GetHeaderPtr(p6));
     REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p6));
-    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) - 17) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) - 1) == Chunk::GetHeaderPtr(p5));
     REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p6));
 }
 

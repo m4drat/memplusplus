@@ -36,7 +36,7 @@ if(CLANG_TIDY)
         clang-tidy
         COMMAND ${CLANG_TIDY}
         ${ALL_CXX_SOURCE_FILES}
-        -checks=*
+        -checks=clang-analyzer-*,cppcoreguidelines*,performance-*,portability-*,readability-*
         --
         -std=c++17
         -I${EXAMPLE_PROJECT_INCLUDES}
