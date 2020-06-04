@@ -7,7 +7,7 @@
 #include <vector>
 
 namespace mpp {
-    struct Arena
+    class Arena final
     {
         /**
          * What we should use to save information about freed/in-use blocks?
@@ -19,6 +19,7 @@ namespace mpp {
          *     4. Find bigger or equal element - O(logN)
          *      ===> Treap
          */
+    public:
         ChunkTreap freedChunks;
 
         std::set<Chunk*> chunksInUse;

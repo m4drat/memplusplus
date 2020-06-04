@@ -1,4 +1,5 @@
 #include "mpplib/arena.hpp"
+#include "mpplib/utils/utils.hpp"
 
 #include <functional>
 
@@ -222,11 +223,21 @@ namespace mpp {
         return chunk;
     }
 
-    // Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
-    // {
-    //     if (t_ptr <= begin || t_ptr >= end)
-    //         return nullptr;
-    // }
+    // WARNING: t_ptr  should be on chunksInUse range!
+    // works ONLY on InUse chunks!
+    Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
+    {
+        auto foundChunkIt = LowerBound(chunksInUse.begin(), chunksInUse.end(), t_ptr, 
+            [](Chunk* t_ch, void* t_ptr) -> bool {
+                return (t_ptr >= reinterpret_cast<void*>(t_ch));
+            }
+        );
+        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr)
+        {
+            return *foundChunkIt;
+        }
+        return *(--foundChunkIt);
+    }
 
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
     {

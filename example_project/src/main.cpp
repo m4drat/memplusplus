@@ -29,7 +29,7 @@ SharedGcPtr<UserData> foo()
 
 int main(int argc, char* argv[])
 {
-    SharedGcPtr<SharedGcPtr<UserData>> p0 = MakeSharedGcPtr<SharedGcPtr<UserData>>(MakeSharedGcPtr<UserData>(1337));
+    // SharedGcPtr<SharedGcPtr<UserData>> p0 = MakeSharedGcPtr<SharedGcPtr<UserData>>(MakeSharedGcPtr<UserData>(1337));
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
     // SharedGcPtr<UserData> p1 = foo();
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
@@ -55,6 +55,22 @@ int main(int argc, char* argv[])
     // std::cout << p5 << std::endl;
     // std::cout << p6 << std::endl;
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+
+    void* p1 = MemoryAllocator::Allocate(144);
+    void* p2 = MemoryAllocator::Allocate(144);
+    void* p3 = MemoryAllocator::Allocate(144);
+    void* p4 = MemoryAllocator::Allocate(144);
+    void* p5 = MemoryAllocator::Allocate(144);
+    void* p6 = MemoryAllocator::Allocate(144);
+
+    MemoryAllocator::Deallocate(p2);
+    MemoryAllocator::Deallocate(p4);
+
+    std::cout << "Found: " << (void*)MemoryManager::GetArenaByPtr(p1)->GetInUseChunkByPtr(p5 + 160) << std::endl;
+    std::cout << "Correct: " << (void*)((std::size_t)p6 - 16) << std::endl;
+
+    MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    MemoryManager::DumpStats(std::cout);
 
     return 0;
 }
