@@ -26,7 +26,7 @@ namespace mpp {
         ~SharedGcPtr() override;
 
         // Assignment operators
-        SharedGcPtr<Type>& operator=(SharedGcPtr t_other);
+        // SharedGcPtr<Type>& operator=(SharedGcPtr t_other);
         SharedGcPtr<Type>& operator=(SharedGcPtr&& t_other) noexcept;
         SharedGcPtr<Type>& operator=(const SharedGcPtr& t_other);
         SharedGcPtr<Type>& operator=(Type* t_newData);

@@ -19,6 +19,9 @@ namespace mpp {
          *     4. Find bigger or equal element - O(logN)
          *      ===> Treap
          */
+    private:
+        std::size_t CurrentlyAllocatedSpace{ 0 };
+
     public:
         ChunkTreap freedChunks;
 
@@ -33,7 +36,7 @@ namespace mpp {
             size = t_size;
             topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
             begin = t_begin;
-            end = reinterpret_cast<void*>((std::size_t)t_begin + t_size);
+            end = reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_begin) + t_size);
         };
 
         ~Arena()
@@ -42,6 +45,8 @@ namespace mpp {
             // MemoryAllocator::SysDealloc(begin, (std::size_t)end - (std::size_t)begin);
             // TODO: correctly destroy ChunkTreap
         }
+
+        std::size_t GetUsedSpace();         
 
         // Find chunk in ChunkTreap (tree of freed chunks)
         Chunk* MaxSizeChunk();

@@ -34,6 +34,7 @@ namespace mpp {
     Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
     {
         void* arenaSpace = SysAlloc(t_arenaSize);
+        // TODO - smart pointers memory managment
         Arena* arena = new Arena(t_arenaSize, arenaSpace);
         s_ArenaList.push_back(arena);
 

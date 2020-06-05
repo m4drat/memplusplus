@@ -13,6 +13,7 @@ namespace mpp {
     {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
         chunksInUse.insert(chunk);
+        CurrentlyAllocatedSpace += t_chunkSize;
         return chunk;
     }
 
@@ -48,6 +49,7 @@ namespace mpp {
     {
         Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
         chunksInUse.insert(chunk);
+        CurrentlyAllocatedSpace += t_chunkSize;
         return chunk;
     }
 
@@ -119,7 +121,7 @@ namespace mpp {
 
         // Delete chunk from active chunks
         chunksInUse.erase(t_chunk);
-
+        CurrentlyAllocatedSpace -= t_chunk->GetSize();
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
         if (newChunk != topChunk) {
             freedChunks.InsertChunk(newChunk);
@@ -237,6 +239,11 @@ namespace mpp {
             return *foundChunkIt;
         }
         return *(--foundChunkIt);
+    }
+
+    std::size_t Arena::GetUsedSpace()
+    {
+        return CurrentlyAllocatedSpace;
     }
 
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)

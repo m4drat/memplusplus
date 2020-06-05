@@ -7,12 +7,12 @@ namespace mpp {
 
     bool GC::Collect()
     {
-        // std::cout << "======================" << std::endl;
+        std::cout << "======================" << std::endl;
         for (GcPtr* gcPtr : s_activeGcPtrs)
         {
-            // std::cout << "GcPtr: " << (void*)gcPtr << std::endl;
-            // std::cout << "Ptr:   " << gcPtr->GetVoid() << std::endl;
+            std::cout << "GcPtr: " << (void*)gcPtr << std::endl;
+            std::cout << "Ptr:   " << gcPtr->GetVoid() << std::endl;
         }
-        // std::cout << "======================" << std::endl;
+        std::cout << "======================" << std::endl;
     }
 }

@@ -6,6 +6,7 @@ namespace mpp {
         : m_root(nullptr)
     {}
 
+    // TODO - smart pointers memory managment
     ChunkTreap::ChunkTreap(const ChunkTreap& t_treap)
         : m_root(new Node(*t_treap.m_root))
     {}
@@ -17,6 +18,7 @@ namespace mpp {
 
         Delete();
 
+        // TODO - smart pointers memory managment
         m_root = new Node(*t_treap.m_root);
 
         return *this;
@@ -73,6 +75,7 @@ namespace mpp {
 
     void ChunkTreap::InsertChunk(Chunk* t_chunk)
     {
+        // TODO - smart pointers memory managment
         InsertNode(new Node(t_chunk));
     }
 

@@ -31,16 +31,19 @@ int main(int argc, char* argv[])
 {
     // SharedGcPtr<SharedGcPtr<UserData>> p0 = MakeSharedGcPtr<SharedGcPtr<UserData>>(MakeSharedGcPtr<UserData>(1337));
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
-    SharedGcPtr<UserData> p0 = MakeSharedGcPtr<UserData>(1337);
+    // SharedGcPtr<UserData> p0 = MakeSharedGcPtr<UserData>(1337);
+    // GC::Collect();
+    SharedGcPtr<UserData> p1(nullptr);
     GC::Collect();
-    SharedGcPtr<UserData> p1 = p0;
+
+    char* data = new char[64];
+
+    SharedGcPtr<char> p2 = nullptr;
+    p2 = data;
     GC::Collect();
-    SharedGcPtr<UserData> p2 = p0;
-    GC::Collect();
-    SharedGcPtr<UserData> p3 = p0;
-    GC::Collect();
-    SharedGcPtr<UserData> p4 = p0;
-    GC::Collect();
+
+    // SharedGcPtr<UserData> p2 = MakeSharedGcPtr<UserData>(1599);
+    // GC::Collect();
 
     // SharedGcPtr<UserData> p0 = MakeSharedGcPtr<UserData>(1337);
 

@@ -48,8 +48,10 @@ namespace mpp {
     {
         if (m_references) {
             ++(*m_references);
-            GC::GetGcPtrs().push_back(this);
         }
+
+        if (m_objectPtr != nullptr)
+            GC::GetGcPtrs().push_back(this);
     }
 
     // Destructors
@@ -58,33 +60,26 @@ namespace mpp {
     {
         // We should delete every smart pointer from list
         DeleteFromGcList();
-
-        if (m_references) {
-            --(*m_references);
-            // Destroy shared ptr and object
-            if (*m_references <= 0) {
-                delete m_references;
-                // TODO: shoud we really deallocate data, or we just need to delete it from chunksInUse? + call object destructor
-                MemoryAllocator::Deallocate<Type>(m_objectPtr);
-
-                m_references = nullptr;
-                m_objectPtr = nullptr;
-            }
-        }
+        Reset();
     }
 
     // Assignment operators
-    template<class Type>
-    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr t_other)
-    {
-        t_other.Swap(*this);
-        return *this;
-    }
+    // template<class Type>
+    // SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr t_other)
+    // {
+    //     t_other.Swap(*this);
+    //     return *this;
+    // }
+
 
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr&& t_other) noexcept
     {
         Swap(t_other);
+
+        if (m_objectPtr != nullptr)
+            GC::GetGcPtrs().push_back(this);
+        
         return *this;
     }
 
@@ -93,30 +88,36 @@ namespace mpp {
     {
         if (this == &t_other)
             return *this;
-        this->~SharedGcPtr();
+        Reset();
+
         m_objectPtr = t_other.m_objectPtr;
         m_references = t_other.m_references;
+
+        if (m_objectPtr == nullptr)
+            DeleteFromGcList();
+
         if (m_references) 
-        {
-            GC::GetGcPtrs().push_back(this);
             ++(*m_references);
-        }
 
         return *this;
     }
 
-    // TODO
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(Type* t_newData)
     {
         SharedGcPtr tmp(t_newData);
         tmp.Swap(*this);
+
+        if (m_objectPtr != nullptr)
+            GC::GetGcPtrs().push_back(this);
+
         return *this;
     }
 
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
+        DeleteFromGcList();
         this->Reset();
     }
 
@@ -188,9 +189,19 @@ namespace mpp {
     template <class Type>
     void SharedGcPtr<Type>::Reset(std::nullptr_t const)
     {
-        this->~SharedGcPtr();
-        m_references = nullptr;
-        m_objectPtr = nullptr;
+        if (m_references) {
+            --(*m_references);
+            // Destroy shared ptr and object
+            if (*m_references <= 0) {
+                delete m_references;
+                // TODO: shoud we really deallocate data, or we just need to delete it from chunksInUse? + call object destructor
+                if (m_objectPtr)
+                    MemoryAllocator::Deallocate<Type>(m_objectPtr);
+
+                m_references = nullptr;
+                m_objectPtr = nullptr;
+            }
+        }
     }
 
     // TODO: should we update pointer in GcPtrsList after swapping?
