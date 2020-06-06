@@ -43,10 +43,11 @@ namespace mpp {
         Type* operator->() const noexcept;
         Type& operator*() const noexcept;
 
+        bool AddToGcList();
         bool DeleteFromGcList();
         void Reset();
         void Reset(std::nullptr_t const);
-        void Swap(SharedGcPtr& t_other) noexcept;
+        void Swap(SharedGcPtr& t_other);
         Type* Get() const;
         void* GetVoid() const override;
         void UpdatePtr(void* t_newPtr) override;

@@ -229,6 +229,10 @@ OR
 35. Smart ptrs info: https://lokiastari.com/blog/2014/12/30/c-plus-plus-by-example-smart-pointer/index.html 
 36. Shared ptr implementation: https://codereview.stackexchange.com/questions/30398/yet-another-shared-pointer
 37. Shared ptr (one of the best): https://codereview.stackexchange.com/questions/49672/one-more-shared-pointer
+38. Graph representations: https://www.geeksforgeeks.org/graph-and-its-representations/
+39. Graph implementation: https://gist.github.com/miguelgazela/4428700
+40. Graph representation - 2: http://www2.cedarcrest.edu/academic/csc/nlippincott/graph/graph_8h-source.html
+41. Boost graph library: https://www.boost.org/doc/libs/1_46_1/libs/graph/doc/index.html
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY

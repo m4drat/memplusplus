@@ -6,7 +6,7 @@ add_library(${PROJECT_NAME}
 	src/shared_gcptr.cpp
 	src/memory_allocator.cpp
 	src/memory_manager.cpp
-	src/graph.cpp
+	src/gc_graph.cpp
 	src/arena.cpp
 	src/gc.cpp
 )

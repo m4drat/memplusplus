@@ -30,7 +30,7 @@ namespace mpp {
     }
     , m_references{ new uint32_t(1) }
     {
-        GC::GetGcPtrs().push_back(this);
+        AddToGcList();
     }
     catch (...)
     {
@@ -51,7 +51,7 @@ namespace mpp {
         }
 
         if (m_objectPtr != nullptr)
-            GC::GetGcPtrs().push_back(this);
+            AddToGcList();
     }
 
     // Destructors
@@ -78,7 +78,7 @@ namespace mpp {
         Swap(t_other);
 
         if (m_objectPtr != nullptr)
-            GC::GetGcPtrs().push_back(this);
+            AddToGcList();
         
         return *this;
     }
@@ -109,7 +109,7 @@ namespace mpp {
         tmp.Swap(*this);
 
         if (m_objectPtr != nullptr)
-            GC::GetGcPtrs().push_back(this);
+            AddToGcList();
 
         return *this;
     }
@@ -169,6 +169,13 @@ namespace mpp {
     }
     
     template<class Type>
+    bool SharedGcPtr<Type>::AddToGcList()
+    {
+        GC::GetGcPtrs().push_back(this);
+        return true;
+    }
+    
+    template<class Type>
     bool SharedGcPtr<Type>::DeleteFromGcList()
     {
         auto toErase = std::find(GC::GetGcPtrs().begin(), GC::GetGcPtrs().end(), this);
@@ -204,10 +211,21 @@ namespace mpp {
         }
     }
 
-    // TODO: should we update pointer in GcPtrsList after swapping?
     template<class Type>
-    void SharedGcPtr<Type>::Swap(SharedGcPtr& t_other) noexcept
+    void SharedGcPtr<Type>::Swap(SharedGcPtr& t_other)
     {
+        if (m_objectPtr == nullptr && t_other.m_objectPtr != nullptr)
+        {
+            t_other.DeleteFromGcList();
+            AddToGcList();
+        }
+
+        if (m_objectPtr != nullptr && t_other.m_objectPtr == nullptr)
+        {
+            DeleteFromGcList();
+            t_other.AddToGcList();
+        }
+
         std::swap(m_objectPtr, t_other.m_objectPtr);
         std::swap(m_references, t_other.m_references);
     }

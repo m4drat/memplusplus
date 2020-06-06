@@ -29,18 +29,24 @@ SharedGcPtr<UserData> foo()
 
 int main(int argc, char* argv[])
 {
+    char* data = new char[64];
+    SharedGcPtr<char> p1(data);
+    SharedGcPtr<char> p2(p1);
+    GC::Collect();
+
+    std::cout << p1 << std::endl;
+    std::cout << p2 << std::endl;
+    std::cout << "======================" << std::endl;
+    SharedGcPtr<char> p3 = nullptr;
+    p3.Swap(p2);
+    std::cout << p1 << std::endl;
+    std::cout << p2 << std::endl;
+    std::cout << p3 << std::endl;
+    GC::Collect();
     // SharedGcPtr<SharedGcPtr<UserData>> p0 = MakeSharedGcPtr<SharedGcPtr<UserData>>(MakeSharedGcPtr<UserData>(1337));
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
     // SharedGcPtr<UserData> p0 = MakeSharedGcPtr<UserData>(1337);
     // GC::Collect();
-    SharedGcPtr<UserData> p1(nullptr);
-    GC::Collect();
-
-    char* data = new char[64];
-
-    SharedGcPtr<char> p2 = nullptr;
-    p2 = data;
-    GC::Collect();
 
     // SharedGcPtr<UserData> p2 = MakeSharedGcPtr<UserData>(1599);
     // GC::Collect();

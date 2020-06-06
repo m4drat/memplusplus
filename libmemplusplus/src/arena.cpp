@@ -251,6 +251,7 @@ namespace mpp {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
 
         t_out << "\tsize: " << t_arena->size << std::endl;
+        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->CurrentlyAllocatedSpace << std::endl;
 
         t_out << "\ttopChunk: ";
         if (t_arena->topChunk)
