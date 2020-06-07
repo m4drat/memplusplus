@@ -9,6 +9,31 @@ namespace mpp {
         Clear();
     }
 
+    std::string GcGraph::GenerateGraphvizLayout()
+    {
+        std::string graphvizStr = "digraph Objects {\n";
+        for (auto v1 : m_adjList)
+        {
+            graphvizStr += "\t\"" + v1->ToString() + "\"";
+            if (v1->GetNeighbors().size() != 0)
+                graphvizStr += " -> ";
+
+            for (auto v2 : v1->GetNeighbors())
+            {
+                graphvizStr += "\"" + v2->ToString() + "\"" + " -> ";
+            }
+
+            if (v1->GetNeighbors().size() != 0)
+                graphvizStr = graphvizStr.substr(0, graphvizStr.size() - 4);
+            
+            graphvizStr += ";\n";
+        }
+
+        graphvizStr += "}";
+
+        return graphvizStr;
+    }
+
     void GcGraph::AddEdge(Vertex* t_from, Vertex* t_to)
     {
         if (m_adjList.find(t_from) == m_adjList.end())
@@ -29,6 +54,16 @@ namespace mpp {
         t_from->RemoveNeighbor(t_to);
     }
 
+    std::pair<std::set<mpp::Vertex *>::iterator, bool> GcGraph::AddVertex(Vertex* t_vertex)
+    {
+        return m_adjList.insert(t_vertex);
+    }
+
+    bool GcGraph::RemoveVertex(Vertex* t_vertex)
+    {
+        return m_adjList.erase(t_vertex);
+    }
+
     Vertex* GcGraph::FindVertex(Chunk* t_chunk)
     {
         std::unique_ptr<Vertex> vertex = std::make_unique<Vertex>(t_chunk);
@@ -39,14 +74,14 @@ namespace mpp {
         return nullptr;
     }
 
-    std::pair<std::set<mpp::Vertex *>::iterator, bool> GcGraph::AddVertex(Vertex* t_vertex)
+    int32_t GcGraph::GetGraphVerticesCount()
     {
-        return m_adjList.insert(t_vertex);
+        return m_adjList.size();
     }
 
-    bool GcGraph::RemoveVertex(Vertex* t_vertex)
+    std::set<Vertex*, GcGraph::VertexComparator>& GcGraph::GetAdjList()
     {
-        return m_adjList.erase(t_vertex);
+        return m_adjList;
     }
 
     bool GcGraph::Clear()

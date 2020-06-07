@@ -62,7 +62,6 @@ namespace mpp {
         Chunk* SplitTopChunk(std::size_t t_chunkSize);
         Chunk* MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
         Chunk* MergeWithTop(Chunk* t_chunk);
-
         // TODO: Find the chunk that the current pointer belongs to
         Chunk* GetInUseChunkByPtr(void* t_ptr);
 

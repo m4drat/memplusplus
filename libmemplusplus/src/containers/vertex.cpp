@@ -16,6 +16,11 @@ namespace mpp {
         return m_neighbors.erase(t_neigbor);
     }
 
+    std::set<Vertex*>& Vertex::GetNeighbors()
+    {
+        return m_neighbors;
+    }
+
     void Vertex::AddGcPtr(GcPtr* t_gcPtr)
     {
         m_pointingToGcPtrs.push_back(t_gcPtr);
@@ -32,8 +37,20 @@ namespace mpp {
         return false;
     }
 
+    std::vector<GcPtr*>& Vertex::GetPointingToGcPtrs()
+    {
+        return m_pointingToGcPtrs;
+    }
+
     Chunk* Vertex::GetCorrespondingChunk() const
     {
         return m_correspondingChunk;
+    }
+
+    std::string Vertex::ToString() const
+    {
+        std::stringstream ss;
+        ss << static_cast<const void*>(m_correspondingChunk);
+        return ss.str();
     }
 }

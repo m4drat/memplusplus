@@ -1,6 +1,7 @@
 project(mpp)
 
 add_library(${PROJECT_NAME}
+	src/heuristics/heuristics.cpp
 	src/containers/chunk_treap.cpp
 	src/containers/gc_graph.cpp
 	src/containers/node.cpp

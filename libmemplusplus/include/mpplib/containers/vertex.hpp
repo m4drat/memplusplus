@@ -3,6 +3,8 @@
 #include <set>
 #include <vector>
 #include <algorithm>
+#include <string>
+#include <sstream>
 
 #include <mpplib/chunk.hpp>
 #include <mpplib/gcptr.hpp>
@@ -26,10 +28,13 @@ namespace mpp {
 
         void AddNeighbor(Vertex* t_neigbor);
         bool RemoveNeighbor(Vertex* t_neigbor);
+        std::set<Vertex*>& GetNeighbors();
 
         void AddGcPtr(GcPtr* t_gcPtr);
         bool RemoveGcPtr(GcPtr* t_gcPtr);
+        std::vector<GcPtr*>& GetPointingToGcPtrs();
 
         Chunk* GetCorrespondingChunk() const;
+        std::string ToString() const;
     };
 }
