@@ -2,11 +2,12 @@ project(mpp)
 
 add_library(${PROJECT_NAME}
 	src/containers/chunk_treap.cpp
+	src/containers/gc_graph.cpp
 	src/containers/node.cpp
+	src/containers/vertex.cpp
 	src/shared_gcptr.cpp
 	src/memory_allocator.cpp
 	src/memory_manager.cpp
-	src/gc_graph.cpp
 	src/arena.cpp
 	src/gc.cpp
 )

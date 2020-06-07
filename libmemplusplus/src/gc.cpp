@@ -1,32 +1,50 @@
 #include "mpplib/gc.hpp"
+#include "mpplib/containers/gc_graph.hpp"
 
-// struct Node
-// {
-//     std::vector<GcPtr*> currentChunkGcPtrs;
-// }
-
-
-// | | | |
-
-// |X|0|1|2|
-// |0| | | |
-// |1| | | |
-// |2| | | |
+#include <memory>
 
 namespace mpp {
     std::vector<GcPtr*> GC::s_activeGcPtrs;
     std::size_t s_garbageSize = 0;
     std::size_t s_dataSize = 0;
-    GcGraph m_objectsGraph(); // Initialize empty graph
 
     bool GC::Collect()
     {
-        std::cout << "======================" << std::endl;
-        for (GcPtr* gcPtr : s_activeGcPtrs)
+        std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>();
+
+        // Construct chunks graph
+        for (auto gcPtr : s_activeGcPtrs)
         {
-            std::cout << "GcPtr: " << (void*)gcPtr << std::endl;
-            std::cout << "Ptr:   " << gcPtr->GetVoid() << std::endl;
+            Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(gcPtr->GetVoid());
+            Chunk* gcPtrLocationChunk = MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(gcPtr));
+
+            if (gcPtrLocationChunk != nullptr)
+            {
+                //Check that "to" vertex is already exsist
+                Vertex* to = objectsGraph->FindVertex(gcPtrObjectChunk);
+                if (to != nullptr)
+                {
+                    to->AddGcPtr(gcPtr);           
+                } else {
+                    to = new Vertex(gcPtrObjectChunk);
+                    to->AddGcPtr(gcPtr); 
+                }
+                //Check that "from" vertex is already exsist
+                Vertex* from = objectsGraph->FindVertex(gcPtrLocationChunk);
+                if (from == nullptr)
+                    from = new Vertex(gcPtrLocationChunk);
+                objectsGraph->AddEdge(from, to);    
+            } else {
+                Vertex* vertex = objectsGraph->FindVertex(gcPtrObjectChunk);
+                if (vertex != nullptr)
+                {
+                    vertex->AddGcPtr(gcPtr);           
+                } else {
+                    vertex = new Vertex(gcPtrObjectChunk);
+                    vertex->AddGcPtr(gcPtr);
+                    objectsGraph->AddVertex(vertex);
+                }
+            }
         }
-        std::cout << "======================" << std::endl;
     }
 }

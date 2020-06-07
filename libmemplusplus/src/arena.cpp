@@ -225,7 +225,7 @@ namespace mpp {
         return chunk;
     }
 
-    // WARNING: t_ptr  should be on chunksInUse range!
+    // WARNING: t_ptr  should be in chunksInUse range!
     // works ONLY on InUse chunks!
     Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
     {

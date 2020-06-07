@@ -22,6 +22,7 @@ namespace mpp {
         }
 
         static Arena* GetArenaByPtr(void* t_ptr);
+        static Chunk* GetInUseChunkByPtr(void* t_chunk);
 
         // TODO:
         static bool ResetAllocatorState();

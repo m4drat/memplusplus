@@ -53,5 +53,19 @@ namespace mpp {
                 return arena;
             }
         }
+
+        return nullptr;
     }
+
+    Chunk* MemoryManager::GetInUseChunkByPtr(void* t_chunk)
+    {
+        Arena* arena = GetArenaByPtr(t_chunk);
+        if (arena != nullptr)
+        {
+            return arena->GetInUseChunkByPtr(t_chunk);
+        }
+
+        return nullptr;
+    }
+
 }
