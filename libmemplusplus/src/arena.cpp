@@ -246,6 +246,11 @@ namespace mpp {
         return CurrentlyAllocatedSpace;
     }
 
+    void Arena::SetUsedSpace(std::size_t t_newSize)
+    {
+        CurrentlyAllocatedSpace = t_newSize;
+    }
+
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
     {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;

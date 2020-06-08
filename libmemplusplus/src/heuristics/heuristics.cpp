@@ -2,36 +2,51 @@
 
 namespace mpp
 {
-    Heuristics::Heuristics(std::unique_ptr<GcGraph>& t_objectsGraph)
+    Heuristics::Heuristics(GcGraph* t_objectsGraph)
     {
-        m_subgraphs = t_objectsGraph->ExtractSubgraphs();
+        m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
+        // for (auto& graph : m_subgraphs)
+        // {
+        //     std::cout << graph->GenerateGraphvizLayout() << std::endl;
+        // }
     }
 
-    std::pair<std::vector<Vertex*>, std::size_t> Heuristics::Layout()
+    std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>> Heuristics::Layout()
     {
-        for (GcGraph* gcGraph : m_subgraphs)
+        
+        for (auto& graph : m_subgraphs)
         {
-            auto groups = ExtractGroups(gcGraph);
-            for (auto [gcSubgraph, DSType] : groups)
+            for (const auto& v : graph->GetAdjList())
             {
-                switch (DSType)
-                {
-                case DataStructures::LinkedList:
-                    layoutedGroup = // Somehow layout group
-                    break;
-                default:
-                    break;
-                }
-
-                for ()
-                {
-                    m_layoutedHeap.push_back()
-                }
+                m_layoutedHeap.push_back(v);
+                m_neededSpace += v->GetCorrespondingChunk()->GetSize();
             }
         }
+        // for (auto& gcGraph : m_subgraphs)
+        // {
+        //     auto groups = ExtractGroups(gcGraph);
+        //     for (auto [gcSubgraph, DSType] : groups)
+        //     {
+        //         switch (DSType)
+        //         {
+        //         case DataStructures::LinkedList:
+        //             // layoutedGroup = // Somehow layout group
+        //             break;
+        //         default:
+        //             break;
+        //         }
+
+        //         // for ()
+        //         // {
+        //         //     // m_layoutedHeap.push_back()
+        //         // }
+        //     }
+        // }
+
+        return std::make_pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>> (m_layoutedHeap, m_neededSpace);
     }
 
-    std::vector<std::pair<GcGraph*, Heuristics::DataStructures>> Heuristics::ExtractGroups(GcGraph* t_gcSubgraph)
+    std::vector<std::pair<GcGraph*, Heuristics::DataStructures>> Heuristics::ExtractGroups(std::unique_ptr<GcGraph>& t_gcSubgraph)
     {
 
     }

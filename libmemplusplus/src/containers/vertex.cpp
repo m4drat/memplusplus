@@ -11,6 +11,16 @@ namespace mpp {
         m_neighbors.insert(t_neigbor);
     }
 
+    void Vertex::AddPointingVertex(Vertex* t_pointingVertex)
+    {
+        m_pointingToVertices.insert(t_pointingVertex);
+    }
+
+    std::set<Vertex*>& Vertex::GetPointingVertices()
+    {
+        return m_pointingToVertices;
+    }
+
     bool Vertex::RemoveNeighbor(Vertex* t_neigbor)
     {
         return m_neighbors.erase(t_neigbor);

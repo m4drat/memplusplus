@@ -4,6 +4,20 @@ namespace mpp {
     GcGraph::GcGraph()
     {}
 
+    // WARNING: creates SHALLOW copy
+    GcGraph::GcGraph(GcGraph& t_other)
+    {
+        for (auto v : t_other.GetAdjList())
+            m_adjList.insert(v);
+    }
+
+    // WARNING: creates SHALLOW copy
+    GcGraph::GcGraph(const std::vector<Vertex*>& t_other)
+    {
+        for (auto v : t_other)
+            m_adjList.insert(v);
+    }
+
     GcGraph::~GcGraph()
     {
         Clear();
@@ -45,7 +59,7 @@ namespace mpp {
         {
             AddVertex(t_to);
         }
-        
+        t_to->AddPointingVertex(t_from);
         t_from->AddNeighbor(t_to);
     }
 
@@ -62,6 +76,71 @@ namespace mpp {
     bool GcGraph::RemoveVertex(Vertex* t_vertex)
     {
         return m_adjList.erase(t_vertex);
+    }
+
+    std::vector<std::unique_ptr<GcGraph>> GcGraph::WeaklyConnectedComponents()
+    {
+        // initialize weakly connected components
+        // Each element in this vector contains isolated subgraph
+        std::vector<std::unique_ptr<GcGraph>> weaklyConnectedComponents;
+        
+        // Copy of adjacence list to use with DFS
+        std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
+
+        // iteraste through all vertixes
+        while (adjListCopy.empty() != true)
+        {
+            std::unique_ptr<GcGraph> connectedComponent = std::make_unique<GcGraph>(UndirectedDFS(*(adjListCopy.begin())));
+            // delete each visited vertex from adjListCopy
+            for (auto v : connectedComponent->GetAdjList())
+                adjListCopy.erase(v);
+            weaklyConnectedComponents.push_back(std::move(connectedComponent));
+        }
+
+        return weaklyConnectedComponents;
+    }
+
+    std::vector<Vertex*> GcGraph::DirectedDFS(Vertex* t_vertex)
+    {
+        std::vector<Vertex*> visited;
+        DDFS(t_vertex, visited);
+        return visited;
+    }
+
+    void GcGraph::DDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
+    {
+        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(), t_vertex->GetNeighbors().end());        
+        t_visited.push_back(t_vertex);
+        for (auto neighbor : neighbors)
+        {
+            if (std::find(t_visited.begin(), t_visited.end(), neighbor) 
+                            != t_visited.end() == false)
+            {  
+                GcGraph::DDFS(neighbor, t_visited);
+            }
+        }
+    }
+
+    std::vector<Vertex*> GcGraph::UndirectedDFS(Vertex* t_vertex)
+    {
+        std::vector<Vertex*> visited;
+        UDFS(t_vertex, visited);
+        return visited;
+    }
+
+    void GcGraph::UDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
+    {
+        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(), t_vertex->GetNeighbors().end());
+        neighbors.insert(neighbors.end(), t_vertex->GetPointingVertices().begin(), t_vertex->GetPointingVertices().end());
+        t_visited.push_back(t_vertex);
+        for (auto neighbor : neighbors)
+        {
+            if (std::find(t_visited.begin(), t_visited.end(), neighbor) 
+                            != t_visited.end() == false)
+            {  
+                GcGraph::UDFS(neighbor, t_visited);
+            }
+        }
     }
 
     Vertex* GcGraph::FindVertex(Chunk* t_chunk)

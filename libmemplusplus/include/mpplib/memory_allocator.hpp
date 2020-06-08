@@ -13,12 +13,13 @@ namespace mpp {
     class MemoryAllocator : public MemoryManager
     {
     private:
-        static inline std::size_t Align(std::size_t t_size, int32_t t_alignment);
+        static std::size_t Align(std::size_t t_size, int32_t t_alignment);
         static void* SysAlloc(std::size_t t_size);
         static bool SysDealloc(void* ptr, std::size_t pageSize);
         static Arena* CreateArena(std::size_t t_arenaSize);
         static void* AllocateBigChunk(std::size_t t_userDataSize);
         static Chunk* GetSuitableChunk(std::size_t t_realSize);
+        friend class GC;
 
     public:
         static void* Allocate(std::size_t t_userDataSize);

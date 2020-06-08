@@ -233,6 +233,8 @@ OR
 39. Graph implementation: https://gist.github.com/miguelgazela/4428700
 40. Graph representation - 2: http://www2.cedarcrest.edu/academic/csc/nlippincott/graph/graph_8h-source.html
 41. Boost graph library: https://www.boost.org/doc/libs/1_46_1/libs/graph/doc/index.html
+42. Find all weakly connected graph components: https://cs.stackexchange.com/questions/56504/efficient-algorithm-for-finding-weakly-connected-components
+43. Connected components in an undirected graph: https://www.geeksforgeeks.org/connected-components-in-an-undirected-graph/
 ---
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY

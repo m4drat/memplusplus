@@ -3,7 +3,11 @@
 #include "mpplib/heuristics/heuristics.hpp"
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/memory_allocator.hpp"
 #include "mpplib/gcptr.hpp"
+#include "mpplib/chunk.hpp"
+
+#include <cstring>
 #include <vector>
 #include <memory>
 

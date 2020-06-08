@@ -41,12 +41,14 @@ namespace mpp {
 
         ~Arena()
         {
-            chunksInUse.clear();
-            // MemoryAllocator::SysDealloc(begin, (std::size_t)end - (std::size_t)begin);
+            freedChunks.Delete();
             // TODO: correctly destroy ChunkTreap
+            chunksInUse.clear();
+            // MemoryAllocator::SysDealloc(this->begin, size);
         }
 
-        std::size_t GetUsedSpace();         
+        std::size_t GetUsedSpace();     
+        void SetUsedSpace(std::size_t t_newSize);  
 
         // Find chunk in ChunkTreap (tree of freed chunks)
         Chunk* MaxSizeChunk();
