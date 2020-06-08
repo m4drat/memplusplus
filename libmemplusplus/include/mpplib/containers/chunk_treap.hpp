@@ -35,12 +35,12 @@ namespace mpp {
         ~ChunkTreap();
 
         /**
-         * Finds max freed chunk in chunk treap in logN.
+         * Finds min freed chunk in chunk treap in logN.
          * @return chunk of minimum size
          */
         Chunk* MinSizeChunk() const;
         /**
-         * Finds min freed chunk in chunk treap in logN.
+         * Finds max freed chunk in chunk treap in logN.
          * @return chunk of maximum size
          */
         Chunk* MaxSizeChunk() const;

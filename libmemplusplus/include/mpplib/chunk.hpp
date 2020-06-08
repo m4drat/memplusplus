@@ -22,7 +22,11 @@ nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         struct ChunkHeader_t
         {
+            /**
+             * Size of the previous chunk.
+             */
             std::size_t prevChunkSize;
+
             std::size_t chunkHeader;
         } ChunkHeader;
 

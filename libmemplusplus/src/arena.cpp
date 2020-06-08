@@ -1,9 +1,25 @@
 #include "mpplib/arena.hpp"
-#include "mpplib/utils/utils.hpp"
+#include "mpplib/memory_allocator.hpp"
 
 #include <functional>
 
 namespace mpp {
+    Arena::Arena(std::size_t t_size, void* t_begin)
+    {
+        size = t_size;
+        topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
+        begin = t_begin;
+        end = reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_begin) + t_size);
+    };
+
+    Arena::~Arena()
+    {
+        // TODO: correctly destroy ChunkTreap
+        freedChunks.Delete();
+        chunksInUse.clear();
+        MemoryAllocator::SysDealloc(this->begin, size);
+    }
+
     Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize)
     {
         return freedChunks.FirstGreaterOrEqualThan(t_desiredChunkSize);
@@ -225,11 +241,9 @@ namespace mpp {
         return chunk;
     }
 
-    // WARNING: t_ptr  should be in chunksInUse range!
-    // works ONLY on InUse chunks!
     Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
     {
-        auto foundChunkIt = LowerBound(chunksInUse.begin(), chunksInUse.end(), t_ptr, 
+        auto foundChunkIt = utils::LowerBound(chunksInUse.begin(), chunksInUse.end(), t_ptr, 
             [](Chunk* t_ch, void* t_ptr) -> bool {
                 return (t_ptr >= reinterpret_cast<void*>(t_ch));
             }

@@ -7,9 +7,9 @@ add_library(${PROJECT_NAME}
 	src/containers/node.cpp
 	src/containers/vertex.cpp
 	src/shared_gcptr.cpp
+	src/arena.cpp
 	src/memory_allocator.cpp
 	src/memory_manager.cpp
-	src/arena.cpp
 	src/gc.cpp
 )
 add_library(lib::mpp ALIAS ${PROJECT_NAME})

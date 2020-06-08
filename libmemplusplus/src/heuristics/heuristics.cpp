@@ -5,10 +5,6 @@ namespace mpp
     Heuristics::Heuristics(GcGraph* t_objectsGraph)
     {
         m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
-        // for (auto& graph : m_subgraphs)
-        // {
-        //     std::cout << graph->GenerateGraphvizLayout() << std::endl;
-        // }
     }
 
     std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>> Heuristics::Layout()

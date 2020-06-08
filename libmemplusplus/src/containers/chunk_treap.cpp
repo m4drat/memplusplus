@@ -51,7 +51,7 @@ namespace mpp {
     // TODO
     void ChunkTreap::Delete()
     {
-        delete m_root;
+        // delete m_root;
     }
 
     Chunk* ChunkTreap::MinSizeChunk() const

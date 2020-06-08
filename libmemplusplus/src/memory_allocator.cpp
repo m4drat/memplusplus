@@ -22,9 +22,9 @@ namespace mpp {
         return rawPtr;
     };
 
-    bool MemoryAllocator::SysDealloc(void* ptr, std::size_t pageSize)
+    bool MemoryAllocator::SysDealloc(void* t_ptr, std::size_t t_pageSize)
     {
-        if (bool result = munmap(ptr, pageSize) != -1) {
+        if (munmap(t_ptr, t_pageSize) == -1) {
             throw UnmapMemoryException();
         };
 

@@ -2,10 +2,12 @@
 
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
+
 #include <iostream>
 #include <vector>
 
 namespace mpp {
+    class Arena;
     class MemoryManager
     {
     protected:

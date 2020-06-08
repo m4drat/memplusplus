@@ -5,6 +5,7 @@
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/gcptr.hpp"
+#include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 
 #include <cstring>
