@@ -9,6 +9,9 @@
 #include <vector>
 
 namespace mpp {
+    /**
+     * Controls area of memory. 
+     */
     class Arena final
     {
     private:

@@ -4,6 +4,10 @@
 #include <string>
 
 namespace mpp {
+    /**
+     * Defines general exceptions class for all project.
+     * All other exceptions shoul be inherited from this class.
+     */
     class Exception : virtual public std::exception
     {
     public:

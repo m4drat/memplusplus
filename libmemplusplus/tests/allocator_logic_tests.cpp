@@ -238,78 +238,78 @@ TEST_CASE("FDA - Chunk that we deallocate located between freed and used chunk")
     REQUIRE(Chunk::GetHeaderPtr(ch3)->GetPrevSize() == 192*2);
 }
 
-// TEST_CASE("ADF - Chunk that we deallocate located between used and freed chunk")
-// {
-//     using namespace mpp;
+TEST_CASE("ADF - Chunk that we deallocate located between used and freed chunk")
+{
+    using namespace mpp;
     
-//     MemoryManager::ResetAllocatorState();
+    MemoryManager::ResetAllocatorState();
 
-//     void* ch1 = MemoryAllocator::Allocate(160);
-//     void* ch2 = MemoryAllocator::Allocate(160);
-//     void* ch3 = MemoryAllocator::Allocate(160);
-//     void* stub = MemoryAllocator::Allocate(1);
-//     MemoryAllocator::Deallocate(ch3);
+    void* ch1 = MemoryAllocator::Allocate(160);
+    void* ch2 = MemoryAllocator::Allocate(160);
+    void* ch3 = MemoryAllocator::Allocate(160);
+    void* stub = MemoryAllocator::Allocate(1);
+    MemoryAllocator::Deallocate(ch3);
 
-//     MemoryAllocator::Deallocate(ch2);
+    MemoryAllocator::Deallocate(ch2);
     
-//     REQUIRE(Chunk::GetHeaderPtr(ch2)->IsUsed() == 0);
-//     REQUIRE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 1);
-//     REQUIRE(Chunk::GetHeaderPtr(stub)->IsPrevInUse() == 0);
-//     REQUIRE(Chunk::GetHeaderPtr(ch2)->GetSize() == 192*2);
-//     REQUIRE(Chunk::GetHeaderPtr(stub)->GetPrevSize() == 192*2);
+    REQUIRE(Chunk::GetHeaderPtr(ch2)->IsUsed() == 0);
+    REQUIRE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 1);
+    REQUIRE(Chunk::GetHeaderPtr(stub)->IsPrevInUse() == 0);
+    REQUIRE(Chunk::GetHeaderPtr(ch2)->GetSize() == 192*2);
+    REQUIRE(Chunk::GetHeaderPtr(stub)->GetPrevSize() == 192*2);
     
-// }
+}
 
-// // FIXME
-// TEST_CASE("ADA - Chunk that we deallocate located between two used chunks")
-// {
-//     using namespace mpp;    
+// FIXME
+TEST_CASE("ADA - Chunk that we deallocate located between two used chunks")
+{
+    using namespace mpp;    
     
-//     MemoryManager::ResetAllocatorState();
+    MemoryManager::ResetAllocatorState();
 
-//     void* ch1 = MemoryAllocator::Allocate(160);
-//     void* ch2 = MemoryAllocator::Allocate(160);
-//     void* ch3 = MemoryAllocator::Allocate(160);
-//     void* stub = MemoryAllocator::Allocate(1);
+    void* ch1 = MemoryAllocator::Allocate(160);
+    void* ch2 = MemoryAllocator::Allocate(160);
+    void* ch3 = MemoryAllocator::Allocate(160);
+    void* stub = MemoryAllocator::Allocate(1);
     
-//     MemoryAllocator::Deallocate(ch2);
+    MemoryAllocator::Deallocate(ch2);
 
-//     REQUIRE(Chunk::GetHeaderPtr(ch2)->IsUsed() == 0);
-//     REQUIRE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 1);
-//     REQUIRE(Chunk::GetHeaderPtr(ch3)->IsPrevInUse() == 0);
-//     REQUIRE(Chunk::GetHeaderPtr(ch2)->GetSize() == 192);
-//     REQUIRE(Chunk::GetHeaderPtr(ch3)->GetPrevSize() == 192);
+    REQUIRE(Chunk::GetHeaderPtr(ch2)->IsUsed() == 0);
+    REQUIRE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 1);
+    REQUIRE(Chunk::GetHeaderPtr(ch3)->IsPrevInUse() == 0);
+    REQUIRE(Chunk::GetHeaderPtr(ch2)->GetSize() == 192);
+    REQUIRE(Chunk::GetHeaderPtr(ch3)->GetPrevSize() == 192);
     
-// }
+}
 
-// TEST_CASE("")
-// {
-//     using namespace mpp;
+TEST_CASE("")
+{
+    using namespace mpp;
 
-//     void* p1 = MemoryAllocator::Allocate(144);
-//     void* p2 = MemoryAllocator::Allocate(144);
-//     void* p3 = MemoryAllocator::Allocate(144);
-//     void* p4 = MemoryAllocator::Allocate(144);
-//     void* p5 = MemoryAllocator::Allocate(144);
-//     void* p6 = MemoryAllocator::Allocate(144);
+    void* p1 = MemoryAllocator::Allocate(144);
+    void* p2 = MemoryAllocator::Allocate(144);
+    void* p3 = MemoryAllocator::Allocate(144);
+    void* p4 = MemoryAllocator::Allocate(144);
+    void* p5 = MemoryAllocator::Allocate(144);
+    void* p6 = MemoryAllocator::Allocate(144);
 
-//     MemoryAllocator::Deallocate(p2);
-//     MemoryAllocator::Deallocate(p4);
+    MemoryAllocator::Deallocate(p2);
+    MemoryAllocator::Deallocate(p4);
 
-//     Arena* arena = MemoryManager::GetArenaByPtr(p1);
+    Arena* arena = MemoryManager::GetArenaByPtr(p1);
 
-//     REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader) + 160) == Chunk::GetHeaderPtr(p6));
-//     REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p5));
-//     REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader) + 160) == Chunk::GetHeaderPtr(p6));
+    REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p5));
 
-//     REQUIRE(arena->GetInUseChunkByPtr(p1 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p1));
-//     REQUIRE(arena->GetInUseChunkByPtr(p1 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p1));
+    REQUIRE(arena->GetInUseChunkByPtr(p1 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p1));
+    REQUIRE(arena->GetInUseChunkByPtr(p1 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p1));
 
-//     REQUIRE(arena->GetInUseChunkByPtr(p6) == Chunk::GetHeaderPtr(p6));
-//     REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p6));
-//     REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) - 1) == Chunk::GetHeaderPtr(p5));
-//     REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p6));
-// }
+    REQUIRE(arena->GetInUseChunkByPtr(p6) == Chunk::GetHeaderPtr(p6));
+    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p6));
+    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) - 1) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p6));
+}
 
 /* For ctrl+c, ctrl-V
 TEST_CASE("")

@@ -6,7 +6,7 @@
 namespace mpp {
 
     /**
-     * Basic allocator structure
+     * Represent chunk of memory.
      */
     struct Chunk
     {
