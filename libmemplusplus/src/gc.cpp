@@ -2,8 +2,8 @@
 
 namespace mpp {
     std::vector<GcPtr*> GC::s_activeGcPtrs;
-    std::size_t s_garbageSize = 0;
-    std::size_t s_dataSize = 0;
+    std::size_t GC::s_garbageSize = 0;
+    std::size_t GC::s_dataSize = 0;
 
     void GC::AddInfoToObjectsGraph(GcPtr* t_gcPtr, std::unique_ptr<GcGraph>& t_objectsGraph)
     {

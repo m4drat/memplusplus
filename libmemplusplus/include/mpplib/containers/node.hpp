@@ -9,68 +9,68 @@
 
 namespace mpp {
     /**
-     * Node class to use in ChunkTreap.
+     * @brief Node class to use in ChunkTreap.
      */
     struct Node final
     {
     public:
         /**
-         * Node priority in treep
+         * @brief Node priority in treep
          */
         int32_t priority{ 0 };
         /**
-         * Сhunk related to the current node.
+         * @brief Сhunk related to the current node.
          */
         Chunk* chunk{ nullptr };
         /**
-         * Reference to the left node.
+         * @brief Reference to the left node.
          */
         Node* leftChild{ nullptr };
         /**
-         * Reference to the right node.
+         * @brief Reference to the right node.
          */
         Node* rightChild{ nullptr };
 
         /**
-         * Constructor, that construct node from chunk.
+         * @brief Constructor, that construct node from chunk.
          */
         Node(Chunk* t_chunk);
 
         /**
-         * Copy-Constructor, that constructs node from const node reference.
+         * @brief Copy-Constructor, that constructs node from const node reference.
          */
         Node(const Node& t_node);
         /**
-         * Assigment operator, that constructs node from const node reference.
+         * @brief Assigment operator, that constructs node from const node reference.
          */
         Node& operator=(const Node& t_node);
         /**
-         * Copy-Constructor, that constructs node from r-value node reference.
+         * @brief Copy-Constructor, that constructs node from r-value node reference.
          */
         Node(Node&& t_node);
         /**
-         * Assigment operator, that constructs node from r-value node reference.
+         * @brief Assigment operator, that constructs node from r-value node reference.
          */
         Node& operator=(Node&& t_node);
 
         /**
-         * Default destructor. 
+         * @brief Default destructor. 
          * @sa Delete.
          */
         ~Node();
         
         /**
-         * Dump text represenation of node.
+         * @brief Dump text represenation of the node.
          */
         static std::ostream& DumpNode(std::ostream& t_out, Node* t_node);
         /**
-         * Output operator to print node using std::cout.
+         * @brief Overloaded output operator to print node using std::cout.
          */
         friend std::ostream& operator<<(std::ostream& t_out, Node* t_node);
 
     private:
         /**
-         * Deleter method.
+         * @brief Deleter method.
          */
         void Delete();
     };

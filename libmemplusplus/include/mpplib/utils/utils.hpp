@@ -9,7 +9,7 @@
 namespace mpp {
     namespace utils {
         /**
-         * Finds first elemet, that is greater or equal to key.
+         * @brief Finds first elemet, that is greater or equal to key.
          * @param first iterator to begin of the range
          * @param last iterator to end of the range
          * @param value element to find
@@ -38,7 +38,7 @@ namespace mpp {
         }
 
         /**
-         * Performs binary search in container.
+         * @brief Performs binary search in container.
          * @param first iterator to begin of the range
          * @param last iterator to end of the range
          * @param value element to find

@@ -260,7 +260,6 @@ TEST_CASE("ADF - Chunk that we deallocate located between used and freed chunk")
     
 }
 
-// FIXME
 TEST_CASE("ADA - Chunk that we deallocate located between two used chunks")
 {
     using namespace mpp;    
@@ -298,17 +297,17 @@ TEST_CASE("")
 
     Arena* arena = MemoryManager::GetArenaByPtr(p1);
 
-    REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader) + 160) == Chunk::GetHeaderPtr(p6));
-    REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p5));
-    REQUIRE(arena->GetInUseChunkByPtr(p5 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 160)) == Chunk::GetHeaderPtr(p6));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader))) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 159)) == Chunk::GetHeaderPtr(p5));
 
-    REQUIRE(arena->GetInUseChunkByPtr(p1 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p1));
-    REQUIRE(arena->GetInUseChunkByPtr(p1 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p1));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader))) == Chunk::GetHeaderPtr(p1));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader) + 159)) == Chunk::GetHeaderPtr(p1));
 
     REQUIRE(arena->GetInUseChunkByPtr(p6) == Chunk::GetHeaderPtr(p6));
-    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader)) == Chunk::GetHeaderPtr(p6));
-    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) - 1) == Chunk::GetHeaderPtr(p5));
-    REQUIRE(arena->GetInUseChunkByPtr(p6 - sizeof(Chunk::ChunkHeader) + 159) == Chunk::GetHeaderPtr(p6));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader))) == Chunk::GetHeaderPtr(p6));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) - 1)) == Chunk::GetHeaderPtr(p5));
+    REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) + 159)) == Chunk::GetHeaderPtr(p6));
 }
 
 /* For ctrl+c, ctrl-V

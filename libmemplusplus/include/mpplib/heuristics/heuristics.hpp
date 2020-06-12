@@ -8,14 +8,14 @@
 namespace mpp
 {
     /**
-     * Implements heuristics, that helps to relayout heap,
+     * @brief Implements heuristics, that helps to relayout heap,
      * to efficiently place objects in memory.
      */
     class Heuristics
     {
     private:
         /**
-         * All possible data structures, that heuristics
+         * @brief All possible data structures, that heuristics
          * can identify.
          */
         enum class DataStructures
@@ -23,29 +23,29 @@ namespace mpp
             LinkedList,
             DoubleLinkedList,
             Tree,
-            BinarySearchTree,
             Graph,
             Undefined
         };
         /**
-         * Size required for new arena.
+         * @brief Size required for new arena.
          */
         std::size_t m_neededSpace{ 0 };
         
         /**
-         * All isolated subgraphs in chunks graph.
+         * @brief All isolated subgraphs in chunks graph.
          */
         std::vector<std::unique_ptr<GcGraph>> m_subgraphs;
         
         /**
-         * Fully layouted heap.
+         * @brief Fully layouted heap.
          */
         std::vector<Vertex*> m_layoutedHeap;
 
     public:
         Heuristics() = delete;
         /**
-         * Default constructor, that constructs heuristics object from graph of chunks.
+         * @brief Default constructor, that constructs heuristics object from graph of chunks.
+         * 
          * While creating new heuristics object, it will divide graph into smaller subgraphs
          * of weakly connected isolated subgraphs.
          * @param t_objectsGraph graph object, to create heuristics from
@@ -54,13 +54,15 @@ namespace mpp
         ~Heuristics() = default;
 
         /**
-         * Finds particular data structures in objects graph, e.g. LinkedList or BinaryTree.
+         * @brief Finds particular data structures in objects graph, e.g. LinkedList or BinaryTree.
          * @param t_gcSubgraph subgraph, that extracted from objects graph.
          * @return vector of pairs of pointers to subgraphs, and types of found datastructures.
          */
         std::vector<std::pair<GcGraph*, DataStructures>> ExtractGroups(std::unique_ptr<GcGraph>& t_gcSubgraph);
         /**
-         * Layouts heap. This method tries to find all possible data structures in graph, and layout
+         * @brief Layouts heap. 
+         * 
+         * This method tries to find all possible data structures in graph, and layout
          * them in the most efficient way.
          * @return pair of vector of vertices and size of all chunks
          */
