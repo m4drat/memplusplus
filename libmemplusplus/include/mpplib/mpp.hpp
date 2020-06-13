@@ -1,7 +1,12 @@
 #pragma once
 
+// Smart pointers
 #include "mpplib/shared_gcptr.hpp"
+
+// GC part
 #include "mpplib/gc.hpp"
+
+// Memory allocator part
 #include "mpplib/memory_allocator.hpp"
 
 /** @mainpage Memplusplus

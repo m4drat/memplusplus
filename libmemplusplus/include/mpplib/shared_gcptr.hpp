@@ -62,4 +62,4 @@ namespace mpp {
 
 // include templates implementation
 // only in this case it's ok to include .cpp file
-#include "shared_gcptr-imp.cpp"
+#include "shared_gcptr-imp.hpp"
