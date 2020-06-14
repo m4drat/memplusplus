@@ -10,7 +10,7 @@
 #include "mpplib/containers/vertex.hpp"
 
 namespace mpp {
-    /**
+    /** 
      * @brief Implements Graph structure to use specially with chunks and gcPtr objects.
      */
     class GcGraph

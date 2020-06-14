@@ -12,17 +12,6 @@ namespace mpp {
     {
         /**
          * @brief chunk header structure.
-         *  
-         *             +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-         *             |       Size of previous chunk        |
-         *             +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-         *             |  Size of chunk, in bytes  |X|U|P|X|X|
-         *     mem-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-         *             |      User data starts here...       .
-         *             .                                     .
-         *             .     (ChunkUsableSize() bytes)       .
-         *             .                                     |
-         * nextchunk-> +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
         */
         struct ChunkHeader_t
         {

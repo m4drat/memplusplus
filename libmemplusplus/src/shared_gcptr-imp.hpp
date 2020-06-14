@@ -123,37 +123,37 @@ namespace mpp {
 
     // comparisons operators
     template<class Type>
-    bool SharedGcPtr<Type>::operator==(Type* t_other) noexcept
+    bool SharedGcPtr<Type>::operator==(const SharedGcPtr& t_other) noexcept
     {
         return this.Get() == t_other.Get();
     }
     
     template<class Type>
-    bool SharedGcPtr<Type>::operator!=(Type* t_other) noexcept
+    bool SharedGcPtr<Type>::operator!=(const SharedGcPtr& t_other) noexcept
     {
         return this.Get() != t_other.Get();
     }
     
     template<class Type>
-    bool SharedGcPtr<Type>::operator<=(Type* t_other) noexcept
+    bool SharedGcPtr<Type>::operator<=(const SharedGcPtr& t_other) noexcept
     {
         return this.Get() <= t_other.Get();
     }
     
     template<class Type>
-    bool SharedGcPtr<Type>::operator<(Type* t_other) noexcept
+    bool SharedGcPtr<Type>::operator<(const SharedGcPtr& t_other) noexcept
     {
         return this.Get() < t_other.Get();
     }
     
     template<class Type>
-    bool SharedGcPtr<Type>::operator>=(Type* t_other) noexcept
+    bool SharedGcPtr<Type>::operator>=(const SharedGcPtr& t_other) noexcept
     {
         return this.Get() >= t_other.Get();
     }
     
     template<class Type>
-    bool SharedGcPtr<Type>::operator>(Type* t_other) noexcept
+    bool SharedGcPtr<Type>::operator>(const SharedGcPtr& t_other) noexcept
     {
         return this.Get() > t_other.Get();
     }
