@@ -7,7 +7,7 @@
 
 namespace mpp {
     /**
-     * @brief SharedGcPtr class. Behaves like normal shared ptr. 
+     * @brief SharedGcPtr class. Behaves like normal shared ptr.
      * @tparam Type of user object.
      */
     template<class Type>
@@ -15,7 +15,7 @@ namespace mpp {
     {
     private:
         /**
-         * @brief pointer to object of user type. 
+         * @brief pointer to object of user type.
          */
         Type* m_objectPtr{ nullptr };
         /**
@@ -30,7 +30,7 @@ namespace mpp {
         SharedGcPtr();
         /**
          * @brief Construct SharedGcPtr from nullptr.
-         * @param t_newData nullpointer. 
+         * @param t_newData nullpointer.
          */
         SharedGcPtr(std::nullptr_t t_newData);
         /**
@@ -45,6 +45,12 @@ namespace mpp {
          */
         SharedGcPtr(const SharedGcPtr<Type>& t_another);
 
+        // /**
+        //  * @brief Copy-Constructor to move from t_another.
+        //  * @param t_another const reference to another SharedGcPtr
+        //  */
+        // SharedGcPtr(SharedGcPtr<Type>&& t_another);
+
         /**
          * @brief Destroy SharedGcPtr.
          */
@@ -52,19 +58,22 @@ namespace mpp {
 
         // SharedGcPtr<Type>& operator=(SharedGcPtr t_other);
         /**
-         * @brief Overloaded assignment operator, to construct object from rvalue reference.
+         * @brief Overloaded assignment operator, to construct object from rvalue
+         * reference.
          * @param t_other rvalue reference to SharedGcPtr.
          * @return SharedGcPtr<Type>& new object
          */
         SharedGcPtr<Type>& operator=(SharedGcPtr&& t_other) noexcept;
         /**
-         * @brief Overloaded assignment operator, to construct object from const SharedGcPtr reference.
+         * @brief Overloaded assignment operator, to construct object from const
+         * SharedGcPtr reference.
          * @param t_other const reference to SharedGcPtr.
          * @return SharedGcPtr<Type>& new object
          */
         SharedGcPtr<Type>& operator=(const SharedGcPtr& t_other);
         /**
-         * @brief Overloaded assignment operator, to construct object from user data pointer.
+         * @brief Overloaded assignment operator, to construct object from user data
+         * pointer.
          * @param t_newData pointer to user data of type Type.
          * @return SharedGcPtr<Type>& new object
          */
@@ -72,7 +81,7 @@ namespace mpp {
         /**
          * @brief Overloaded assignment operator, to construct object from nullptr.
          * @param t_newData nullptr
-         * @return SharedGcPtr<Type>& new object 
+         * @return SharedGcPtr<Type>& new object
          */
         SharedGcPtr<Type>& operator=(std::nullptr_t t_newData);
 
@@ -100,7 +109,7 @@ namespace mpp {
          * @brief check, that lhs is greater than rhs.
          */
         bool operator>(const SharedGcPtr& t_other) noexcept;
-        
+
         /**
          * @brief Allows to use smart pointers as usual pointers.
          * @return Type* pointer to user data
@@ -142,12 +151,12 @@ namespace mpp {
          */
         Type* Get() const;
         /**
-         * @brief Overrided function, that returns raw pointer to user data. 
+         * @brief Overrided function, that returns raw pointer to user data.
          * @return void* pointer to user data.
          */
         void* GetVoid() const override;
         /**
-         * @brief Overrided function, that sets new value for object pointer. 
+         * @brief Overrided function, that sets new value for object pointer.
          * @param t_newPtr new pointer.
          */
         void UpdatePtr(void* t_newPtr) override;
@@ -166,9 +175,9 @@ namespace mpp {
     };
 
     /**
-     * @brief Method to construct new SharedGcPtr. It will allocate enought space, create object 
-     * and construct it.
-     * 
+     * @brief Method to construct new SharedGcPtr. It will allocate enought space, create
+     * object and construct it.
+     *
      * @tparam T type of user object.
      * @tparam Args type of variadic arguments to pass to user object constructor.
      * @param t_args variadic arguments to pass to user object constructor.

@@ -22,18 +22,17 @@ namespace mpp {
     {
         for (auto* arena : s_ArenaList) {
             t_out << "Arena: " << reinterpret_cast<void*>(arena) << ":" << std::endl;
-            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);  
-                pos < reinterpret_cast<std::size_t>(arena->end);
-                pos += reinterpret_cast<Chunk*>(pos)->GetSize())
-            {
+            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
+                 pos < reinterpret_cast<std::size_t>(arena->end);
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
-                t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize() << "/P:" << currChunk->IsPrevInUse() 
-                    << "/U:" << currChunk->IsUsed() << "]"; 
+                t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
+                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
+                      << "]";
             }
         }
         return t_out;
     }
-
 
     // TODO: make it work better (probably add smart pointers memory managment)
     // This is just ugly thing to reset allocator state
@@ -60,8 +59,7 @@ namespace mpp {
     Chunk* MemoryManager::GetInUseChunkByPtr(void* t_chunk)
     {
         Arena* arena = GetArenaByPtr(t_chunk);
-        if (arena != nullptr)
-        {
+        if (arena != nullptr) {
             return arena->GetInUseChunkByPtr(t_chunk);
         }
 

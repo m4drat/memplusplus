@@ -12,7 +12,7 @@ namespace mpp {
     {
         /**
          * @brief chunk header structure.
-        */
+         */
         struct ChunkHeader_t
         {
             /**
@@ -21,9 +21,9 @@ namespace mpp {
             std::size_t prevChunkSize;
             /**
              * @brief actual chunk header.
-             * 
+             *
              * Contains all required mark bits. Maximum amount of mark bits is 5.
-             * Currently used only 2. 
+             * Currently used only 2.
              * Bit-2: Previous chunk in use
              * Bit-3: Current chunk in use
              */
@@ -61,7 +61,8 @@ namespace mpp {
          */
         static void* GetUserDataPtr(Chunk* t_chunk)
         {
-            return reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) + sizeof(Chunk::ChunkHeader));
+            return reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) +
+                                           sizeof(Chunk::ChunkHeader));
         }
 
         /**
@@ -71,7 +72,8 @@ namespace mpp {
          */
         static Chunk* GetHeaderPtr(void* t_userData)
         {
-            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_userData) - sizeof(Chunk::ChunkHeader));
+            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_userData) -
+                                            sizeof(Chunk::ChunkHeader));
         }
 
         /**
@@ -81,7 +83,8 @@ namespace mpp {
          */
         static Chunk* GetPrevChunk(Chunk* t_chunk)
         {
-            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_chunk) - t_chunk->GetPrevSize());
+            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_chunk) -
+                                            t_chunk->GetPrevSize());
         }
 
         /**
@@ -91,7 +94,8 @@ namespace mpp {
          */
         static Chunk* GetNextChunk(Chunk* t_chunk)
         {
-            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_chunk) + t_chunk->GetSize());
+            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_chunk) +
+                                            t_chunk->GetSize());
         }
 
         /**
@@ -114,7 +118,7 @@ namespace mpp {
 
         /**
          * @brief Get size of current chunk from its chunk header.
-         * @return std::size_t current chunk size 
+         * @return std::size_t current chunk size
          */
         std::size_t GetSize()
         {
@@ -123,7 +127,7 @@ namespace mpp {
 
         /**
          * @brief Set size of current chunk.
-         * 
+         *
          * This function wouldn't change any flag bits.
          * @param size new size value.
          */
@@ -203,7 +207,8 @@ namespace mpp {
         }
 
         /**
-         * @brief Overloaded "<<" operator to dump chunk structure in human-readable format.
+         * @brief Overloaded "<<" operator to dump chunk structure in human-readable
+         * format.
          * @param t_out stream to write to.
          * @param t_ch chunk pointer.
          * @return std::ostream& stream that was used

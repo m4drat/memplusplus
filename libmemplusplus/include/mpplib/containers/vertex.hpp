@@ -1,10 +1,10 @@
 #pragma once
 
-#include <set>
-#include <vector>
 #include <algorithm>
-#include <string>
+#include <set>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #include <mpplib/chunk.hpp>
 #include <mpplib/gcptr.hpp>
@@ -42,31 +42,31 @@ namespace mpp {
         Vertex(Chunk* t_chunk)
             : m_correspondingChunk(t_chunk)
         {}
-        
+
         /**
          * @brief Set new value for m_correspondingChunk.
          * @param t_chunk new value for chunk pointer.
          */
         void UpdateChunkPtr(Chunk* t_chunk);
-        
+
         /**
          * @brief Add new vertex, that points to the current vertex.
          * @param t_pointingVertex pointer to vertex.
          */
         void AddPointingVertex(Vertex* t_pointingVertex);
-        
+
         /**
          * @brief Get all vertices, that points to the current vertex.
          * @return reference to set of pointers to vertices
          */
         std::set<Vertex*>& GetPointingVertices();
-        
+
         /**
          * @brief Add the vertex, that current vertex points to.
          * @param t_neigbor vertex, to add to neighbors.
          */
         void AddNeighbor(Vertex* t_neigbor);
-        
+
         /**
          * @brief Remove the vertex that the current vertex points to.
          * @param t_neigbor vertex, to remove from neighbors.
@@ -97,7 +97,7 @@ namespace mpp {
         std::vector<GcPtr*>& GetPointingToGcPtrs();
 
         /**
-         * @brief Get corresponding chunk object. 
+         * @brief Get corresponding chunk object.
          * @return Chunk* chunk, that current vertex represents
          */
         Chunk* GetCorrespondingChunk() const;

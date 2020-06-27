@@ -85,12 +85,13 @@ namespace mpp {
                 std::size_t toSplitChunkSize = t_chunk->GetSize();
                 Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
 
-                Chunk* splittedChunk =
-                  Chunk::ConstructChunk(reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
-                                        t_chunkSize,
-                                        toSplitChunkSize - t_chunkSize,
-                                        0,
-                                        1);
+                Chunk* splittedChunk = Chunk::ConstructChunk(
+                  reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) +
+                                          t_chunkSize),
+                  t_chunkSize,
+                  toSplitChunkSize - t_chunkSize,
+                  0,
+                  1);
                 Chunk::GetNextChunk(splittedChunk)
                   ->SetPrevSize(toSplitChunkSize - t_chunkSize);
                 // Chunk::GetNextChunk(splittedChunk)->SetIsPrevInUse(0);
@@ -110,12 +111,12 @@ namespace mpp {
                 std::size_t toSplitChunkSize = t_chunk->GetSize();
                 Chunk* chunk = Chunk::ConstructChunk(
                   t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
-                Chunk* splittedChunk =
-                  Chunk::ConstructChunk(reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
-                                        t_chunkSize,
-                                        toSplitChunkSize - t_chunkSize,
-                                        0,
-                                        1);
+                Chunk* splittedChunk = Chunk::ConstructChunk(
+                  reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
+                  t_chunkSize,
+                  toSplitChunkSize - t_chunkSize,
+                  0,
+                  1);
                 Chunk::GetNextChunk(splittedChunk)
                   ->SetPrevSize(toSplitChunkSize - t_chunkSize);
                 // Chunk::GetNextChunk(splittedChunk)->SetIsPrevInUse(0);
@@ -158,7 +159,8 @@ namespace mpp {
         4. DT
         */
         if (((topChunk == nullptr) &&
-             (reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) + t_chunk->GetSize()) == end)) ||
+             (reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) +
+                                      t_chunk->GetSize()) == end)) ||
             (Chunk::GetNextChunk(t_chunk) == topChunk)) {
             return MergeWithTop(t_chunk);
         }
@@ -180,7 +182,8 @@ namespace mpp {
         }
 
         // Merge backwards
-        if ((reinterpret_cast<void*>(t_chunk) != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+        if ((reinterpret_cast<void*>(t_chunk) != begin) &&
+            Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
         }
@@ -203,7 +206,8 @@ namespace mpp {
         // if (topChunk != nullptr)
         //     freedChunks.RemoveChunk(t_chunk);
         Chunk* newChunk{ t_chunk };
-        if ((reinterpret_cast<void*>(t_chunk) != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+        if ((reinterpret_cast<void*>(t_chunk) != begin) &&
+            Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             // freedChunks.RemoveChunk(t_chunk);
             newChunk = MergeTwoSequnceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
@@ -243,13 +247,14 @@ namespace mpp {
 
     Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
     {
-        auto foundChunkIt = utils::LowerBound(chunksInUse.begin(), chunksInUse.end(), t_ptr, 
-            [](Chunk* t_ch, void* t_ptr) -> bool {
-                return (t_ptr >= reinterpret_cast<void*>(t_ch));
-            }
-        );
-        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr)
-        {
+        auto foundChunkIt =
+          utils::LowerBound(chunksInUse.begin(),
+                            chunksInUse.end(),
+                            t_ptr,
+                            [](Chunk* t_ch, void* t_ptr) -> bool {
+                                return (t_ptr >= reinterpret_cast<void*>(t_ch));
+                            });
+        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
             return *foundChunkIt;
         }
         return *(--foundChunkIt);
@@ -270,7 +275,8 @@ namespace mpp {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
 
         t_out << "\tsize: " << t_arena->size << std::endl;
-        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->CurrentlyAllocatedSpace << std::endl;
+        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->CurrentlyAllocatedSpace
+              << std::endl;
 
         t_out << "\ttopChunk: ";
         if (t_arena->topChunk)

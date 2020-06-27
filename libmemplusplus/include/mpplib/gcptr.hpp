@@ -27,7 +27,7 @@ namespace mpp {
         virtual void UpdatePtr(void* t_newPtr) = 0;
         /**
          * @brief Use count of current object controlled by gcPtr of any type.
-         * @return uint32_t use count 
+         * @return uint32_t use count
          */
         virtual uint32_t UseCount() = 0;
 
@@ -43,7 +43,7 @@ namespace mpp {
 
         /**
          * @brief Overloaded "<<" operator to dump GcPtr.
-         * @param t_out stream to write to. 
+         * @param t_out stream to write to.
          * @param t_gcPtr actual object to dump.
          * @return std::ostream& that was used
          */

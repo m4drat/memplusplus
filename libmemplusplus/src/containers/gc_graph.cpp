@@ -26,20 +26,18 @@ namespace mpp {
     std::string GcGraph::GenerateGraphvizLayout()
     {
         std::string graphvizStr = "digraph Objects {\n";
-        for (auto v1 : m_adjList)
-        {
+        for (auto v1 : m_adjList) {
             graphvizStr += "\t\"" + v1->ToString() + "\"";
             if (v1->GetNeighbors().size() != 0)
                 graphvizStr += " -> ";
 
-            for (auto v2 : v1->GetNeighbors())
-            {
+            for (auto v2 : v1->GetNeighbors()) {
                 graphvizStr += "\"" + v2->ToString() + "\"" + " -> ";
             }
 
             if (v1->GetNeighbors().size() != 0)
                 graphvizStr = graphvizStr.substr(0, graphvizStr.size() - 4);
-            
+
             graphvizStr += ";\n";
         }
 
@@ -50,13 +48,11 @@ namespace mpp {
 
     void GcGraph::AddEdge(Vertex* t_from, Vertex* t_to)
     {
-        if (m_adjList.find(t_from) == m_adjList.end())
-        {
+        if (m_adjList.find(t_from) == m_adjList.end()) {
             AddVertex(t_from);
         }
 
-        if (m_adjList.find(t_to) == m_adjList.end())
-        {
+        if (m_adjList.find(t_to) == m_adjList.end()) {
             AddVertex(t_to);
         }
         t_to->AddPointingVertex(t_from);
@@ -68,7 +64,7 @@ namespace mpp {
         t_from->RemoveNeighbor(t_to);
     }
 
-    std::pair<std::set<mpp::Vertex *>::iterator, bool> GcGraph::AddVertex(Vertex* t_vertex)
+    std::pair<std::set<mpp::Vertex*>::iterator, bool> GcGraph::AddVertex(Vertex* t_vertex)
     {
         return m_adjList.insert(t_vertex);
     }
@@ -83,14 +79,15 @@ namespace mpp {
         // initialize weakly connected components
         // Each element in this vector contains isolated subgraph
         std::vector<std::unique_ptr<GcGraph>> weaklyConnectedComponents;
-        
+
         // Copy of adjacence list to use with DFS
-        std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
+        std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(),
+                                                        m_adjList.end());
 
         // iteraste through all vertixes
-        while (adjListCopy.empty() != true)
-        {
-            std::unique_ptr<GcGraph> connectedComponent = std::make_unique<GcGraph>(UndirectedDFS(*(adjListCopy.begin())));
+        while (adjListCopy.empty() != true) {
+            std::unique_ptr<GcGraph> connectedComponent =
+              std::make_unique<GcGraph>(UndirectedDFS(*(adjListCopy.begin())));
             // delete each visited vertex from adjListCopy
             for (auto v : connectedComponent->GetAdjList())
                 adjListCopy.erase(v);
@@ -109,13 +106,12 @@ namespace mpp {
 
     void GcGraph::DDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
     {
-        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(), t_vertex->GetNeighbors().end());        
+        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
+                                       t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
-        for (auto neighbor : neighbors)
-        {
-            if (std::find(t_visited.begin(), t_visited.end(), neighbor) 
-                            != t_visited.end() == false)
-            {  
+        for (auto neighbor : neighbors) {
+            if (std::find(t_visited.begin(), t_visited.end(), neighbor) !=
+                t_visited.end() == false) {
                 GcGraph::DDFS(neighbor, t_visited);
             }
         }
@@ -130,14 +126,15 @@ namespace mpp {
 
     void GcGraph::UDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
     {
-        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(), t_vertex->GetNeighbors().end());
-        neighbors.insert(neighbors.end(), t_vertex->GetPointingVertices().begin(), t_vertex->GetPointingVertices().end());
+        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
+                                       t_vertex->GetNeighbors().end());
+        neighbors.insert(neighbors.end(),
+                         t_vertex->GetPointingVertices().begin(),
+                         t_vertex->GetPointingVertices().end());
         t_visited.push_back(t_vertex);
-        for (auto neighbor : neighbors)
-        {
-            if (std::find(t_visited.begin(), t_visited.end(), neighbor) 
-                            != t_visited.end() == false)
-            {  
+        for (auto neighbor : neighbors) {
+            if (std::find(t_visited.begin(), t_visited.end(), neighbor) !=
+                t_visited.end() == false) {
                 GcGraph::UDFS(neighbor, t_visited);
             }
         }
@@ -149,7 +146,7 @@ namespace mpp {
         auto foundVertexIt = m_adjList.find(vertex.get());
         if (foundVertexIt != m_adjList.end())
             return *foundVertexIt;
-        
+
         return nullptr;
     }
 

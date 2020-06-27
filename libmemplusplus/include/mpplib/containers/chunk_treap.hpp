@@ -7,20 +7,19 @@
 
 namespace mpp {
     /**
-     * @brief ChunkTreap (CTreap) - Container class, that provides easy way of inserting/finding freed chunks in arena.
-     * 
-     * Data structure itself is a treap (tree + heap). Provides easy way to work with chunks.
-     * Complexity (in general):
-     *  Insert: O(logn)
-     *  Remove: O(logn)
-     *  Find[min/max]: O(logn) 
+     * @brief ChunkTreap (CTreap) - Container class, that provides easy way of
+     * inserting/finding freed chunks in arena.
+     *
+     * Data structure itself is a treap (tree + heap). Provides easy way to work with
+     * chunks. Complexity (in general): Insert: O(logn) Remove: O(logn) Find[min/max]:
+     * O(logn)
      */
     class ChunkTreap final
     {
     public:
         /**
          * @brief Constructs empty chunk treap.
-         * 
+         *
          * Root node is nullptr.
          */
         ChunkTreap();

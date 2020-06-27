@@ -6,13 +6,13 @@
 namespace mpp {
     /**
      * @brief Defines general exceptions class for all project.
-     * 
+     *
      * All other exceptions shoul be inherited from this class.
      */
     class Exception : virtual public std::exception
     {
     public:
-        /** 
+        /**
          * @brief Constructor (C strings).
          * @param message C-style string error message.
          *                The string contents are copied upon construction.
@@ -23,7 +23,7 @@ namespace mpp {
             : m_errorMsg(message)
         {}
 
-        /** 
+        /**
          * @brief Constructor (C++ STL strings).
          * @param message The error message.
          */
@@ -31,9 +31,9 @@ namespace mpp {
             : m_errorMsg(message)
         {}
 
-        /** 
+        /**
          * @brief Destructor.
-         * 
+         *
          * Virtual to allow for subclassing.
          */
         virtual ~Exception() throw()
@@ -51,7 +51,7 @@ namespace mpp {
         }
 
     protected:
-        /** 
+        /**
          * @brief Error message.
          */
         std::string m_errorMsg;

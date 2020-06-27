@@ -24,7 +24,7 @@ namespace mpp {
          * @return std::size_t Aligned number
          */
         static std::size_t Align(std::size_t t_size, int32_t t_alignment);
-        
+
         /**
          * @brief mmap(2) wrapper, that maps readble and writable, not shared
          * memory page of given size.
@@ -42,17 +42,17 @@ namespace mpp {
          * @return true if everything is fine, otherwise it will throw exception
          */
         static bool SysDealloc(void* t_ptr, std::size_t t_pageSize);
-        
+
         /**
          * @brief Creates arena of given size and update global arenas list.
          * @param t_arenaSize is size of arena, that will be created.
          * @return newly created arena.
          */
         static Arena* CreateArena(std::size_t t_arenaSize);
-        
+
         /**
          * @brief Function that allocate chunk with user data bigger than 32MB.
-         * 
+         *
          * It creates new arena and allocate chunk in it.
          * @param t_userDataSize is the size of user data, that will be allocated.
          * @return void* pointer to newly allocated chunk.
@@ -70,7 +70,8 @@ namespace mpp {
 
     public:
         /**
-         * @brief Default Allocate method. Allocates chunk with size at least t_userDataSize.
+         * @brief Default Allocate method. Allocates chunk with size at least
+         * t_userDataSize.
          * @param t_userDataSize request size.
          * @return void* pointer to user data in allocated chunk
          */

@@ -54,11 +54,11 @@ namespace mpp {
         Node& operator=(Node&& t_node);
 
         /**
-         * @brief Default destructor. 
+         * @brief Default destructor.
          * @sa Delete.
          */
         ~Node();
-        
+
         /**
          * @brief Dump text represenation of the node.
          */

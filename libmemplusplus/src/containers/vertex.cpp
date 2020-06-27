@@ -38,9 +38,9 @@ namespace mpp {
 
     bool Vertex::RemoveGcPtr(GcPtr* t_gcPtr)
     {
-        auto toErase = std::find(m_pointingToGcPtrs.begin(), m_pointingToGcPtrs.end(), t_gcPtr);
-        if (toErase != m_pointingToGcPtrs.end())
-        {
+        auto toErase =
+          std::find(m_pointingToGcPtrs.begin(), m_pointingToGcPtrs.end(), t_gcPtr);
+        if (toErase != m_pointingToGcPtrs.end()) {
             m_pointingToGcPtrs.erase(toErase);
             return true;
         }

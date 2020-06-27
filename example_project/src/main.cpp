@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "mpplib/shared_gcptr.hpp"
 #include "mpplib/gc.hpp"
+#include "mpplib/shared_gcptr.hpp"
 #include <memory>
 
 using namespace mpp;
@@ -10,8 +10,10 @@ class UserData
 {
 private:
     int m_data{ 0 };
+
 public:
-    UserData(int val) : m_data{ val }
+    UserData(int val)
+        : m_data{ val }
     {
         // std::cout << "Created!\n";
     }
