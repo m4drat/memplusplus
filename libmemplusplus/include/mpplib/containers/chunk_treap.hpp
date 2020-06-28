@@ -18,6 +18,14 @@ namespace mpp {
     {
     public:
         /**
+         * @brief Implements iteration logic for ChunkTreap.
+         */
+        struct Iterator
+        {
+
+        };
+
+        /**
          * @brief Constructs empty chunk treap.
          *
          * Root node is nullptr.

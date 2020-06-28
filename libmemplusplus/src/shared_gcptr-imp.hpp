@@ -59,48 +59,36 @@ namespace mpp {
             AddToGcList();
     }
 
-    // TODO
     // Destructors
     template<class Type>
     SharedGcPtr<Type>::~SharedGcPtr()
     {
-        // We should delete every smart pointer from list
         DeleteFromGcList();
         Reset();
     }
-
-    // Assignment operators
-    // template<class Type>
-    // SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr t_other)
-    // {
-    //     t_other.Swap(*this);
-    //     return *this;
-    // }
 
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr&& t_other) noexcept
     {
         Swap(t_other);
-
-        if (m_objectPtr != nullptr)
-            AddToGcList();
-
         return *this;
     }
 
-    // TODO
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(const SharedGcPtr& t_other)
     {
         if (this == &t_other)
             return *this;
+
+        if (t_other.m_objectPtr == nullptr)
+            DeleteFromGcList();
+        if (m_objectPtr == nullptr && t_other.m_objectPtr != nullptr)
+            AddToGcList();
+
         Reset();
 
         m_objectPtr = t_other.m_objectPtr;
         m_references = t_other.m_references;
-
-        if (m_objectPtr == nullptr)
-            DeleteFromGcList();
 
         if (m_references)
             ++(*m_references);
@@ -111,22 +99,15 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(Type* t_newData)
     {
-        // Reset();
         SharedGcPtr tmp(t_newData);
         tmp.Swap(*this);
-
-        if (m_objectPtr != nullptr)
-            AddToGcList();
-
         return *this;
     }
 
-    // TODO
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
-        if (m_objectPtr != nullptr)
-            DeleteFromGcList();
+        DeleteFromGcList();
         this->Reset();
     }
 
@@ -134,37 +115,37 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::operator==(const SharedGcPtr& t_other) noexcept
     {
-        return this.Get() == t_other.Get();
+        return Get() == t_other.Get();
     }
 
     template<class Type>
     bool SharedGcPtr<Type>::operator!=(const SharedGcPtr& t_other) noexcept
     {
-        return this.Get() != t_other.Get();
+        return Get() != t_other.Get();
     }
 
     template<class Type>
     bool SharedGcPtr<Type>::operator<=(const SharedGcPtr& t_other) noexcept
     {
-        return this.Get() <= t_other.Get();
+        return Get() <= t_other.Get();
     }
 
     template<class Type>
     bool SharedGcPtr<Type>::operator<(const SharedGcPtr& t_other) noexcept
     {
-        return this.Get() < t_other.Get();
+        return Get() < t_other.Get();
     }
 
     template<class Type>
     bool SharedGcPtr<Type>::operator>=(const SharedGcPtr& t_other) noexcept
     {
-        return this.Get() >= t_other.Get();
+        return Get() >= t_other.Get();
     }
 
     template<class Type>
     bool SharedGcPtr<Type>::operator>(const SharedGcPtr& t_other) noexcept
     {
-        return this.Get() > t_other.Get();
+        return Get() > t_other.Get();
     }
 
     template<class Type>
@@ -189,6 +170,9 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::DeleteFromGcList()
     {
+        if (m_objectPtr == nullptr)
+            return false;
+
         auto toErase = std::find(GC::GetGcPtrs().begin(), GC::GetGcPtrs().end(), this);
         if (toErase != GC::GetGcPtrs().end()) {
             GC::GetGcPtrs().erase(toErase);
@@ -212,7 +196,7 @@ namespace mpp {
             if (*m_references <= 0) {
                 delete m_references;
                 // TODO: shoud we really deallocate data, or we just need to delete it
-                // from chunksInUse? + call object destructor
+                // from chunksInUse + call object destructor
                 if (m_objectPtr)
                     MemoryAllocator::Deallocate<Type>(m_objectPtr);
 
@@ -222,7 +206,6 @@ namespace mpp {
         }
     }
 
-    // TODO
     template<class Type>
     void SharedGcPtr<Type>::Swap(SharedGcPtr& t_other)
     {

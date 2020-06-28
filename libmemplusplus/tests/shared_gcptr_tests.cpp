@@ -1,5 +1,6 @@
 #include "catch2/catch.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/memory_allocator.hpp"
 #include "mpplib/gc.hpp"
 
 TEST_CASE("Empty constructor")
@@ -74,11 +75,12 @@ TEST_CASE("Assign to Type*")
 
     char* data1 = new char[40];
     SharedGcPtr<char> ptr1 = nullptr;
+    REQUIRE(GC::GetGcPtrs().size() == 0);
     REQUIRE(ptr1.UseCount() == 1);
     REQUIRE(ptr1.Get() == nullptr);
 
     ptr1 = data1;
-
+    REQUIRE(GC::GetGcPtrs().size() == 1);
     REQUIRE(ptr1.UseCount() == 1);
     REQUIRE(ptr1.Get() == data1);
     REQUIRE(GC::GetGcPtrs().size() == 1);
@@ -92,7 +94,7 @@ TEST_CASE("Assign to nullptr")
 
     REQUIRE(ptr1.UseCount() == 1);
     REQUIRE(ptr1.Get() == nullptr);
-    REQUIRE(GC::GetGcPtrs().size() == 1);
+    REQUIRE(GC::GetGcPtrs().size() == 0);
 }
 
 TEST_CASE("Function call with shared ptr in parameters")
@@ -138,16 +140,55 @@ TEST_CASE("Create new pointer through assigment")
     SharedGcPtr<char> ptr4(ptr3);
     REQUIRE(GC::GetGcPtrs().size() == 0);
 
-    ptr1 = new char[20];
+    ptr1 = (char*)MemoryAllocator::Allocate(64);
 
     REQUIRE((ptr1.UseCount() == 1 && ptr2.UseCount() == 3 &&
              ptr3.UseCount() == 3 && ptr4.UseCount() == 3));
-    REQUIRE(GC::GetGcPtrs().size() == 4);
+    REQUIRE((ptr2 == nullptr && ptr3 == nullptr && ptr4 == nullptr));
+    REQUIRE(GC::GetGcPtrs().size() == 1);
 }
 
-// TEST_CASE("")
-// {
-//     mpp::SharedGcPtr<char> ptr1(nullptr);
-//     mpp::SharedGcPtr<char> ptr2(new char[64]);
-// }
+TEST_CASE("Integration test - 1")
+{
+    using namespace mpp;
 
+    SharedGcPtr<char> ptr1((char*)MemoryAllocator::Allocate(64));
+    SharedGcPtr<char> ptr2((char*)MemoryAllocator::Allocate(64));
+    SharedGcPtr<char> ptr3((char*)MemoryAllocator::Allocate(64));
+    SharedGcPtr<char> ptr4((char*)MemoryAllocator::Allocate(64));
+    REQUIRE(GC::GetGcPtrs().size() == 4);
+    REQUIRE((ptr1.UseCount() == 1 && ptr2.UseCount() == 1 &&
+             ptr3.UseCount() == 1 && ptr4.UseCount() == 1));
+
+    ptr1 = nullptr;
+    REQUIRE(GC::GetGcPtrs().size() == 3);
+    
+    ptr1 = ptr4;
+    REQUIRE(GC::GetGcPtrs().size() == 4);
+    REQUIRE(ptr1.UseCount() == 2);
+    REQUIRE(ptr4.UseCount() == 2);
+
+    ptr2 = SharedGcPtr<char>(nullptr);
+    REQUIRE(GC::GetGcPtrs().size() == 3);
+    REQUIRE(ptr2.UseCount() == 1);
+
+    ptr1 = ptr2;
+    REQUIRE(GC::GetGcPtrs().size() == 2);
+    REQUIRE(ptr1.UseCount() == 2);
+    REQUIRE(ptr2.UseCount() == 2);
+    
+    ptr3 = ptr2;
+    REQUIRE(GC::GetGcPtrs().size() == 1);
+    REQUIRE(ptr3.UseCount() == 3);
+    REQUIRE(ptr2.UseCount() == 3);
+    
+    ptr4 = ptr2;
+    REQUIRE(GC::GetGcPtrs().size() == 0);
+    REQUIRE(ptr2.UseCount() == 4);
+    REQUIRE(ptr4.UseCount() == 4);
+}
+
+TEST_CASE("Integration test - 2")
+{
+
+}
