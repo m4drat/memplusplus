@@ -82,9 +82,15 @@ namespace mpp {
         }
 
         /**
-         * @brief Chunk treap deleteion logic.
+         * @brief Wrapper around Delete(Node* t_root), to deletye from root.
+         * @sa Delete(Node* t_root)
          */
         void Delete();
+
+        /**
+         * @brief Delete all nodes starting from t_root.
+         */
+        void Delete(Node* t_root);
 
     private:
         /**

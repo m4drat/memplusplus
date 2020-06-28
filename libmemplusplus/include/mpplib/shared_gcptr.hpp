@@ -41,15 +41,15 @@ namespace mpp {
 
         /**
          * @brief Copy-Constructor to construct from const SharedGcPtr reference.
-         * @param t_another const reference to another SharedGcPtr
+         * @param t_other rvalue reference to another SharedGcPtr
          */
-        SharedGcPtr(const SharedGcPtr<Type>& t_another);
+        SharedGcPtr(const SharedGcPtr<Type>& t_other);
 
-        // /**
-        //  * @brief Copy-Constructor to move from t_another.
-        //  * @param t_another const reference to another SharedGcPtr
-        //  */
-        // SharedGcPtr(SharedGcPtr<Type>&& t_another);
+        /**
+         * @brief Copy-Constructor to construct from const SharedGcPtr rvalue reference.
+         * @param t_other const reference to another SharedGcPtr
+         */
+        SharedGcPtr(SharedGcPtr<Type>&& t_other);
 
         /**
          * @brief Destroy SharedGcPtr.
@@ -63,14 +63,14 @@ namespace mpp {
          * @param t_other rvalue reference to SharedGcPtr.
          * @return SharedGcPtr<Type>& new object
          */
-        SharedGcPtr<Type>& operator=(SharedGcPtr&& t_other) noexcept;
+        SharedGcPtr<Type>& operator=(SharedGcPtr<Type>&& t_other) noexcept;
         /**
          * @brief Overloaded assignment operator, to construct object from const
          * SharedGcPtr reference.
          * @param t_other const reference to SharedGcPtr.
          * @return SharedGcPtr<Type>& new object
          */
-        SharedGcPtr<Type>& operator=(const SharedGcPtr& t_other);
+        SharedGcPtr<Type>& operator=(const SharedGcPtr<Type>& t_other);
         /**
          * @brief Overloaded assignment operator, to construct object from user data
          * pointer.

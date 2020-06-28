@@ -47,9 +47,9 @@ namespace mpp {
 
     // Copy-Constructors
     template<class Type>
-    SharedGcPtr<Type>::SharedGcPtr(const SharedGcPtr<Type>& t_another)
-        : m_objectPtr{ t_another.m_objectPtr }
-        , m_references{ t_another.m_references }
+    SharedGcPtr<Type>::SharedGcPtr(const SharedGcPtr<Type>& t_other)
+        : m_objectPtr{ t_other.m_objectPtr }
+        , m_references{ t_other.m_references }
     {
         if (m_references) {
             ++(*m_references);
@@ -59,36 +59,41 @@ namespace mpp {
             AddToGcList();
     }
 
+    template<class Type>
+    SharedGcPtr<Type>::SharedGcPtr(SharedGcPtr<Type>&& t_other)
+    {
+        Swap(t_other);
+    }
+
     // Destructors
     template<class Type>
     SharedGcPtr<Type>::~SharedGcPtr()
     {
-        DeleteFromGcList();
         Reset();
     }
 
     template<class Type>
-    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr&& t_other) noexcept
+    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr<Type>&& t_other) noexcept
     {
-        Swap(t_other);
+        if (this != &t_other)
+            Swap(t_other);
+
         return *this;
     }
 
     template<class Type>
-    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(const SharedGcPtr& t_other)
+    SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(const SharedGcPtr<Type>& t_other)
     {
         if (this == &t_other)
             return *this;
-
-        if (t_other.m_objectPtr == nullptr)
-            DeleteFromGcList();
-        if (m_objectPtr == nullptr && t_other.m_objectPtr != nullptr)
-            AddToGcList();
 
         Reset();
 
         m_objectPtr = t_other.m_objectPtr;
         m_references = t_other.m_references;
+
+        if (m_objectPtr != nullptr)
+            AddToGcList();
 
         if (m_references)
             ++(*m_references);
@@ -107,7 +112,6 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
-        DeleteFromGcList();
         this->Reset();
     }
 
@@ -190,6 +194,8 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::Reset(std::nullptr_t const)
     {
+        DeleteFromGcList();
+
         if (m_references) {
             --(*m_references);
             // Destroy shared ptr and object
@@ -199,11 +205,15 @@ namespace mpp {
                 // from chunksInUse + call object destructor
                 if (m_objectPtr)
                     MemoryAllocator::Deallocate<Type>(m_objectPtr);
-
+                
                 m_references = nullptr;
-                m_objectPtr = nullptr;
+
+                return;
             }
         }
+
+        m_references = new uint32_t(1);
+        m_objectPtr = nullptr;
     }
 
     template<class Type>

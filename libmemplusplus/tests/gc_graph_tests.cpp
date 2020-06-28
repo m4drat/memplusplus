@@ -67,10 +67,6 @@ TEST_CASE("Check workability of FindVertex method of gc_graph")
     REQUIRE(v4 == objectsGraph->FindVertex(v4ch));
 }
 
-TEST_CASE("")
-{
-    
-}
 /* For ctrl+c, ctrl+v
 TEST_CASE("")
 {
