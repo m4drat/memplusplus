@@ -15,7 +15,7 @@ namespace mpp {
     Arena::~Arena()
     {
         // TODO: correctly destroy ChunkTreap
-        freedChunks.Delete();
+        // ~ChunkTreap get called automatically
         chunksInUse.clear();
         MemoryAllocator::SysDealloc(this->begin, size);
     }

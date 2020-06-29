@@ -69,7 +69,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>::~SharedGcPtr()
     {
-        Reset();
+        DeleteReference();
     }
 
     template<class Type>
@@ -87,7 +87,7 @@ namespace mpp {
         if (this == &t_other)
             return *this;
 
-        Reset();
+        DeleteReference();
 
         m_objectPtr = t_other.m_objectPtr;
         m_references = t_other.m_references;
@@ -112,7 +112,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
-        this->Reset();
+        this->DeleteReference();
     }
 
     // comparisons operators
@@ -194,6 +194,15 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::Reset(std::nullptr_t const)
     {
+        DeleteReference();
+
+        m_references = new uint32_t(1);
+        m_objectPtr = nullptr;
+    }
+
+    template<class Type>
+    void SharedGcPtr<Type>::DeleteReference()
+    {
         DeleteFromGcList();
 
         if (m_references) {
@@ -205,14 +214,10 @@ namespace mpp {
                 // from chunksInUse + call object destructor
                 if (m_objectPtr)
                     MemoryAllocator::Deallocate<Type>(m_objectPtr);
-                
-                m_references = nullptr;
-
-                return;
             }
         }
 
-        m_references = new uint32_t(1);
+        m_references = nullptr;
         m_objectPtr = nullptr;
     }
 

@@ -55,13 +55,16 @@ namespace mpp {
 
     void ChunkTreap::Delete(Node* t_root)
     {
-        // if (t_root == nullptr)
-        //     return;
+        if (t_root == nullptr)
+            return;
         
-        // Delete(t_root->leftChild);
-        // Delete(t_root->rightChild);
+        Delete(t_root->leftChild);
+        t_root->leftChild = nullptr;
+        Delete(t_root->rightChild);
+        t_root->rightChild = nullptr;
 
-        // delete t_root;
+        delete t_root;
+        t_root = nullptr;
     }
 
     Chunk* ChunkTreap::MinSizeChunk() const

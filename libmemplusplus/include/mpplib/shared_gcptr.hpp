@@ -22,6 +22,10 @@ namespace mpp {
          * @brief Number of references to object.
          */
         uint32_t* m_references{ nullptr };
+        /**
+         * @brief Release object, decrementing m_references. 
+         */
+        void DeleteReference();
 
     public:
         /**

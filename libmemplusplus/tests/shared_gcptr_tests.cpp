@@ -244,3 +244,19 @@ TEST_CASE("Integration test - 3")
     SharedGcPtr<char> ptr3(SharedGcPtr<char>(nullptr));
     REQUIRE(GC::GetGcPtrs().size() == 1);
 }
+
+TEST_CASE("Integration test - 4")
+{
+    using namespace mpp;
+
+    SharedGcPtr<char> ptr1 = nullptr;
+    REQUIRE(GC::GetGcPtrs().size() == 0);
+    
+    ptr1 = SharedGcPtr<char>((char*)MemoryAllocator::Allocate(64));
+    REQUIRE(GC::GetGcPtrs().size() == 1);
+
+    ptr1.Reset();
+    REQUIRE(GC::GetGcPtrs().size() == 0);
+
+    SharedGcPtr<char> ptr2 = ptr1;
+}
