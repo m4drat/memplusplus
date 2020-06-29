@@ -184,4 +184,28 @@ namespace mpp {
             t_right = t_root;
         }
     }
+
+    // TODO
+    std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
+    {
+        // t_out << "digraph Objects {\n";
+        // for (auto v1 : m_adjList) {
+        //     t_out << "\t\"" + v1->ToString() + "\"";
+        //     if (v1->GetNeighbors().size() != 0)
+        //         t_out << " -> ";
+
+        //     for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end(); ++it) {
+        //         if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
+        //             t_out << "\"" + (*it)->ToString() + "\"";
+        //         else
+        //             t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
+        //     }
+
+        //     t_out << ";\n";
+        // }
+
+        // t_out << "}";
+
+        // return t_out;
+    }
 }

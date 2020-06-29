@@ -23,27 +23,27 @@ namespace mpp {
         Clear();
     }
 
-    std::string GcGraph::GenerateGraphvizLayout()
+    std::ostream& GcGraph::GenerateGraphvizLayout(std::ostream& t_out) const
     {
-        std::string graphvizStr = "digraph Objects {\n";
+        t_out << "digraph Objects {\n";
         for (auto v1 : m_adjList) {
-            graphvizStr += "\t\"" + v1->ToString() + "\"";
+            t_out << "\t\"" + v1->ToString() + "\"";
             if (v1->GetNeighbors().size() != 0)
-                graphvizStr += " -> ";
+                t_out << " -> ";
 
-            for (auto v2 : v1->GetNeighbors()) {
-                graphvizStr += "\"" + v2->ToString() + "\"" + " -> ";
+            for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end(); ++it) {
+                if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
+                    t_out << "\"" + (*it)->ToString() + "\"";
+                else
+                    t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
             }
 
-            if (v1->GetNeighbors().size() != 0)
-                graphvizStr = graphvizStr.substr(0, graphvizStr.size() - 4);
-
-            graphvizStr += ";\n";
+            t_out << ";\n";
         }
 
-        graphvizStr += "}";
+        t_out << "}";
 
-        return graphvizStr;
+        return t_out;
     }
 
     void GcGraph::AddEdge(Vertex* t_from, Vertex* t_to)

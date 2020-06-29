@@ -92,6 +92,14 @@ namespace mpp {
          */
         void Delete(Node* t_root);
 
+        /**
+         * @brief Generates tree representation in form, that can be used in dot
+         * (graphviz), to visualize tree structure.
+         *
+         * @return std::string with description of the tree
+         */
+        std::ostream& GenerateGraphvizLayout(std::ostream& t_out) const;
+
     private:
         /**
          * @brief Chunk treap root node.

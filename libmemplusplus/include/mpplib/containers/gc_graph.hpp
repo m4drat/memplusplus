@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <ostream>
 #include <cstdint>
 #include <memory>
 #include <set>
@@ -62,9 +63,9 @@ namespace mpp {
          * @brief Generates graph representation in form, that can be used in dot
          * (graphviz), to visualize graph structure.
          *
-         * @return std::string with description of the graph
+         * @return std::ostream
          */
-        std::string GenerateGraphvizLayout();
+        std::ostream& GenerateGraphvizLayout(std::ostream& t_out) const;
 
         /**
          * @brief Adds new edge to the graph.
