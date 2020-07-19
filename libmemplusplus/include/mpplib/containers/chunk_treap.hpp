@@ -17,6 +17,7 @@ namespace mpp {
     class ChunkTreap final
     {
     public:
+        // TODO
         /**
          * @brief Implements iteration logic for ChunkTreap.
          */
