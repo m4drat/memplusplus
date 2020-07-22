@@ -4,11 +4,8 @@ cmake_minimum_required(VERSION 3.10)
 set(CMAKE_C_FLAGS_DEBUG "-g2 -DDEBUG")
 set(CMAKE_CXX_FLAGS_DEBUG "-g2 -DDEBUG")
 
-################# SET VARIABLES #################
+################# SET GLOBAL VARIABLES #################
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/binaries/bin)
 set(CMAKE_CXX_STANDARD 17)
 
 ################# DEFINE PROJECT #################
@@ -18,9 +15,15 @@ project(memplusplus VERSION 1.0.0 LANGUAGES CXX)
 option(BUILD_SHARED_LIBS "Request build of shared libraries" ON)
 option(MPP_BUILD_HARNESS "Build the mpp fuzzing harness" OFF)
 option(MPP_BUILD_EXAMPLE "Build the mpp example project" OFF)
-option(MPP_BUILD_TESTS "Build the mpp tests" ON)
+option(MPP_BUILD_TESTS "Build the mpp tests" OFF)
 option(MPP_BUILD_DOCS "Build the mpp documentation" OFF)
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)
+
+message(STATUS "BUILD_SHARED_LIBS: ${BUILD_SHARED_LIBS}")
+message(STATUS "MPP_BUILD_HARNESS: ${MPP_BUILD_HARNESS}")
+message(STATUS "MPP_BUILD_EXAMPLE: ${MPP_BUILD_EXAMPLE}")
+message(STATUS "MPP_BUILD_TESTS: ${MPP_BUILD_TESTS}")
+message(STATUS "MPP_BUILD_DOCS: ${MPP_BUILD_DOCS}")
 
 if(NOT BUILD_SHARED_LIBS)
 	set(STATIC_POSTFIX "s")

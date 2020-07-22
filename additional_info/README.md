@@ -1,5 +1,7 @@
 # mem++
 
+Here presented a lot of information, that was used in phase of active development.
+
 ### Технологии:
 1. cmake - build system
 2. sphnix/doxygen - documentation
@@ -7,6 +9,13 @@
 4. clang-format - formatting tool
 5. clang-tidy - linting tool
 6. catch2 - unit-testing
+
+### Обновление версий
+- Обновлять только в CMakeLists.txt в ./libmemplusplus
+- Пример: 1.2.3
+    - 1 - Major version - обновляется при изменении API
+    - 2 - Minor version - обновляется при добавлении чего-то в API
+    - 3 - Patch - обновляется при багфиксе
 
 ### Правила форматирования
 1. namespace `mpp`
