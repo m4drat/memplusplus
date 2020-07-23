@@ -36,7 +36,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 2. compile and install:
 
     ```bash
-    cmake \
+    sudo cmake \
         --build build \
         --target install \
         -j 8
@@ -54,7 +54,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
     target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE mpp::mpp)
     ```
 
-4. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.h>`
+4. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.hpp>`
 
 ### How to use the library internally
 
@@ -67,7 +67,9 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
     target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE lib::mpp)
     ```
 
-3. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.h>`
+3. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.hpp>`
+
+## Internal architecture
 
 ## Examples
 
