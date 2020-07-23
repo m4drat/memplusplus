@@ -1,13 +1,23 @@
 ################# SET UP PROJECT + VERSION #################
-project(mpp VERSION 1.0.0 LANGUAGES CXX)
+project(mpp LANGUAGES CXX)
+set(VERSION_MAJOR 1)
+set(VERSION_MINOR 0)
+set(VERSION_PATCH 0)
+set(MPP_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 ################# ADD CONFIG FILE #################
 configure_file(${PROJECT_SOURCE_DIR}/include/mpplib/config.h.in 
 	${PROJECT_SOURCE_DIR}/include/mpplib/config.h @ONLY
 )
 
-################# COMPILE LIBRARY #################
-add_library(${PROJECT_NAME}
+################# ADD INSTALL PATHS #################
+#  - CMAKE_INSTALL_LIBDIR
+#  - CMAKE_INSTALL_BINDIR
+#  - CMAKE_INSTALL_INCLUDEDIR
+include(GNUInstallDirs)
+
+################# SET SOURCES #################
+set(MPP_SOURCES
 	src/heuristics/heuristics.cpp
 	src/containers/chunk_treap.cpp
 	src/containers/gc_graph.cpp
@@ -19,37 +29,102 @@ add_library(${PROJECT_NAME}
 	src/memory_manager.cpp
 	src/gc.cpp
 )
+
+################# DEFAULT BUILD TYPE #################
+if (NOT CMAKE_BUILD_TYPE)
+	if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
+		message(STATUS "No build type selected, default to: Debug")
+		set(CMAKE_BUILD_TYPE "Debug")
+	else()
+		message(STATUS "No build type selected, default to: Release")
+		set(CMAKE_BUILD_TYPE "Release")
+	endif()
+endif()
+
+################# SET TARGET NAME #################
+if(MPP_SECURE MATCHES "ON")
+	set(MPP_BASENAME "${PROJECT_NAME}-secure")
+else()
+	set(MPP_BASENAME ${PROJECT_NAME})
+endif()
+
+string(TOLOWER ${CMAKE_BUILD_TYPE} CMAKE_BUILD_TYPE_LC)
+
+if(NOT(CMAKE_BUILD_TYPE_LC MATCHES "^(release|relwithdebinfo|minsizerel)$"))
+	set(MPP_BASENAME "${MPP_BASENAME}-${CMAKE_BUILD_TYPE_LC}") #append build type (e.g. -debug) if not a release version
+endif()
+
+if(MPP_BUILD_SHARED_LIBS)
+	list(APPEND MPP_BUILD_TARGETS "shared")
+endif()
+
+if(MPP_BUILD_STATIC_LIBS)
+	list(APPEND MPP_BUILD_TARGETS "static")
+endif()
+
+################# OUTPUT LIBRARY INFO #################
+message(STATUS "##################### LIBRARY INFO #####################")
+message(STATUS "Library base name: ${MPP_BASENAME}")
+message(STATUS "Build type       : ${CMAKE_BUILD_TYPE_LC}")
+message(STATUS "Install directory: ${CMAKE_INSTALL_LIBDIR}")
+message(STATUS "Build targets    : ${MPP_BUILD_TARGETS}")
+
+################# COMPILE LIBRARY #################
+if (MPP_BUILD_SHARED_LIBS)
+	add_library(${PROJECT_NAME} SHARED ${MPP_SOURCES})
+else()
+	add_library(${PROJECT_NAME} STATIC ${MPP_SOURCES})
+endif()
+
+################# ALIAS TO USE AS AN INTERNAL PROJECT #################
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 
-################# UPDATE INCLUDE DIRECTORIES #################
-target_include_directories(${PROJECT_NAME}
-	PUBLIC ${PROJECT_SOURCE_DIR}/include
-	PUBLIC ${PROJECT_SOURCE_DIR}/src
+################# SET DEFINES FOR DEBUG MODE #################
+if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
+	# ADDED TO SUPPORT DEBUGGING
+	target_compile_options(${PROJECT_NAME} PRIVATE "-g")
+	list(APPEND MPP_DEFINES MPP_DEBUG=1)
+	list(APPEND MPP_DEFINES DEBUG=1)
+else()
+	list(APPEND MPP_DEFINES MPP_DEBUG=0)
+	list(APPEND MPP_DEFINES DEBUG=0)
+endif()
+
+target_compile_definitions(${PROJECT_NAME} 
+	PRIVATE ${MPP_DEFINES}
 )
 
-################# TARGET PROPERTIES #################
-set_target_properties(${PROJECT_NAME}
-	PROPERTIES
-	VERSION ${PROJECT_VERSION}
-	DEBUG_POSTFIX "-${STATIC_POSTFIX}d"
-	RELEASE_POSTFIX "-${STATIC_POSTFIX}r"
-	MINSIZEREL_POSTFIX "-${STATIC_POSTFIX}mr"
-	RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
-	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+set_target_properties(${PROJECT_NAME} 
+	PROPERTIES 
+	VERSION ${MPP_VERSION} 
+	OUTPUT_NAME ${MPP_BASENAME}
 )
+
+################# UPDATE INCLUDE DIRECTORIES #################
+target_include_directories(${PROJECT_NAME} PUBLIC
+	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+)
+
+message(STATUS "Used definitions : ${MPP_DEFINES}")
 
 ################# INSTALL LIBRARY #################
-include(GNUInstallDirs)
 
+# Install targets
 install(TARGETS ${PROJECT_NAME} 
-	EXPORT MpplibConfig
+	EXPORT ${PROJECT_NAME}-config
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+	RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+	INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
 
-install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME})
-install(EXPORT MpplibConfig DESTINATION share/mpplib/cmake)
+# Install headers
+install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/ 
+	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
-export(TARGETS ${PROJECT_NAME} FILE MyLibConfig.cmake)
+# Install Config
+install(EXPORT ${PROJECT_NAME}-config 
+	NAMESPACE ${PROJECT_NAME}::
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)

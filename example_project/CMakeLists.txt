@@ -1,4 +1,4 @@
-project(fuzzer)
+project(example_project)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
@@ -7,16 +7,16 @@ target_include_directories(${PROJECT_NAME}
 )
 
 set_target_properties(${PROJECT_NAME}
-	PROPERTIES
+    PROPERTIES
 	DEBUG_POSTFIX "-${STATIC_POSTFIX}d"
 	RELEASE_POSTFIX "-${STATIC_POSTFIX}r"
 	MINSIZEREL_POSTFIX "-${STATIC_POSTFIX}mr"
-	RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
-	ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 	LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
 	RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
 )
 
-target_link_libraries( ${PROJECT_NAME}
+target_link_libraries(${PROJECT_NAME}
 	lib::mpp
-)
+) 

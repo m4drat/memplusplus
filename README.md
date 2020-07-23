@@ -8,9 +8,10 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 - Fast free algorithms
 - Advanced compacting algorithms
 
-## Supported systems
+## Supported systems / limitations
 - All Unix-like systems (where it is possible to use mmap)
 - g++ or clang++ compilers
+- currently supports only single-threaded applications
 
 ## Usage
 
@@ -21,7 +22,10 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 1. 
 
 ### How to use the library as a dependency (external project)
-1. 
+1. create `build` directory and enter it: `mkdir build && cd build`
+2. run cmake: `cmake ..`
+3. install targets: `cmake --build . --target install -j 8`
+
 
 ## Examples
 

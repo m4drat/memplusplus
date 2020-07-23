@@ -29,6 +29,23 @@ if(CLANG_FORMAT)
     )
 endif()
 
+# Find all headers for all projects
+# get_target_property(MPP_INCLUDES mpp INCLUDE_DIRECTORIES)
+# if (MPP_BUILD_FUZZER)
+#     get_target_property(FUZZING_HARNESS_INCLUDES fuzzer INCLUDE_DIRECTORIES)
+# endif()
+# if (MPP_BUILD_EXAMPLE)
+#     get_target_property(EXAMPLE_PROJECT_INCLUDES example_project INCLUDE_DIRECTORIES)
+# endif()
+
+# foreach(dir ${MPP_INCLUDES} ${FUZZING_HARNESS_INCLUDES} ${EXAMPLE_PROJECT_INCLUDES})
+#     string(APPEND PROJECTS_INCLUDE_DIRS "-I${dir} ")
+# endforeach()
+
+set(EXAMPLE_PROJECT_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/example_project/include)
+set(FUZZING_HARNESS_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/fuzzing_harness/include)
+set(LIBMEMPLUSPLUS_INCLUDES  ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/libmemplusplus/include)
+
 # Adding clang-tidy target if executable is found
 find_program(CLANG_TIDY "clang-tidy")
 if(CLANG_TIDY)
