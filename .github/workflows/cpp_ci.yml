@@ -20,14 +20,13 @@ jobs:
     - uses: actions/checkout@v1
     
     - name: configure
-      run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Debug -D MPP_BUILD_SHARED_LIBS=OFF -D MPP_ENABLE_COVERAGE=ON
+      run: mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_SHARED_LIBS=OFF -DMPP_ENABLE_COVERAGE=ON ..
 
     - name: build
-      run: cmake --build build --config Debug -j4
+      run: cmake --build . --config Debug -- -j4
 
     - name: test
-      run: |
-        cd build
-        ctest --build-config Debug
+      run: ctest --build-config Debug
+      
     - name: collect code coverage
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
