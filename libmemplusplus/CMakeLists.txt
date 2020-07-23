@@ -24,7 +24,7 @@ if (MPP_SECURE MATCHES "ON")
 endif()
 
 ################# ADD CONFIG FILE #################
-configure_file(${PROJECT_SOURCE_DIR}/include/mpplib/config.hpp.in 
+configure_file(${PROJECT_SOURCE_DIR}/src/config.hpp.in 
 	${PROJECT_SOURCE_DIR}/include/mpplib/config.hpp @ONLY
 )
 
