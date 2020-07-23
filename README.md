@@ -51,7 +51,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
     find_package(mpp 1.0.0 REQUIRED)
 
     add_executable(<YOUR_PROJECT_NAME> <YOUR_SOURCES>)
-    target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE lib::mpp)
+    target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE mpp::mpp)
     ```
 
 4. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.h>`

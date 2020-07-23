@@ -192,4 +192,4 @@ namespace mpp {
 };
 
 // include templates implementation
-#include "shared_gcptr-imp.hpp"
+#include "mpplib/shared_gcptr-imp.hpp"

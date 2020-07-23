@@ -5,6 +5,11 @@ set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
 set(MPP_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
+################# CHECK IF IT IS LINUX #################
+if (WIN32)
+	message(FATAL_ERROR "Windows is not currently supported!")
+endif()
+
 ################# OPTIONS #################
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
@@ -69,9 +74,7 @@ endif()
 
 if(MPP_BUILD_SHARED_LIBS)
 	list(APPEND MPP_BUILD_TARGETS "shared")
-endif()
-
-if(MPP_BUILD_STATIC_LIBS)
+else()
 	list(APPEND MPP_BUILD_TARGETS "static")
 endif()
 
@@ -117,6 +120,7 @@ set_target_properties(${PROJECT_NAME}
 target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 	$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 message(STATUS "Used definitions : ${MPP_DEFINES}")
@@ -137,7 +141,22 @@ install(DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/include/
 	DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Install Config
+set(CONFIG_INSTALL_DIR ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME})
+
 install(EXPORT ${PROJECT_NAME}-config 
 	NAMESPACE ${PROJECT_NAME}::
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+	DESTINATION ${CONFIG_INSTALL_DIR}
+)
+
+# Install version file
+include(CMakePackageConfigHelpers)
+set(VERSION_CONFIG_FILE ${CMAKE_CURRENT_BINARY_DIR}/cmake/${PROJECT_NAME}-config-version.cmake)
+
+write_basic_package_version_file(${VERSION_CONFIG_FILE}
+	VERSION ${MPP_VERSION}
+	COMPATIBILITY SameMajorVersion
+)
+
+install(FILES ${VERSION_CONFIG_FILE}
+	DESTINATION ${CONFIG_INSTALL_DIR}
 )
