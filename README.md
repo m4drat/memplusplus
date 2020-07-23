@@ -1,5 +1,8 @@
 # mem++
 
+[![codecov](https://codecov.io/gh/m4drat/memplusplus/branch/master/graph/badge.svg)](https://codecov.io/gh/m4drat/memplusplus)
+![build](https://github.com/m4drat/memplusplus/workflows/C/C++%20CI/badge.svg?branch=master)
+
 C++ memory allocator with smart features, such as garbage collection, and heap compacting.
 
 ## Features
