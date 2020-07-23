@@ -23,10 +23,14 @@ jobs:
       run: mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_SHARED_LIBS=OFF -DMPP_ENABLE_COVERAGE=ON ..
 
     - name: build
-      run: cmake --build . --config Debug -- -j4
+      run: |
+        cd build 
+        cmake --build . --config Debug -- -j4
 
     - name: test
-      run: ctest --build-config Debug
+      run: |
+        cd build
+        ctest --build-config Debug
       
     - name: collect code coverage
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
