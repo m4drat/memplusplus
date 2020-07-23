@@ -5,9 +5,22 @@ set(VERSION_MINOR 0)
 set(VERSION_PATCH 0)
 set(MPP_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
+################# OPTIONS #################
+option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
+option(MPP_SECURE "Build mpp in secure mode" OFF)
+
+################# LIBRARY OPTIONS #################
+message(STATUS "MPP_BUILD_SHARED_LIBS: ${MPP_BUILD_SHARED_LIBS}")
+message(STATUS "MPP_SECURE: ${MPP_SECURE}")
+
+if (MPP_SECURE MATCHES "ON")
+	message(STATUS "Building in secure mode: MPP_SECURE=1")
+	list(APPEND MPP_DEFINES MPP_SECURE=1)
+endif()
+
 ################# ADD CONFIG FILE #################
-configure_file(${PROJECT_SOURCE_DIR}/include/mpplib/config.h.in 
-	${PROJECT_SOURCE_DIR}/include/mpplib/config.h @ONLY
+configure_file(${PROJECT_SOURCE_DIR}/include/mpplib/config.hpp.in 
+	${PROJECT_SOURCE_DIR}/include/mpplib/config.hpp @ONLY
 )
 
 ################# ADD INSTALL PATHS #################

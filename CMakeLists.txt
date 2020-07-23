@@ -7,27 +7,18 @@ set(CMAKE_CXX_STANDARD 17)
 ################# DEFINE PROJECT #################
 project(memplusplus LANGUAGES CXX)
 
-################# OPTIONS #################
-option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
+################# GLOBAL OPTIONS #################
 option(MPP_BUILD_FUZZER "Build mpp fuzzing harness" OFF)
-option(MPP_BUILD_EXAMPLE "Build mpp example project" OFF)
-option(MPP_BUILD_TESTS "Build mpp tests" OFF)
+option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
+option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
-# option(MPP_SECURE "Build mpp in secure mode" OFF)
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)
 
-message(STATUS "##################### OPTIONS #####################")
-message(STATUS "MPP_BUILD_SHARED_LIBS: ${MPP_BUILD_SHARED_LIBS}")
+message(STATUS "##################### GLOBAL OPTIONS #####################")
 message(STATUS "MPP_BUILD_FUZZER: ${MPP_BUILD_FUZZER}")
 message(STATUS "MPP_BUILD_EXAMPLE: ${MPP_BUILD_EXAMPLE}")
 message(STATUS "MPP_BUILD_TESTS: ${MPP_BUILD_TESTS}")
 message(STATUS "MPP_BUILD_DOCS: ${MPP_BUILD_DOCS}")
-# message(STATUS "MPP_SECURE: ${MPP_SECURE}")
-
-# if (MPP_SECURE MATCHES "ON")
-# 	message(STATUS "Building in secure mode: MPP_SECURE=1")
-# 	list(APPEND MPP_DEFINES MPP_SECURE=1)
-# endif()
 
 ################# ADD PROJECTS + DOCS + TESTS #################
 add_subdirectory(libmemplusplus)
