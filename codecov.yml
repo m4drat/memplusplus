@@ -1,2 +1,2 @@
 ignore:
-  - "*/tests/.*" # exclude tests directory 
+  - "/tests/**/*" # exclude tests directory 
