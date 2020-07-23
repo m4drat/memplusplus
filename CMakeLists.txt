@@ -35,7 +35,7 @@ message(STATUS "MPP_BUILD_DOCS      : ${MPP_BUILD_DOCS}")
 ################# ADD PROJECTS + DOCS + TESTS #################
 add_subdirectory(libmemplusplus)
 if (MPP_ENABLE_COVERAGE)
-	target_compile_options(mpp PRIVATE --coverage  -O0)
+	target_compile_options(mpp PRIVATE --coverage -O0)
 	target_link_libraries(mpp --coverage)
 endif()
 
