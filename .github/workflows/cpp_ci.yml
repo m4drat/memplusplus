@@ -23,11 +23,11 @@ jobs:
       run: cmake -S . -B build -D CMAKE_BUILD_TYPE=Release -D MPP_BUILD_SHARED_LIBS=OFF -D MPP_ENABLE_COVERAGE=ON
 
     - name: build
-      run: cmake --build build --config Debug -j4
+      run: cmake --build build --config Release -j4
 
     - name: test
       run: |
         cd build
-        ctest --build-config Debug
+        ctest --build-config Release
     - name: collect code coverage
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
