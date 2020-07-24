@@ -10,13 +10,47 @@ if (WIN32)
 	message(FATAL_ERROR "Windows is not currently supported!")
 endif()
 
-################# OPTIONS #################
+################# LIBRARY OPTIONS #################
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
+option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" OFF)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
 
-################# LIBRARY OPTIONS #################
+################# DEFAULT BUILD TYPE #################
+if (NOT CMAKE_BUILD_TYPE)
+	if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
+		message(STATUS "No build type selected, default to: Debug")
+		set(CMAKE_BUILD_TYPE "Debug")
+	else()
+		message(STATUS "No build type selected, default to: Release")
+		set(CMAKE_BUILD_TYPE "Release")
+	endif()
+endif()
+
+################# SET DEFINES FOR DEBUG MODE #################
+if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
+	# standart debug defines
+	list(APPEND MPP_DEFINES DEBUG=1)
+	list(APPEND MPP_DEFINES MPP_DEBUG=1)
+
+	# use extended debug features
+	set(MPP_FULL_DEBUG ON)
+else()
+	list(APPEND MPP_DEFINES MPP_DEBUG=0)
+	list(APPEND MPP_DEFINES DEBUG=0)
+endif()
+
+# extended debug features, such as full free-list checks for double-free
+if (MPP_FULL_DEBUG MATHCES "ON")
+	message(STATUS "Building in full debug mode: MPP_FULL_DEBUG=1")
+	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=1)
+else()
+	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=0)
+endif()
+
 message(STATUS "MPP_BUILD_SHARED_LIBS: ${MPP_BUILD_SHARED_LIBS}")
 message(STATUS "MPP_SECURE: ${MPP_SECURE}")
+message(STATUS "MPP_DEBUG: ${MPP_DEBUG}")
+message(STATUS "MPP_FULL_DEBUG: ${MPP_FULL_DEBUG}")
 
 if (MPP_SECURE MATCHES "ON")
 	message(STATUS "Building in secure mode: MPP_SECURE=1")
@@ -47,17 +81,6 @@ set(MPP_SOURCES
 	src/memory_manager.cpp
 	src/gc.cpp
 )
-
-################# DEFAULT BUILD TYPE #################
-if (NOT CMAKE_BUILD_TYPE)
-	if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
-		message(STATUS "No build type selected, default to: Debug")
-		set(CMAKE_BUILD_TYPE "Debug")
-	else()
-		message(STATUS "No build type selected, default to: Release")
-		set(CMAKE_BUILD_TYPE "Release")
-	endif()
-endif()
 
 ################# SET TARGET NAME #################
 if(MPP_SECURE MATCHES "ON")
@@ -95,15 +118,10 @@ endif()
 ################# ALIAS TO USE AS AN INTERNAL PROJECT #################
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 
-################# SET DEFINES FOR DEBUG MODE #################
+################# SET DEBUG FLAG FOR DEBUG BUILDS #################
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# ADDED TO SUPPORT DEBUGGING
 	target_compile_options(${PROJECT_NAME} PRIVATE "-g")
-	list(APPEND MPP_DEFINES MPP_DEBUG=1)
-	list(APPEND MPP_DEFINES DEBUG=1)
-else()
-	list(APPEND MPP_DEFINES MPP_DEBUG=0)
-	list(APPEND MPP_DEFINES DEBUG=0)
 endif()
 
 target_compile_definitions(${PROJECT_NAME} 
@@ -123,7 +141,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-message(STATUS "Used definitions : ${MPP_DEFINES}")
+message(STATUS "Used defines : ${MPP_DEFINES}")
 
 ################# INSTALL LIBRARY #################
 

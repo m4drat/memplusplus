@@ -10,7 +10,7 @@ namespace mpp {
         if (t_size != 0 && t_size % t_alignment == 0)
             return t_size;
         return t_size + (t_alignment - (t_size % t_alignment));
-    };
+    }
 
     void* MemoryAllocator::SysAlloc(std::size_t t_size)
     {
@@ -20,7 +20,7 @@ namespace mpp {
             throw NoMemoryException();
         }
         return rawPtr;
-    };
+    }
 
     bool MemoryAllocator::SysDealloc(void* t_ptr, std::size_t t_pageSize)
     {
@@ -29,7 +29,7 @@ namespace mpp {
         };
 
         return true;
-    };
+    }
 
     Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
     {
@@ -93,7 +93,7 @@ namespace mpp {
         // arena = CreateArena(g_DEFAULT_ARENA_SIZE);
         // return (arena->AllocateChunk(realChunkSize) +
         //        sizeof(Chunk::ChunkHeader));
-    };
+    }
 
     void MemoryAllocator::Deallocate(void* t_chunkPtr)
     {

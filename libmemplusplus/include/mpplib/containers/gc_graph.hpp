@@ -54,8 +54,6 @@ namespace mpp {
         /**
          * @brief Graph destructor. Iterates through each Vertex in adjList, deletes it,
          * and calls Destructor.
-         *
-         * @warning This copy constructor performs only shallow copy!
          */
         ~GcGraph();
 
