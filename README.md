@@ -74,6 +74,8 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 ## Internal architecture
 
+![Linked list compacting](./additional_info/images/compacting_example.svg)
+
 ## Examples
 
 - Manual memory managment
