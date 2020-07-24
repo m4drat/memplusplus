@@ -40,7 +40,7 @@ else()
 endif()
 
 # extended debug features, such as full free-list checks for double-free
-if (MPP_FULL_DEBUG MATHCES "ON")
+if (MPP_FULL_DEBUG MATCHES "ON")
 	message(STATUS "Building in full debug mode: MPP_FULL_DEBUG=1")
 	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=1)
 else()
