@@ -76,10 +76,125 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 ## Examples
 
+- Manual memory managment
+
+    ```c++
+    #include <mpplib/mpp.hpp>
+
+    ...
+
+    // will call constructor automatically, like new
+    Object* obj = mpp::MemoryAllocator::Allocate<Object>(<constructor params>);
+    // create raw pointer (behaves like malloc)
+    void* ptr = mpp::MemoryAllocator::Allocate(128);
+
+    ...
+
+    // will call destructor automatically, like delete
+    mpp::MemoryAllocator::Deallocate(obj);
+    // only deallocates raw pointer (behaves like free)
+    mpp::MemoryAllocator::Deallocate(ptr);
+    ```
+
+- Automatic memory managment
+
+    ```c++
+    #include <mpplib/mpp.hpp>
+
+    ...
+
+    // create smart pointer, that will automatically deallocate object, when needed
+    mpp::SharedGcPtr<Object> object = mpp::MakeSharedGcPtr<Object>(<constructor params>);
+
+    ...
+
+    // collect all garbage + compact memory (can be called manually)
+    GC::Collect();
+    ```
+
 ## Performance comparisons
 
 ## Documentation
 
+- Install doxygen, sphinx, breathe
+
+- Configure:
+
+    ```bash
+    cmake \
+        -S . \
+        -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DMPP_BUILD_FUZZER=OFF \
+        -DMPP_BUILD_EXAMPLE=OFF \
+        -DMPP_BUILD_TESTS=OFF \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DMPP_BUILD_DOCS=ON
+    ```
+
+- Build docs:
+
+    ```bash
+    cmake \
+        --build build \
+        -j 8
+    ```
+
+- Now docs can be found in "./build/docs/doxygen/html" or "./build/docs/sphinx"
+
 ## Tests
 
+- Configure tests:
+
+    ```bash
+    cmake \
+        -S . \
+        -B build \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DBUILD_SHARED_LIBS=OFF \
+        -DMPP_BUILD_TESTS=ON
+    ```
+
+- Build tests:
+
+    ```bash
+    cmake \
+        --build build \
+        --target unit_tests \
+        -j 8
+    ```
+
+- Run tests:
+
+    ```bash
+    cd build && ctest
+    ```
+
 ## clang-format and clang-tidy
+
+- install clang-tidy and clang-format
+
+- Configure:
+
+    ```bash
+    cmake \
+        -S . \
+        -B build \
+        -DCMAKE_BUILD_TYPE=Release
+    ```
+
+- Use clang-format:
+
+    ```bash
+    cmake \
+        --build build \
+        --target clang-format
+    ```
+
+- Use clang-tidy:
+
+    ```bash
+    cmake \
+        --build build \
+        --target clang-tidy
+    ```
