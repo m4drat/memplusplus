@@ -20,7 +20,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 endif()
 
 option(MPP_BUILD_FUZZER "Build mpp fuzzing harness" OFF)
-option(MPP_BUILD_EXAMPLE "Build mpp example project" OFF)
+option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)

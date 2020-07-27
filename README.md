@@ -72,9 +72,36 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 3. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.hpp>`
 
+## Build options
+
+- `MPP_ENABLE_COVERAGE` - build with code coverage support
+
+- `MPP_BUILD_FUZZER` - build fuzzer project
+
+- `MPP_BUILD_EXAMPLE` - build example project
+
+- `MPP_BUILD_TESTS` - build tests
+
+- `MPP_BUILD_DOCS` - build documentation
+
+- `MPP_BUILD_SHARED_LIBS` - build shared or static libraries
+
+- `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
+
+- `MPP_SECURE` - build in secure mode with additional security features
+
 ## Internal architecture
 
-![Linked list compacting](./additional_info/images/compacting_example.svg)
+1. Allocation process starts from function `Allocate(std::size_t)`. Depending on allocation size this method can work in 2 different ways:
+    1. `AllocateBigChunk`, if requested size is bigger than `g_DEFAULT_ARENA_SIZE`
+
+    2. `GetSuitableChunk`
+
+2. 
+
+3. 
+
+<img src="./additional_info/images/compacting_example.svg" width="40%" height="40%">
 
 ## Examples
 

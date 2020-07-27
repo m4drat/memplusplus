@@ -19,6 +19,7 @@ namespace mpp {
         if (rawPtr == MAP_FAILED) {
             throw NoMemoryException();
         }
+        
         return rawPtr;
     }
 
@@ -26,7 +27,7 @@ namespace mpp {
     {
         if (munmap(t_ptr, t_pageSize) == -1) {
             throw UnmapMemoryException();
-        };
+        }
 
         return true;
     }
