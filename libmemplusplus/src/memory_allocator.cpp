@@ -34,9 +34,13 @@ namespace mpp {
 
     Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
     {
+        // Allocate memory for arena
         void* arenaSpace = SysAlloc(t_arenaSize);
+
         // TODO - smart pointers memory managment
         Arena* arena = new Arena(t_arenaSize, arenaSpace);
+
+        // Add newly created arena to vector of active arenas
         s_ArenaList.push_back(arena);
 
         return arena;
@@ -72,7 +76,10 @@ namespace mpp {
 
     void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
     {
+        // Create new arena with requested size
         Arena* arena = CreateArena(t_userDataSize);
+
+        // Allocate chunk from right space of that arena
         Chunk* bigChungus = arena->AllocateFromTopChunk(t_userDataSize);
         return Chunk::GetUserDataPtr(bigChungus);
     }
