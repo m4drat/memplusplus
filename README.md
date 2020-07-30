@@ -90,19 +90,6 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 - `MPP_SECURE` - build in secure mode with additional security features
 
-## Internal architecture
-
-1. Allocation process starts from function `Allocate(std::size_t)`. Depending on allocation size this method can work in 2 different ways:
-    1. `AllocateBigChunk`, if requested size is bigger than `g_DEFAULT_ARENA_SIZE`
-
-    2. `GetSuitableChunk`
-
-2. 
-
-3. 
-
-<img src="./additional_info/images/compacting_example.svg" width="40%" height="40%">
-
 ## Examples
 
 - Manual memory managment

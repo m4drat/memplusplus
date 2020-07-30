@@ -279,10 +279,12 @@ namespace mpp {
               << std::endl;
 
         t_out << "\ttopChunk: ";
-        if (t_arena->topChunk)
+        if (t_arena->topChunk) {
             Chunk::DumpChunk(t_out, t_arena->topChunk);
-        else
+        }
+        else {
             t_out << "nullptr";
+        }
         t_out << std::endl;
 
         t_out << "\tbegin: " << t_arena->begin << std::endl;

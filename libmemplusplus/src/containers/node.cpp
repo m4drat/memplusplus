@@ -36,9 +36,9 @@ namespace mpp {
 
     Node::Node(Node&& t_node)
         : priority(t_node.priority)
-        , chunk(std::move(t_node.chunk))
-        , leftChild(leftChild)
-        , rightChild(rightChild)
+        , chunk(t_node.chunk)
+        , leftChild(t_node.leftChild)
+        , rightChild(t_node.rightChild)
     {
         t_node.chunk = nullptr;
         t_node.leftChild = nullptr;
@@ -53,7 +53,7 @@ namespace mpp {
         Delete();
 
         priority = t_node.priority;
-        chunk = std::move(t_node.chunk);
+        chunk = t_node.chunk;
         leftChild = t_node.leftChild;
         rightChild = t_node.rightChild;
 

@@ -44,7 +44,9 @@ namespace mpp {
 
     Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
     {
-        // If we have enough space in topChunk
+        // Try iterating through all available arenas
+        // to try to find enought space for user-requested chunk 
+        // in top chunk
         for (auto* arena : s_ArenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
@@ -53,8 +55,8 @@ namespace mpp {
             }
         }
 
-        // If we cant find arena with enough right space, we will
-        // iterate through ChunkTreap to find chunk to reuse
+        // If we cant find arena with enough right space (aka topchunk size),
+        // we will iterate through ChunkTreap to find chunk to reuse
         for (Arena* arena : s_ArenaList) {
             Chunk* chunk = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
             if (chunk == nullptr) {
@@ -63,6 +65,8 @@ namespace mpp {
             return arena->AllocateFromFreeList(chunk, t_realSize);
         }
 
+        // Of we still cant find chunk, we will return nullptr
+        // to show that we dont have arena, to allocate from
         return nullptr;
     }
 
@@ -75,35 +79,56 @@ namespace mpp {
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     {
+
+        // Align, because we want to have metadata bits
         std::size_t realChunkSize =
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
 
+        // If allocation size is bigger than default arena size
+        // we will allocate new arena with chunk, which size is 
+        // equal to requested size, aligned to g_PAGE_SIZE
         if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
             return AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
         }
 
+        // If we dont have active arenas yet
+        // we will create new one
         if (s_ArenaList.empty()) {
             CreateArena(g_DEFAULT_ARENA_SIZE);
         }
-
+        
+        // Try to get chunk from any suitable arena (by searching in free list
+        // or by splitting top chunk)
         Chunk* chunk = GetSuitableChunk(realChunkSize);
         if (chunk != nullptr) {
             return Chunk::GetUserDataPtr(chunk);
         }
 
-        // arena = CreateArena(g_DEFAULT_ARENA_SIZE);
-        // return (arena->AllocateChunk(realChunkSize) +
-        //        sizeof(Chunk::ChunkHeader));
+        // finally, if there are no available space for chunk
+        // create new arena and allocate into it
+        Arena* arena = CreateArena(g_DEFAULT_ARENA_SIZE);
+        return (arena->AllocateFromTopChunk(realChunkSize));
     }
 
-    void MemoryAllocator::Deallocate(void* t_chunkPtr)
+    bool MemoryAllocator::Deallocate(void* t_chunkPtr)
     {
-        // Find arena, to which chunk belongs
+        // If given pointer is nullptr just return false
+        // because we dont want to waste time, trying to search
+        // for arena
+        if (t_chunkPtr == nullptr)
+            return false;
+
+        // iterating through all the areas in an attempt 
+        // to find the one that the chunk belongs to
         for (auto* arena : s_ArenaList) {
             if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
                 arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
+                return true;
                 break;
             }
         }
+
+        // The given pointer doens't belong to any active arena 
+        return false;
     }
 }

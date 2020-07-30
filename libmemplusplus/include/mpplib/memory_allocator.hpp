@@ -79,8 +79,10 @@ namespace mpp {
         /**
          * @brief Deallocates chunk of memory.
          * @param t_chunkPtr pointer to start of user data.
+         * @return true, if chunk was deallocated successfully, false if chunk
+         * doesn't belong to any arena
          */
-        static void Deallocate(void* t_chunkPtr);
+        static bool Deallocate(void* t_chunkPtr);
 
         /**
          * @brief Template version of Allocate to call object constructor.
@@ -99,13 +101,15 @@ namespace mpp {
          * @brief Template version of Deallocate to call object destructor.
          * @tparam T actual type of object.
          * @param t_objPtr pointer to object of type T.
+         * @return true, if chunk was deallocated successfully, false if chunk
+         * doesn't belong to any arena
          */
         template<class T>
-        static void Deallocate(T* t_objPtr)
+        static bool Deallocate(T* t_objPtr)
         {
             if (std::is_destructible<T>::value)
                 t_objPtr->~T();
-            Deallocate(reinterpret_cast<void*>(t_objPtr));
+            return Deallocate(reinterpret_cast<void*>(t_objPtr));
         }
     };
 }
