@@ -2,6 +2,11 @@
 
 #include <string>
 
+#ifdef MPP_COLOUR
+#include "mpplib/utils/colours.hpp"
+namespace col = mpp::utils::colours;
+#endif
+
 namespace mpp {
     std::vector<Arena*> MemoryManager::s_ArenaList;
 
@@ -26,9 +31,22 @@ namespace mpp {
                  pos < reinterpret_cast<std::size_t>(arena->end);
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                
+                #ifdef MPP_COLOUR
+                if (currChunk->IsUsed()) {
+                    t_out << col::GREEN << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
+                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
+                      << "]" << col::RESET;
+                } else {
+                    t_out << col::RED << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
+                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
+                      << "]" << col::RESET;
+                }
+                #else
                 t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
                       << "]";
+                #endif
             }
         }
         return t_out;
@@ -39,10 +57,14 @@ namespace mpp {
     // exists only to make possible running of unit-tests
     bool MemoryManager::ResetAllocatorState()
     {
-        for (int32_t i = 0; i < s_ArenaList.size(); ++i) {
-            delete s_ArenaList.at(i);
+        auto it = s_ArenaList.begin();
+        while(it != s_ArenaList.end()) {
+            delete *it;
+            *it = nullptr;
+            it = s_ArenaList.erase(it);
         }
-        s_ArenaList.clear();
+
+        return true;
     }
 
     Arena* MemoryManager::GetArenaByPtr(void* t_ptr)

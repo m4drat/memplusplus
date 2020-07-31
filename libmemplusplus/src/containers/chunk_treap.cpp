@@ -58,8 +58,11 @@ namespace mpp {
         if (t_root == nullptr)
             return;
         
+        // Delete recursively each node
         Delete(t_root->leftChild);
         t_root->leftChild = nullptr;
+
+        // Delete recursively each node
         Delete(t_root->rightChild);
         t_root->rightChild = nullptr;
 
@@ -124,6 +127,7 @@ namespace mpp {
         nodeToRemove->rightChild = nullptr;
 
         delete nodeToRemove;
+        nodeToRemove = nullptr;
 
         MergeNodes(leftSubtree, rightSubtree, m_root);
     }
@@ -186,26 +190,27 @@ namespace mpp {
     }
 
     // TODO
-    std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
-    {
-        // t_out << "digraph Objects {\n";
-        // for (auto v1 : m_adjList) {
-        //     t_out << "\t\"" + v1->ToString() + "\"";
-        //     if (v1->GetNeighbors().size() != 0)
-        //         t_out << " -> ";
+    // https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
+    // std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
+    // {
+    //     t_out << "digraph Objects {\n";
+    //     for (auto v1 : m_adjList) {
+    //         t_out << "\t\"" + v1->ToString() + "\"";
+    //         if (v1->GetNeighbors().size() != 0)
+    //             t_out << " -> ";
 
-        //     for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end(); ++it) {
-        //         if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
-        //             t_out << "\"" + (*it)->ToString() + "\"";
-        //         else
-        //             t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
-        //     }
+    //         for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end(); ++it) {
+    //             if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
+    //                 t_out << "\"" + (*it)->ToString() + "\"";
+    //             else
+    //                 t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
+    //         }
 
-        //     t_out << ";\n";
-        // }
+    //         t_out << ";\n";
+    //     }
 
-        // t_out << "}";
+    //     t_out << "}";
 
-        // return t_out;
-    }
+    //     return t_out;
+    // }
 }

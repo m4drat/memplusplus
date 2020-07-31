@@ -51,10 +51,13 @@ namespace mpp {
         : m_objectPtr{ t_other.m_objectPtr }
         , m_references{ t_other.m_references }
     {
+        // Shared ptr copied. Increase references count.
         if (m_references) {
             ++(*m_references);
         }
 
+        // Insert newly created shared ptr to list of all
+        // active gc ptrs
         if (m_objectPtr != nullptr)
             AddToGcList();
     }
@@ -87,14 +90,18 @@ namespace mpp {
         if (this == &t_other)
             return *this;
 
+        // Delete reference
         DeleteReference();
 
+        // Update fileds of assigned object
         m_objectPtr = t_other.m_objectPtr;
         m_references = t_other.m_references;
 
+        // If needed add to list of all active gc ptr
         if (m_objectPtr != nullptr)
             AddToGcList();
 
+        // Increase references count
         if (m_references)
             ++(*m_references);
 
@@ -104,7 +111,10 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(Type* t_newData)
     {
+        // Create temp object
         SharedGcPtr tmp(t_newData);
+        
+        // Swap with temp object
         tmp.Swap(*this);
         return *this;
     }
@@ -112,7 +122,9 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
+        // Just delete reference
         this->DeleteReference();
+        return *this;
     }
 
     // comparisons operators
@@ -174,9 +186,11 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::DeleteFromGcList()
     {
+        // If current object points to nullptr do nothing
         if (m_objectPtr == nullptr)
             return false;
 
+        // Delete shared ptr from list of all active gc ptrs
         auto toErase = std::find(GC::GetGcPtrs().begin(), GC::GetGcPtrs().end(), this);
         if (toErase != GC::GetGcPtrs().end()) {
             GC::GetGcPtrs().erase(toErase);
@@ -205,11 +219,17 @@ namespace mpp {
     {
         DeleteFromGcList();
 
+        // If m_references isn't nullptr 
         if (m_references) {
+            // Decrease references count
             --(*m_references);
+
             // Destroy shared ptr and object
             if (*m_references <= 0) {
+                // Delete references variable
                 delete m_references;
+                m_references = nullptr;
+
                 // TODO: shoud we really deallocate data, or we just need to delete it
                 // from chunksInUse + call object destructor
                 if (m_objectPtr)
@@ -224,11 +244,15 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::Swap(SharedGcPtr& t_other)
     {
+        // Current object ptr is nullptr
+        // t_other's object ptr isn't nullptr
         if (m_objectPtr == nullptr && t_other.m_objectPtr != nullptr) {
             t_other.DeleteFromGcList();
             AddToGcList();
         }
 
+        // Current object ptr isn't nullptr
+        // t_other's object ptr is nullptr
         if (m_objectPtr != nullptr && t_other.m_objectPtr == nullptr) {
             DeleteFromGcList();
             t_other.AddToGcList();

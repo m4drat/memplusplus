@@ -11,9 +11,15 @@ if (WIN32)
 endif()
 
 ################# LIBRARY OPTIONS #################
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+	option(MPP_SANITIZERS "Build mpp with support of sanitizers" OFF)
+endif()
+
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
 option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" OFF)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
+option(MPP_PROFILE "Build mpp with support of profiling" OFF)
+option(MPP_COLOUR "Build mpp with support of coloured output" ON)
 
 ################# DEFAULT BUILD TYPE #################
 if (NOT CMAKE_BUILD_TYPE)
@@ -29,12 +35,11 @@ endif()
 ################# SET DEFINES FOR DEBUG MODE #################
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# standart debug defines
+	set(MPP_DEBUG ON)
 	list(APPEND MPP_DEFINES DEBUG=1)
 	list(APPEND MPP_DEFINES MPP_DEBUG=1)
-
-	# use extended debug features
-	set(MPP_FULL_DEBUG ON)
 else()
+	set(MPP_DEBUG OFF)
 	list(APPEND MPP_DEFINES MPP_DEBUG=0)
 	list(APPEND MPP_DEFINES DEBUG=0)
 endif()
@@ -47,15 +52,35 @@ else()
 	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=0)
 endif()
 
-message(STATUS "MPP_BUILD_SHARED_LIBS: ${MPP_BUILD_SHARED_LIBS}")
-message(STATUS "MPP_SECURE: ${MPP_SECURE}")
-message(STATUS "MPP_DEBUG: ${MPP_DEBUG}")
-message(STATUS "MPP_FULL_DEBUG: ${MPP_FULL_DEBUG}")
-
 if (MPP_SECURE MATCHES "ON")
 	message(STATUS "Building in secure mode: MPP_SECURE=1")
 	list(APPEND MPP_DEFINES MPP_SECURE=1)
+else()
+	list(APPEND MPP_DEFINES MPP_SECURE=0)
 endif()
+
+if (MPP_PROFILE MATCHES "ON")
+	message(STATUS "Building in profiling mode: MPP_PROFILE=1")
+	list(APPEND MPP_DEFINES MPP_PROFILE=1)
+else()
+	list(APPEND MPP_DEFINES MPP_PROFILE=0)
+endif()
+
+if (MPP_COLOUR MATCHES "ON")
+	message(STATUS "Building with support of coloured output: MPP_COLOUR=1")
+	list(APPEND MPP_DEFINES MPP_COLOUR=1)
+else()
+	list(APPEND MPP_DEFINES MPP_COLOUR=0)
+endif()
+
+message(STATUS "##################### LIBRARY OPTIONS #####################")
+message(STATUS "MPP_SANITIZERS: ${MPP_SANITIZERS}")
+message(STATUS "MPP_BUILD_SHARED_LIBS: ${MPP_BUILD_SHARED_LIBS}")
+message(STATUS "MPP_FULL_DEBUG: ${MPP_FULL_DEBUG}")
+message(STATUS "MPP_DEBUG: ${MPP_DEBUG}")
+message(STATUS "MPP_SECURE: ${MPP_SECURE}")
+message(STATUS "MPP_PROFILE: ${MPP_PROFILE}")
+message(STATUS "MPP_COLOUR: ${MPP_COLOUR}")
 
 ################# ADD CONFIG FILE #################
 configure_file(${PROJECT_SOURCE_DIR}/src/config.hpp.in 
@@ -122,6 +147,12 @@ add_library(lib::mpp ALIAS ${PROJECT_NAME})
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# ADDED TO SUPPORT DEBUGGING
 	target_compile_options(${PROJECT_NAME} PRIVATE "-g")
+endif()
+
+################# ENABLE SUPPORT OF SANITIZERS #################
+if (MPP_SANITIZERS MATCHES "ON")
+	target_compile_options(${PROJECT_NAME} INTERFACE -fsanitize=address -g -O2 -fno-omit-frame-pointer)
+	target_link_libraries(${PROJECT_NAME} INTERFACE -fsanitize=address)
 endif()
 
 target_compile_definitions(${PROJECT_NAME} 

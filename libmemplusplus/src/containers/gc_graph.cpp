@@ -48,14 +48,20 @@ namespace mpp {
 
     void GcGraph::AddEdge(Vertex* t_from, Vertex* t_to)
     {
+        // Check if we already have starting vertex
         if (m_adjList.find(t_from) == m_adjList.end()) {
             AddVertex(t_from);
         }
 
+        // Check if we already have ending vertex
         if (m_adjList.find(t_to) == m_adjList.end()) {
             AddVertex(t_to);
         }
+
+        // Update vector of pointing to vertices 
         t_to->AddPointingVertex(t_from);
+
+        // Create connection between two vertices
         t_from->AddNeighbor(t_to);
     }
 
@@ -84,13 +90,17 @@ namespace mpp {
         std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(),
                                                         m_adjList.end());
 
-        // iteraste through all vertixes
+        // iteraste through all vertices
         while (adjListCopy.empty() != true) {
+            // Find connected component inside graph
             std::unique_ptr<GcGraph> connectedComponent =
               std::make_unique<GcGraph>(UndirectedDFS(*(adjListCopy.begin())));
+            
             // delete each visited vertex from adjListCopy
             for (auto v : connectedComponent->GetAdjList())
                 adjListCopy.erase(v);
+            
+            // Add found component to vector
             weaklyConnectedComponents.push_back(std::move(connectedComponent));
         }
 
@@ -99,8 +109,12 @@ namespace mpp {
 
     std::vector<Vertex*> GcGraph::DirectedDFS(Vertex* t_vertex)
     {
+        // Vector of visited vertices using directed DFS
         std::vector<Vertex*> visited;
+
+        // Perform directed DFS, starting from t_vertex
         DDFS(t_vertex, visited);
+        
         return visited;
     }
 
@@ -110,8 +124,8 @@ namespace mpp {
                                        t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
         for (auto neighbor : neighbors) {
-            if (std::find(t_visited.begin(), t_visited.end(), neighbor) !=
-                t_visited.end() == false) {
+            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) !=
+                t_visited.end()) == false) {
                 GcGraph::DDFS(neighbor, t_visited);
             }
         }
@@ -119,8 +133,12 @@ namespace mpp {
 
     std::vector<Vertex*> GcGraph::UndirectedDFS(Vertex* t_vertex)
     {
+        // Vector of visited vertices using undirected DFS
         std::vector<Vertex*> visited;
+
+        // Perform undirected DFS, starting from t_vertex
         UDFS(t_vertex, visited);
+
         return visited;
     }
 
@@ -133,8 +151,8 @@ namespace mpp {
                          t_vertex->GetPointingVertices().end());
         t_visited.push_back(t_vertex);
         for (auto neighbor : neighbors) {
-            if (std::find(t_visited.begin(), t_visited.end(), neighbor) !=
-                t_visited.end() == false) {
+            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) !=
+                t_visited.end()) == false) {
                 GcGraph::UDFS(neighbor, t_visited);
             }
         }
@@ -162,9 +180,14 @@ namespace mpp {
 
     bool GcGraph::Clear()
     {
-        for (Vertex* vertex : m_adjList)
+        // delete each vertex from graph
+        for (Vertex* vertex : m_adjList) 
+        {
             delete vertex;
+            vertex = nullptr;
+        }
 
         m_adjList.clear();
+        return true;
     }
 }

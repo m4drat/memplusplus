@@ -50,8 +50,10 @@ namespace mpp {
         if (&t_node == this)
             return *this;
 
+        // Delete current object
         Delete();
 
+        // Construct new one
         priority = t_node.priority;
         chunk = t_node.chunk;
         leftChild = t_node.leftChild;
@@ -72,7 +74,9 @@ namespace mpp {
     void Node::Delete()
     {
         delete leftChild;
+        leftChild = nullptr;
         delete rightChild;
+        rightChild = nullptr;
     }
 
     std::ostream& DumpNode(std::ostream& t_out, Node* t_node)

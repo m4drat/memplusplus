@@ -189,7 +189,7 @@ namespace mpp {
      */
     template<class T, class... Args>
     SharedGcPtr<T> MakeSharedGcPtr(Args&&... t_args);
-};
+}
 
 // include templates implementation
 #include "mpplib/shared_gcptr-imp.hpp"

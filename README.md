@@ -33,7 +33,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
         -S . \
         -B build \
         -DCMAKE_BUILD_TYPE=Release \
-        -DBUILD_SHARED_LIBS=ON \
+        -DMPP_BUILD_SHARED_LIBS=ON \
     ```
 
 2. compile and install:
@@ -74,6 +74,8 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 ## Build options
 
+Global options:
+
 - `MPP_ENABLE_COVERAGE` - build with code coverage support
 
 - `MPP_BUILD_FUZZER` - build fuzzer project
@@ -84,11 +86,21 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 - `MPP_BUILD_DOCS` - build documentation
 
+- `MPP_BUILD_BENCMARK` - build documentation
+
+Library options:
+
 - `MPP_BUILD_SHARED_LIBS` - build shared or static libraries
 
 - `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
 
 - `MPP_SECURE` - build in secure mode with additional security features
+
+- `MPP_PROFILE` - enable profiling instrumentation
+
+- `MPP_SANITIZERS` - add sanitizers to the build
+
+- `MPP_COLOUR_DEBUG_OUTPUT` - Add colours to debug output
 
 ## Examples
 

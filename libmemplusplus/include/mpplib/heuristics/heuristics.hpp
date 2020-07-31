@@ -60,8 +60,8 @@ namespace mpp {
          * @return vector of pairs of pointers to subgraphs, and types of found
          * datastructures.
          */
-        std::vector<std::pair<GcGraph*, DataStructures>> ExtractGroups(
-          std::unique_ptr<GcGraph>& t_gcSubgraph);
+        // std::vector<std::pair<GcGraph*, DataStructures>> ExtractGroups(
+        //   std::unique_ptr<GcGraph>& t_gcSubgraph);
         /**
          * @brief Layouts heap.
          *

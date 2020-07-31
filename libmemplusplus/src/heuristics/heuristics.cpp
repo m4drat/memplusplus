@@ -42,7 +42,9 @@ namespace mpp {
                                                                    m_neededSpace);
     }
 
-    std::vector<std::pair<GcGraph*, Heuristics::DataStructures>>
-    Heuristics::ExtractGroups(std::unique_ptr<GcGraph>& t_gcSubgraph)
-    {}
+    // std::vector<std::pair<GcGraph*, Heuristics::DataStructures>>
+    // Heuristics::ExtractGroups(std::unique_ptr<GcGraph>& t_gcSubgraph)
+    // {
+    //     return std::vector<std::pair<GcGraph*, Heuristics::DataStructures>>();
+    // }
 }

@@ -41,11 +41,12 @@ namespace mpp {
         /**
          * @brief Constructor to initialize from reference to another graph.
          * @param t_other GcGraph, to copy from.
+         * @warning This copy constructor performs only shallow copy!
          */
         GcGraph(GcGraph& t_other);
 
         /**
-         * @brief Constructor to initialize from reference to another graph.
+         * @brief Constructor to initialize from vector of vertices.
          * @param t_other vector of vertexes, to copy from.
          * @warning This copy constructor performs only shallow copy!
          */

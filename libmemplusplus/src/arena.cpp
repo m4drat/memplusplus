@@ -10,7 +10,7 @@ namespace mpp {
         topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
         begin = t_begin;
         end = reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_begin) + t_size);
-    };
+    }
 
     Arena::~Arena()
     {
