@@ -15,14 +15,14 @@ namespace mpp {
             constexpr std::string_view CYAN = "\u001b[36m";
             constexpr std::string_view WHITE = "\u001b[37m";
 
-            constexpr std::string_view BRIGHT_BLACK = "\u001b[40;1M";
-            constexpr std::string_view BRIGHT_RED = "\u001b[41;1M";
-            constexpr std::string_view BRIGHT_GREEN = "\u001b[42;1M";
-            constexpr std::string_view BRIGHT_YELLOW = "\u001b[43;1M";
-            constexpr std::string_view BRIGHT_BLUE = "\u001b[44;1M";
-            constexpr std::string_view BRIGHT_MAGENTA = "\u001b[45;1M";
-            constexpr std::string_view BRIGHT_CYAN = "\u001b[46;1M";
-            constexpr std::string_view BRIGHT_WHITE = "\u001b[47;1M";
+            constexpr std::string_view BRIGHT_BLACK = "\u001b[30;1m";
+            constexpr std::string_view BRIGHT_RED = "\u001b[31;1m";
+            constexpr std::string_view BRIGHT_GREEN = "\u001b[32;1m";
+            constexpr std::string_view BRIGHT_YELLOW = "\u001b[33;1m";
+            constexpr std::string_view BRIGHT_BLUE = "\u001b[34;1m";
+            constexpr std::string_view BRIGHT_MAGENTA = "\u001b[35;1m";
+            constexpr std::string_view BRIGHT_CYAN = "\u001b[36;1m";
+            constexpr std::string_view BRIGHT_WHITE = "\u001b[37;1m";
         }
     }
 }

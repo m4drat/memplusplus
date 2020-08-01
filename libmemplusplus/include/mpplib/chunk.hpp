@@ -35,6 +35,13 @@ namespace mpp {
             std::size_t chunkHeader;
         } ChunkHeader;
 
+        static constexpr uint32_t EXTRACT_SIZE_SHIFT = 5;
+        static constexpr uint32_t INFO_BITS_MASK = 0b11111;
+        static constexpr uint32_t IS_USED_BIT_MASK = 0b1111;
+        static constexpr uint32_t IS_USED_SHIFT = 3;
+        static constexpr uint32_t IS_PREV_IN_USE_BIT_MASK = 0b111;
+        static constexpr uint32_t IS_PREV_IN_USE_SHIFT = 2;
+        
         /**
          * @brief Constructs new chunk at location, passed as first parameter.
          * @param t_newChunkPtr actual memory, where chunk is going to be constructed.
@@ -109,7 +116,7 @@ namespace mpp {
          */
         std::size_t GetPrevSize()
         {
-            return (this->ChunkHeader.prevChunkSize >> 5) << 5;
+            return (this->ChunkHeader.prevChunkSize >> EXTRACT_SIZE_SHIFT) << EXTRACT_SIZE_SHIFT;
         };
 
         /**
@@ -127,7 +134,7 @@ namespace mpp {
          */
         std::size_t GetSize()
         {
-            return (this->ChunkHeader.chunkHeader >> 5) << 5;
+            return (this->ChunkHeader.chunkHeader >> EXTRACT_SIZE_SHIFT) << EXTRACT_SIZE_SHIFT;
         };
 
         /**
@@ -139,7 +146,7 @@ namespace mpp {
         void SetSize(std::size_t size)
         {
             this->ChunkHeader.chunkHeader =
-              (size | (0b11111 & this->ChunkHeader.chunkHeader));
+              (size | (INFO_BITS_MASK & this->ChunkHeader.chunkHeader));
         }
 
         /**
@@ -158,7 +165,7 @@ namespace mpp {
          */
         bool IsUsed()
         {
-            return (this->ChunkHeader.chunkHeader & 0b1111) >> 3;
+            return (this->ChunkHeader.chunkHeader & IS_USED_BIT_MASK) >> IS_USED_SHIFT;
         };
 
         /**
@@ -168,7 +175,7 @@ namespace mpp {
          */
         bool IsPrevInUse()
         {
-            return (this->ChunkHeader.chunkHeader & 0b111) >> 2;
+            return (this->ChunkHeader.chunkHeader & IS_PREV_IN_USE_BIT_MASK) >> IS_PREV_IN_USE_SHIFT;
         };
 
         /**
@@ -178,9 +185,9 @@ namespace mpp {
         void SetIsPrevInUse(uint8_t opt)
         {
             if (opt) {
-                this->ChunkHeader.chunkHeader |= 1UL << 2;
+                this->ChunkHeader.chunkHeader |= 1UL << IS_PREV_IN_USE_SHIFT;
             } else {
-                this->ChunkHeader.chunkHeader &= ~(1UL << 2);
+                this->ChunkHeader.chunkHeader &= ~(1UL << IS_PREV_IN_USE_SHIFT);
             }
         };
 
@@ -191,9 +198,9 @@ namespace mpp {
         void SetIsUsed(uint8_t opt)
         {
             if (opt) {
-                this->ChunkHeader.chunkHeader |= 1UL << 3;
+                this->ChunkHeader.chunkHeader |= 1UL << IS_USED_SHIFT;
             } else {
-                this->ChunkHeader.chunkHeader &= ~(1UL << 3);
+                this->ChunkHeader.chunkHeader &= ~(1UL << IS_USED_SHIFT);
             }
         };
 
@@ -207,7 +214,7 @@ namespace mpp {
         {
 #ifdef MPP_COLOUR
             t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize()
-                  << ", " << t_ch->GetSize();
+                  << ", " << col::BRIGHT_BLUE << t_ch->GetSize() << col::RESET;
 
             if (t_ch->IsUsed()) {
                 t_out << "|InUse:" << col::GREEN << t_ch->IsUsed() << col::RESET;
