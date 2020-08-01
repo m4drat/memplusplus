@@ -28,7 +28,7 @@ namespace mpp {
         t_out << "digraph Objects {\n";
         for (auto v1 : m_adjList) {
             t_out << "\t\"" + v1->ToString() + "\"";
-            if (v1->GetNeighbors().size() != 0)
+            if (!v1->GetNeighbors().empty())
                 t_out << " -> ";
 
             for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end();

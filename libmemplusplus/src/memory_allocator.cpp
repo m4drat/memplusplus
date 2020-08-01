@@ -7,7 +7,7 @@ namespace mpp {
 
     std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
     {
-        if (t_size != 0 && t_size % t_alignment == 0)
+        if (t_size != 0 && (t_size % t_alignment == 0))
             return t_size;
         return t_size + (t_alignment - (t_size % t_alignment));
     }
@@ -54,7 +54,7 @@ namespace mpp {
         for (auto* arena : s_ArenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
-            if (arena->topChunk && t_realSize <= arena->topChunk->GetSize()) {
+            if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
                 return arena->AllocateFromTopChunk(t_realSize);
             }
         }
@@ -121,8 +121,9 @@ namespace mpp {
         // If given pointer is nullptr just return false
         // because we dont want to waste time, trying to search
         // for arena
-        if (t_chunkPtr == nullptr)
+        if (t_chunkPtr == nullptr) {
             return false;
+        }
 
         // iterating through all the areas in an attempt
         // to find the one that the chunk belongs to

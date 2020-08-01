@@ -58,8 +58,9 @@ namespace mpp {
 
         // Insert newly created shared ptr to list of all
         // active gc ptrs
-        if (m_objectPtr != nullptr)
+        if (m_objectPtr != nullptr) {
             AddToGcList();
+        }
     }
 
     template<class Type>
@@ -232,8 +233,9 @@ namespace mpp {
 
                 // TODO: shoud we really deallocate data, or we just need to delete it
                 // from chunksInUse + call object destructor
-                if (m_objectPtr)
+                if (m_objectPtr) {
                     MemoryAllocator::Deallocate<Type>(m_objectPtr);
+                }
             }
         }
 
@@ -291,10 +293,12 @@ namespace mpp {
     {
         t_out << "|SP|[" << this << "]"
               << "(";
-        if (m_objectPtr)
+        if (m_objectPtr) {
             t_out << reinterpret_cast<void*>(m_objectPtr);
-        else
+        }
+        else {
             t_out << "nullptr";
+        }
         return t_out << ", " << *m_references << ")";
     }
 

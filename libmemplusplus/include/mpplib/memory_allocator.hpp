@@ -107,8 +107,9 @@ namespace mpp {
         template<class T>
         static bool Deallocate(T* t_objPtr)
         {
-            if (std::is_destructible<T>::value)
+            if (std::is_destructible<T>::value) {
                 t_objPtr->~T();
+            }
             return Deallocate(reinterpret_cast<void*>(t_objPtr));
         }
     };

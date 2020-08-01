@@ -33,8 +33,9 @@ namespace mpp {
                 if (comp(*it, value)) {
                     first = ++it;
                     count -= step + 1;
-                } else
+                } else {
                     count = step;
+                }
             }
             return first;
         }

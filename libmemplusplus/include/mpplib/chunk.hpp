@@ -57,7 +57,7 @@ namespace mpp {
                                      uint8_t t_isInUse,
                                      uint8_t t_isPrevInUse)
         {
-            Chunk* newChunk = reinterpret_cast<Chunk*>(t_newChunkPtr);
+            Chunk* newChunk = static_cast<Chunk*>(t_newChunkPtr);
             newChunk->SetPrevSize(t_prevSize);
             newChunk->SetSize(t_chunkSize);
             newChunk->SetIsUsed(t_isInUse);
