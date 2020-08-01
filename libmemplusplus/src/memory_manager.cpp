@@ -34,13 +34,13 @@ namespace mpp {
                 
                 #ifdef MPP_COLOUR
                 if (currChunk->IsUsed()) {
-                    t_out << col::GREEN << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
+                    t_out << "[" << col::GREEN << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
-                      << "]" << col::RESET;
+                      << col::RESET << "]";
                 } else {
-                    t_out << col::RED << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
+                    t_out << "[" << col::RED << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
-                      << "]" << col::RESET;
+                      << col::RESET << "]";
                 }
                 #else
                 t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
