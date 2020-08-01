@@ -113,7 +113,7 @@ namespace mpp {
     {
         // Create temp object
         SharedGcPtr tmp(t_newData);
-        
+
         // Swap with temp object
         tmp.Swap(*this);
         return *this;
@@ -219,7 +219,7 @@ namespace mpp {
     {
         DeleteFromGcList();
 
-        // If m_references isn't nullptr 
+        // If m_references isn't nullptr
         if (m_references) {
             // Decrease references count
             --(*m_references);

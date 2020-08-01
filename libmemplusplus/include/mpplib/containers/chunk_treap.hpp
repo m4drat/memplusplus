@@ -22,9 +22,7 @@ namespace mpp {
          * @brief Implements iteration logic for ChunkTreap.
          */
         struct Iterator
-        {
-
-        };
+        {};
 
         /**
          * @brief Constructs empty chunk treap.

@@ -28,13 +28,13 @@ namespace mpp {
 
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)
     {
-        // We have enough space in top chunk, so in this case 
+        // We have enough space in top chunk, so in this case
         // we just need to split it in smaller chunks
         Chunk* chunk = SplitTopChunk(t_chunkSize);
 
         // Keep track of in use chunks
         chunksInUse.insert(chunk);
-        
+
         // update current allocated space
         CurrentlyAllocatedSpace += t_chunkSize;
         return chunk;
@@ -62,7 +62,7 @@ namespace mpp {
         // Constructing new chunk from splitted memory
         Chunk* chunk =
           Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
-        
+
         // Update top chunk
         topChunk = Chunk::ConstructChunk(
           reinterpret_cast<Chunk*>(reinterpret_cast<size_t>(topChunk) + t_chunkSize),
@@ -78,10 +78,10 @@ namespace mpp {
     {
         // Extract chunk from free list, and split it if needed
         Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
-        
+
         // Keep track of inuse chunks
         chunksInUse.insert(chunk);
-        
+
         // Updatede used space variable
         CurrentlyAllocatedSpace += t_chunkSize;
         return chunk;
@@ -89,10 +89,10 @@ namespace mpp {
 
     Chunk* Arena::SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
     {
-        // Delete chunk, that we are currently working with from 
+        // Delete chunk, that we are currently working with from
         // free list
         freedChunks.RemoveChunk(t_chunk);
-        
+
         // First case, chunk to split is the first chunk inside arena
         // memory layout: [t_chunk][....]
         if (t_chunk == begin) {
@@ -104,12 +104,12 @@ namespace mpp {
                 Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
                 Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
                 return chunk;
-            // First chunks size doesn't equal to requested size
+                // First chunks size doesn't equal to requested size
             } else {
                 // First chunk (is going to be splitted)
                 std::size_t toSplitChunkSize = t_chunk->GetSize();
 
-                // Splitting first chunk, this is going to be returned 
+                // Splitting first chunk, this is going to be returned
                 // to the user
                 Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
 
@@ -123,17 +123,18 @@ namespace mpp {
                   1);
 
                 // Update previous size for the next chunk after splitted
-                // current memory layout: [user-returned][splitted part][next chunk after splitted]
+                // current memory layout: [user-returned][splitted part][next chunk after
+                // splitted]
                 Chunk::GetNextChunk(splittedChunk)
                   ->SetPrevSize(toSplitChunkSize - t_chunkSize);
 
-                // Keep track of splitted part, by placing it into 
+                // Keep track of splitted part, by placing it into
                 // free list
                 freedChunks.InsertChunk(splittedChunk);
                 return chunk;
             }
-        // Second case: we are anywhere in arena, excluding first chunk
-        // memory layout: [...][t_chunk][....]
+            // Second case: we are anywhere in arena, excluding first chunk
+            // memory layout: [...][t_chunk][....]
         } else {
             // t_chunk size is equal to requesteed size, so we don't need
             // to split it in smaller parts
@@ -141,21 +142,21 @@ namespace mpp {
                 // Construct new chunk
                 Chunk* chunk = Chunk::ConstructChunk(
                   t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
-                
+
                 // Update inuse bit
                 Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
-                
+
                 // Update previous sizse
                 Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
                 return chunk;
             } else {
                 // Chunk size, that is going to be splitted
                 std::size_t toSplitChunkSize = t_chunk->GetSize();
-                
+
                 // Construct chunk, that is going to be returned
                 Chunk* chunk = Chunk::ConstructChunk(
                   t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
-                
+
                 // Construct splitted chunk
                 Chunk* splittedChunk = Chunk::ConstructChunk(
                   reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
@@ -163,8 +164,8 @@ namespace mpp {
                   toSplitChunkSize - t_chunkSize,
                   0,
                   1);
-                
-                // Update previous size field for next chunk, after 
+
+                // Update previous size field for next chunk, after
                 // splitted chunk
                 Chunk::GetNextChunk(splittedChunk)
                   ->SetPrevSize(toSplitChunkSize - t_chunkSize);
@@ -181,10 +182,10 @@ namespace mpp {
         // Delete chunk from active chunks
         chunksInUse.erase(t_chunk);
 
-        // Update currently used space variable 
+        // Update currently used space variable
         CurrentlyAllocatedSpace -= t_chunk->GetSize();
 
-        // try to merge deallocated chunk forward and backwards 
+        // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
         if (newChunk != topChunk) {
             // Update free list
@@ -206,7 +207,7 @@ namespace mpp {
             D - to deallocate
             T - top (can be nullptr)
         */
-       
+
         /*
         First case:
             1. FDT
@@ -265,7 +266,7 @@ namespace mpp {
     {
         Chunk* newChunk{ t_chunk };
 
-        // Merge backwards 
+        // Merge backwards
         if ((reinterpret_cast<void*>(t_chunk) != begin) &&
             Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
@@ -278,7 +279,7 @@ namespace mpp {
             // Check, if top chunk isn't the first chunk in arena:
             if (reinterpret_cast<void*>(topChunk) != begin) {
                 topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize());
-            // Check, if top chunk is the first chunk in arena:
+                // Check, if top chunk is the first chunk in arena:
             } else {
                 // ChunkSize is already set by MergeTwoSequnceChunks function
                 topChunk->SetPrevSize(0);
@@ -286,8 +287,8 @@ namespace mpp {
             topChunk->SetIsPrevInUse(1);
             topChunk->SetIsUsed(1);
             return topChunk;
-        // Merging with topChunk if it isn't nullptr 
-        // Merge forward
+            // Merging with topChunk if it isn't nullptr
+            // Merge forward
         } else {
             topChunk = MergeTwoSequnceChunks(newChunk, topChunk);
             topChunk->SetIsPrevInUse(1);
@@ -347,8 +348,7 @@ namespace mpp {
         t_out << "\ttopChunk: ";
         if (t_arena->topChunk) {
             Chunk::DumpChunk(t_out, t_arena->topChunk);
-        }
-        else {
+        } else {
             t_out << "nullptr";
         }
         t_out << std::endl;

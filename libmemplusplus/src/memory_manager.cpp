@@ -31,22 +31,22 @@ namespace mpp {
                  pos < reinterpret_cast<std::size_t>(arena->end);
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
-                
-                #ifdef MPP_COLOUR
+
+#ifdef MPP_COLOUR
                 if (currChunk->IsUsed()) {
-                    t_out << "[" << col::GREEN << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
-                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
-                      << col::RESET << "]";
+                    t_out << "[" << col::GREEN << currChunk->GetPrevSize() << "/"
+                          << currChunk->GetSize() << "/P:" << currChunk->IsPrevInUse()
+                          << "/U:" << currChunk->IsUsed() << col::RESET << "]";
                 } else {
-                    t_out << "[" << col::RED << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
-                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
-                      << col::RESET << "]";
+                    t_out << "[" << col::RED << currChunk->GetPrevSize() << "/"
+                          << currChunk->GetSize() << "/P:" << currChunk->IsPrevInUse()
+                          << "/U:" << currChunk->IsUsed() << col::RESET << "]";
                 }
-                #else
+#else
                 t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
                       << "]";
-                #endif
+#endif
             }
         }
         return t_out;
@@ -58,7 +58,7 @@ namespace mpp {
     bool MemoryManager::ResetAllocatorState()
     {
         auto it = s_ArenaList.begin();
-        while(it != s_ArenaList.end()) {
+        while (it != s_ArenaList.end()) {
             delete *it;
             *it = nullptr;
             it = s_ArenaList.erase(it);

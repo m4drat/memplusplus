@@ -19,7 +19,7 @@ namespace mpp {
         if (rawPtr == MAP_FAILED) {
             throw NoMemoryException();
         }
-        
+
         return rawPtr;
     }
 
@@ -49,7 +49,7 @@ namespace mpp {
     Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
     {
         // Try iterating through all available arenas
-        // to try to find enought space for user-requested chunk 
+        // to try to find enought space for user-requested chunk
         // in top chunk
         for (auto* arena : s_ArenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
@@ -86,13 +86,12 @@ namespace mpp {
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     {
-
         // Align, because we want to have metadata bits
         std::size_t realChunkSize =
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
 
         // If allocation size is bigger than default arena size
-        // we will allocate new arena with chunk, which size is 
+        // we will allocate new arena with chunk, which size is
         // equal to requested size, aligned to g_PAGE_SIZE
         if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
             return AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
@@ -103,7 +102,7 @@ namespace mpp {
         if (s_ArenaList.empty()) {
             CreateArena(g_DEFAULT_ARENA_SIZE);
         }
-        
+
         // Try to get chunk from any suitable arena (by searching in free list
         // or by splitting top chunk)
         Chunk* chunk = GetSuitableChunk(realChunkSize);
@@ -125,7 +124,7 @@ namespace mpp {
         if (t_chunkPtr == nullptr)
             return false;
 
-        // iterating through all the areas in an attempt 
+        // iterating through all the areas in an attempt
         // to find the one that the chunk belongs to
         for (auto* arena : s_ArenaList) {
             if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
@@ -135,7 +134,7 @@ namespace mpp {
             }
         }
 
-        // The given pointer doens't belong to any active arena 
+        // The given pointer doens't belong to any active arena
         return false;
     }
 }

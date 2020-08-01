@@ -3,6 +3,11 @@
 #include <cstdint>
 #include <iostream>
 
+#ifdef MPP_COLOUR
+#include "mpplib/utils/colours.hpp"
+namespace col = mpp::utils::colours;
+#endif
+
 namespace mpp {
 
     /**
@@ -200,10 +205,30 @@ namespace mpp {
          */
         static std::ostream& DumpChunk(std::ostream& t_out, Chunk* t_ch)
         {
-            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "]("
-                         << t_ch->GetPrevSize() << ", " << t_ch->GetSize()
-                         << "|InUse:" << t_ch->IsUsed()
-                         << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+#ifdef MPP_COLOUR
+            t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize()
+                  << ", " << t_ch->GetSize();
+
+            if (t_ch->IsUsed()) {
+                t_out << "|InUse:" << col::GREEN << t_ch->IsUsed() << col::RESET;
+            } else {
+                t_out << "|InUse:" << col::RED << t_ch->IsUsed() << col::RESET;
+            }
+
+            if (t_ch->IsPrevInUse()) {
+                t_out << "|PrevInUse:" << col::GREEN << t_ch->IsPrevInUse() << col::RESET
+                      << ")";
+            } else {
+                t_out << "|PrevInUse:" << col::RED << t_ch->IsPrevInUse() << col::RESET
+                      << ")";
+            }
+#else
+            t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize()
+                  << ", " << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed()
+                  << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+#endif
+
+            return t_out;
         }
 
         /**
@@ -215,10 +240,7 @@ namespace mpp {
          */
         friend std::ostream& operator<<(std::ostream& t_out, Chunk* t_ch)
         {
-            return t_out << "[" << reinterpret_cast<void*>(t_ch) << "]("
-                         << t_ch->GetPrevSize() << ", " << t_ch->GetSize()
-                         << "|InUse:" << t_ch->IsUsed()
-                         << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
+            return DumpChunk(t_out, t_ch);
         }
     };
 }

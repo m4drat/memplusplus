@@ -62,7 +62,7 @@ namespace mpp {
         // Create heuristics object
         std::unique_ptr<Heuristics> heuristics =
           std::make_unique<Heuristics>(objectsGraph.get());
-        
+
         // Layout heap in the most efficient way
         auto layoutedData = heuristics->Layout();
 
@@ -82,7 +82,7 @@ namespace mpp {
         for (auto vertex : layoutedData.first.get()) {
             // Extract size of chunk
             currSize = vertex->GetCorrespondingChunk()->GetSize();
-            
+
             // Copy chunk data to new location
             std::memcpy(currPtr,
                         reinterpret_cast<void*>(vertex->GetCorrespondingChunk()),
@@ -111,7 +111,7 @@ namespace mpp {
         // If we have used all space in the arena
         if (godArenaSize - layoutedData.second == 0) {
             godArena->topChunk = nullptr;
-        // We still have some space in top chunk
+            // We still have some space in top chunk
         } else {
             Chunk* topChunk = Chunk::ConstructChunk(
               currPtr, prevSize, godArenaSize - layoutedData.second, 1, 1);
@@ -121,8 +121,8 @@ namespace mpp {
 
         // Delete all arenas
         auto it = s_ArenaList.begin();
-        while(it != s_ArenaList.end()) {
-            if(*it != godArena) {
+        while (it != s_ArenaList.end()) {
+            if (*it != godArena) {
                 delete *it;
                 *it = nullptr;
                 it = s_ArenaList.erase(it);

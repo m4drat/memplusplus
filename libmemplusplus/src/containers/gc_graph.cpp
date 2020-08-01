@@ -31,7 +31,8 @@ namespace mpp {
             if (v1->GetNeighbors().size() != 0)
                 t_out << " -> ";
 
-            for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end(); ++it) {
+            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end();
+                 ++it) {
                 if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
                     t_out << "\"" + (*it)->ToString() + "\"";
                 else
@@ -58,7 +59,7 @@ namespace mpp {
             AddVertex(t_to);
         }
 
-        // Update vector of pointing to vertices 
+        // Update vector of pointing to vertices
         t_to->AddPointingVertex(t_from);
 
         // Create connection between two vertices
@@ -95,11 +96,11 @@ namespace mpp {
             // Find connected component inside graph
             std::unique_ptr<GcGraph> connectedComponent =
               std::make_unique<GcGraph>(UndirectedDFS(*(adjListCopy.begin())));
-            
+
             // delete each visited vertex from adjListCopy
             for (auto v : connectedComponent->GetAdjList())
                 adjListCopy.erase(v);
-            
+
             // Add found component to vector
             weaklyConnectedComponents.push_back(std::move(connectedComponent));
         }
@@ -114,7 +115,7 @@ namespace mpp {
 
         // Perform directed DFS, starting from t_vertex
         DDFS(t_vertex, visited);
-        
+
         return visited;
     }
 
@@ -125,7 +126,7 @@ namespace mpp {
         t_visited.push_back(t_vertex);
         for (auto neighbor : neighbors) {
             if ((std::find(t_visited.begin(), t_visited.end(), neighbor) !=
-                t_visited.end()) == false) {
+                 t_visited.end()) == false) {
                 GcGraph::DDFS(neighbor, t_visited);
             }
         }
@@ -152,7 +153,7 @@ namespace mpp {
         t_visited.push_back(t_vertex);
         for (auto neighbor : neighbors) {
             if ((std::find(t_visited.begin(), t_visited.end(), neighbor) !=
-                t_visited.end()) == false) {
+                 t_visited.end()) == false) {
                 GcGraph::UDFS(neighbor, t_visited);
             }
         }
@@ -181,8 +182,7 @@ namespace mpp {
     bool GcGraph::Clear()
     {
         // delete each vertex from graph
-        for (Vertex* vertex : m_adjList) 
-        {
+        for (Vertex* vertex : m_adjList) {
             delete vertex;
             vertex = nullptr;
         }

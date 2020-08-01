@@ -23,7 +23,7 @@ namespace mpp {
          */
         uint32_t* m_references{ nullptr };
         /**
-         * @brief Release object, decrementing m_references. 
+         * @brief Release object, decrementing m_references.
          */
         void DeleteReference();
 
