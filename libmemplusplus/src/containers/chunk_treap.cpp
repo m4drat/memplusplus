@@ -179,8 +179,7 @@ namespace mpp {
         }
 
         if ((t_root->chunk->GetSize() < t_chunk->GetSize()) ||
-            ((t_root->chunk->GetSize() == t_chunk->GetSize()) &&
-             t_root->chunk < t_chunk)) {
+            ((t_root->chunk->GetSize() == t_chunk->GetSize()) && t_root->chunk < t_chunk)) {
             SplitNodesByElement(t_root->rightChild, t_root->rightChild, t_right, t_chunk);
             t_left = t_root;
         } else {

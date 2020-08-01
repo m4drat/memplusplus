@@ -44,8 +44,7 @@ namespace mpp {
                 }
 #else
                 t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
-                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed()
-                      << "]";
+                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed() << "]";
 #endif
             }
         }

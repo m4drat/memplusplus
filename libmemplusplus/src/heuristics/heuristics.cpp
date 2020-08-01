@@ -6,8 +6,7 @@ namespace mpp {
         m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
     }
 
-    std::pair<std::reference_wrapper<std::vector<Vertex*>>,
-              std::reference_wrapper<std::size_t>>
+    std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>>
     Heuristics::Layout()
     {
         for (auto& graph : m_subgraphs) {
@@ -38,8 +37,7 @@ namespace mpp {
         // }
 
         return std::make_pair<std::reference_wrapper<std::vector<Vertex*>>,
-                              std::reference_wrapper<std::size_t>>(m_layoutedHeap,
-                                                                   m_neededSpace);
+                              std::reference_wrapper<std::size_t>>(m_layoutedHeap, m_neededSpace);
     }
 
     // std::vector<std::pair<GcGraph*, Heuristics::DataStructures>>

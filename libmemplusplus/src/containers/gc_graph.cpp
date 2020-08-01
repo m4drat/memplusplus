@@ -28,15 +28,16 @@ namespace mpp {
         t_out << "digraph Objects {\n";
         for (auto v1 : m_adjList) {
             t_out << "\t\"" + v1->ToString() + "\"";
-            if (!v1->GetNeighbors().empty())
+            if (!v1->GetNeighbors().empty()) {
                 t_out << " -> ";
+            }
 
-            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end();
-                 ++it) {
-                if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
+            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
+                if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end()) {
                     t_out << "\"" + (*it)->ToString() + "\"";
-                else
+                } else {
                     t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
+                }
             }
 
             t_out << ";\n";
@@ -88,8 +89,7 @@ namespace mpp {
         std::vector<std::unique_ptr<GcGraph>> weaklyConnectedComponents;
 
         // Copy of adjacence list to use with DFS
-        std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(),
-                                                        m_adjList.end());
+        std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
 
         // iteraste through all vertices
         while (adjListCopy.empty() != true) {
@@ -125,8 +125,8 @@ namespace mpp {
                                        t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
         for (auto neighbor : neighbors) {
-            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) !=
-                 t_visited.end()) == false) {
+            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) != t_visited.end()) ==
+                false) {
                 GcGraph::DDFS(neighbor, t_visited);
             }
         }
@@ -152,8 +152,8 @@ namespace mpp {
                          t_vertex->GetPointingVertices().end());
         t_visited.push_back(t_vertex);
         for (auto neighbor : neighbors) {
-            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) !=
-                 t_visited.end()) == false) {
+            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) != t_visited.end()) ==
+                false) {
                 GcGraph::UDFS(neighbor, t_visited);
             }
         }

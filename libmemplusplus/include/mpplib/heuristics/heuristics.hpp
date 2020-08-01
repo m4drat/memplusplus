@@ -69,8 +69,7 @@ namespace mpp {
          * them in the most efficient way.
          * @return pair of vector of vertices and size of all chunks
          */
-        std::pair<std::reference_wrapper<std::vector<Vertex*>>,
-                  std::reference_wrapper<std::size_t>>
+        std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>>
         Layout();
     };
 }

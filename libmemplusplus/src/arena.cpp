@@ -60,8 +60,7 @@ namespace mpp {
         std::size_t newTopChunkSize = topChunk->GetSize() - t_chunkSize;
 
         // Constructing new chunk from splitted memory
-        Chunk* chunk =
-          Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
+        Chunk* chunk = Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
 
         // Update top chunk
         topChunk = Chunk::ConstructChunk(
@@ -115,8 +114,7 @@ namespace mpp {
 
                 // Update the fields of the remaining chunk
                 Chunk* splittedChunk = Chunk::ConstructChunk(
-                  reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) +
-                                          t_chunkSize),
+                  reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
                   t_chunkSize,
                   toSplitChunkSize - t_chunkSize,
                   0,
@@ -125,8 +123,7 @@ namespace mpp {
                 // Update previous size for the next chunk after splitted
                 // current memory layout: [user-returned][splitted part][next chunk after
                 // splitted]
-                Chunk::GetNextChunk(splittedChunk)
-                  ->SetPrevSize(toSplitChunkSize - t_chunkSize);
+                Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
 
                 // Keep track of splitted part, by placing it into
                 // free list
@@ -167,8 +164,7 @@ namespace mpp {
 
                 // Update previous size field for next chunk, after
                 // splitted chunk
-                Chunk::GetNextChunk(splittedChunk)
-                  ->SetPrevSize(toSplitChunkSize - t_chunkSize);
+                Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
 
                 // Insert splitted part into free list
                 freedChunks.InsertChunk(splittedChunk);
@@ -302,11 +298,8 @@ namespace mpp {
     // excluding chunk size
     Chunk* Arena::MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
     {
-        Chunk* chunk = Chunk::ConstructChunk(t_chunk1,
-                                             t_chunk1->GetPrevSize(),
-                                             t_chunk1->GetSize() + t_chunk2->GetSize(),
-                                             0,
-                                             0);
+        Chunk* chunk = Chunk::ConstructChunk(
+          t_chunk1, t_chunk1->GetPrevSize(), t_chunk1->GetSize() + t_chunk2->GetSize(), 0, 0);
         return chunk;
     }
 
@@ -314,13 +307,10 @@ namespace mpp {
     {
         // Try to found in use chunk by ptr in some location
         // inside this chunk
-        auto foundChunkIt =
-          utils::LowerBound(chunksInUse.begin(),
-                            chunksInUse.end(),
-                            t_ptr,
-                            [](Chunk* t_ch, void* t_ptr) -> bool {
-                                return (t_ptr >= reinterpret_cast<void*>(t_ch));
-                            });
+        auto foundChunkIt = utils::LowerBound(
+          chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
+              return (t_ptr >= reinterpret_cast<void*>(t_ch));
+          });
         if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
             return *foundChunkIt;
         }
@@ -342,8 +332,7 @@ namespace mpp {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
 
         t_out << "\tsize: " << t_arena->size << std::endl;
-        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->CurrentlyAllocatedSpace
-              << std::endl;
+        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->CurrentlyAllocatedSpace << std::endl;
 
         t_out << "\ttopChunk: ";
         if (t_arena->topChunk) {
@@ -358,8 +347,7 @@ namespace mpp {
 
         t_out << "\tfreedChunks nodes: " << std::endl;
         int32_t idx1 = 0;
-        std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out,
-                                                                Node* node) {
+        std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node) {
             if (!node)
                 return;
 

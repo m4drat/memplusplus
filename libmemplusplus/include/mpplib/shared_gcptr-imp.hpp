@@ -79,8 +79,9 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr<Type>&& t_other) noexcept
     {
-        if (this != &t_other)
+        if (this != &t_other) {
             Swap(t_other);
+        }
 
         return *this;
     }
@@ -88,8 +89,9 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(const SharedGcPtr<Type>& t_other)
     {
-        if (this == &t_other)
+        if (this == &t_other) {
             return *this;
+        }
 
         // Delete reference
         DeleteReference();
@@ -295,8 +297,7 @@ namespace mpp {
               << "(";
         if (m_objectPtr) {
             t_out << reinterpret_cast<void*>(m_objectPtr);
-        }
-        else {
+        } else {
             t_out << "nullptr";
         }
         return t_out << ", " << *m_references << ")";
@@ -305,7 +306,6 @@ namespace mpp {
     template<class Type, class... Args>
     SharedGcPtr<Type> MakeSharedGcPtr(Args&&... t_args)
     {
-        return SharedGcPtr<Type>(
-          MemoryAllocator::Allocate<Type>(std::forward<Args>(t_args)...));
+        return SharedGcPtr<Type>(MemoryAllocator::Allocate<Type>(std::forward<Args>(t_args)...));
     }
 }

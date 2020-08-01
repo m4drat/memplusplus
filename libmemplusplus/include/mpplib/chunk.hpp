@@ -41,7 +41,7 @@ namespace mpp {
         static constexpr uint32_t IS_USED_SHIFT = 3;
         static constexpr uint32_t IS_PREV_IN_USE_BIT_MASK = 0b111;
         static constexpr uint32_t IS_PREV_IN_USE_SHIFT = 2;
-        
+
         /**
          * @brief Constructs new chunk at location, passed as first parameter.
          * @param t_newChunkPtr actual memory, where chunk is going to be constructed.
@@ -175,7 +175,8 @@ namespace mpp {
          */
         bool IsPrevInUse()
         {
-            return (this->ChunkHeader.chunkHeader & IS_PREV_IN_USE_BIT_MASK) >> IS_PREV_IN_USE_SHIFT;
+            return (this->ChunkHeader.chunkHeader & IS_PREV_IN_USE_BIT_MASK) >>
+                   IS_PREV_IN_USE_SHIFT;
         };
 
         /**
@@ -213,8 +214,8 @@ namespace mpp {
         static std::ostream& DumpChunk(std::ostream& t_out, Chunk* t_ch)
         {
 #ifdef MPP_COLOUR
-            t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize()
-                  << ", " << col::BRIGHT_BLUE << t_ch->GetSize() << col::RESET;
+            t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", "
+                  << col::BRIGHT_BLUE << t_ch->GetSize() << col::RESET;
 
             if (t_ch->IsUsed()) {
                 t_out << "|InUse:" << col::GREEN << t_ch->IsUsed() << col::RESET;
@@ -223,15 +224,13 @@ namespace mpp {
             }
 
             if (t_ch->IsPrevInUse()) {
-                t_out << "|PrevInUse:" << col::GREEN << t_ch->IsPrevInUse() << col::RESET
-                      << ")";
+                t_out << "|PrevInUse:" << col::GREEN << t_ch->IsPrevInUse() << col::RESET << ")";
             } else {
-                t_out << "|PrevInUse:" << col::RED << t_ch->IsPrevInUse() << col::RESET
-                      << ")";
+                t_out << "|PrevInUse:" << col::RED << t_ch->IsPrevInUse() << col::RESET << ")";
             }
 #else
-            t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize()
-                  << ", " << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed()
+            t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", "
+                  << t_ch->GetSize() << "|InUse:" << t_ch->IsUsed()
                   << "|PrevInUse:" << t_ch->IsPrevInUse() << ")";
 #endif
 

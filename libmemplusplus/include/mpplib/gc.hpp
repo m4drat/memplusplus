@@ -51,8 +51,7 @@ namespace mpp {
          * @param t_gcPtr GcPtr that is going to be added to t_objectsGraph.
          * @param t_objectsGraph actual chunks graph.
          */
-        static void AddInfoToObjectsGraph(GcPtr* t_gcPtr,
-                                          std::unique_ptr<GcGraph>& t_objectsGraph);
+        static void AddInfoToObjectsGraph(GcPtr* t_gcPtr, std::unique_ptr<GcGraph>& t_objectsGraph);
         /**
          * @brief Get reference to vector of currently active GcPtr's
          * @return std::vector<GcPtr*>& of currently used GcPtr's
