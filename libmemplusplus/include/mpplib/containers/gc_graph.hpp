@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "mpplib/containers/vertex.hpp"
+#include "mpplib/memory_manager.hpp"
 
 namespace mpp {
     /**
@@ -57,6 +58,12 @@ namespace mpp {
          * and calls Destructor.
          */
         ~GcGraph();
+    
+        /**
+         * @brief Add information about GcPtr and the object it controls to objects graph.
+         * @param t_gcPtr GcPtr that is going to be added to t_objectsGraph.
+         */
+        void AddObjectInfo(GcPtr* t_gcPtr);
 
         /**
          * @brief Generates graph representation in form, that can be used in dot

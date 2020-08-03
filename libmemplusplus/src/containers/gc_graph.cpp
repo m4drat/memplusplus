@@ -23,6 +23,39 @@ namespace mpp {
         Clear();
     }
 
+    void GcGraph::AddObjectInfo(GcPtr* t_gcPtr)
+    {
+        Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
+        Chunk* gcPtrLocationChunk =
+          MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(t_gcPtr));
+
+        if (gcPtrLocationChunk != nullptr) {
+            // Check that "to" vertex is already exist
+            Vertex* to = FindVertex(gcPtrObjectChunk);
+            if (to != nullptr) {
+                to->AddGcPtr(t_gcPtr);
+            } else {
+                to = new Vertex(gcPtrObjectChunk);
+                to->AddGcPtr(t_gcPtr);
+            }
+            // Check that "from" vertex is already exist
+            Vertex* from = FindVertex(gcPtrLocationChunk);
+            if (from == nullptr) {
+                from = new Vertex(gcPtrLocationChunk);
+            }
+            AddEdge(from, to);
+        } else {
+            Vertex* vertex = FindVertex(gcPtrObjectChunk);
+            if (vertex != nullptr) {
+                vertex->AddGcPtr(t_gcPtr);
+            } else {
+                vertex = new Vertex(gcPtrObjectChunk);
+                vertex->AddGcPtr(t_gcPtr);
+                AddVertex(vertex);
+            }
+        }
+    }
+
     std::ostream& GcGraph::GenerateGraphvizLayout(std::ostream& t_out) const
     {
         t_out << "digraph Objects {\n";
