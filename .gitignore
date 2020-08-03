@@ -10,6 +10,7 @@ graph.dot
 
 ### CMake builds ###
 /build*
+!build.sh
 
 ### C ###
 # Prerequisites
