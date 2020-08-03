@@ -55,6 +55,7 @@ namespace mpp {
         {
             return s_activeGcPtrs;
         }
+
         // static std::string GetObjectsGraphDot();
     };
 }

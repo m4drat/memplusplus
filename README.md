@@ -102,6 +102,12 @@ Library options:
 
 - `MPP_COLOUR_DEBUG_OUTPUT` - Add colours to debug output
 
+Environment options:
+
+- `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph, while performing GC::Collect()
+
+- `MPP_SHOW_STATISTICS=1` - display statistics after program terminates
+
 ## Examples
 
 - Manual memory managment

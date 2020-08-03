@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cstdint>
+#include <functional>
 #include <memory>
 #include <ostream>
 #include <set>
@@ -28,6 +29,7 @@ namespace mpp {
                 return (lhs->GetCorrespondingChunk() < rhs->GetCorrespondingChunk());
             }
         };
+
         /**
          * @brief adjacency list to store graph.
          */
@@ -58,7 +60,14 @@ namespace mpp {
          * and calls Destructor.
          */
         ~GcGraph();
-    
+
+        /**
+         * @brief Clear current graph, by deleting each vertex, and caling destructor on
+         * it.
+         * @return true, if clear was successfull
+         */
+        bool Clear();
+
         /**
          * @brief Add information about GcPtr and the object it controls to objects graph.
          * @param t_gcPtr GcPtr that is going to be added to t_objectsGraph.
@@ -109,10 +118,11 @@ namespace mpp {
 
         /**
          * @brief Find all weakly connected components in the graph.
-         * @return vector of unique_ptr's to graphs, that forms weakly
+         * @return vector of pointers to graphs, that forms weakly
          * connected components
          */
-        std::vector<std::unique_ptr<GcGraph>> WeaklyConnectedComponents();
+        std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>>
+        WeaklyConnectedComponents();
 
         /**
          * @brief Helper method to use with DirectedDFS.
@@ -163,14 +173,8 @@ namespace mpp {
          * @return set of vertices (adjacency list)
          */
         std::set<Vertex*, VertexComparator>& GetAdjList();
+
         // GcGraph* GetUndirected();
         // std::vector<std::vector<>> GetAdjMatrix();
-
-        /**
-         * @brief Clear current graph, by deleteing each vertex, and caling destructor on
-         * it.
-         * @return true, if clear was successfull
-         */
-        bool Clear();
     };
 }

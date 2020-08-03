@@ -23,12 +23,25 @@ namespace mpp {
         Clear();
     }
 
+    bool GcGraph::Clear()
+    {
+        // delete each vertex from graph
+        for (Vertex* vertex : m_adjList) {
+            delete vertex;
+            vertex = nullptr;
+        }
+
+        m_adjList.clear();
+        return true;
+    }
+
     void GcGraph::AddObjectInfo(GcPtr* t_gcPtr)
     {
         Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
         Chunk* gcPtrLocationChunk =
           MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(t_gcPtr));
 
+        // GcPtr is lying on heap
         if (gcPtrLocationChunk != nullptr) {
             // Check that "to" vertex is already exist
             Vertex* to = FindVertex(gcPtrObjectChunk);
@@ -44,6 +57,7 @@ namespace mpp {
                 from = new Vertex(gcPtrLocationChunk);
             }
             AddEdge(from, to);
+            // GcPtr isn't lying on heap
         } else {
             Vertex* vertex = FindVertex(gcPtrObjectChunk);
             if (vertex != nullptr) {
@@ -115,11 +129,13 @@ namespace mpp {
         return m_adjList.erase(t_vertex);
     }
 
-    std::vector<std::unique_ptr<GcGraph>> GcGraph::WeaklyConnectedComponents()
+    std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>> GcGraph::
+      WeaklyConnectedComponents()
     {
         // initialize weakly connected components
         // Each element in this vector contains isolated subgraph
-        std::vector<std::unique_ptr<GcGraph>> weaklyConnectedComponents;
+        std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>>
+          weaklyConnectedComponents;
 
         // Copy of adjacence list to use with DFS
         std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
@@ -127,12 +143,16 @@ namespace mpp {
         // iteraste through all vertices
         while (adjListCopy.empty() != true) {
             // Find connected component inside graph
-            std::unique_ptr<GcGraph> connectedComponent =
-              std::make_unique<GcGraph>(UndirectedDFS(*(adjListCopy.begin())));
+            std::unique_ptr<GcGraph, std::function<void(GcGraph*)>> connectedComponent(
+              new GcGraph(UndirectedDFS(*(adjListCopy.begin()))), [](GcGraph* t_graph) {
+                  t_graph->GetAdjList().clear();
+                  operator delete(t_graph);
+              });
 
             // delete each visited vertex from adjListCopy
-            for (auto v : connectedComponent->GetAdjList())
+            for (auto v : connectedComponent->GetAdjList()) {
                 adjListCopy.erase(v);
+            }
 
             // Add found component to vector
             weaklyConnectedComponents.push_back(std::move(connectedComponent));
@@ -210,17 +230,5 @@ namespace mpp {
     std::set<Vertex*, GcGraph::VertexComparator>& GcGraph::GetAdjList()
     {
         return m_adjList;
-    }
-
-    bool GcGraph::Clear()
-    {
-        // delete each vertex from graph
-        for (Vertex* vertex : m_adjList) {
-            delete vertex;
-            vertex = nullptr;
-        }
-
-        m_adjList.clear();
-        return true;
     }
 }

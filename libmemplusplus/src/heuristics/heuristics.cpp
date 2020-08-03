@@ -1,14 +1,11 @@
 #include "mpplib/heuristics/heuristics.hpp"
 
 namespace mpp {
-    Heuristics::Heuristics(GcGraph* t_objectsGraph)
-    {
-        m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
-    }
-
     std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>>
-    Heuristics::Layout()
+    Heuristics::Layout(std::unique_ptr<GcGraph>& t_objectsGraph)
     {
+        auto m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
+
         for (auto& graph : m_subgraphs) {
             for (const auto& v : graph->GetAdjList()) {
                 m_layoutedHeap.push_back(v);

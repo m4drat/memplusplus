@@ -11,7 +11,7 @@ namespace mpp {
         1.
             1.1 Divide graph into subgraps (by connected components)
             1.2 for each component find structures, rearranges them
-                unite all of the components ->
+                unite all of the components
             1.3 Heuruistics returns pair<neededSpace, vector<Vertex*>>
         2.
             2.1 iterate through all arenas
@@ -27,10 +27,10 @@ namespace mpp {
         }
 
         // Create heuristics object
-        std::unique_ptr<Heuristics> heuristics = std::make_unique<Heuristics>(objectsGraph.get());
+        std::unique_ptr<Heuristics> heuristics = std::make_unique<Heuristics>();
 
         // Layout heap in the most efficient way
-        auto layoutedData = heuristics->Layout();
+        auto layoutedData = heuristics->Layout(objectsGraph);
 
         // Create arena with enough size to fit all objects
         std::size_t godArenaSize = MemoryAllocator::Align(
