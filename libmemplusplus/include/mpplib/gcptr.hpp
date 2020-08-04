@@ -20,11 +20,13 @@ namespace mpp {
          * @return void* pointer to controlled object
          */
         virtual void* GetVoid() const = 0;
+        
         /**
          * @brief Update pointer to controlled object
          * @param t_newPtr new pointer to controlled object
          */
         virtual void UpdatePtr(void* t_newPtr) = 0;
+        
         /**
          * @brief Use count of current object controlled by gcPtr of any type.
          * @return uint32_t use count

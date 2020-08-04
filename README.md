@@ -102,11 +102,13 @@ Library options:
 
 - `MPP_COLOUR_DEBUG_OUTPUT` - Add colours to debug output
 
+- `MPP_STATS` - Add statistics instrumentation to debug build.
+
 ## Environment options
 
 - `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only exists in debug mode)
 
-- __currently not supported__. `MPP_SHOW_STATISTICS=1` - display statistics after program terminates (only exists in debug mode)
+- __currently not supported__. `MPP_SHOW_STATISTICS=1` - display statistics after program termination (only exists in debug mode + should be built with `MPP_STATS` set to ON)
 
 ## Examples
 

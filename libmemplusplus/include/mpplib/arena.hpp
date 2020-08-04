@@ -4,7 +4,12 @@
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/utils/utils.hpp"
 
+#ifdef MPP_STATS
+#include "mpplib/utils/statistics.hpp"
+#endif
+
 #include <cstddef>
+#include <memory>
 #include <set>
 #include <vector>
 
@@ -18,7 +23,11 @@ namespace mpp {
         /**
          * @brief Currently used space in arena.
          */
-        std::size_t CurrentlyAllocatedSpace{ 0 };
+        std::size_t m_CurrentlyAllocatedSpace{ 0 };
+
+#ifdef MPP_STATS
+        // std::unique_ptr<utils::Statistics::ArenaStats_t> m_ArenaStats;
+#endif
 
     public:
         /**

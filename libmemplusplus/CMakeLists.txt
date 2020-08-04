@@ -20,6 +20,7 @@ option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security che
 option(MPP_SECURE "Build mpp in secure mode" OFF)
 option(MPP_PROFILE "Build mpp with support of profiling" OFF)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
+option(MPP_STATS "Build mpp with support of statistics dumping (only works in debug build)" ON)
 
 ################# DEFAULT BUILD TYPE #################
 if (NOT CMAKE_BUILD_TYPE)
@@ -73,6 +74,15 @@ else()
 	list(APPEND MPP_DEFINES MPP_COLOUR=0)
 endif()
 
+if (MPP_STATS MATCHES "ON" AND MPP_DEBUG MATCHES "OFF")
+	message(FATAL "Statistic cannot be enabled in non-debug mode!")
+elseif (MPP_STATS MATCHES "ON" AND MPP_DEBUG MATCHES "ON")
+	message(STATUS "Building with support of statistics dumping: MPP_STATS=1")
+	list(APPEND MPP_DEFINES MPP_STATS=1)
+else()
+	list(APPEND MPP_DEFINES MPP_STATS=0)
+endif()
+
 message(STATUS "##################### LIBRARY OPTIONS #####################")
 message(STATUS "MPP_SANITIZERS: ${MPP_SANITIZERS}")
 message(STATUS "MPP_BUILD_SHARED_LIBS: ${MPP_BUILD_SHARED_LIBS}")
@@ -81,6 +91,7 @@ message(STATUS "MPP_DEBUG: ${MPP_DEBUG}")
 message(STATUS "MPP_SECURE: ${MPP_SECURE}")
 message(STATUS "MPP_PROFILE: ${MPP_PROFILE}")
 message(STATUS "MPP_COLOUR: ${MPP_COLOUR}")
+message(STATUS "MPP_STATS: ${MPP_STATS}")
 
 ################# ADD CONFIG FILE #################
 configure_file(${PROJECT_SOURCE_DIR}/src/config.hpp.in 
@@ -109,6 +120,7 @@ list(APPEND MPP_SOURCES
 
 if(MPP_DEBUG MATCHES "ON")
 	list(APPEND MPP_SOURCES src/utils/options.cpp)
+	list(APPEND MPP_SOURCES src/utils/statistics.cpp)
 endif()
 
 ################# SET TARGET NAME #################

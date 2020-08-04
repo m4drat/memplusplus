@@ -6,6 +6,10 @@
 namespace mpp {
     Arena::Arena(std::size_t t_size, void* t_begin)
     {
+#ifdef MPP_STATS
+        // m_ArenaStats = std::make_unique<utils::Statistics::ArenaStats_t>();
+        // m_ArenaStats->fullArenaSize = t_size;
+#endif
         size = t_size;
         topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
         begin = t_begin;
@@ -36,7 +40,7 @@ namespace mpp {
         chunksInUse.insert(chunk);
 
         // update current allocated space
-        CurrentlyAllocatedSpace += t_chunkSize;
+        m_CurrentlyAllocatedSpace += t_chunkSize;
         return chunk;
     }
 
@@ -82,7 +86,7 @@ namespace mpp {
         chunksInUse.insert(chunk);
 
         // Updatede used space variable
-        CurrentlyAllocatedSpace += t_chunkSize;
+        m_CurrentlyAllocatedSpace += t_chunkSize;
         return chunk;
     }
 
@@ -179,7 +183,7 @@ namespace mpp {
         chunksInUse.erase(t_chunk);
 
         // Update currently used space variable
-        CurrentlyAllocatedSpace -= t_chunk->GetSize();
+        m_CurrentlyAllocatedSpace -= t_chunk->GetSize();
 
         // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
@@ -319,12 +323,12 @@ namespace mpp {
 
     std::size_t Arena::GetUsedSpace()
     {
-        return CurrentlyAllocatedSpace;
+        return m_CurrentlyAllocatedSpace;
     }
 
     void Arena::SetUsedSpace(std::size_t t_newSize)
     {
-        CurrentlyAllocatedSpace = t_newSize;
+        m_CurrentlyAllocatedSpace = t_newSize;
     }
 
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
@@ -332,7 +336,7 @@ namespace mpp {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
 
         t_out << "\tsize: " << t_arena->size << std::endl;
-        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->CurrentlyAllocatedSpace << std::endl;
+        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->m_CurrentlyAllocatedSpace << std::endl;
 
         t_out << "\ttopChunk: ";
         if (t_arena->topChunk) {

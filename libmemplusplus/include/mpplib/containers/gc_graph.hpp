@@ -120,6 +120,9 @@ namespace mpp {
          * @brief Find all weakly connected components in the graph.
          * @return vector of pointers to graphs, that forms weakly
          * connected components
+         * @warning returns GcGraphs, which are formed based on original GcGraph.
+         * So as soon, as original GcGraph is destroyed, all connected components will
+         * also become invalid.
          */
         std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>>
         WeaklyConnectedComponents();
