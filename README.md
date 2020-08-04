@@ -78,7 +78,7 @@ Global options:
 
 - `MPP_ENABLE_COVERAGE` - build with code coverage support
 
-- `MPP_BUILD_FUZZER` - build fuzzer project
+- __currently not supported__. `MPP_BUILD_FUZZER` - build fuzzer project
 
 - `MPP_BUILD_EXAMPLE` - build example project
 
@@ -86,15 +86,15 @@ Global options:
 
 - `MPP_BUILD_DOCS` - build documentation
 
-- `MPP_BUILD_BENCMARK` - build documentation
+- __currently not supported__. `MPP_BUILD_BENCMARK` - build documentation
 
 Library options:
 
 - `MPP_BUILD_SHARED_LIBS` - build shared or static libraries
 
-- `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
+- __currently not supported__. `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
 
-- `MPP_SECURE` - build in secure mode with additional security features
+- __currently not supported__. `MPP_SECURE` - build in secure mode with additional security features
 
 - `MPP_PROFILE` - enable profiling instrumentation
 
@@ -102,11 +102,11 @@ Library options:
 
 - `MPP_COLOUR_DEBUG_OUTPUT` - Add colours to debug output
 
-Environment options:
+## Environment options
 
-- `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph, while performing GC::Collect()
+- __currently not supported__. `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph, while performing `GC::Collect()`
 
-- `MPP_SHOW_STATISTICS=1` - display statistics after program terminates
+- __currently not supported__. `MPP_SHOW_STATISTICS=1` - display statistics after program terminates
 
 ## Examples
 
