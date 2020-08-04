@@ -26,6 +26,15 @@ namespace mpp {
             objectsGraph->AddObjectInfo(gcPtr);
         }
 
+#ifdef MPP_DEBUG
+        if (utils::Options::GetMppDumpObjectsGraph())
+        {
+            std::ofstream objectsDot("objects.dot");
+            objectsGraph->GenerateGraphvizLayout(objectsDot) << std::endl;
+            objectsDot.close();
+        }
+#endif
+
         // Create heuristics object
         std::unique_ptr<Heuristics> heuristics = std::make_unique<Heuristics>();
 

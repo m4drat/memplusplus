@@ -8,6 +8,11 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/memory_manager.hpp"
 
+#ifdef MPP_DEBUG
+#include <fstream>
+#include "mpplib/utils/options.hpp"
+#endif
+
 #include <cstring>
 #include <memory>
 #include <vector>

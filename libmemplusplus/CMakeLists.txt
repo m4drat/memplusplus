@@ -94,7 +94,7 @@ configure_file(${PROJECT_SOURCE_DIR}/src/config.hpp.in
 include(GNUInstallDirs)
 
 ################# SET SOURCES #################
-set(MPP_SOURCES
+list(APPEND MPP_SOURCES
 	src/heuristics/heuristics.cpp
 	src/containers/chunk_treap.cpp
 	src/containers/gc_graph.cpp
@@ -106,6 +106,10 @@ set(MPP_SOURCES
 	src/memory_manager.cpp
 	src/gc.cpp
 )
+
+if(MPP_DEBUG MATCHES "ON")
+	list(APPEND MPP_SOURCES src/utils/options.cpp)
+endif()
 
 ################# SET TARGET NAME #################
 if(MPP_SECURE MATCHES "ON")

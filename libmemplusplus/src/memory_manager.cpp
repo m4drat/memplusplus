@@ -2,11 +2,6 @@
 
 #include <string>
 
-#ifdef MPP_COLOUR
-#include "mpplib/utils/colours.hpp"
-namespace col = mpp::utils::colours;
-#endif
-
 namespace mpp {
     std::vector<Arena*> MemoryManager::s_ArenaList;
 

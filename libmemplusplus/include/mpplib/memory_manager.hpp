@@ -3,6 +3,11 @@
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 
+#ifdef MPP_COLOUR
+#include "mpplib/utils/colours.hpp"
+namespace col = mpp::utils::colours;
+#endif
+
 #include <iostream>
 #include <vector>
 

@@ -104,9 +104,9 @@ Library options:
 
 ## Environment options
 
-- __currently not supported__. `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph, while performing `GC::Collect()`
+- `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only exists in debug mode)
 
-- __currently not supported__. `MPP_SHOW_STATISTICS=1` - display statistics after program terminates
+- __currently not supported__. `MPP_SHOW_STATISTICS=1` - display statistics after program terminates (only exists in debug mode)
 
 ## Examples
 
