@@ -4,7 +4,7 @@
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/utils/utils.hpp"
 
-#ifdef MPP_STATS
+#if MPP_STATS == 1
 #include "mpplib/utils/statistics.hpp"
 #endif
 
@@ -25,10 +25,9 @@ namespace mpp {
          */
         std::size_t m_CurrentlyAllocatedSpace{ 0 };
 
-#ifdef MPP_STATS
-        // std::unique_ptr<utils::Statistics::ArenaStats_t> m_ArenaStats;
+#if MPP_STATS == 1
+        std::unique_ptr<utils::Statistics::ArenaStats> m_ArenaStats;
 #endif
-
     public:
         /**
          * @brief Treap, to handle freed chunks.
@@ -201,6 +200,7 @@ namespace mpp {
          */
         Chunk* GetInUseChunkByPtr(void* t_ptr);
 
+#if MPP_STATS == 1
         /**
          * @brief Dump arena statistics in human-readable format.
          * @param t_out file stream, to write to. (std::cout / std::ofstream)
@@ -208,5 +208,6 @@ namespace mpp {
          * @return std::ostream, that earlier was passed as t_out
          */
         static std::ostream& DumpArena(std::ostream& t_out, Arena* t_arena);
+#endif
     };
 }

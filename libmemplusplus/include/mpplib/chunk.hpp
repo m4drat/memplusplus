@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <iostream>
 
-#ifdef MPP_COLOUR
+#if MPP_COLOUR == 1
 #include "mpplib/utils/colours.hpp"
 namespace col = mpp::utils::colours;
 #endif
@@ -213,7 +213,7 @@ namespace mpp {
          */
         static std::ostream& DumpChunk(std::ostream& t_out, Chunk* t_ch)
         {
-#ifdef MPP_COLOUR
+#if MPP_COLOUR == 1
             t_out << "[" << reinterpret_cast<void*>(t_ch) << "](" << t_ch->GetPrevSize() << ", "
                   << col::BRIGHT_BLUE << t_ch->GetSize() << col::RESET;
 

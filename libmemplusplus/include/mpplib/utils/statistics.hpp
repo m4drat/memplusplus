@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <memory>
 
 #include "mpplib/utils/options.hpp"
 
@@ -10,7 +11,7 @@ namespace mpp {
         class Statistics
         {
         public:
-            typedef struct ArenaStats
+            struct ArenaStats
             {
                 std::size_t totalAllocated;
                 std::size_t totalFreed;
@@ -18,12 +19,15 @@ namespace mpp {
                 std::size_t smallestAllocation;
                 std::size_t fullArenaSize;
                 bool bigArena;
-            } ArenaStats_t;
+            };
 
             static __attribute__((destructor)) void DumpStats();
+            void AddArenaStats(std::unique_ptr<ArenaStats> t_arenaStats);
 
         private:
-            std::vector<ArenaStats_t*> m_ArenasStats;
+            std::vector<std::unique_ptr<ArenaStats>> m_ArenasStats;
         };
+
+        static Statistics s_Stats;
     }
 }

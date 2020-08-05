@@ -2,15 +2,17 @@
 
 namespace mpp {
     namespace utils {
-        static Statistics s_Stats;
-
         void Statistics::DumpStats()
         {
             if (Options::GetMppShowStatistics())
             {
                 std::cerr << "Arenas statistics: " << std::endl;
-                // for (uint32_t i = 0; i < )
             }
+        }
+
+        void Statistics::AddArenaStats(std::unique_ptr<ArenaStats> t_arenaStats)
+        {
+            m_ArenasStats.push_back(std::move(t_arenaStats));
         }
     }
 }

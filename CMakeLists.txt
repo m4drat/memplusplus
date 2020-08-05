@@ -32,7 +32,7 @@ message(STATUS "MPP_BUILD_FUZZER    : ${MPP_BUILD_FUZZER}")
 message(STATUS "MPP_BUILD_EXAMPLE   : ${MPP_BUILD_EXAMPLE}")
 message(STATUS "MPP_BUILD_TESTS     : ${MPP_BUILD_TESTS}")
 message(STATUS "MPP_BUILD_DOCS      : ${MPP_BUILD_DOCS}")
-message(STATUS "MPP_BUILD_BENCHMARK  : ${MPP_BUILD_BENCHMARK}")
+message(STATUS "MPP_BUILD_BENCHMARK : ${MPP_BUILD_BENCHMARK}")
 
 ################# ADD PROJECTS + DOCS + TESTS #################
 add_subdirectory(libmemplusplus)

@@ -8,7 +8,7 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/memory_manager.hpp"
 
-#ifdef MPP_DEBUG
+#if MPP_DEBUG == 1
 #include <fstream>
 #include "mpplib/utils/options.hpp"
 #endif

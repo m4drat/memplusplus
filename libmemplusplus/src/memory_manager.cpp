@@ -5,6 +5,7 @@
 namespace mpp {
     std::vector<Arena*> MemoryManager::s_ArenaList;
 
+#if MPP_STATS == 1
     std::ostream& MemoryManager::DumpStats(std::ostream& t_out)
     {
         t_out << "MIN_CHUNK_SIZE: " << g_MIN_CHUNK_SIZE << std::endl;
@@ -27,7 +28,7 @@ namespace mpp {
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
 
-#ifdef MPP_COLOUR
+#if MPP_COLOUR == 1
                 if (currChunk->IsUsed()) {
                     t_out << "[" << col::GREEN << currChunk->GetPrevSize() << "/"
                           << currChunk->GetSize() << "/P:" << currChunk->IsPrevInUse()
@@ -45,6 +46,7 @@ namespace mpp {
         }
         return t_out;
     }
+#endif
 
     // TODO: make it work better (probably add smart pointers memory managment)
     // This is just ugly thing to reset allocator state

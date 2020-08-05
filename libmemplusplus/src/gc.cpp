@@ -26,7 +26,7 @@ namespace mpp {
             objectsGraph->AddObjectInfo(gcPtr);
         }
 
-#ifdef MPP_DEBUG
+#if MPP_DEBUG == 1
         if (utils::Options::GetMppDumpObjectsGraph())
         {
             std::ofstream objectsDot("objects.dot");

@@ -3,7 +3,7 @@
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 
-#ifdef MPP_COLOUR
+#if MPP_COLOUR == 1
 #include "mpplib/utils/colours.hpp"
 namespace col = mpp::utils::colours;
 #endif
@@ -26,18 +26,21 @@ namespace mpp {
         static std::vector<Arena*> s_ArenaList;
 
     public:
+#if MPP_STATS == 1
         /**
          * @brief Dump information about arenas.
          * @param t_out output sream to write to.
          * @return std::ostream& stream reference
          */
         static std::ostream& DumpStats(std::ostream& t_out);
+
         /**
          * @brief Visualizes heap layout.
          * @param t_out output sream to write to.
          * @return std::ostream& stream reference
          */
         static std::ostream& VisHeapLayout(std::ostream& t_out);
+#endif
 
         /**
          * @brief Get reference to vector of arenas.
@@ -54,6 +57,7 @@ namespace mpp {
          * @return Arena* if pointer points into arena, nullptr otherwise
          */
         static Arena* GetArenaByPtr(void* t_ptr);
+
         /**
          * @brief Check, that specified pointer points in any active chunk.
          * @param t_chunk pointer to some location.
@@ -61,7 +65,6 @@ namespace mpp {
          */
         static Chunk* GetInUseChunkByPtr(void* t_chunk);
 
-        // TODO:
         /**
          * @brief Resets allocator state by destroying all arenas.
          * @return true if everything is fine, false otherwise
@@ -72,14 +75,17 @@ namespace mpp {
          * @brief Minimum allowed chunk size. Chunk size less than that will be extended.
          */
         static const std::size_t g_MIN_CHUNK_SIZE = 32;
+
         /**
          * @brief Size of chunk header.
          */
         static const std::size_t g_CHUNK_HEADER_SIZE = sizeof(Chunk::ChunkHeader_t);
+
         /**
          * @brief Default arena size.
          */
         static const std::size_t g_DEFAULT_ARENA_SIZE = 32 * (1 << 20);
+
         /**
          * @brief Page size for mmap request.
          */

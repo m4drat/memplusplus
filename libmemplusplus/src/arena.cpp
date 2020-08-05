@@ -6,9 +6,9 @@
 namespace mpp {
     Arena::Arena(std::size_t t_size, void* t_begin)
     {
-#ifdef MPP_STATS
-        // m_ArenaStats = std::make_unique<utils::Statistics::ArenaStats_t>();
-        // m_ArenaStats->fullArenaSize = t_size;
+#if MPP_STATS == 1
+        m_ArenaStats = std::make_unique<utils::Statistics::ArenaStats>();
+        m_ArenaStats->fullArenaSize = t_size;
 #endif
         size = t_size;
         topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
@@ -18,8 +18,9 @@ namespace mpp {
 
     Arena::~Arena()
     {
-        // TODO: correctly destroy ChunkTreap
-        // ~ChunkTreap gets called automatically
+#if MPP_STATS == 1
+        utils::s_Stats.AddArenaStats(std::move(m_ArenaStats));
+#endif
         chunksInUse.clear();
         MemoryAllocator::SysDealloc(this->begin, size);
     }
@@ -331,6 +332,7 @@ namespace mpp {
         m_CurrentlyAllocatedSpace = t_newSize;
     }
 
+#if MPP_STATS == 1
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
     {
         t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
@@ -352,8 +354,9 @@ namespace mpp {
         t_out << "\tfreedChunks nodes: " << std::endl;
         int32_t idx1 = 0;
         std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node) {
-            if (!node)
+            if (!node) {
                 return;
+            }
 
             Iterate(out, node->rightChild);
             out << "\t\t" << idx1 << ". " << node << std::endl;
@@ -371,4 +374,5 @@ namespace mpp {
         }
         return t_out;
     }
+#endif
 }
