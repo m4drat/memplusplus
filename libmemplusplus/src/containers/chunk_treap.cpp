@@ -3,7 +3,8 @@
 namespace mpp {
 
     ChunkTreap::ChunkTreap()
-        : m_root(nullptr)
+        : m_root{ nullptr }
+        , m_freedChunks{ 0 }
     {}
 
     // TODO - smart pointers memory managment
@@ -70,6 +71,37 @@ namespace mpp {
         t_root = nullptr;
     }
 
+    uint32_t ChunkTreap::GetFreedChunksSize()
+    {
+        return m_freedChunks;
+    }
+
+    // TODO
+    // https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
+    // std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
+    // {
+    //     t_out << "digraph Objects {\n";
+    //     for (auto v1 : m_adjList) {
+    //         t_out << "\t\"" + v1->ToString() + "\"";
+    //         if (v1->GetNeighbors().size() != 0)
+    //             t_out << " -> ";
+
+    //         for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end();
+    //         ++it) {
+    //             if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
+    //                 t_out << "\"" + (*it)->ToString() + "\"";
+    //             else
+    //                 t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
+    //         }
+
+    //         t_out << ";\n";
+    //     }
+
+    //     t_out << "}";
+
+    //     return t_out;
+    // }
+
     Chunk* ChunkTreap::MinSizeChunk() const
     {
         Node* currentNode = m_root;
@@ -92,6 +124,9 @@ namespace mpp {
 
     void ChunkTreap::InsertChunk(Chunk* t_chunk)
     {
+#if MPP_STATS == 1
+        m_freedChunks++;
+#endif
         // TODO - smart pointers memory managment
         InsertNode(new Node(t_chunk));
     }
@@ -108,6 +143,9 @@ namespace mpp {
 
     void ChunkTreap::RemoveChunk(Chunk* t_chunk)
     {
+#if MPP_STATS == 1
+        m_freedChunks--;
+#endif
         Node* leftSubtree = nullptr;
         Node* rightSubtree = nullptr;
 
@@ -187,30 +225,4 @@ namespace mpp {
             t_right = t_root;
         }
     }
-
-    // TODO
-    // https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
-    // std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
-    // {
-    //     t_out << "digraph Objects {\n";
-    //     for (auto v1 : m_adjList) {
-    //         t_out << "\t\"" + v1->ToString() + "\"";
-    //         if (v1->GetNeighbors().size() != 0)
-    //             t_out << " -> ";
-
-    //         for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end();
-    //         ++it) {
-    //             if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
-    //                 t_out << "\"" + (*it)->ToString() + "\"";
-    //             else
-    //                 t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
-    //         }
-
-    //         t_out << ";\n";
-    //     }
-
-    //     t_out << "}";
-
-    //     return t_out;
-    // }
 }

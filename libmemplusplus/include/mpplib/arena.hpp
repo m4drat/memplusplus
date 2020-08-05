@@ -25,10 +25,14 @@ namespace mpp {
          */
         std::size_t m_CurrentlyAllocatedSpace{ 0 };
 
+    public:
 #if MPP_STATS == 1
+        /**
+         * @brief Unique ptr with arena metadata to use with Statistics.
+         */
         std::unique_ptr<utils::Statistics::ArenaStats> m_ArenaStats;
 #endif
-    public:
+
         /**
          * @brief Treap, to handle freed chunks.
          *

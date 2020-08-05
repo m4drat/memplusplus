@@ -14,7 +14,7 @@ namespace mpp {
              * @brief true, if environment variable MPP_DUMP_OBJECTS_GRAPH is set.
              */
             static bool s_MPP_DUMP_OBJECTS_GRAPH;
-            
+
             /**
              * @brief true, if environment variable MPP_SHOW_STATISTICS is set.
              */
@@ -29,13 +29,13 @@ namespace mpp {
         public:
             /**
              * @brief Get the MppDumpObjectsGraph variable.
-             * @return true, if variable is set, false - otherwise. 
+             * @return true, if variable is set, false - otherwise.
              */
             static bool GetMppDumpObjectsGraph();
-            
+
             /**
              * @brief Get the MppShowStatistics variable.
-             * @return true, if variable is set, false - otherwise. 
+             * @return true, if variable is set, false - otherwise.
              */
             static bool GetMppShowStatistics();
         };

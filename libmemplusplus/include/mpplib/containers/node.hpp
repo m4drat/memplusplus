@@ -59,6 +59,7 @@ namespace mpp {
          */
         ~Node();
 
+#if MPP_STATS == 1
         /**
          * @brief Dump text represenation of the node.
          */
@@ -67,6 +68,7 @@ namespace mpp {
          * @brief Overloaded output operator to print node using std::cout.
          */
         friend std::ostream& operator<<(std::ostream& t_out, Node* t_node);
+#endif
 
     private:
         /**

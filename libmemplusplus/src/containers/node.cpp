@@ -79,10 +79,11 @@ namespace mpp {
         rightChild = nullptr;
     }
 
+#if MPP_STATS == 1
     std::ostream& DumpNode(std::ostream& t_out, Node* t_node)
     {
         t_out << "[" << reinterpret_cast<void*>(t_node) << "]"
-              << "(" << t_node->priority << ", {" << t_node->chunk
+              << "(" << std::to_string(t_node->priority) << ", {" << t_node->chunk
               << "}, L:" << reinterpret_cast<void*>(t_node->leftChild)
               << ", R:" << reinterpret_cast<void*>(t_node->rightChild);
         return t_out;
@@ -90,10 +91,9 @@ namespace mpp {
 
     std::ostream& operator<<(std::ostream& t_out, Node* t_node)
     {
-        t_out << "[" << reinterpret_cast<void*>(t_node) << "]"
-              << "(" << t_node->priority << ", {" << t_node->chunk
-              << "}, L:" << reinterpret_cast<void*>(t_node->leftChild)
-              << ", R:" << reinterpret_cast<void*>(t_node->rightChild);
+        DumpNode(t_out, t_node);
         return t_out;
     }
+#endif
+
 }

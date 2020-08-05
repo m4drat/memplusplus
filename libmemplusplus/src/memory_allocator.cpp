@@ -110,7 +110,7 @@ namespace mpp {
             return Chunk::GetUserDataPtr(chunk);
         }
 
-        // finally, if there are no available space for chunk
+        // finally, if there is no available space for chunk
         // create new arena and allocate into it
         Arena* arena = CreateArena(g_DEFAULT_ARENA_SIZE);
         return (arena->AllocateFromTopChunk(realChunkSize));

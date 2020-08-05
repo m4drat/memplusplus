@@ -27,8 +27,7 @@ namespace mpp {
         }
 
 #if MPP_DEBUG == 1
-        if (utils::Options::GetMppDumpObjectsGraph())
-        {
+        if (utils::Options::GetMppDumpObjectsGraph()) {
             std::ofstream objectsDot("objects.dot");
             objectsGraph->GenerateGraphvizLayout(objectsDot) << std::endl;
             objectsDot.close();

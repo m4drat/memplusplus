@@ -47,6 +47,7 @@ namespace mpp {
          * @return chunk of minimum size
          */
         Chunk* MinSizeChunk() const;
+
         /**
          * @brief Finds max freed chunk in chunk treap in logN.
          * @return chunk of maximum size
@@ -58,6 +59,7 @@ namespace mpp {
          * @param t_chunk the chunk to insert
          */
         void InsertChunk(Chunk* t_chunk);
+
         /**
          * @brief Remove chunk from chunk treap in logN.
          * @param t_chunk the chunk to remove
@@ -92,6 +94,12 @@ namespace mpp {
         void Delete(Node* t_root);
 
         /**
+         * @brief Get the amount of freed chunks.
+         * @return uint32_t amount of freed chunks.
+         */
+        uint32_t GetFreedChunksSize();
+
+        /**
          * @brief Generates tree representation in form, that can be used in dot
          * (graphviz), to visualize tree structure.
          *
@@ -105,6 +113,12 @@ namespace mpp {
          */
         Node* m_root;
 
+#if MPP_STATS == 1
+        /**
+         * @brief Keeps track of amount of freed chunks.
+         */
+        uint32_t m_freedChunks;
+#endif
         /**
          * @brief Inserts new node into ctreap.
          * @param t_node node to insert into chunk treap

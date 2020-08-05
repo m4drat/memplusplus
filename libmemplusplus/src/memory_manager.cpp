@@ -6,23 +6,11 @@ namespace mpp {
     std::vector<Arena*> MemoryManager::s_ArenaList;
 
 #if MPP_STATS == 1
-    std::ostream& MemoryManager::DumpStats(std::ostream& t_out)
-    {
-        t_out << "MIN_CHUNK_SIZE: " << g_MIN_CHUNK_SIZE << std::endl;
-        t_out << "CHUNK_HEADER_SIZE: " << sizeof(Chunk::ChunkHeader) << std::endl;
-        t_out << "DEFAULT_ARENA_SIZE: " << g_DEFAULT_ARENA_SIZE << std::endl;
-        t_out << "PAGE_SIZE: " << g_PAGE_SIZE << std::endl;
-        for (auto* arena : s_ArenaList) {
-            Arena::DumpArena(t_out, arena) << std::endl;
-        }
-
-        return t_out;
-    }
-
     std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out)
     {
         for (auto* arena : s_ArenaList) {
-            t_out << "Arena: " << reinterpret_cast<void*>(arena) << ":" << std::endl;
+            t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
+                  << std::endl;
             for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
                  pos < reinterpret_cast<std::size_t>(arena->end);
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {

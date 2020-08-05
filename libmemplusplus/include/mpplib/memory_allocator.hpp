@@ -4,6 +4,10 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 
+#if MPP_STATS == 1
+#include "mpplib/utils/statistics.hpp"
+#endif
+
 #include <cmath>
 #include <cstdint>
 #include <new>

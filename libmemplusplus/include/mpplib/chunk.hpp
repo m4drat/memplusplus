@@ -205,6 +205,7 @@ namespace mpp {
             }
         };
 
+#if MPP_STATS == 1
         /**
          * @brief Helper method to dump chunk structure in human-readable format.
          * @param t_out stream to write to.
@@ -248,5 +249,6 @@ namespace mpp {
         {
             return DumpChunk(t_out, t_ch);
         }
+#endif
     };
 }

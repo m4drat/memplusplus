@@ -335,12 +335,20 @@ namespace mpp {
 #if MPP_STATS == 1
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
     {
-        t_out << "Arena: " << reinterpret_cast<void*>(t_arena) << std::endl;
+        t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena) << " --------------"
+              << std::endl;
 
-        t_out << "\tsize: " << t_arena->size << std::endl;
-        t_out << "\tCurrentlyAllocatedSpace: " << t_arena->m_CurrentlyAllocatedSpace << std::endl;
+        t_out << "MPP - Total arena size           : " << t_arena->size << std::endl;
+        t_out << "MPP - Currently Allocated Space  : " << t_arena->m_CurrentlyAllocatedSpace
+              << std::endl;
+        t_out << "MPP - Amount of free memory      : "
+              << (t_arena->size - t_arena->m_CurrentlyAllocatedSpace) / float(t_arena->size) * 100
+              << " %" << std::endl;
+        t_out << "MPP - Amount of allocated memory : "
+              << t_arena->m_CurrentlyAllocatedSpace / float(t_arena->size) * 100 << " %"
+              << std::endl;
 
-        t_out << "\ttopChunk: ";
+        t_out << "MPP - TopChunk                   : ";
         if (t_arena->topChunk) {
             Chunk::DumpChunk(t_out, t_arena->topChunk);
         } else {
@@ -348,10 +356,11 @@ namespace mpp {
         }
         t_out << std::endl;
 
-        t_out << "\tbegin: " << t_arena->begin << std::endl;
-        t_out << "\tend: " << t_arena->end << std::endl;
+        t_out << "MPP - Arena begin pointer        : " << t_arena->begin << std::endl;
+        t_out << "MPP - Arena end pointer          : " << t_arena->end << std::endl;
 
-        t_out << "\tfreedChunks nodes: " << std::endl;
+        t_out << "MPP - Freed chunks nodes (" << t_arena->freedChunks.GetFreedChunksSize() << ")"
+              << std::endl;
         int32_t idx1 = 0;
         std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node) {
             if (!node) {
@@ -359,16 +368,16 @@ namespace mpp {
             }
 
             Iterate(out, node->rightChild);
-            out << "\t\t" << idx1 << ". " << node << std::endl;
+            out << "\t" << idx1 << ". " << node << std::endl;
             idx1++;
             Iterate(out, node->leftChild);
         };
         Iterate(std::cout, t_arena->freedChunks.GetRootNode());
 
-        t_out << "\tchunksInUse: " << std::endl;
+        t_out << "MPP - Chunks in use (" << t_arena->chunksInUse.size() << ")" << std::endl;
         int32_t idx2 = 0;
         for (auto ch : t_arena->chunksInUse) {
-            t_out << "\t\t" << idx2 << ". ";
+            t_out << "\t" << idx2 << ". ";
             Chunk::DumpChunk(t_out, ch) << std::endl;
             idx2++;
         }

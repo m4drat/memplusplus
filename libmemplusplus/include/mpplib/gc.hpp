@@ -9,8 +9,8 @@
 #include "mpplib/memory_manager.hpp"
 
 #if MPP_DEBUG == 1
-#include <fstream>
 #include "mpplib/utils/options.hpp"
+#include <fstream>
 #endif
 
 #include <cstring>

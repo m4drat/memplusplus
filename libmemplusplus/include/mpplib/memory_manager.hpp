@@ -28,13 +28,6 @@ namespace mpp {
     public:
 #if MPP_STATS == 1
         /**
-         * @brief Dump information about arenas.
-         * @param t_out output sream to write to.
-         * @return std::ostream& stream reference
-         */
-        static std::ostream& DumpStats(std::ostream& t_out);
-
-        /**
          * @brief Visualizes heap layout.
          * @param t_out output sream to write to.
          * @return std::ostream& stream reference

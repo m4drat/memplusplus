@@ -50,7 +50,7 @@ int main()
     p2 = nullptr;
     p4 = nullptr;
 
-    // MemoryManager::DumpStats(std::cout);
+    utils::Statistics::DumpStats(std::cout) << std::endl;
     MemoryManager::VisHeapLayout(std::cout) << std::endl;
 
     std::cout << p1 << p1->GetData() << std::endl;
@@ -65,7 +65,7 @@ int main()
     std::cout << p3 << p3->GetData() << std::endl;
     std::cout << p5 << p5->GetData() << std::endl;
 
-    MemoryManager::DumpStats(std::cout) << std::endl;
+    utils::Statistics::DumpStats(std::cout) << std::endl;
 
     SharedGcPtr<char> ptr1((char*)MemoryAllocator::Allocate(64));
     SharedGcPtr<char> ptr2 = ptr1;

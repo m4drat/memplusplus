@@ -10,15 +10,13 @@ namespace mpp {
             char* dump_graph = std::getenv("MPP_DUMP_OBJECTS_GRAPH");
             char* show_stats = std::getenv("MPP_SHOW_STATISTICS");
 
-            if (dump_graph != nullptr && dump_graph[0] == '1')
-            {
+            if (dump_graph != nullptr && dump_graph[0] == '1') {
                 s_MPP_DUMP_OBJECTS_GRAPH = true;
             } else {
                 s_MPP_DUMP_OBJECTS_GRAPH = false;
             }
 
-            if (show_stats != nullptr && show_stats[0] == '1')
-            {
+            if (show_stats != nullptr && show_stats[0] == '1') {
                 s_MPP_SHOW_STATISTICS = true;
             } else {
                 s_MPP_SHOW_STATISTICS = false;
