@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mpplib/utils/profiler_definitions.hpp"
 #include <stdlib.h>
 
 namespace mpp {

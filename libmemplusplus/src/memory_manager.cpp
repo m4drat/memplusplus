@@ -8,6 +8,7 @@ namespace mpp {
 #if MPP_STATS == 1
     std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out)
     {
+        PROFILE_FUNCTION();
         for (auto* arena : s_ArenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
                   << std::endl;
@@ -41,6 +42,7 @@ namespace mpp {
     // exists only to make possible running of unit-tests
     bool MemoryManager::ResetAllocatorState()
     {
+        PROFILE_FUNCTION();
         auto it = s_ArenaList.begin();
         while (it != s_ArenaList.end()) {
             delete *it;
@@ -53,6 +55,7 @@ namespace mpp {
 
     Arena* MemoryManager::GetArenaByPtr(void* t_ptr)
     {
+        PROFILE_FUNCTION();
         for (auto* arena : s_ArenaList) {
             if (t_ptr >= arena->begin && t_ptr <= arena->end) {
                 return arena;
@@ -64,6 +67,7 @@ namespace mpp {
 
     Chunk* MemoryManager::GetInUseChunkByPtr(void* t_chunk)
     {
+        PROFILE_FUNCTION();
         Arena* arena = GetArenaByPtr(t_chunk);
         if (arena != nullptr) {
             return arena->GetInUseChunkByPtr(t_chunk);

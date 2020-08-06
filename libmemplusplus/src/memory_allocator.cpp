@@ -7,6 +7,7 @@ namespace mpp {
 
     std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
     {
+        PROFILE_FUNCTION();
         if (t_size != 0 && (t_size % t_alignment == 0))
             return t_size;
         return t_size + (t_alignment - (t_size % t_alignment));
@@ -14,6 +15,7 @@ namespace mpp {
 
     void* MemoryAllocator::SysAlloc(std::size_t t_size)
     {
+        PROFILE_FUNCTION();
         void* rawPtr =
           mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (rawPtr == MAP_FAILED) {
@@ -25,6 +27,7 @@ namespace mpp {
 
     bool MemoryAllocator::SysDealloc(void* t_ptr, std::size_t t_pageSize)
     {
+        PROFILE_FUNCTION();
         if (munmap(t_ptr, t_pageSize) == -1) {
             throw UnmapMemoryException();
         }
@@ -34,6 +37,7 @@ namespace mpp {
 
     Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
     {
+        PROFILE_FUNCTION();
         // Allocate memory for arena
         void* arenaSpace = SysAlloc(t_arenaSize);
 
@@ -48,6 +52,7 @@ namespace mpp {
 
     Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
     {
+        PROFILE_FUNCTION();
         // Try iterating through all available arenas
         // to try to find enought space for user-requested chunk
         // in top chunk
@@ -76,6 +81,7 @@ namespace mpp {
 
     void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
     {
+        PROFILE_FUNCTION();
         // Create new arena with requested size
         Arena* arena = CreateArena(t_userDataSize);
 
@@ -86,6 +92,7 @@ namespace mpp {
 
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     {
+        PROFILE_FUNCTION();
         // Align, because we want to have metadata bits
         std::size_t realChunkSize =
           Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
@@ -118,6 +125,7 @@ namespace mpp {
 
     bool MemoryAllocator::Deallocate(void* t_chunkPtr)
     {
+        PROFILE_FUNCTION();
         // If given pointer is nullptr just return false
         // because we dont want to waste time, trying to search
         // for arena

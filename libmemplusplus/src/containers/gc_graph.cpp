@@ -25,6 +25,7 @@ namespace mpp {
 
     bool GcGraph::Clear()
     {
+        PROFILE_FUNCTION();
         // delete each vertex from graph
         for (Vertex* vertex : m_adjList) {
             delete vertex;
@@ -37,6 +38,7 @@ namespace mpp {
 
     void GcGraph::AddObjectInfo(GcPtr* t_gcPtr)
     {
+        PROFILE_FUNCTION();
         Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
         Chunk* gcPtrLocationChunk =
           MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(t_gcPtr));
@@ -97,6 +99,7 @@ namespace mpp {
 
     void GcGraph::AddEdge(Vertex* t_from, Vertex* t_to)
     {
+        PROFILE_FUNCTION();
         // Check if we already have starting vertex
         if (m_adjList.find(t_from) == m_adjList.end()) {
             AddVertex(t_from);
@@ -132,6 +135,7 @@ namespace mpp {
     std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>> GcGraph::
       WeaklyConnectedComponents()
     {
+        PROFILE_FUNCTION();
         // initialize weakly connected components
         // Each element in this vector contains isolated subgraph
         std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>>
@@ -163,6 +167,7 @@ namespace mpp {
 
     std::vector<Vertex*> GcGraph::DirectedDFS(Vertex* t_vertex)
     {
+        PROFILE_FUNCTION();
         // Vector of visited vertices using directed DFS
         std::vector<Vertex*> visited;
 
@@ -174,6 +179,7 @@ namespace mpp {
 
     void GcGraph::DDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
     {
+        PROFILE_FUNCTION();
         std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
                                        t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
@@ -187,6 +193,7 @@ namespace mpp {
 
     std::vector<Vertex*> GcGraph::UndirectedDFS(Vertex* t_vertex)
     {
+        PROFILE_FUNCTION();
         // Vector of visited vertices using undirected DFS
         std::vector<Vertex*> visited;
 
@@ -198,6 +205,7 @@ namespace mpp {
 
     void GcGraph::UDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
     {
+        PROFILE_FUNCTION();
         std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
                                        t_vertex->GetNeighbors().end());
         neighbors.insert(neighbors.end(),
@@ -214,6 +222,7 @@ namespace mpp {
 
     Vertex* GcGraph::FindVertex(Chunk* t_chunk)
     {
+        PROFILE_FUNCTION();
         std::unique_ptr<Vertex> vertex = std::make_unique<Vertex>(t_chunk);
         auto foundVertexIt = m_adjList.find(vertex.get());
         if (foundVertexIt != m_adjList.end())

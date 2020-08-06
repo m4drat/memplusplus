@@ -3,6 +3,7 @@
 #include "mpplib/gc.hpp"
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -35,6 +36,7 @@ namespace mpp {
     }
     , m_references{ new uint32_t(1) }
     {
+        PROFILE_FUNCTION();
         AddToGcList();
     }
     catch (...)
@@ -51,6 +53,8 @@ namespace mpp {
         : m_objectPtr{ t_other.m_objectPtr }
         , m_references{ t_other.m_references }
     {
+        PROFILE_FUNCTION();
+
         // Shared ptr copied. Increase references count.
         if (m_references) {
             ++(*m_references);
@@ -66,6 +70,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(SharedGcPtr<Type>&& t_other)
     {
+        PROFILE_FUNCTION();
         Swap(t_other);
     }
 
@@ -73,12 +78,14 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>::~SharedGcPtr()
     {
+        PROFILE_FUNCTION();
         DeleteReference();
     }
 
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr<Type>&& t_other) noexcept
     {
+        PROFILE_FUNCTION();
         if (this != &t_other) {
             Swap(t_other);
         }
@@ -89,6 +96,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(const SharedGcPtr<Type>& t_other)
     {
+        PROFILE_FUNCTION();
         if (this == &t_other) {
             return *this;
         }
@@ -114,6 +122,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(Type* t_newData)
     {
+        PROFILE_FUNCTION();
         // Create temp object
         SharedGcPtr tmp(t_newData);
 
@@ -125,6 +134,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
+        PROFILE_FUNCTION();
         // Just delete reference
         this->DeleteReference();
         return *this;
@@ -189,6 +199,7 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::DeleteFromGcList()
     {
+        PROFILE_FUNCTION();
         // If current object points to nullptr do nothing
         if (m_objectPtr == nullptr)
             return false;
@@ -205,12 +216,14 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::Reset()
     {
+        PROFILE_FUNCTION();
         Reset(nullptr);
     }
 
     template<class Type>
     void SharedGcPtr<Type>::Reset(std::nullptr_t const)
     {
+        PROFILE_FUNCTION();
         DeleteReference();
 
         m_references = new uint32_t(1);
@@ -220,6 +233,7 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::DeleteReference()
     {
+        PROFILE_FUNCTION();
         DeleteFromGcList();
 
         // If m_references isn't nullptr
@@ -248,6 +262,7 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::Swap(SharedGcPtr& t_other)
     {
+        PROFILE_FUNCTION();
         // Current object ptr is nullptr
         // t_other's object ptr isn't nullptr
         if (m_objectPtr == nullptr && t_other.m_objectPtr != nullptr) {
@@ -306,6 +321,7 @@ namespace mpp {
     template<class Type, class... Args>
     SharedGcPtr<Type> MakeSharedGcPtr(Args&&... t_args)
     {
+        PROFILE_FUNCTION();
         return SharedGcPtr<Type>(MemoryAllocator::Allocate<Type>(std::forward<Args>(t_args)...));
     }
 }

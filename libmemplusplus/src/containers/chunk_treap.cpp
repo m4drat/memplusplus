@@ -51,6 +51,7 @@ namespace mpp {
 
     void ChunkTreap::Delete()
     {
+        PROFILE_FUNCTION();
         Delete(m_root);
     }
 
@@ -133,6 +134,7 @@ namespace mpp {
 
     void ChunkTreap::InsertNode(Node* t_node)
     {
+        PROFILE_FUNCTION();
         Node* leftSubtree = nullptr;
         Node* rightSubtree = nullptr;
 
@@ -143,6 +145,7 @@ namespace mpp {
 
     void ChunkTreap::RemoveChunk(Chunk* t_chunk)
     {
+        PROFILE_FUNCTION();
 #if MPP_STATS == 1
         m_freedChunks--;
 #endif
@@ -172,6 +175,7 @@ namespace mpp {
 
     Chunk* ChunkTreap::FirstGreaterOrEqualThan(std::size_t desiredChunkSize) const
     {
+        PROFILE_FUNCTION();
         Node* currentNode = m_root;
 
         while (currentNode) {

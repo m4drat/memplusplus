@@ -38,6 +38,7 @@ namespace mpp {
 
     bool Vertex::RemoveGcPtr(GcPtr* t_gcPtr)
     {
+        PROFILE_FUNCTION();
         // Remove GcPtr pointer from current vertex
         auto toErase = std::find(m_pointingToGcPtrs.begin(), m_pointingToGcPtrs.end(), t_gcPtr);
         if (toErase != m_pointingToGcPtrs.end()) {

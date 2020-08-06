@@ -2,6 +2,7 @@
 
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/containers/vertex.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #include <memory>
 

@@ -30,6 +30,11 @@ namespace mpp { namespace utils { namespace profile {
         Profiler();
 
         /**
+         * @brief Destroy the Profiler object, and write to mpplib-profile if needed
+         */
+        ~Profiler();
+
+        /**
          * @brief Start new profiling session
          * @param t_name session name
          * @param t_filepath profile filename
@@ -40,6 +45,10 @@ namespace mpp { namespace utils { namespace profile {
          * @brief Stop profiling session
          */
         void EndSession();
+
+#if MPP_PROFILE == 1
+        __attribute__((constructor)) void BeginGlobalSession();
+#endif
 
         /**
          * @brief Write info to profile

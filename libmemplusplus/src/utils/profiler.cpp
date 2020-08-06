@@ -6,6 +6,13 @@ namespace mpp { namespace utils { namespace profile {
     {
     }
 
+    Profiler::~Profiler()
+    {
+#if MPP_PROFILE == 1
+        Profiler::Get().EndSession();
+#endif
+    }
+
     void Profiler::BeginSession(const std::string& t_name, const std::string& t_filepath)
     {
         m_OutputStream.open(t_filepath);
@@ -18,6 +25,13 @@ namespace mpp { namespace utils { namespace profile {
         m_OutputStream.close();
         m_ProfileCount = 0;
     }
+
+#if MPP_PROFILE == 1
+    void Profiler::BeginGlobalSession()
+    {
+        Profiler::Get().BeginSession("Mpplib profiling", "mpplib-profiling.json");
+    }
+#endif
 
     void Profiler::WriteProfile(const char* t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId)
     {

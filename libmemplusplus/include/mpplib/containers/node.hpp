@@ -1,6 +1,8 @@
 #pragma once
 
 #include "mpplib/chunk.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
+
 #include <cstdlib>
 #include <utility>
 

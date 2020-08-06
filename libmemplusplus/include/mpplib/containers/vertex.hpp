@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include "mpplib/utils/profiler_definitions.hpp"
 #include <mpplib/chunk.hpp>
 #include <mpplib/gcptr.hpp>
 

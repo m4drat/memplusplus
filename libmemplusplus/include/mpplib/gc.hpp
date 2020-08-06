@@ -7,6 +7,7 @@
 #include "mpplib/heuristics/heuristics.hpp"
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_DEBUG == 1
 #include "mpplib/utils/options.hpp"

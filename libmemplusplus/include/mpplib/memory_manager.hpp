@@ -2,6 +2,7 @@
 
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_COLOUR == 1
 #include "mpplib/utils/colours.hpp"

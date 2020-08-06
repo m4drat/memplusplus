@@ -3,6 +3,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/utils/utils.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_STATS == 1
 #include "mpplib/utils/statistics.hpp"

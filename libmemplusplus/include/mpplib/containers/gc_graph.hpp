@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "mpplib/utils/profiler_definitions.hpp"
 #include "mpplib/containers/vertex.hpp"
 #include "mpplib/memory_manager.hpp"
 

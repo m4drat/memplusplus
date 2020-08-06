@@ -33,7 +33,4 @@ namespace mpp { namespace utils { namespace profile {
          */
         bool m_Stopped;
     };
-
-    #define PROFILE_SCOPE(name) mpp::utils::profile::ProfilerTimer timer##__LINE__(name)
-    #define PROFILE_FUNCTION() PROFILE_SCOPE(__PRETTY_FUNCTION__)
 }}}

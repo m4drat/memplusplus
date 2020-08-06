@@ -2,8 +2,7 @@
 
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
-#include "mpplib/utils/profiler_timer.hpp"
-#include "mpplib/utils/timer.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 #include <memory>
 
 using namespace mpp;
@@ -17,12 +16,10 @@ public:
     UserData(int val)
         : m_data{ val }
     {
-        // std::cout << "Created!\n";
     }
 
     ~UserData()
     {
-        // std::cout << "Deleted!\n";
     }
 
     int GetData()
@@ -30,12 +27,6 @@ public:
         return m_data;
     }
 };
-
-// SharedGcPtr<UserData> foo()
-// {
-//     SharedGcPtr<UserData> p1 = MakeSharedGcPtr<UserData>(1337);
-//     return p1;
-// }
 
 void logic()
 {
@@ -50,43 +41,34 @@ void logic()
     SharedGcPtr<UserData> p4 = MakeSharedGcPtr<UserData>(1341);
     SharedGcPtr<UserData> p5 = MakeSharedGcPtr<UserData>(1342);
 
+    std::vector<SharedGcPtr<UserData>> ptrs;
+
+    for (uint32_t i = 0; i < 10000; ++i)
+        ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
+
+    for (uint32_t i = 0; i < 8000; i++)
+    {
+        ptrs.at(rand() % ptrs.size()) = nullptr;
+    }
+    
     p0 = nullptr;
     p2 = nullptr;
     p4 = nullptr;
 
-    utils::Statistics::DumpStats(std::cout) << std::endl;
-    MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // utils::Statistics::DumpStats(std::cout) << std::endl;
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
 
     std::cout << p1 << p1->GetData() << std::endl;
     std::cout << p3 << p3->GetData() << std::endl;
     std::cout << p5 << p5->GetData() << std::endl;
 
     GC::Collect();
-
-    MemoryManager::VisHeapLayout(std::cout) << std::endl;
-
-    std::cout << p1 << p1->GetData() << std::endl;
-    std::cout << p3 << p3->GetData() << std::endl;
-    std::cout << p5 << p5->GetData() << std::endl;
-
-    utils::Statistics::DumpStats(std::cout) << std::endl;
-
-    SharedGcPtr<char> ptr1((char*)MemoryAllocator::Allocate(64));
-    SharedGcPtr<char> ptr2 = ptr1;
-    ptr1.Swap(ptr2);
-    ptr1.Reset();
-
-    GC::Collect();
-
-    MemoryManager::ResetAllocatorState();
+    // MemoryManager::VisHeapLayout(std::cout) << std::endl;
 }
 
 int main()
 {
-    mpp::utils::profile::Profiler::Get().BeginSession("Example project session");
-
+    PROFILE_FUNCTION();
     logic();
-
-    mpp::utils::profile::Profiler::Get().EndSession();
     return 0;
 }

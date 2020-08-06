@@ -6,6 +6,7 @@
 namespace mpp {
     Arena::Arena(std::size_t t_size, void* t_begin)
     {
+        PROFILE_FUNCTION();
 #if MPP_STATS == 1
         m_ArenaStats = std::make_unique<utils::Statistics::ArenaStats>();
         m_ArenaStats->fullArenaSize = t_size;
@@ -18,6 +19,7 @@ namespace mpp {
 
     Arena::~Arena()
     {
+        PROFILE_FUNCTION();
 #if MPP_STATS == 1
         utils::Statistics::Get().AddArenaStats(std::move(m_ArenaStats));
 #endif
@@ -27,12 +29,14 @@ namespace mpp {
 
     Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize)
     {
+        PROFILE_FUNCTION();
         // Find suitable chunk in treap of freed chunks
         return freedChunks.FirstGreaterOrEqualThan(t_desiredChunkSize);
     }
 
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)
     {
+        PROFILE_FUNCTION();
         // We have enough space in top chunk, so in this case
         // we just need to split it in smaller chunks
         Chunk* chunk = SplitTopChunk(t_chunkSize);
@@ -47,6 +51,7 @@ namespace mpp {
 
     Chunk* Arena::SplitTopChunk(std::size_t t_chunkSize)
     {
+        PROFILE_FUNCTION();
         // Size of requested chunk is equal to size of top chunk
         if (t_chunkSize == topChunk->GetSize()) {
             // Construct new chunk from all memory, that belongs to top chunk
@@ -80,6 +85,7 @@ namespace mpp {
 
     Chunk* Arena::AllocateFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
     {
+        PROFILE_FUNCTION();
         // Extract chunk from free list, and split it if needed
         Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
 
@@ -93,6 +99,7 @@ namespace mpp {
 
     Chunk* Arena::SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
     {
+        PROFILE_FUNCTION();
         // Delete chunk, that we are currently working with from
         // free list
         freedChunks.RemoveChunk(t_chunk);
@@ -180,6 +187,7 @@ namespace mpp {
 
     void Arena::DeallocateChunk(Chunk* t_chunk)
     {
+        PROFILE_FUNCTION();
         // Delete chunk from active chunks
         chunksInUse.erase(t_chunk);
 
@@ -201,6 +209,7 @@ namespace mpp {
     // to point to new chunk
     Chunk* Arena::MergeNeighborsChunks(Chunk* t_chunk)
     {
+        PROFILE_FUNCTION();
         /*
         Legend:
             F - freed
@@ -265,6 +274,7 @@ namespace mpp {
 
     Chunk* Arena::MergeWithTop(Chunk* t_chunk)
     {
+        PROFILE_FUNCTION();
         Chunk* newChunk{ t_chunk };
 
         // Merge backwards
@@ -303,6 +313,7 @@ namespace mpp {
     // excluding chunk size
     Chunk* Arena::MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
     {
+        PROFILE_FUNCTION();
         Chunk* chunk = Chunk::ConstructChunk(
           t_chunk1, t_chunk1->GetPrevSize(), t_chunk1->GetSize() + t_chunk2->GetSize(), 0, 0);
         return chunk;
@@ -310,6 +321,7 @@ namespace mpp {
 
     Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
     {
+        PROFILE_FUNCTION();
         // Try to found in use chunk by ptr in some location
         // inside this chunk
         auto foundChunkIt = utils::LowerBound(
@@ -324,17 +336,20 @@ namespace mpp {
 
     std::size_t Arena::GetUsedSpace()
     {
+        PROFILE_FUNCTION();
         return m_CurrentlyAllocatedSpace;
     }
 
     void Arena::SetUsedSpace(std::size_t t_newSize)
     {
+        PROFILE_FUNCTION();
         m_CurrentlyAllocatedSpace = t_newSize;
     }
 
 #if MPP_STATS == 1
     std::ostream& Arena::DumpArena(std::ostream& t_out, Arena* t_arena)
     {
+        PROFILE_FUNCTION();
         t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena) << " --------------"
               << std::endl;
 

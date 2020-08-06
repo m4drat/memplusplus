@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "mpplib/gcptr.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 namespace mpp {
     /**

@@ -2,6 +2,7 @@
 
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/node.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #include <iostream>
 

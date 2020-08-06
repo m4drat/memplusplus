@@ -7,6 +7,7 @@ namespace mpp {
 
     bool GC::Collect()
     {
+        PROFILE_FUNCTION();
         /*
         1.
             1.1 Divide graph into subgraps (by connected components)

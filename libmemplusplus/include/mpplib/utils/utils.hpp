@@ -3,6 +3,7 @@
 // Utils to create graphical representation
 // of objects graph
 
+#include "mpplib/utils/profiler_definitions.hpp"
 #include <algorithm>
 #include <iostream>
 
@@ -19,6 +20,7 @@ namespace mpp {
         template<class ForwardIt, class T, class Compare>
         ForwardIt LowerBound(ForwardIt first, ForwardIt last, const T& value, Compare comp)
         {
+            PROFILE_FUNCTION();
             ForwardIt it;
             typename std::iterator_traits<ForwardIt>::difference_type count, step;
             count = std::distance(first, last);
@@ -48,6 +50,7 @@ namespace mpp {
         template<class T1, class ForwardIt, class T2, class Compare>
         T1* BinarySearch(ForwardIt first, ForwardIt last, const T2& value, Compare comp)
         {
+            PROFILE_FUNCTION();
             first = std::lower_bound(first, last, value, comp);
             if (!(first == last) && !(comp(value, *first)))
                 return *first;

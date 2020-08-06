@@ -3,6 +3,7 @@
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_STATS == 1
 #include "mpplib/utils/statistics.hpp"
@@ -98,6 +99,7 @@ namespace mpp {
         template<class T, class... Args>
         static T* Allocate(Args&&... t_args)
         {
+            PROFILE_FUNCTION();
             return new (Allocate(sizeof(T))) T(std::forward<Args>(t_args)...);
         }
 
@@ -111,6 +113,7 @@ namespace mpp {
         template<class T>
         static bool Deallocate(T* t_objPtr)
         {
+            PROFILE_FUNCTION();
             if (std::is_destructible<T>::value) {
                 t_objPtr->~T();
             }
