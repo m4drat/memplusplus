@@ -20,12 +20,28 @@ jobs:
     - uses: actions/checkout@v1
     
     - name: configure
-      run: mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Debug -DMPP_BUILD_SHARED_LIBS=OFF -DMPP_ENABLE_COVERAGE=ON ..
-
+      run: |
+        cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DMPP_BUILD_SHARED_LIBS=OFF \
+        -DMPP_ENABLE_COVERAGE=ON \
+        -DMPP_BUILD_FUZZER=OFF \
+        -DMPP_BUILD_EXAMPLE=OFF \
+        -DMPP_BUILD_TESTS=ON \
+        -DMPP_BUILD_DOCS=OFF \
+        -DMPP_BUILD_BENCHMARK=OFF \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
+        -DMPP_SANITIZERS=OFF \
+        -DMPP_BUILD_SHARED_LIBS=OFF \
+        -DMPP_FULL_DEBUG=OFF \
+        -DMPP_SECURE=OFF \
+        -DMPP_PROFILE=OFF \
+        -DMPP_COLOUR=ON \
+        -DMPP_STATS=ON
+    
     - name: build
       run: |
-        cd build 
-        cmake --build . --config Debug -- -j4
+        cmake --build build --config Debug --target all
 
     - name: test
       run: |
