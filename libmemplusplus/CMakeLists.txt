@@ -18,7 +18,7 @@ endif()
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
 option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" OFF)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
-option(MPP_PROFILE "Build mpp with support of profiling" OFF)
+option(MPP_PROFILE "Build mpp with support of profiling" ON)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
 option(MPP_STATS "Build mpp with support of statistics dumping" ON)
 
@@ -118,11 +118,21 @@ list(APPEND MPP_SOURCES
 	src/gc.cpp
 )
 
+################# ADD SPECIFIC SOURCES #################
 if(MPP_DEBUG MATCHES "ON" OR MPP_STATS MATCHES "ON")
 	list(APPEND MPP_SOURCES src/utils/options.cpp)
 endif()
+
 if(MPP_STATS MATCHES "ON")
 	list(APPEND MPP_SOURCES src/utils/statistics.cpp)
+endif()
+
+if(MPP_PROFILE MATCHES "ON" OR MPP_STATS MATCHES "ON")
+	list(APPEND MPP_SOURCES src/utils/timer.cpp)
+	if (MPP_PROFILE MATCHES "ON")
+		list(APPEND MPP_SOURCES src/utils/profiler.cpp)
+		list(APPEND MPP_SOURCES src/utils/profiler_timer.cpp)
+	endif()
 endif()
 
 ################# SET TARGET NAME #################
