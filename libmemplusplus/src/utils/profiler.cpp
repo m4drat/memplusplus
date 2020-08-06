@@ -6,7 +6,7 @@ namespace mpp { namespace utils { namespace profile {
     {
     }
 
-    void Profiler::BeginSession(const std::string& t_name, const std::string& t_filepath = "profile.json")
+    void Profiler::BeginSession(const std::string& t_name, const std::string& t_filepath)
     {
         m_OutputStream.open(t_filepath);
         WriteHeader();
@@ -19,12 +19,12 @@ namespace mpp { namespace utils { namespace profile {
         m_ProfileCount = 0;
     }
 
-    void Profiler::WriteProfile(std::string& t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId)
+    void Profiler::WriteProfile(const char* t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId)
     {
         if (m_ProfileCount++ > 0)
             m_OutputStream << ",";
 
-        std::string name = t_name;
+        std::string name = std::string(t_name);
         std::replace(name.begin(), name.end(), '"', '\'');
 
         m_OutputStream << "{";
@@ -52,7 +52,7 @@ namespace mpp { namespace utils { namespace profile {
         m_OutputStream.flush();
     }
 
-    Profiler& Get()
+    Profiler& Profiler::Get()
     {
         static Profiler s_instance;
         return s_instance;

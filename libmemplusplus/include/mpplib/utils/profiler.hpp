@@ -48,7 +48,7 @@ namespace mpp { namespace utils { namespace profile {
          * @param t_end end time
          * @param t_threadId thread id
          */
-        void WriteProfile(std::string& t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId);
+        void WriteProfile(const char* t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId);
 
         /**
          * @brief Write header to profile file

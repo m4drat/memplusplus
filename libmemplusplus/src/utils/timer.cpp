@@ -1,7 +1,7 @@
 #include "mpplib/utils/timer.hpp"
 
 namespace mpp { namespace utils { namespace profile {
-    Timer::Timer(std::string& t_name)
+    Timer::Timer(const char* t_name)
         : m_Name(t_name)
     {}
 
@@ -27,7 +27,7 @@ namespace mpp { namespace utils { namespace profile {
         return m_EndTimePoint;
     }
 
-    std::string& Timer::GetName()
+    const char* Timer::GetName()
     {
         return m_Name;
     }

@@ -14,7 +14,7 @@ namespace mpp { namespace utils { namespace profile {
          * @brief Construct a new Timer object
          * @param t_name timer name
          */
-        Timer(std::string& t_name);
+        Timer(const char* t_name);
 
         /**
          * @brief Start timer
@@ -44,7 +44,7 @@ namespace mpp { namespace utils { namespace profile {
          * @brief Get name of the timer
          * @return std::string& 
          */
-        std::string& GetName();
+        const char* GetName();
 
         /**
          * @brief Get the elapsed time
@@ -60,7 +60,7 @@ namespace mpp { namespace utils { namespace profile {
         /**
          * @brief Name of the timer
          */
-        std::string m_Name;
+        const char* m_Name;
 
         /**
          * @brief Start time point

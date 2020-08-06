@@ -16,7 +16,7 @@ namespace mpp { namespace utils { namespace profile {
          * @brief Construct a new Profiler Timer object
          * @param t_name name of the timer
          */
-        ProfilerTimer(std::string& t_name);
+        ProfilerTimer(const char* t_name);
 
         /**
          * @brief Destroy the Profiler Timer object
@@ -34,6 +34,6 @@ namespace mpp { namespace utils { namespace profile {
         bool m_Stopped;
     };
 
-    #define PROFILE_SCOPE(name) ProfilerTimer timer##__LINE__(name)
-    #define PROFILE_FUNCTION() PROFILE_SCOPE(__FUNCTION__)
+    #define PROFILE_SCOPE(name) mpp::utils::profile::ProfilerTimer timer##__LINE__(name)
+    #define PROFILE_FUNCTION() PROFILE_SCOPE(__PRETTY_FUNCTION__)
 }}}

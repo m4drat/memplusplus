@@ -2,6 +2,8 @@
 
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/profiler_timer.hpp"
+#include "mpplib/utils/timer.hpp"
 #include <memory>
 
 using namespace mpp;
@@ -35,9 +37,11 @@ public:
 //     return p1;
 // }
 
-int main()
+void logic()
 {
+    PROFILE_FUNCTION();
     using namespace mpp;
+    using namespace std::literals::chrono_literals;
 
     SharedGcPtr<UserData> p0 = MakeSharedGcPtr<UserData>(1337);
     SharedGcPtr<UserData> p1 = MakeSharedGcPtr<UserData>(1338);
@@ -75,6 +79,14 @@ int main()
     GC::Collect();
 
     MemoryManager::ResetAllocatorState();
+}
 
+int main()
+{
+    mpp::utils::profile::Profiler::Get().BeginSession("Example project session");
+
+    logic();
+
+    mpp::utils::profile::Profiler::Get().EndSession();
     return 0;
 }
