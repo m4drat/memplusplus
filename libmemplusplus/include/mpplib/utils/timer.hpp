@@ -49,12 +49,12 @@ namespace mpp { namespace utils { namespace profile {
         /**
          * @brief Get the elapsed time
          * @tparam T - can be any of std::chrono time types (std::chrono::milliseconds, ...)
-         * @return std::chrono::duration<double, T> 
+         * @return std::chrono::duration<double, T>
          */
-        template <class T>
-        std::chrono::duration<double, T> GetElapsed()
+        template <class T=std::chrono::milliseconds>
+        auto GetElapsed() -> auto
         {
-            return std::chrono::duration<double, T>(m_EndTimePoint - m_StartTimepoint);
+            return std::chrono::duration_cast<T>(m_EndTimePoint - m_StartTimepoint);
         }
     private:
         /**

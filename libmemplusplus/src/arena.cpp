@@ -19,7 +19,7 @@ namespace mpp {
     Arena::~Arena()
     {
 #if MPP_STATS == 1
-        utils::s_Stats.AddArenaStats(std::move(m_ArenaStats));
+        utils::Statistics::Get().AddArenaStats(std::move(m_ArenaStats));
 #endif
         chunksInUse.clear();
         MemoryAllocator::SysDealloc(this->begin, size);

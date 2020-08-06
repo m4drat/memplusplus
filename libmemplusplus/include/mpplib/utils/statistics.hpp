@@ -72,7 +72,7 @@ namespace mpp {
                 /**
                  * @brief Time wasted inside GC::Collect()
                  */
-                std::chrono::duration<double, std::chrono::milliseconds> timeWasted;
+                std::chrono::duration<double, std::milli> timeWasted;
             };
 
             /**

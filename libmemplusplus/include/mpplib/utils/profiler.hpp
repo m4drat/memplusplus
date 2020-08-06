@@ -1,15 +1,10 @@
 #pragma once
 
 #include <string>
-#include <chrono>
 #include <algorithm>
 #include <memory>
+#include <memory>
 #include <fstream>
-
-struct InstrumentationSession
-{
-    std::string Name;
-};
 
 namespace mpp { namespace utils { namespace profile {
     /**
