@@ -10,7 +10,7 @@ CXX=/usr/local/clang_9.0.0/bin/clang++ cmake -S . -B build \
 	-DMPP_BUILD_SHARED_LIBS=OFF \
 	-DMPP_FULL_DEBUG=OFF \
 	-DMPP_SECURE=OFF \
-	-DMPP_PROFILE=ON \
+	-DMPP_PROFILE=OFF \
 	-DMPP_COLOUR=ON \
 	-DMPP_STATS=ON
 

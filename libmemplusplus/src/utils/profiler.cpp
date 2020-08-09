@@ -1,4 +1,5 @@
 #include "mpplib/utils/profiler.hpp"
+#include <iostream>
 
 namespace mpp { namespace utils { namespace profile {
     Profiler::Profiler()

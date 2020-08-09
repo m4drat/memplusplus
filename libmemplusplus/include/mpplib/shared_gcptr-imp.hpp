@@ -192,7 +192,7 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::AddToGcList()
     {
-        GC::GetGcPtrs().push_back(this);
+        GC::GetInstance().GetGcPtrs().push_back(this);
         return true;
     }
 
@@ -205,9 +205,9 @@ namespace mpp {
             return false;
 
         // Delete shared ptr from list of all active gc ptrs
-        auto toErase = std::find(GC::GetGcPtrs().begin(), GC::GetGcPtrs().end(), this);
-        if (toErase != GC::GetGcPtrs().end()) {
-            GC::GetGcPtrs().erase(toErase);
+        auto toErase = std::find(GC::GetInstance().GetGcPtrs().begin(), GC::GetInstance().GetGcPtrs().end(), this);
+        if (toErase != GC::GetInstance().GetGcPtrs().end()) {
+            GC::GetInstance().GetGcPtrs().erase(toErase);
             return true;
         }
         return false;

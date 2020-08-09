@@ -21,7 +21,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 #if MPP_STATS == 1
-        utils::Statistics::Get().AddArenaStats(std::move(m_ArenaStats));
+        utils::Statistics::GetInstance().AddArenaStats(std::move(m_ArenaStats));
 #endif
         chunksInUse.clear();
         MemoryAllocator::SysDealloc(this->begin, size);
@@ -354,6 +354,8 @@ namespace mpp {
               << std::endl;
 
         t_out << "MPP - Total arena size           : " << t_arena->size << std::endl;
+        // t_out << "MPP - Total chunks metadata size : " << t_arena->size << std::endl;
+        // t_out << "MPP - Total metadata size        : " << t_arena->size << std::endl;
         t_out << "MPP - Currently Allocated Space  : " << t_arena->m_CurrentlyAllocatedSpace
               << std::endl;
         t_out << "MPP - Amount of free memory      : "

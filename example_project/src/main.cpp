@@ -55,14 +55,14 @@ void logic()
     p2 = nullptr;
     p4 = nullptr;
 
-    // utils::Statistics::DumpStats(std::cout) << std::endl;
+    utils::Statistics::GetInstance().DumpStats(std::cout, true) << std::endl;
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
 
     std::cout << p1 << p1->GetData() << std::endl;
     std::cout << p3 << p3->GetData() << std::endl;
     std::cout << p5 << p5->GetData() << std::endl;
 
-    GC::Collect();
+    GC::GetInstance().Collect();
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
 }
 

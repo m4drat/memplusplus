@@ -86,7 +86,7 @@ Global options:
 
 - `MPP_BUILD_DOCS` - build documentation
 
-- __currently not supported__. `MPP_BUILD_BENCMARK` - build documentation
+- __currently not supported__. `MPP_BUILD_BENCMARK` - build benchmarks
 
 Library options:
 
@@ -145,7 +145,7 @@ Library options:
     ...
 
     // collect all garbage + compact memory (can be called manually)
-    GC::Collect();
+    GC::GetInstance.Collect();
     ```
 
 ## Performance comparisons

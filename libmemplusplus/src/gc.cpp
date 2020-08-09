@@ -1,12 +1,12 @@
 #include "mpplib/gc.hpp"
 
 namespace mpp {
-    std::vector<GcPtr*> GC::s_activeGcPtrs;
-    std::size_t GC::s_garbageSize = 0;
-    std::size_t GC::s_dataSize = 0;
-
     bool GC::Collect()
     {
+#if MPP_STATS == 1
+        utils::profile::Timer timer("GC::Collect()");
+        timer.TimerStart();
+#endif
         PROFILE_FUNCTION();
         /*
         1.
@@ -40,6 +40,10 @@ namespace mpp {
 
         // Layout heap in the most efficient way
         auto layoutedData = heuristics->Layout(objectsGraph);
+
+#if MPP_STATS == 1
+        m_GcStats->activeObjectsTotalSize = layoutedData.second;
+#endif
 
         // Create arena with enough size to fit all objects
         std::size_t godArenaSize = MemoryAllocator::Align(
@@ -102,6 +106,11 @@ namespace mpp {
                 ++it;
             }
         }
+
+#if MPP_STATS == 1
+        timer.TimerEnd();
+        m_GcStats->timeWasted = timer.GetElapsed<std::chrono::milliseconds>();
+#endif
 
         return true;
     }

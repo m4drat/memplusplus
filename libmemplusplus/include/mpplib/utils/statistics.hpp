@@ -51,13 +51,13 @@ namespace mpp {
                  * @brief Chunk headers total size
                  */
                 std::size_t chunksMetadataSize;
-                
+
                 /**
                  * @brief Full amount of memory, that was used for
                  * metadata (chunk treap, active chunks, ...)
                  */
                 std::size_t fullMetadataSize;
-                
+
                 /**
                  * @brief Arena was allocated for big chunk
                  */
@@ -73,6 +73,17 @@ namespace mpp {
                  * @brief Time wasted inside GC::Collect()
                  */
                 std::chrono::duration<double, std::milli> timeWasted;
+
+                /**
+                 * @brief Amount of memory cleaned by GC
+                 */
+                std::size_t memoryCleaned;
+
+                /**
+                 * @brief total size of objects, that
+                 * remained active
+                 */
+                std::size_t activeObjectsTotalSize;
             };
 
             /**
@@ -80,28 +91,34 @@ namespace mpp {
              * @param t_out - std::ostream& to write to
              * @return std::ostream&
              */
-            static std::ostream& DumpArenasGeneralStats(std::ostream& t_out);
+            std::ostream& DumpArenasGeneralStats(std::ostream& t_out);
 
             /**
              * @brief Dump GC stats
              * @param t_out - std::ostream& to write to
              * @return std::ostream&
              */
-            static std::ostream& DumpGcStats(std::ostream& t_out);
+            std::ostream& DumpGcStats(std::ostream& t_out);
 
             /**
              * @brief Dump information about arenas.
              * @param t_out output sream to write to.
              * @return std::ostream& stream reference
              */
-            static std::ostream& DumpStats(std::ostream& t_out);
+            std::ostream& DumpStats(std::ostream& t_out, bool t_dumpActiveArenas);
 
             /**
              * @brief destructor function, that will print all
              * stats (if env MPP_SHOW_STATISTICS=1) after program termination
              */
             static __attribute__((destructor)) void DumpStats();
-            
+
+            /**
+             * @brief Add gc stats to vector of all gc statistics
+             * @param t_arenaStats std::unique_ptr<GcStats>
+             */
+            void AddGcCycleStats(std::unique_ptr<GcStats> t_gcCycleStats);
+
             /**
              * @brief Add arena stats to vector of all arena statistics
              * @param t_arenaStats std::unique_ptr<ArenaStats>
@@ -112,7 +129,7 @@ namespace mpp {
              * @brief Get Gc stats
              * @return std::unique_ptr<GcStats>& 
              */
-            std::unique_ptr<GcStats>& GetGcStats();
+            std::vector<std::unique_ptr<Statistics::GcStats>>& GetGcStats();
             
             /**
              * @brief Get the vector of arena stats
@@ -124,7 +141,7 @@ namespace mpp {
              * @brief Return static instance of statistics object
              * @return Statistics 
              */
-            static Statistics& Get();
+            static Statistics& GetInstance();
 
         private:
             /**
@@ -135,7 +152,7 @@ namespace mpp {
             /**
              * @brief Garbage Collector stats 
              */
-            std::unique_ptr<GcStats> m_GcStats;
+            std::vector<std::unique_ptr<GcStats>> m_GcCyclesStats;
         };
     }
 }

@@ -9,6 +9,11 @@
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
+#if MPP_STATS == 1
+#include "mpplib/utils/statistics.hpp"
+#include "mpplib/utils/timer.hpp"
+#endif
+
 #if MPP_DEBUG == 1
 #include "mpplib/utils/options.hpp"
 #include <fstream>
@@ -31,37 +36,50 @@ namespace mpp {
          * All GcPtr's that are currently used in program adds to this list, to keep track
          * of them.
          */
-        static std::vector<GcPtr*> s_activeGcPtrs;
+        std::vector<GcPtr*> s_activeGcPtrs;
+        
         /**
          * @brief size of garbage, cleaned last time.
          */
-        static std::size_t s_garbageSize;
+        std::size_t s_garbageSize { 0 };
+        
         /**
          * @brief Required size of memory block, to save all user data in.
          */
-        static std::size_t s_dataSize;
+        std::size_t s_dataSize { 0 };
+
+#if MPP_STATS == 1
+        /**
+         * @brief Used to keep track of garbage collector stats  
+         */
+        std::unique_ptr<utils::Statistics::GcStats> m_GcStats;
+#endif
 
     public:
         /**
          * @brief Collect garbage.
          *
-         * This method will construct graph of all inuse chunks.
+         * This method will construct graph of all in use chunks.
          * Then it will create Heuristics object to relayout data in most efficient way.
          * After that, it will move all data to newly created arena, updating
          * corresponding gcptr's. And in the end it will destroy unused arenas.
          * @return true if everything is good, false - otherwise
          */
-        static bool Collect();
+        bool Collect();
 
         /**
          * @brief Get reference to vector of currently active GcPtr's
          * @return std::vector<GcPtr*>& of currently used GcPtr's
          */
-        static std::vector<GcPtr*>& GetGcPtrs()
+        std::vector<GcPtr*>& GetGcPtrs()
         {
             return s_activeGcPtrs;
         }
 
-        // static std::string GetObjectsGraphDot();
+        static GC& GetInstance()
+        {
+            static GC gcInstance;
+            return gcInstance;
+        }
     };
 }

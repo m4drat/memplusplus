@@ -1,8 +1,8 @@
 ################# SET UP PROJECT + VERSION #################
 project(mpp LANGUAGES CXX)
-set(VERSION_MAJOR 1)
-set(VERSION_MINOR 2)
-set(VERSION_PATCH 0)
+set(VERSION_MAJOR 2)
+set(VERSION_MINOR 3)
+set(VERSION_PATCH 5)
 set(MPP_VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH})
 
 ################# CHECK IF IT IS LINUX #################
@@ -18,7 +18,7 @@ endif()
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
 option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" OFF)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
-option(MPP_PROFILE "Build mpp with support of profiling" ON)
+option(MPP_PROFILE "Build mpp with support of profiling" OFF)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
 option(MPP_STATS "Build mpp with support of statistics dumping" ON)
 
