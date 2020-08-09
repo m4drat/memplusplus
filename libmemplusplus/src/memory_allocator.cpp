@@ -60,7 +60,16 @@ namespace mpp {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
             if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
-                return arena->AllocateFromTopChunk(t_realSize);
+                Chunk* chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
+#if MPP_STATS == 1
+                if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
+                    arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
+                }
+                if (chunkToReturn->GetSize() < arena->m_ArenaStats->smallestAllocation) {
+                    arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
+                }
+#endif
+                return chunkToReturn;
             }
         }
 
@@ -71,10 +80,19 @@ namespace mpp {
             if (chunk == nullptr) {
                 continue;
             }
-            return arena->AllocateFromFreeList(chunk, t_realSize);
+            Chunk* chunkToReturn = arena->AllocateFromFreeList(chunk, t_realSize);
+#if MPP_STATS == 1
+            if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
+                arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
+            }
+            if (chunkToReturn->GetSize() < arena->m_ArenaStats->smallestAllocation) {
+                arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
+            }
+#endif
+            return chunkToReturn;
         }
 
-        // Of we still cant find chunk, we will return nullptr
+        // If we still cant find chunk, we will return nullptr
         // to show that we dont have arena, to allocate from
         return nullptr;
     }
@@ -84,6 +102,9 @@ namespace mpp {
         PROFILE_FUNCTION();
         // Create new arena with requested size
         Arena* arena = CreateArena(t_userDataSize);
+#if MPP_STATS == 1
+        arena->m_ArenaStats->bigArena = true;
+#endif
 
         // Allocate chunk from right space of that arena
         Chunk* bigChungus = arena->AllocateFromTopChunk(t_userDataSize);

@@ -315,7 +315,12 @@ namespace mpp {
         } else {
             t_out << "nullptr";
         }
-        return t_out << ", " << *m_references << ")";
+        if (m_references != nullptr) {
+            t_out << ", " << *m_references << ")";
+        } else {
+            t_out << ", nullptr)";
+        }
+        return t_out;
     }
 
     template<class Type, class... Args>

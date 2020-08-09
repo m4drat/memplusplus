@@ -101,6 +101,13 @@ namespace mpp {
         uint32_t GetFreedChunksSize();
 
         /**
+         * @brief Get the amount of total memory held by chunks
+         * inside chunk treap
+         * @return std::size_t total amount of freed memory 
+         */
+        std::size_t GetAmountOfFreedMemory();
+
+        /**
          * @brief Generates tree representation in form, that can be used in dot
          * (graphviz), to visualize tree structure.
          *
@@ -114,12 +121,17 @@ namespace mpp {
          */
         Node* m_root;
 
-#if MPP_STATS == 1
         /**
          * @brief Keeps track of amount of freed chunks.
          */
         uint32_t m_freedChunks;
-#endif
+
+        /**
+         * @brief keeps track of total amount
+         * of freed memory inside ChunkTreap
+         */
+        std::size_t m_freedMemory;
+
         /**
          * @brief Inserts new node into ctreap.
          * @param t_node node to insert into chunk treap

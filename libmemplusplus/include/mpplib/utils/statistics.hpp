@@ -1,9 +1,12 @@
 #pragma once
 
 #include <iostream>
+#include <iomanip>
+#include <string>
 #include <memory>
 #include <vector>
 #include <chrono>
+#include <cmath>
 
 #include "mpplib/utils/options.hpp"
 
@@ -48,20 +51,14 @@ namespace mpp {
                 std::size_t fullArenaSize;
 
                 /**
-                 * @brief Chunk headers total size
-                 */
-                std::size_t chunksMetadataSize;
-
-                /**
-                 * @brief Full amount of memory, that was used for
-                 * metadata (chunk treap, active chunks, ...)
-                 */
-                std::size_t fullMetadataSize;
-
-                /**
                  * @brief Arena was allocated for big chunk
                  */
                 bool bigArena;
+
+                /**
+                 * @brief Arena was created by GC
+                 */
+                bool gcCreatedArena;
             };
 
             /**
@@ -87,6 +84,20 @@ namespace mpp {
             };
 
             /**
+             * @brief Destroy the Statistics object
+             * and call DumpStats (if env MPP_SHOW_STATISTICS=1) after program termination
+             */
+            ~Statistics();
+
+            /**
+             * @brief Get size in bytes converted to appropriate unit (mb, kb, ...)
+             * @param t_bytes size in bytes
+             * @param decimals number of signs after comma
+             * @return std::string size in a specific unit
+             */
+            static std::string FormattedSize(std::size_t t_bytes, uint32_t t_decimals = 3);
+
+            /**
              * @brief Dump all arenas general stats
              * @param t_out - std::ostream& to write to
              * @return std::ostream&
@@ -103,15 +114,12 @@ namespace mpp {
             /**
              * @brief Dump information about arenas.
              * @param t_out output sream to write to.
+             * @param t_dumpActiveArenas dump active arenas.
+             * @param t_DumpFreedChunks dump freed chunks.
+             * @param t_DumpInUseChunks dump in use chunks.
              * @return std::ostream& stream reference
              */
-            std::ostream& DumpStats(std::ostream& t_out, bool t_dumpActiveArenas);
-
-            /**
-             * @brief destructor function, that will print all
-             * stats (if env MPP_SHOW_STATISTICS=1) after program termination
-             */
-            static __attribute__((destructor)) void DumpStats();
+            std::ostream& DumpStats(std::ostream& t_out, bool t_dumpActiveArenas, bool t_DumpFreedChunks, bool t_DumpInUseChunks);
 
             /**
              * @brief Add gc stats to vector of all gc statistics
@@ -123,7 +131,7 @@ namespace mpp {
              * @brief Add arena stats to vector of all arena statistics
              * @param t_arenaStats std::unique_ptr<ArenaStats>
              */
-            void AddArenaStats(std::unique_ptr<ArenaStats> t_arenaStats);
+            void AddArenaStats(std::shared_ptr<ArenaStats> t_arenaStats);
 
             /**
              * @brief Get Gc stats
@@ -135,7 +143,7 @@ namespace mpp {
              * @brief Get the vector of arena stats
              * @return std::vector<std::unique_ptr<ArenaStats>>& 
              */
-            std::vector<std::unique_ptr<ArenaStats>>& GetArenaStats();
+            std::vector<std::shared_ptr<ArenaStats>>& GetArenaStats();
 
             /**
              * @brief Return static instance of statistics object
@@ -147,7 +155,7 @@ namespace mpp {
             /**
              * @brief vector of all arenas statistics 
              */
-            std::vector<std::unique_ptr<ArenaStats>> m_ArenasStats;
+            std::vector<std::shared_ptr<ArenaStats>> m_ArenasStats;
             
             /**
              * @brief Garbage Collector stats 

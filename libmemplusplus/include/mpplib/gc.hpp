@@ -57,6 +57,11 @@ namespace mpp {
 
     public:
         /**
+         * @brief Construct a new GC object
+         */
+        GC();
+
+        /**
          * @brief Collect garbage.
          *
          * This method will construct graph of all in use chunks.

@@ -1,6 +1,10 @@
 #include "mpplib/gc.hpp"
 
 namespace mpp {
+    GC::GC() {
+        m_GcStats = std::make_unique<utils::Statistics::GcStats>();
+    }
+
     bool GC::Collect()
     {
 #if MPP_STATS == 1
@@ -41,15 +45,16 @@ namespace mpp {
         // Layout heap in the most efficient way
         auto layoutedData = heuristics->Layout(objectsGraph);
 
-#if MPP_STATS == 1
-        m_GcStats->activeObjectsTotalSize = layoutedData.second;
-#endif
-
         // Create arena with enough size to fit all objects
         std::size_t godArenaSize = MemoryAllocator::Align(
           (layoutedData.second < g_DEFAULT_ARENA_SIZE) ? g_DEFAULT_ARENA_SIZE : layoutedData.second,
           g_PAGE_SIZE);
         Arena* godArena = MemoryAllocator::CreateArena(godArenaSize);
+
+#if MPP_STATS == 1
+        m_GcStats->activeObjectsTotalSize = layoutedData.second;
+        godArena->m_ArenaStats->gcCreatedArena = true;
+#endif
 
         void* currPtr{ godArena->begin };
         Chunk* currChunk{ nullptr };
@@ -60,6 +65,10 @@ namespace mpp {
         for (auto vertex : layoutedData.first.get()) {
             // Extract size of chunk
             currSize = vertex->GetCorrespondingChunk()->GetSize();
+
+#if MPP_STATS == 1
+            godArena->m_ArenaStats->totalAllocated += currSize;
+#endif
 
             // Copy chunk data to new location
             std::memcpy(
@@ -99,6 +108,9 @@ namespace mpp {
         auto it = s_ArenaList.begin();
         while (it != s_ArenaList.end()) {
             if (*it != godArena) {
+#if MPP_STATS == 1
+                m_GcStats->memoryCleaned += (*it)->FreeMemoryInsideChunkTreap();
+#endif
                 delete *it;
                 *it = nullptr;
                 it = s_ArenaList.erase(it);
@@ -110,6 +122,8 @@ namespace mpp {
 #if MPP_STATS == 1
         timer.TimerEnd();
         m_GcStats->timeWasted = timer.GetElapsed<std::chrono::milliseconds>();
+        utils::Statistics::GetInstance().AddGcCycleStats(std::move(m_GcStats));
+        m_GcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
 
         return true;

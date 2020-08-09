@@ -11,6 +11,7 @@ class UserData
 {
 private:
     int m_data{ 0 };
+    char data[2048];
 
 public:
     UserData(int val)
@@ -30,7 +31,6 @@ public:
 
 void logic()
 {
-    PROFILE_FUNCTION();
     using namespace mpp;
     using namespace std::literals::chrono_literals;
 
@@ -41,34 +41,52 @@ void logic()
     SharedGcPtr<UserData> p4 = MakeSharedGcPtr<UserData>(1341);
     SharedGcPtr<UserData> p5 = MakeSharedGcPtr<UserData>(1342);
 
-    std::vector<SharedGcPtr<UserData>> ptrs;
+    // std::vector<SharedGcPtr<UserData>> ptrs;
 
-    for (uint32_t i = 0; i < 10000; ++i)
-        ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
+    // void* p0 = MemoryAllocator::Allocate(1024);
+    // void* p1 = MemoryAllocator::Allocate(1024);
+    // void* p2 = MemoryAllocator::Allocate(1024);
+    // void* p3 = MemoryAllocator::Allocate(1024);
+    // void* p4 = MemoryAllocator::Allocate(15);
 
-    for (uint32_t i = 0; i < 8000; i++)
-    {
-        ptrs.at(rand() % ptrs.size()) = nullptr;
-    }
-    
-    p0 = nullptr;
     p2 = nullptr;
     p4 = nullptr;
 
-    utils::Statistics::GetInstance().DumpStats(std::cout, true) << std::endl;
+    // MemoryAllocator::Deallocate(p0);
+    // MemoryAllocator::Deallocate(p1);
+    // MemoryAllocator::Deallocate(p2);
+    // MemoryAllocator::Deallocate(p3);
+    // MemoryAllocator::Deallocate(p4);
+    // MemoryAllocator::Deallocate(p4);
+
+    // for (uint32_t i = 0; i < 10000; ++i)
+    //     ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
+
+    // for (uint32_t i = 0; i < 8000; i++)
+    // {
+    //     ptrs.at(rand() % ptrs.size()) = nullptr;
+    // }
+
+    // GC::GetInstance().Collect();
+
+    // p1 = nullptr;
+    // p2 = nullptr;
+
+    // SharedGcPtr<UserData> p5 = MakeSharedGcPtr<UserData>(1342);
+    // utils::Statistics::GetInstance().DumpStats(std::cout, true) << std::endl;
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
 
-    std::cout << p1 << p1->GetData() << std::endl;
-    std::cout << p3 << p3->GetData() << std::endl;
-    std::cout << p5 << p5->GetData() << std::endl;
+    // std::cout << p1 << p1->GetData() << std::endl;
+    // std::cout << p3 << p3->GetData() << std::endl;
+    // std::cout << p5 << p5->GetData() << std::endl;
 
     GC::GetInstance().Collect();
     // MemoryManager::VisHeapLayout(std::cout) << std::endl;
+    // utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
 }
 
 int main()
 {
-    PROFILE_FUNCTION();
     logic();
     return 0;
 }

@@ -5,6 +5,7 @@ namespace mpp {
     ChunkTreap::ChunkTreap()
         : m_root{ nullptr }
         , m_freedChunks{ 0 }
+        , m_freedMemory{ 0 }
     {}
 
     // TODO - smart pointers memory managment
@@ -77,6 +78,11 @@ namespace mpp {
         return m_freedChunks;
     }
 
+    std::size_t ChunkTreap::GetAmountOfFreedMemory()
+    {
+        return m_freedMemory;
+    }
+
     // TODO
     // https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
     // std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
@@ -125,9 +131,9 @@ namespace mpp {
 
     void ChunkTreap::InsertChunk(Chunk* t_chunk)
     {
-#if MPP_STATS == 1
         m_freedChunks++;
-#endif
+        m_freedMemory += t_chunk->GetSize();
+
         // TODO - smart pointers memory managment
         InsertNode(new Node(t_chunk));
     }
@@ -146,9 +152,9 @@ namespace mpp {
     void ChunkTreap::RemoveChunk(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
-#if MPP_STATS == 1
         m_freedChunks--;
-#endif
+        m_freedMemory -= t_chunk->GetSize();
+
         Node* leftSubtree = nullptr;
         Node* rightSubtree = nullptr;
 

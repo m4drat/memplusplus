@@ -9,6 +9,8 @@
 #include "mpplib/utils/statistics.hpp"
 #endif
 
+#include <limits>
+#include <iomanip>
 #include <cstddef>
 #include <memory>
 #include <set>
@@ -25,13 +27,12 @@ namespace mpp {
          * @brief Currently used space in arena.
          */
         std::size_t m_CurrentlyAllocatedSpace{ 0 };
-
     public:
 #if MPP_STATS == 1
         /**
          * @brief Unique ptr with arena metadata to use with Statistics.
          */
-        std::unique_ptr<utils::Statistics::ArenaStats> m_ArenaStats;
+        std::shared_ptr<utils::Statistics::ArenaStats> m_ArenaStats;
 #endif
 
         /**
@@ -77,6 +78,12 @@ namespace mpp {
          * Deletes chunksInUse, freedChunks, and munmaps allocated memory page.
          */
         ~Arena();
+
+        /**
+         * @brief Returns amount of freed memory inside chunk treap
+         * @return std::size_t amount of memory
+         */
+        std::size_t FreeMemoryInsideChunkTreap();
 
         /**
          * @brief Get currently used space.
@@ -210,9 +217,11 @@ namespace mpp {
          * @brief Dump arena statistics in human-readable format.
          * @param t_out file stream, to write to. (std::cout / std::ofstream)
          * @param t_arena arena, that is going to be dumped.
+         * @param t_DumpFreedChunks dump all freed chunks
+         * @param t_DempInUseChunks dump all in use chunks
          * @return std::ostream, that earlier was passed as t_out
          */
-        static std::ostream& DumpArena(std::ostream& t_out, Arena* t_arena);
+        static std::ostream& DumpArena(std::ostream& t_out, Arena* t_arena, bool t_DumpFreedChunks, bool t_DumpInUseChunks);
 #endif
     };
 }
