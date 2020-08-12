@@ -70,7 +70,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
     target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE lib::mpp)
     ```
 
-3. After that you will be able to include library headers in your sources like that: `#include <mpplib/mpp.hpp>`
+3. After that you will be able to include library headers in your sources like that: `#include "mpplib/mpp.hpp"`
 
 ## Build options
 
@@ -108,7 +108,7 @@ Library options:
 
 - `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only exists in debug mode)
 
-- __currently not supported__. `MPP_SHOW_STATISTICS=1` - display statistics after program termination (should be built with `MPP_STATS` set to ON)
+- `MPP_SHOW_STATISTICS=1` - display statistics after program termination (should be built with `MPP_STATS` set to ON)
 
 ## Examples
 
@@ -145,7 +145,7 @@ Library options:
     ...
 
     // collect all garbage + compact memory (can be called manually)
-    GC::GetInstance.Collect();
+    GC::GetInstance().Collect();
     ```
 
 ## Performance comparisons
