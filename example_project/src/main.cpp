@@ -16,12 +16,10 @@ private:
 public:
     UserData(int val)
         : m_data{ val }
-    {
-    }
+    {}
 
     ~UserData()
-    {
-    }
+    {}
 
     int GetData()
     {
@@ -57,8 +55,7 @@ void logic()
     for (uint32_t i = 0; i < 17000; ++i)
         ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
 
-    for (uint32_t i = 0; i < 16000; i++)
-    {
+    for (uint32_t i = 0; i < 16000; i++) {
         ptrs.at(rand() % ptrs.size()) = nullptr;
     }
     GC::GetInstance().Collect();

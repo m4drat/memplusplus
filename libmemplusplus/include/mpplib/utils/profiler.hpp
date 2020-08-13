@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
 #include <algorithm>
-#include <memory>
-#include <memory>
 #include <fstream>
+#include <memory>
+#include <string>
 
 namespace mpp { namespace utils { namespace profile {
     /**
@@ -39,7 +38,8 @@ namespace mpp { namespace utils { namespace profile {
          * @param t_name session name
          * @param t_filepath profile filename
          */
-        void BeginSession(const std::string& t_name, const std::string& t_filepath = "profile.json");
+        void BeginSession(const std::string& t_name,
+                          const std::string& t_filepath = "profile.json");
 
         /**
          * @brief Stop profiling session
@@ -52,7 +52,7 @@ namespace mpp { namespace utils { namespace profile {
 
         /**
          * @brief Write info to profile
-         * @param t_name timestamp name 
+         * @param t_name timestamp name
          * @param t_start start time
          * @param t_end end time
          * @param t_threadId thread id
@@ -71,7 +71,7 @@ namespace mpp { namespace utils { namespace profile {
 
         /**
          * @brief Get static instance
-         * @return Profiler& 
+         * @return Profiler&
          */
         static Profiler& Get();
     };

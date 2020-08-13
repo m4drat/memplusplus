@@ -7,7 +7,7 @@
 
 namespace mpp { namespace utils { namespace profile {
     /**
-     * @brief Extended timer, to automate profiling 
+     * @brief Extended timer, to automate profiling
      */
     class ProfilerTimer : public Timer
     {
@@ -27,6 +27,7 @@ namespace mpp { namespace utils { namespace profile {
          * @brief stop the profiler timer
          */
         void Stop();
+
     private:
         /**
          * @brief is profiler timer stopped

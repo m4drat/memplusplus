@@ -14,7 +14,7 @@ namespace mpp { namespace utils { namespace profile {
     Timer& Timer::TimerEnd()
     {
         m_EndTimePoint = std::chrono::high_resolution_clock::now();
-        return *this;   
+        return *this;
     }
 
     std::chrono::time_point<std::chrono::high_resolution_clock> Timer::GetStartTimepoint()

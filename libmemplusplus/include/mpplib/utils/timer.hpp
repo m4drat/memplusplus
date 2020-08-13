@@ -18,31 +18,31 @@ namespace mpp { namespace utils { namespace profile {
 
         /**
          * @brief Start timer
-         * @return Timer& 
+         * @return Timer&
          */
         Timer& TimerStart();
 
         /**
          * @brief Stop timer
-         * @return Timer& 
+         * @return Timer&
          */
         Timer& TimerEnd();
 
         /**
          * @brief Get the start timepoint
-         * @return std::chrono::time_point<std::chrono::high_resolution_clock> 
+         * @return std::chrono::time_point<std::chrono::high_resolution_clock>
          */
         std::chrono::time_point<std::chrono::high_resolution_clock> GetStartTimepoint();
 
         /**
          * @brief Get the end timepoint
-         * @return std::chrono::time_point<std::chrono::high_resolution_clock> 
+         * @return std::chrono::time_point<std::chrono::high_resolution_clock>
          */
         std::chrono::time_point<std::chrono::high_resolution_clock> GetEndTimepoint();
 
         /**
          * @brief Get name of the timer
-         * @return std::string& 
+         * @return std::string&
          */
         const char* GetName();
 
@@ -51,11 +51,12 @@ namespace mpp { namespace utils { namespace profile {
          * @tparam T - can be any of std::chrono time types (std::chrono::milliseconds, ...)
          * @return std::chrono::duration<double, T>
          */
-        template <class T=std::chrono::milliseconds>
+        template<class T = std::chrono::milliseconds>
         auto GetElapsed() -> auto
         {
             return std::chrono::duration_cast<T>(m_EndTimePoint - m_StartTimepoint);
         }
+
     private:
         /**
          * @brief Name of the timer

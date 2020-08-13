@@ -1,3 +1,4 @@
 #include "mpplib/utils/utils.hpp"
 
-namespace mpp {}
+namespace mpp {
+}

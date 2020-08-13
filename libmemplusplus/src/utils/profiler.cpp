@@ -4,8 +4,7 @@
 namespace mpp { namespace utils { namespace profile {
     Profiler::Profiler()
         : m_ProfileCount(0)
-    {
-    }
+    {}
 
     Profiler::~Profiler()
     {
@@ -20,7 +19,7 @@ namespace mpp { namespace utils { namespace profile {
         WriteHeader();
     }
 
-    void Profiler::EndSession() 
+    void Profiler::EndSession()
     {
         WriteFooter();
         m_OutputStream.close();
@@ -34,7 +33,10 @@ namespace mpp { namespace utils { namespace profile {
     }
 #endif
 
-    void Profiler::WriteProfile(const char* t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId)
+    void Profiler::WriteProfile(const char* t_name,
+                                int64_t t_start,
+                                int64_t t_end,
+                                uint32_t t_threadId)
     {
         if (m_ProfileCount++ > 0)
             m_OutputStream << ",";
