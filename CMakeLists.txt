@@ -44,6 +44,7 @@ endif()
 
 if (MPP_BUILD_FUZZER)
 	message(STATUS "[+] Building with fuzzer support! Library will be build with sanitizers!")
+	enable_testing()
 	target_compile_options(mpp INTERFACE -fsanitize=address -g -O2 -fno-omit-frame-pointer)
 	target_link_libraries(mpp INTERFACE -fsanitize=address)
 	add_subdirectory(fuzzer)
