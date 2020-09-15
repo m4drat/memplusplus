@@ -78,7 +78,9 @@
 			"typeindex": "cpp",
 			"valarray": "cpp",
 			"filesystem": "cpp",
-			"any": "cpp"
+			"any": "cpp",
+			"bit": "cpp",
+			"queue": "cpp"
 		}
 	}
 }

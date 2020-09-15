@@ -5,6 +5,10 @@
 
 C++ memory allocator with smart features, such as garbage collection, and heap compacting.
 
+## Current version
+
+Curren library version: 2.3.5
+
 ## Features
 
 - Garbage Collecting
@@ -51,7 +55,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
     cmake_minimum_required(VERSION 3.13)
     project(<YOUR_PROJECT_NAME>)
 
-    find_package(mpp 1.0.0 REQUIRED)
+    find_package(mpp 2.3.5 REQUIRED)
 
     add_executable(<YOUR_PROJECT_NAME> <YOUR_SOURCES>)
     target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE mpp::mpp)

@@ -3,7 +3,9 @@
 namespace mpp {
 GC::GC()
 {
+#if MPP_STATS == 1
     m_GcStats = std::make_unique<utils::Statistics::GcStats>();
+#endif
 }
 
 bool GC::Collect()

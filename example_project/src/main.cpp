@@ -1,12 +1,12 @@
+#include <fstream>
 #include <iostream>
+#include <memory>
 
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
-#include <memory>
 
 using namespace mpp;
-
 class UserData
 {
 private:
@@ -51,16 +51,29 @@ void logic()
     // p4 = nullptr;
     // p5 = nullptr;
 
-    std::vector<SharedGcPtr<UserData>> ptrs;
-    for (uint32_t i = 0; i < 17000; ++i)
-        ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
+    // std::vector<SharedGcPtr<UserData>> ptrs;
+    // for (uint32_t i = 0; i < 17000; ++i)
+    //     ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
 
-    for (uint32_t i = 0; i < 16000; i++) {
-        ptrs.at(rand() % ptrs.size()) = nullptr;
+    // for (uint32_t i = 0; i < 16000; i++) {
+    //     ptrs.at(rand() % ptrs.size()) = nullptr;
+    // }
+    // GC::GetInstance().Collect();
+
+    // utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
+    void* p0 = MemoryAllocator::Allocate(1 << 31);
+
+    std::fstream maps("/proc/self/maps");
+    std::string line;
+    
+    if (maps.is_open())
+    {
+        while ( getline(maps, line) )
+        {
+            std::cout << line << '\n';
+        }
+        maps.close();
     }
-    GC::GetInstance().Collect();
-
-    utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
 }
 
 int main()
