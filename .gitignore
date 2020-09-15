@@ -8,7 +8,7 @@
 /fuzzer/fuzzer_utils/**
 
 mpplib-profiling.json
-
+/crash-**
 profile.json
 
 .gdb_history
