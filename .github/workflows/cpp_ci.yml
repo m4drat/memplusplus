@@ -21,11 +21,11 @@ jobs:
     
     - name: configure
       run: |
-        cmake -S . -B build \
+        CXX=clang++ cmake -S . -B build \
         -DCMAKE_BUILD_TYPE=Debug \
         -DMPP_BUILD_SHARED_LIBS=OFF \
         -DMPP_ENABLE_COVERAGE=ON \
-        -DMPP_BUILD_FUZZER=OFF \
+        -DMPP_BUILD_FUZZER=ON \
         -DMPP_BUILD_EXAMPLE=OFF \
         -DMPP_BUILD_TESTS=ON \
         -DMPP_BUILD_DOCS=OFF \
@@ -41,7 +41,7 @@ jobs:
     
     - name: build
       run: |
-        cmake --build build --config Debug --target all
+        CXX=clang++ cmake --build build --config Debug --target all
 
     - name: test
       run: |
