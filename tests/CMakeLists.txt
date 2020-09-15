@@ -17,4 +17,4 @@ target_link_libraries(${PROJECT_NAME}
     Catch2::Test
 )
 
-add_test(test_all ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME})
+add_test(unit_tester ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME})

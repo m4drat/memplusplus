@@ -51,7 +51,7 @@ namespace mpp { namespace fuzzer {
             {
             case 0x61 /* Allocate */: {
                 std::string allocSize = ParseNumber(currentDataPtr + 1, dataEnd);
-                if (std::stoull(allocSize) == -1 || std::stoull(allocSize) > 67109888)
+                if (allocSize.length() > 8 || std::stoull(allocSize) == -1 || std::stoull(allocSize) > 67109888)
                 {
                     currentCommand = std::make_pair(Tokens::Invalid, 0);
                     break;
