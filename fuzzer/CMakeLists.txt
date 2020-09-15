@@ -17,3 +17,9 @@ target_compile_options(${PROJECT_NAME} PRIVATE -g -O1 -fsanitize=fuzzer,address)
 target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -fsanitize=fuzzer)
 # target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
 # target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp)
+
+set(FUZZ_RUNTIME
+    30
+    CACHE STRING "Number of seconds to run fuzz tests during ctest run") # Default of 10 seconds
+
+add_test(NAME fuzz_tester_run COMMAND fuzzer ./corpus -max_total_time=${FUZZ_RUNTIME})
