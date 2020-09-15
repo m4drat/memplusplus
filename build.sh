@@ -12,6 +12,6 @@ CXX=/usr/local/clang_9.0.0/bin/clang++ cmake -S . -B build \
 	-DMPP_SECURE=OFF \
 	-DMPP_PROFILE=OFF \
 	-DMPP_COLOUR=ON \
-	-DMPP_STATS=OFF
+	-DMPP_STATS=ON
 
 CXX=/usr/local/clang_9.0.0/bin/clang++ cmake --build build --config Debug --target all

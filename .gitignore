@@ -5,6 +5,8 @@
 /fuzzer/corpus/**
 !/fuzzer/corpus/testcase1.txt
 
+/fuzzer/fuzzer_utils/**
+
 mpplib-profiling.json
 
 profile.json

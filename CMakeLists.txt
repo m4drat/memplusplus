@@ -19,7 +19,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Cla
 	option(MPP_ENABLE_COVERAGE "Enable coverage reporting for gcc/clang" OFF)
 endif()
 
-option(MPP_BUILD_FUZZER "Build mpp fuzzing harness" ON)
+option(MPP_BUILD_FUZZER "Build mpp fuzzing harness" OFF)
 option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
@@ -44,7 +44,7 @@ endif()
 
 if (MPP_BUILD_FUZZER)
 	message(STATUS "[+] Building with fuzzer support! Library will be build with sanitizers!")
-	enable_testing()
+	# enable_testing()
 	target_compile_options(mpp INTERFACE -fsanitize=address -g -O2 -fno-omit-frame-pointer)
 	target_link_libraries(mpp INTERFACE -fsanitize=address)
 	add_subdirectory(fuzzer)
