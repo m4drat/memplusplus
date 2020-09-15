@@ -22,4 +22,4 @@ set(FUZZ_RUNTIME
     30
     CACHE STRING "Number of seconds to run fuzz tests during ctest run") # Default of 10 seconds
 
-add_test(NAME fuzz_tester_run COMMAND ASAN_OPTIONS=detect_leaks=0 ./fuzzer/fuzzer ../fuzzer/corpus -max_total_time=${FUZZ_RUNTIME})
+add_test(NAME fuzz_tester_run COMMAND ./fuzzer/fuzzer ../fuzzer/corpus -max_total_time=${FUZZ_RUNTIME})

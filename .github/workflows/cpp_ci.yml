@@ -46,7 +46,7 @@ jobs:
     - name: test
       run: |
         cd build
-        ctest --build-config Debug
+        ASAN_OPTIONS=detect_leaks=0 ctest --build-config Debug
       
     - name: collect code coverage
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
