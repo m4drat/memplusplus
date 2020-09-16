@@ -51,7 +51,7 @@ jobs:
       
     - name: cleanup
       run: |
-        cd .. && rm -rf ./build/
+        cd .. && sudo rm -rf ./build/
 
     - name: configure_g++
       run: |
