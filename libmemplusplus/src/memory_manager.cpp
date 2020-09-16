@@ -5,6 +5,15 @@
 namespace mpp {
 std::vector<Arena*> MemoryManager::s_ArenaList;
 
+void MemoryManager::InitAllocatorState()
+{
+#if MPP_FUZZER_INSECURE == 1
+    std::srand(0);
+#else
+    std::srand(std::time(NULL));
+#endif
+}
+
 #if MPP_STATS == 1
 std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out)
 {

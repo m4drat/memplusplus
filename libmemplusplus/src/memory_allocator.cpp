@@ -8,6 +8,7 @@ namespace mpp {
 std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
 {
     PROFILE_FUNCTION();
+
     if (t_size != 0 && (t_size % t_alignment == 0))
         return t_size;
     return t_size + (t_alignment - (t_size % t_alignment));
@@ -16,9 +17,16 @@ std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
 void* MemoryAllocator::SysAlloc(std::size_t t_size)
 {
     PROFILE_FUNCTION();
+
     void* rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (rawPtr == MAP_FAILED) {
+
+    // If we are using fuzzer just ignore out-of-memory errors and exit 
+#if MPP_FUZZER_INSECURE == 1
+        exit(0);
+#else
         throw NoMemoryException();
+#endif
     }
 
     return rawPtr;
@@ -27,6 +35,7 @@ void* MemoryAllocator::SysAlloc(std::size_t t_size)
 bool MemoryAllocator::SysDealloc(void* t_ptr, std::size_t t_pageSize)
 {
     PROFILE_FUNCTION();
+
     if (munmap(t_ptr, t_pageSize) == -1) {
         throw UnmapMemoryException();
     }
@@ -37,6 +46,7 @@ bool MemoryAllocator::SysDealloc(void* t_ptr, std::size_t t_pageSize)
 Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
 {
     PROFILE_FUNCTION();
+
     // Allocate memory for arena
     void* arenaSpace = SysAlloc(t_arenaSize);
 
@@ -52,6 +62,7 @@ Arena* MemoryAllocator::CreateArena(std::size_t t_arenaSize)
 Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
 {
     PROFILE_FUNCTION();
+
     // Try iterating through all available arenas
     // to try to find enought space for user-requested chunk
     // in top chunk
@@ -99,6 +110,7 @@ Chunk* MemoryAllocator::GetSuitableChunk(std::size_t t_realSize)
 void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
 {
     PROFILE_FUNCTION();
+
     // Create new arena with requested size
     Arena* arena = CreateArena(t_userDataSize);
 #if MPP_STATS == 1
@@ -113,6 +125,7 @@ void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
 void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
 {
     PROFILE_FUNCTION();
+    
     // Align, because we want to have metadata bits
     std::size_t realChunkSize =
       Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
@@ -121,7 +134,13 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     // we will allocate new arena with chunk, which size is
     // equal to requested size, aligned to g_PAGE_SIZE
     if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
+#if MPP_FULL_DEBUG == 1
+        void* bigChunk = AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
+        std::memset(bigChunk, g_FILL_CHAR, Align(realChunkSize, g_PAGE_SIZE) - sizeof(Chunk::ChunkHeader));
+        return bigChunk;
+#else
         return AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
+#endif
     }
 
     // If we dont have active arenas yet
@@ -134,18 +153,30 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     // or by splitting top chunk)
     Chunk* chunk = GetSuitableChunk(realChunkSize);
     if (chunk != nullptr) {
+#if MPP_FULL_DEBUG == 1
+        std::memset(Chunk::GetUserDataPtr(chunk), g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
         return Chunk::GetUserDataPtr(chunk);
+#else
+        return Chunk::GetUserDataPtr(chunk);
+#endif
     }
 
     // finally, if there is no available space for chunk
-    // create new arena and allocate into it
+    // create new arena and allocate from it
     Arena* arena = CreateArena(g_DEFAULT_ARENA_SIZE);
-    return (arena->AllocateFromTopChunk(realChunkSize));
+#if MPP_FULL_DEBUG == 1
+    void* userChunk = Chunk::GetUserDataPtr(arena->AllocateFromTopChunk(realChunkSize));
+    std::memset(userChunk, g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
+    return userChunk;
+#else
+    return Chunk::GetUserDataPtr(arena->AllocateFromTopChunk(realChunkSize));
+#endif
 }
 
 bool MemoryAllocator::Deallocate(void* t_chunkPtr)
 {
     PROFILE_FUNCTION();
+
     // If given pointer is nullptr just return false
     // because we dont want to waste time, trying to search
     // for arena

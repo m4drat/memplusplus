@@ -52,14 +52,26 @@ void logic()
     // p4 = nullptr;
     // p5 = nullptr;
 
+    // std::vector<void*> ptrs;
+    // for (uint32_t i = 0; i < 17000; ++i) {
+    //     ptrs.push_back(MemoryAllocator::Allocate(2056));
+    // }
+
+    // for (uint32_t i = 0; i < 17000; i++) {
+    //     MemoryAllocator::Deallocate(ptrs.at(i)); // rand() % ptrs.size()
+    // }
+
+    const std::size_t allocaSize = 65520;
+    const std::size_t realChunkSize = MemoryAllocator::Align(allocaSize + sizeof(Chunk::ChunkHeader), MemoryAllocator::g_MIN_CHUNK_SIZE);
+    const std::size_t allocationsCount = MemoryAllocator::g_DEFAULT_ARENA_SIZE / realChunkSize;
+
     std::vector<void*> ptrs;
-    for (uint32_t i = 0; i < 17000; ++i) {
-        ptrs.push_back(MemoryAllocator::Allocate(2056));
+    for (uint32_t i = 0; i < allocationsCount; ++i) {
+        ptrs.push_back(MemoryAllocator::Allocate(allocaSize));
     }
 
-    for (uint32_t i = 0; i < 17000; i++) {
-        MemoryAllocator::Deallocate(ptrs.at(i)); // rand() % ptrs.size()
-    }
+    void* newArenaChunk = MemoryAllocator::Allocate(allocaSize);
+    MemoryAllocator::Deallocate(newArenaChunk);
 
     // std::for_each(ptrs.begin(), ptrs.end(), [](void* ptr){ MemoryAllocator::Deallocate(ptr); });
 

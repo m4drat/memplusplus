@@ -19,6 +19,12 @@ class Arena;
  */
 class MemoryManager
 {
+private:
+    /**
+     * @brief Initializes random seed for chunk treap.
+     */
+    __attribute__((constructor)) void InitAllocatorState();
+
 protected:
     // TODO: refactor to work with std::unique_ptr
     /**
@@ -84,5 +90,10 @@ public:
      * @brief Page size for mmap request.
      */
     static const std::size_t g_PAGE_SIZE = 4096;
+
+    /**
+     * @brief fill char, to fill allocated chunks in debug mode. 
+     */
+    static const uint8_t g_FILL_CHAR = '\x99'; 
 };
 }

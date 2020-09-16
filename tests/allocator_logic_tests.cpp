@@ -281,7 +281,7 @@ TEST_CASE("ADA - Chunk that we deallocate located between two used chunks")
     
 }
 
-TEST_CASE("")
+TEST_CASE("Linked list checks")
 {
     using namespace mpp;
 
@@ -308,6 +308,23 @@ TEST_CASE("")
     REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader))) == Chunk::GetHeaderPtr(p6));
     REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) - 1)) == Chunk::GetHeaderPtr(p5));
     REQUIRE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) + 159)) == Chunk::GetHeaderPtr(p6));
+}
+
+TEST_CASE("Check that new arena alloacate chunks correctly")
+{
+    using namespace mpp;
+
+    const std::size_t allocaSize = 65520;
+    const std::size_t realChunkSize = MemoryAllocator::Align(allocaSize + sizeof(Chunk::ChunkHeader), MemoryAllocator::g_MIN_CHUNK_SIZE);
+    const std::size_t allocationsCount = MemoryAllocator::g_DEFAULT_ARENA_SIZE / realChunkSize;
+
+    std::vector<void*> ptrs;
+    for (uint32_t i = 0; i < allocationsCount; ++i) {
+        ptrs.push_back(MemoryAllocator::Allocate(allocaSize));
+    }
+
+    void* newArenaChunk = MemoryAllocator::Allocate(allocaSize);
+    MemoryAllocator::Deallocate(newArenaChunk);
 }
 
 /* For ctrl+c, ctrl-V

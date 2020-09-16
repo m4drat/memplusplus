@@ -43,10 +43,9 @@ if (MPP_ENABLE_COVERAGE)
 endif()
 
 if (MPP_BUILD_FUZZER)
-	message(STATUS "[+] Building with fuzzer support! Library will be build with sanitizers!")
-	# enable_testing()
-	target_compile_options(mpp INTERFACE -fsanitize=address -g -O2 -fno-omit-frame-pointer)
-	target_link_libraries(mpp INTERFACE -fsanitize=address)
+	message(STATUS "[+] Building with fuzzer support!")
+	message(STATUS "    WARNING: Library will be build with sanitizers + with insecure defines!")
+	enable_testing()
 	add_subdirectory(fuzzer)
 endif()
 

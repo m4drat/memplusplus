@@ -11,6 +11,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <new>
 #include <type_traits>
 
@@ -22,14 +23,6 @@ class Arena;
 class MemoryAllocator : public MemoryManager
 {
 private:
-    /**
-     * @brief Function that make number dividable by alignment.
-     * @param t_size is number to align
-     * @param t_alignment is alignment
-     * @return std::size_t Aligned number
-     */
-    static std::size_t Align(std::size_t t_size, int32_t t_alignment);
-
     /**
      * @brief mmap(2) wrapper, that maps readble and writable, not shared
      * memory page of given size.
@@ -75,12 +68,21 @@ private:
 
 public:
     /**
+     * @brief Function that make number dividable by alignment.
+     * @param t_size is number to align
+     * @param t_alignment is alignment
+     * @return std::size_t Aligned number
+     */
+    static std::size_t Align(std::size_t t_size, int32_t t_alignment);
+
+    /**
      * @brief Default Allocate method. Allocates chunk with size at least
      * t_userDataSize.
      * @param t_userDataSize request size.
      * @return void* pointer to user data in allocated chunk
      */
     static void* Allocate(std::size_t t_userDataSize);
+    
     /**
      * @brief Deallocates chunk of memory.
      * @param t_chunkPtr pointer to start of user data.

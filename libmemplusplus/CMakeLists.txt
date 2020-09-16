@@ -45,11 +45,21 @@ else()
 	list(APPEND MPP_DEFINES DEBUG=0)
 endif()
 
+################# SET DEFINES IF BUILDING WITH FUZZER #################
+if (MPP_BUILD_FUZZER MATCHES "ON")
+	set(MPP_SANITIZERS ON)
+	list(APPEND MPP_DEFINES MPP_FUZZER_INSECURE=1)
+else()
+	list(APPEND MPP_DEFINES MPP_FUZZER_INSECURE=0)
+endif()
+
 # extended debug features, such as full free-list checks for double-free
-if (MPP_FULL_DEBUG MATCHES "ON")
+if (MPP_FULL_DEBUG MATCHES "ON" OR MPP_DEBUG MATCHES "ON")
 	message(STATUS "Building in full debug mode: MPP_FULL_DEBUG=1")
+	set(MPP_FULL_DEBUG ON)
 	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=1)
 else()
+	set(MPP_FULL_DEBUG OFF)
 	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=0)
 endif()
 
