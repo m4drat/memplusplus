@@ -21,7 +21,7 @@ jobs:
     
     - name: configure
       run: |
-        CXX=g++ cmake -S . -B build \
+        CXX=clang++ cmake -S . -B build \
         -DCMAKE_BUILD_TYPE=Debug \
         -DMPP_BUILD_SHARED_LIBS=OFF \
         -DMPP_ENABLE_COVERAGE=ON \
@@ -41,7 +41,7 @@ jobs:
     
     - name: build
       run: |
-        CXX=g++ cmake --build build --config Debug --target all
+        CXX=clang++ cmake --build build --config Debug --target all
 
     - name: test
       run: |
