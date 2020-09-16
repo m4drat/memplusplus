@@ -5,6 +5,7 @@
 #include "mpplib/utils/profiler_definitions.hpp"
 
 #include <iostream>
+#include <functional>
 
 namespace mpp {
 /**
