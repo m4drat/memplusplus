@@ -19,13 +19,47 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     
-    - name: configure
+    - name: configure_clang
+      run: |
+        CXX=clang++ cmake -S . -B build \
+        -DCMAKE_BUILD_TYPE=Debug \
+        -DMPP_BUILD_SHARED_LIBS=OFF \
+        -DMPP_ENABLE_COVERAGE=OFF \
+        -DMPP_BUILD_FUZZER=ON \
+        -DMPP_BUILD_EXAMPLE=OFF \
+        -DMPP_BUILD_TESTS=OFF \
+        -DMPP_BUILD_DOCS=OFF \
+        -DMPP_BUILD_BENCHMARK=OFF \
+        -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
+        -DMPP_SANITIZERS=ON \
+        -DMPP_BUILD_SHARED_LIBS=OFF \
+        -DMPP_FULL_DEBUG=OFF \
+        -DMPP_SECURE=OFF \
+        -DMPP_PROFILE=OFF \
+        -DMPP_COLOUR=ON \
+        -DMPP_STATS=ON
+    
+    - name: build_clang
+      run: |
+        CXX=clang++ cmake --build build --config Debug --target all
+
+    - name: test_fuzzer
+      run: |
+        cd build
+        mkdir corpus && echo -ne "a1024a1024a128a0a10ddda1024a1024ddd" > ./corpus/testcase_1
+        ASAN_OPTIONS=detect_leaks=0 ctest --build-config Debug
+      
+    - name: cleanup
+      run: |
+        cd .. && rm -rf ./build/
+
+    - name: configure_g++
       run: |
         CXX=g++ cmake -S . -B build \
         -DCMAKE_BUILD_TYPE=Debug \
         -DMPP_BUILD_SHARED_LIBS=OFF \
         -DMPP_ENABLE_COVERAGE=ON \
-        -DMPP_BUILD_FUZZER=ON \
+        -DMPP_BUILD_FUZZER=OFF \
         -DMPP_BUILD_EXAMPLE=OFF \
         -DMPP_BUILD_TESTS=ON \
         -DMPP_BUILD_DOCS=OFF \
@@ -39,15 +73,14 @@ jobs:
         -DMPP_COLOUR=ON \
         -DMPP_STATS=ON
     
-    - name: build
+    - name: build_g++
       run: |
         CXX=g++ cmake --build build --config Debug --target all
 
-    - name: test
+    - name: test_unit
       run: |
         cd build
-        mkdir corpus && echo -ne "a1024a1024a128a0a10ddda1024a1024ddd" > ./corpus/testcase_1
         ASAN_OPTIONS=detect_leaks=0 ctest --build-config Debug
-      
+
     - name: collect code coverage
       run: bash <(curl -s https://codecov.io/bash) || echo "Codecov did not collect coverage reports"
