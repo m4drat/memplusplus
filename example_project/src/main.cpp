@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <algorithm>
 
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
@@ -51,29 +52,21 @@ void logic()
     // p4 = nullptr;
     // p5 = nullptr;
 
-    // std::vector<SharedGcPtr<UserData>> ptrs;
-    // for (uint32_t i = 0; i < 17000; ++i)
-    //     ptrs.push_back(MakeSharedGcPtr<UserData>(1337));
+    std::vector<void*> ptrs;
+    for (uint32_t i = 0; i < 17000; ++i) {
+        ptrs.push_back(MemoryAllocator::Allocate(2056));
+    }
 
-    // for (uint32_t i = 0; i < 16000; i++) {
-    //     ptrs.at(rand() % ptrs.size()) = nullptr;
-    // }
+    for (uint32_t i = 0; i < 17000; i++) {
+        MemoryAllocator::Deallocate(ptrs.at(i)); // rand() % ptrs.size()
+    }
+
+    // std::for_each(ptrs.begin(), ptrs.end(), [](void* ptr){ MemoryAllocator::Deallocate(ptr); });
+
     // GC::GetInstance().Collect();
 
     // utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
-    void* p0 = MemoryAllocator::Allocate(1 << 31);
-
-    std::fstream maps("/proc/self/maps");
-    std::string line;
-    
-    if (maps.is_open())
-    {
-        while ( getline(maps, line) )
-        {
-            std::cout << line << '\n';
-        }
-        maps.close();
-    }
+    // void* p0 = MemoryAllocator::Allocate(1 << 31);
 }
 
 int main()

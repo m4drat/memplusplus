@@ -82,7 +82,7 @@ Global options:
 
 - `MPP_ENABLE_COVERAGE` - build with code coverage support
 
-- __currently not supported__. `MPP_BUILD_FUZZER` - build fuzzer project
+- `MPP_BUILD_FUZZER` - build fuzzer project (will build library with sanitizers)
 
 - `MPP_BUILD_EXAMPLE` - build example project
 

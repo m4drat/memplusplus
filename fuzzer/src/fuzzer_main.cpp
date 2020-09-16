@@ -37,6 +37,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size)
             break;
         }
         case Tokenizer::Tokens::Invalid: {
+            mpp::MemoryAllocator::ResetAllocatorState();
             return 0;
             break;
         }
@@ -45,6 +46,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size)
         commands.pop_front();
     }
 
+    mpp::MemoryAllocator::ResetAllocatorState();
     return 0;
 }
 
