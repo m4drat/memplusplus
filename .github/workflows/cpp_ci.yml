@@ -53,7 +53,7 @@ jobs:
 
     - name: cleanup
       run: |
-        ls -la && cd .. && ls -la && sudo rm -rf ./build/
+        rm -rf ./build/
 
     - name: configure_clang
       run: |
