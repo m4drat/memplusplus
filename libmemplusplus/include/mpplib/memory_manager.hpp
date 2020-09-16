@@ -23,7 +23,7 @@ private:
     /**
      * @brief Initializes random seed for chunk treap.
      */
-    __attribute__((constructor)) void InitAllocatorState();
+    static __attribute__((constructor)) void InitAllocatorState();
 
 protected:
     // TODO: refactor to work with std::unique_ptr

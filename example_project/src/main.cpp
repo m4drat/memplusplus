@@ -70,8 +70,21 @@ void logic()
         ptrs.push_back(MemoryAllocator::Allocate(allocaSize));
     }
 
-    void* newArenaChunk = MemoryAllocator::Allocate(allocaSize);
-    MemoryAllocator::Deallocate(newArenaChunk);
+    for (uint32_t i = 0; i < allocationsCount / 2; i++) {
+        MemoryAllocator::Deallocate(ptrs.at(rand() % ptrs.size())); // rand() % ptrs.size()
+    }
+
+    // MemoryAllocator::Deallocate(ptrs.at(1)); // rand() % ptrs.size()
+    // MemoryAllocator::Deallocate(ptrs.at(3)); // rand() % ptrs.size()
+    // MemoryAllocator::Deallocate(ptrs.at(5)); // rand() % ptrs.size()
+    // MemoryAllocator::Deallocate(ptrs.at(7)); // rand() % ptrs.size()
+    // MemoryAllocator::Deallocate(ptrs.at(9)); // rand() % ptrs.size()
+    // MemoryAllocator::Deallocate(ptrs.at(11)); // rand() % ptrs.size()
+    // MemoryAllocator::Deallocate(ptrs.at(13)); // rand() % ptrs.size()
+    // MemoryManager::VisHeapLayout(std::cout);
+    MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout);
+    // void* newArenaChunk = MemoryAllocator::Allocate(allocaSize);
+    // MemoryAllocator::Deallocate(newArenaChunk);
 
     // std::for_each(ptrs.begin(), ptrs.end(), [](void* ptr){ MemoryAllocator::Deallocate(ptr); });
 

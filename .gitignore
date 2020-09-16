@@ -16,6 +16,7 @@ profile.json
 valgrind-out.txt
 
 graph.dot
+treap.dot
 objects.dot
 
 ### CMake builds ###

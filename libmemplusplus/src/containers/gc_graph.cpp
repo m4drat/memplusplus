@@ -73,6 +73,8 @@ void GcGraph::AddObjectInfo(GcPtr* t_gcPtr)
 
 std::ostream& GcGraph::GenerateGraphvizLayout(std::ostream& t_out) const
 {
+    PROFILE_FUNCTION();
+    
     t_out << "digraph Objects {\n";
     for (auto v1 : m_adjList) {
         t_out << "\t\"" + v1->ToString() + "\"";

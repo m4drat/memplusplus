@@ -109,9 +109,10 @@ public:
 
     /**
      * @brief Generates tree representation in form, that can be used in dot
-     * (graphviz), to visualize tree structure.
+     * (graphviz), to visualize tree structure. As inspiration i've used this article: 
+     * https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
      *
-     * @return std::string with description of the tree
+     * @return std::ostream that was passed as parameter
      */
     std::ostream& GenerateGraphvizLayout(std::ostream& t_out) const;
 

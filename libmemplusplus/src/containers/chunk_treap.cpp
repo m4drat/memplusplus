@@ -83,31 +83,79 @@ std::size_t ChunkTreap::GetAmountOfFreedMemory()
     return m_freedMemory;
 }
 
-// TODO
-// https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
-// std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
-// {
-//     t_out << "digraph Objects {\n";
-//     for (auto v1 : m_adjList) {
-//         t_out << "\t\"" + v1->ToString() + "\"";
-//         if (v1->GetNeighbors().size() != 0)
-//             t_out << " -> ";
+std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
+{
+    PROFILE_FUNCTION();
 
-//         for (auto it = v1->GetNeighbors().begin() ; it != v1->GetNeighbors().end();
-//         ++it) {
-//             if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end())
-//                 t_out << "\"" + (*it)->ToString() + "\"";
-//             else
-//                 t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
-//         }
+    std::function<std::ostream&(Node*, std::ostream&)> DumpNode = [](Node* t_node, std::ostream& t_out) -> std::ostream&
+    {
+        t_out << " [label=\"chunk = " << reinterpret_cast<void*>(t_node->chunk) << "\n" << "chunk.size = " << t_node->chunk->GetSize() << std::endl; 
+        t_out << "priority = " << t_node->priority << "\"];";
+        return t_out;
+    };
 
-//         t_out << ";\n";
-//     }
+    std::function<void(Node*, uint32_t, std::ostream&)> GenerateNull = [&DumpNode](Node* t_node, uint32_t t_nullCount, std::ostream& t_out)
+    {
+        t_out << "    null" << t_nullCount << " [shape=point];" << std::endl;
+        t_out << "    " << (reinterpret_cast<intptr_t>(t_node->chunk) ^ t_node->priority); 
+        DumpNode(t_node, t_out) << std::endl;
+        t_out << "    " << (reinterpret_cast<intptr_t>(t_node->chunk) ^ t_node->priority) << " -> null" << t_nullCount << ";\n" << std::endl;
+    };
 
-//     t_out << "}";
+    std::function<void(Node*, std::ostream&)> GenerateRecursive = [&GenerateNull, &GenerateRecursive, &DumpNode](Node* t_node, std::ostream& t_out)
+    {
+        static uint32_t nullCount = 0;
 
-//     return t_out;
-// }
+        if (t_node->leftChild != nullptr)
+        {
+            t_out << "    " << (reinterpret_cast<intptr_t>(t_node->chunk) ^ t_node->priority);
+            DumpNode(t_node, t_out) << std::endl;
+            
+            t_out << "    " << (reinterpret_cast<intptr_t>(t_node->leftChild->chunk) ^ t_node->leftChild->priority);
+            DumpNode(t_node->leftChild, t_out) << std::endl;
+
+            t_out << "    " << (reinterpret_cast<intptr_t>(t_node->chunk) ^ t_node->priority) << " -> " << (reinterpret_cast<intptr_t>(t_node->leftChild->chunk) ^ t_node->leftChild->priority) << ";\n" << std::endl;
+            GenerateRecursive(t_node->leftChild, t_out);
+        } else {
+            GenerateNull(t_node, nullCount++, t_out);
+        }
+
+        if (t_node->rightChild != nullptr)
+        {
+            t_out << "    " << (reinterpret_cast<intptr_t>(t_node->chunk) ^ t_node->priority);
+            DumpNode(t_node, t_out) << std::endl;
+
+            t_out << "    " << (reinterpret_cast<intptr_t>(t_node->rightChild->chunk) ^ t_node->rightChild->priority);
+            DumpNode(t_node->rightChild, t_out) << std::endl;
+
+            t_out << "    " << (reinterpret_cast<intptr_t>(t_node->chunk) ^ t_node->priority) << " -> " << (reinterpret_cast<intptr_t>(t_node->rightChild->chunk) ^ t_node->rightChild->priority) << ";\n" << std::endl;
+            GenerateRecursive(t_node->rightChild, t_out);
+        } else {
+            GenerateNull(t_node, nullCount++, t_out);
+        }
+    };
+
+    t_out << "digraph Treap {\n";
+    t_out << "    node [shape=rectangle]";
+
+    if (m_root == nullptr)
+    {
+        t_out << std::endl;
+    } 
+    else if (m_root->leftChild == nullptr && m_root->rightChild == nullptr)
+    {
+        t_out << "    " << (reinterpret_cast<intptr_t>(m_root->chunk) ^ m_root->priority) 
+              << " [label=\"chunk: " << reinterpret_cast<void*>(m_root->chunk) << "\npriority: " << m_root->priority << "\"];" << std::endl;
+    }
+    else 
+    {
+        GenerateRecursive(m_root, t_out);
+    }
+
+    t_out << "}" << std::endl;
+
+    return t_out;
+}
 
 Chunk* ChunkTreap::MinSizeChunk() const
 {
