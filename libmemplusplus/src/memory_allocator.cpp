@@ -134,7 +134,7 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     // we will allocate new arena with chunk, which size is
     // equal to requested size, aligned to g_PAGE_SIZE
     if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
-#if MPP_FULL_DEBUG == 1
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
         void* bigChunk = AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
         std::memset(bigChunk, g_FILL_CHAR, Align(realChunkSize, g_PAGE_SIZE) - sizeof(Chunk::ChunkHeader));
         return bigChunk;
@@ -153,7 +153,7 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     // or by splitting top chunk)
     Chunk* chunk = GetSuitableChunk(realChunkSize);
     if (chunk != nullptr) {
-#if MPP_FULL_DEBUG == 1
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
         std::memset(Chunk::GetUserDataPtr(chunk), g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
         return Chunk::GetUserDataPtr(chunk);
 #else
@@ -164,7 +164,7 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     // finally, if there is no available space for chunk
     // create new arena and allocate from it
     Arena* arena = CreateArena(g_DEFAULT_ARENA_SIZE);
-#if MPP_FULL_DEBUG == 1
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
     void* userChunk = Chunk::GetUserDataPtr(arena->AllocateFromTopChunk(realChunkSize));
     std::memset(userChunk, g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
     return userChunk;

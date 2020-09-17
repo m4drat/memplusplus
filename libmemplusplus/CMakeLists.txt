@@ -33,6 +33,9 @@ if (NOT CMAKE_BUILD_TYPE)
 	endif()
 endif()
 
+################# SET DEFAULT FILL CHAR #################
+list(APPEND MPP_DEFINES MPP_FILL_CHAR='\\x00')
+
 ################# SET DEFINES FOR DEBUG MODE #################
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# standart debug defines
@@ -54,10 +57,15 @@ else()
 endif()
 
 # extended debug features, such as full free-list checks for double-free
-if (MPP_FULL_DEBUG MATCHES "ON" OR MPP_DEBUG MATCHES "ON")
+if (MPP_FULL_DEBUG MATCHES "ON" AND MPP_DEBUG MATCHES "ON")
 	message(STATUS "Building in full debug mode: MPP_FULL_DEBUG=1")
 	set(MPP_FULL_DEBUG ON)
 	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=1)
+	
+	# In full debug mode we want to fill memory
+    # with non-zero values, so we actually can easily crash
+    # or spot a weird behaviour
+	list(APPEND MPP_DEFINES MPP_FILL_CHAR='\\x99')
 else()
 	set(MPP_FULL_DEBUG OFF)
 	list(APPEND MPP_DEFINES MPP_FULL_DEBUG=0)
@@ -66,6 +74,12 @@ endif()
 if (MPP_SECURE MATCHES "ON")
 	message(STATUS "Building in secure mode: MPP_SECURE=1")
 	list(APPEND MPP_DEFINES MPP_SECURE=1)
+
+	# In secure mode we want to fill memory with zeroes 
+    # (prevents memleaks through string printing functions)
+	if (MPP_FULL_DEBUG MATCHES "OFF" AND MPP_DEBUG MATCHES "OFF") 
+		list(APPEND MPP_DEFINES MPP_FILL_CHAR='\\x00')
+	endif()
 else()
 	list(APPEND MPP_DEFINES MPP_SECURE=0)
 endif()

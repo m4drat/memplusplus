@@ -136,7 +136,7 @@ std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
     };
 
     t_out << "digraph Treap {\n";
-    t_out << "    node [shape=rectangle]";
+    t_out << "    node [shape=rectangle]\n";
 
     if (m_root == nullptr)
     {
