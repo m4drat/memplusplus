@@ -152,6 +152,56 @@ Library options:
     GC::GetInstance().Collect();
     ```
 
+## Debugging / profiling library
+
+Memplusplus provides different debug-like features, such as: data visualizers, profiler, statistics collector.
+
+- Data visualizers:
+  
+  In Debug builds you are able to dump .dot representation of ChunkTreap and GcGraph (only using specific environment variable). Later you can "render" this .dot files using dot from graphviz.  
+
+  - ChunkTreap visualizer
+
+    How to dump ChunkTreap in code (don't forget to redirect program output to file treap.dot):
+
+    ```c++
+    // 1. Get the arena you want to dump the tree for
+    Arena* tmpArena = MemoryAllocator::GetArenaList()[0]
+
+    // 2. Extract ChunkTreap from this arena, and dump it
+    // (in this example everything was dumped to std::cout).
+    tmpArena->freedChunks.GenerateGraphvizLayout(std::cout);
+    ```
+
+    How to generage .svg file with treap:
+
+    ```bash
+    dot -Tsvg treap.dot -o treap.svg
+    ```
+
+    After that you will get .svg file with your tree:
+    ![treap](./additional_info/images/treap.svg)
+
+  - GcGraph visualizer
+
+    Visualization of GcGraph is much simplier. Just build library in Debug mode, and set MPP_DUMP_OBJECTS_GRAPH=1 before running target app. On each GC cycle it will dump objects graph to file objects_cycle\<current cycle number\>.dot. After that just generate .svg file with dot.
+
+    ```bash
+    dot -Tsvg objects.dot -o objects.svg
+    ```
+
+    After that you will get .svg file with your alive objects graph:
+    ![objects](./additional_info/images/objects.svg)
+
+
+- Profiler
+
+  123
+
+- Statistics collector
+
+  123
+
 ## Performance comparisons
 
 ## Documentation

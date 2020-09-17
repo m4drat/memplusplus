@@ -16,7 +16,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Cla
 endif()
 
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
-option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" OFF)
+option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" ON)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
 option(MPP_PROFILE "Build mpp with support of profiling" OFF)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)

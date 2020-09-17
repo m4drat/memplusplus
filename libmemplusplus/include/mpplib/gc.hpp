@@ -55,6 +55,13 @@ protected:
     std::unique_ptr<utils::Statistics::GcStats> m_GcStats;
 #endif
 
+#if MPP_DEBUG == 1
+    /**
+     * @brief Current cycle to dump objects graph
+     */
+    static uint32_t m_currentCycle;
+#endif
+
 public:
     /**
      * @brief Construct a new GC object

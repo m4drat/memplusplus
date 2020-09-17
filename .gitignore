@@ -13,6 +13,8 @@ profile.json
 
 .gdb_history
 
+objects_cycle**.dot
+
 valgrind-out.txt
 
 graph.dot

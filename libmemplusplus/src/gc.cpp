@@ -1,8 +1,15 @@
 #include "mpplib/gc.hpp"
 
 namespace mpp {
+#if MPP_DEBUG == 1
+uint32_t GC::m_currentCycle;
+#endif
+
 GC::GC()
 {
+#if MPP_DEBUG == 1
+    m_currentCycle = 1;
+#endif
 #if MPP_STATS == 1
     m_GcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
@@ -36,9 +43,10 @@ bool GC::Collect()
 
 #if MPP_DEBUG == 1
     if (utils::Options::GetMppDumpObjectsGraph()) {
-        std::ofstream objectsDot("objects.dot");
+        std::ofstream objectsDot("objects_cycle" + std::to_string(m_currentCycle) + ".dot");
         objectsGraph->GenerateGraphvizLayout(objectsDot) << std::endl;
         objectsDot.close();
+        m_currentCycle++;
     }
 #endif
 
