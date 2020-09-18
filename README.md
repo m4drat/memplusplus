@@ -173,13 +173,13 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
     tmpArena->freedChunks.GenerateGraphvizLayout(std::cout);
     ```
 
-    How to generage .svg file with treap:
+    How to generage .svg file with dot:
 
     ```bash
     dot -Tsvg treap.dot -o treap.svg
     ```
 
-    After that you will get .svg file with your tree:
+    After that you will get .svg file with your freed chunks treap:
     ![treap](./additional_info/images/treap.svg)
 
   - GcGraph visualizer
@@ -187,7 +187,7 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
     Visualization of GcGraph is much simplier. Just build library in Debug mode, and set MPP_DUMP_OBJECTS_GRAPH=1 before running target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot". Then just generate .svg file with dot.
 
     ```bash
-    dot -Tsvg objects.dot -o objects.svg
+    dot -Tsvg objects_cycle<N>.dot -o objects_cycle<N>.svg
     ```
 
     For example, for this code (it creates simple linked list and tree):
@@ -284,7 +284,7 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
 
 - Statistics collector
 
-  And last debug feature allows you to dump memory allocator statistics. You can use this feature in 2 ways:
+  This feature allows you to dump memory allocator statistics. To build library with support of this feature add `MPP_STATS` while building project. You can use this feature in 2 ways:
 
     1. In runtime using c++ API:
 
@@ -347,7 +347,7 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
             +============== STATISTICS DUMP END ==============+
             ```
 
-    2. After program termination setting environment variable MPP_SHOW_STATISTICS=1.  
+    2. After program termination, setting environment variable MPP_SHOW_STATISTICS=1.  
         Important note. Runtime stats cannot be dumped using this approah.
 
         - Example output:
