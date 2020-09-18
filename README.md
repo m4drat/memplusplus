@@ -96,7 +96,7 @@ Library options:
 
 - `MPP_BUILD_SHARED_LIBS` - build shared or static libraries
 
-- __currently not supported__. `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
+- `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
 
 - __currently not supported__. `MPP_SECURE` - build in secure mode with additional security features
 
