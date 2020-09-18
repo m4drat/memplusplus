@@ -77,6 +77,7 @@ Arena* MemoryManager::GetArenaByPtr(void* t_ptr)
 Chunk* MemoryManager::GetInUseChunkByPtr(void* t_chunk)
 {
     PROFILE_FUNCTION();
+    
     Arena* arena = GetArenaByPtr(t_chunk);
     if (arena != nullptr) {
         return arena->GetInUseChunkByPtr(t_chunk);

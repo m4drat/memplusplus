@@ -184,15 +184,95 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
 
   - GcGraph visualizer
 
-    Visualization of GcGraph is much simplier. Just build library in Debug mode, and set MPP_DUMP_OBJECTS_GRAPH=1 before running target app. On each GC cycle it will dump objects graph to file objects_cycle\<current cycle number\>.dot. After that just generate .svg file with dot.
+    Visualization of GcGraph is much simplier. Just build library in Debug mode, and set MPP_DUMP_OBJECTS_GRAPH=1 before running target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot". Then just generate .svg file with dot.
 
     ```bash
     dot -Tsvg objects.dot -o objects.svg
     ```
 
-    After that you will get .svg file with your alive objects graph:
-    ![objects](./additional_info/images/objects.svg)
+    For example, for this code (it creates simple linked list and tree):
 
+    ```c++
+    // Linked List node
+    struct Node {
+        uint32_t data;
+        SharedGcPtr<Node> prev;
+        SharedGcPtr<Node> next;
+
+        Node(uint32_t t_data, SharedGcPtr<Node> t_p, SharedGcPtr<Node> t_n)
+            : data{t_data}, prev{t_p}, next{t_n}
+        {
+        }
+    };
+
+    // Create Linked List
+    SharedGcPtr<Node> n1 = MakeSharedGcPtr<Node>(1, nullptr, nullptr);
+    SharedGcPtr<Node> n2 = MakeSharedGcPtr<Node>(2, nullptr, nullptr);
+    SharedGcPtr<Node> n3 = MakeSharedGcPtr<Node>(3, nullptr, nullptr);
+    SharedGcPtr<Node> n4 = MakeSharedGcPtr<Node>(4, nullptr, nullptr);
+
+    n1->prev = nullptr;
+    n1->next = n2;
+
+    n2->prev = n1;
+    n2->next = n3;
+
+    n3->prev = n2;
+    n3->next = n4;
+
+    n4->prev = n3;
+    n4->next = nullptr;
+
+    // Tree node
+    struct TreeNode {
+        uint32_t data;
+        SharedGcPtr<TreeNode> left;
+        SharedGcPtr<TreeNode> right;
+        SharedGcPtr<TreeNode> up;
+
+        TreeNode(uint32_t t_data, SharedGcPtr<TreeNode> t_left, SharedGcPtr<TreeNode> t_right, SharedGcPtr<TreeNode> t_up)
+            : data{t_data}, left{t_left}, right{t_right}, up{t_up}
+        {
+        }
+    };
+
+    // Create Random tree
+    SharedGcPtr<TreeNode> root = MakeSharedGcPtr<TreeNode>(0, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode1 = MakeSharedGcPtr<TreeNode>(1, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode2 = MakeSharedGcPtr<TreeNode>(2, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode3 = MakeSharedGcPtr<TreeNode>(3, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode4 = MakeSharedGcPtr<TreeNode>(4, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode5 = MakeSharedGcPtr<TreeNode>(5, nullptr, nullptr, nullptr);
+
+    root->up = nullptr;
+    root->left = treeNode1;
+    root->right = treeNode2;
+
+    treeNode1->up = root;
+    treeNode1->left = nullptr;
+    treeNode1->right = nullptr;
+
+    treeNode2->up = root;
+    treeNode2->left = treeNode3;
+    treeNode2->right = treeNode4;
+
+    treeNode3->up = treeNode2;
+    treeNode3->left = nullptr;
+    treeNode3->right = nullptr;
+
+    treeNode4->up = treeNode2;
+    treeNode4->left = treeNode5;
+    treeNode4->right = nullptr;
+
+    treeNode5->up = treeNode4;
+    treeNode5->left = nullptr;
+    treeNode5->right = nullptr;
+
+    GC::GetInstance().Collect();
+    ```
+
+    You you will get this objects graph.
+    ![objects](./additional_info/images/objects.svg)
 
 - Profiler
 

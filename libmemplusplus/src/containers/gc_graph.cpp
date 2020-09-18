@@ -26,6 +26,7 @@ GcGraph::~GcGraph()
 bool GcGraph::Clear()
 {
     PROFILE_FUNCTION();
+
     // delete each vertex from graph
     for (Vertex* vertex : m_adjList) {
         delete vertex;
@@ -39,6 +40,7 @@ bool GcGraph::Clear()
 void GcGraph::AddObjectInfo(GcPtr* t_gcPtr)
 {
     PROFILE_FUNCTION();
+
     Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
     Chunk* gcPtrLocationChunk = MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(t_gcPtr));
 
@@ -76,21 +78,18 @@ std::ostream& GcGraph::GenerateGraphvizLayout(std::ostream& t_out) const
     PROFILE_FUNCTION();
     
     t_out << "digraph Objects {\n";
+
+    // iterate for each vertex in adjacency list
     for (auto v1 : m_adjList) {
-        t_out << "\t\"" + v1->ToString() + "\"";
+        // if current vertex has neighbours draw all connections
         if (!v1->GetNeighbors().empty()) {
-            t_out << " -> ";
-        }
-
-        for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
-            if (auto tmpIt = it; (++tmpIt) == v1->GetNeighbors().end()) {
-                t_out << "\"" + (*it)->ToString() + "\"";
-            } else {
-                t_out << "\"" + (*it)->ToString() + "\"" + " -> ";
+            // for each neigbour draw connection between v1 and its neighbour
+            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
+                t_out << "\t\"" + v1->ToString() + "\"" << " -> " << "\"" + (*it)->ToString() + "\";\n";
             }
+        } else {
+            t_out << "\t\"" + v1->ToString() + "\";\n";
         }
-
-        t_out << ";\n";
     }
 
     t_out << "}";
