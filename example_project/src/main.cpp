@@ -136,6 +136,8 @@ void logic()
 
     GC::GetInstance().Collect();
 
+    // utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
+
     // const std::size_t allocaSize = 65520;
     // const std::size_t realChunkSize = MemoryAllocator::Align(allocaSize + sizeof(Chunk::ChunkHeader), MemoryAllocator::g_MIN_CHUNK_SIZE);
     // const std::size_t allocationsCount = 13;

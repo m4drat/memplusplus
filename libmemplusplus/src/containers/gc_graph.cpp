@@ -85,6 +85,8 @@ std::ostream& GcGraph::GenerateGraphvizLayout(std::ostream& t_out) const
         if (!v1->GetNeighbors().empty()) {
             // for each neigbour draw connection between v1 and its neighbour
             for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
+                t_out << "\"" << v1->ToString() << "\" [label=\"chunk = " << v1->ToString() << "\n" << "chunk.size = " << v1->GetCorrespondingChunk()->GetSize() << "\"];" << std::endl; 
+                t_out << "\"" << (*it)->ToString() << "\" [label=\"chunk = " << (*it)->ToString() << "\n" << "chunk.size = " << (*it)->GetCorrespondingChunk()->GetSize() << "\"];" << std::endl; 
                 t_out << "\t\"" + v1->ToString() + "\"" << " -> " << "\"" + (*it)->ToString() + "\";\n";
             }
         } else {

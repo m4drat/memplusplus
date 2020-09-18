@@ -33,9 +33,6 @@ if (NOT CMAKE_BUILD_TYPE)
 	endif()
 endif()
 
-################# SET DEFAULT FILL CHAR #################
-list(APPEND MPP_DEFINES MPP_FILL_CHAR='\\x00')
-
 ################# SET DEFINES FOR DEBUG MODE #################
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# standart debug defines
