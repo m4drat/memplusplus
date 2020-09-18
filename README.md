@@ -271,7 +271,7 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
     GC::GetInstance().Collect();
     ```
 
-    You you will get this objects graph.
+    You will get this objects graph.
     ![objects](./additional_info/images/objects.svg)
 
 - Profiler
