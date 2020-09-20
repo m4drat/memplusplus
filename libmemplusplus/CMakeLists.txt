@@ -16,7 +16,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Cla
 endif()
 
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
-option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks (ON by default in Debug mode)" OFF)
+option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks" OFF)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
 option(MPP_PROFILE "Build mpp with support of profiling" OFF)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
@@ -137,6 +137,7 @@ list(APPEND MPP_SOURCES
 	src/memory_allocator.cpp
 	src/memory_manager.cpp
 	src/gc.cpp
+	src/utils/utils.cpp
 )
 
 ################# ADD SPECIFIC SOURCES #################
@@ -192,10 +193,11 @@ endif()
 ################# ALIAS TO USE AS AN INTERNAL PROJECT #################
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 
-################# SET DEBUG FLAG FOR DEBUG BUILDS #################
+################# SET DEBUG COMPILER OPTIONS #################
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# ADDED TO SUPPORT DEBUGGING
-	target_compile_options(${PROJECT_NAME} PRIVATE "-g")
+	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -export-dynamic -ldl)	# to support backtrace dumping in debug mode
+	target_link_libraries(${PROJECT_NAME} PRIVATE -ldl)
 endif()
 
 ################# ENABLE SUPPORT OF SANITIZERS #################

@@ -1,5 +1,6 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/exception.hpp"
+#include "mpplib/utils/utils.hpp"
 
 #include <sys/mman.h>
 
@@ -193,6 +194,14 @@ bool MemoryAllocator::Deallocate(void* t_chunkPtr)
             break;
         }
     }
+
+    // If we reached this point, we should be in some kind of error
+    // state, because, we've tried to free invalid/non-existing chunk
+    // In FULL_DEBUG/SECURE mode terminate the program, otherwise silently 
+    // return false 
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
+    utils::ErrorAbort("MemoryAllocator::Deallocate(): Invalid pointer deallocation detected!\n");
+#endif
 
     // The given pointer doens't belong to any active arena
     return false;

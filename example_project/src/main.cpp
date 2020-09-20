@@ -35,21 +35,28 @@ void logic()
     using namespace mpp;
     using namespace std::literals::chrono_literals;
 
-    const std::size_t allocaSize = 65520;
+    const std::size_t allocaSize = 112;
     const std::size_t realChunkSize = MemoryAllocator::Align(allocaSize + sizeof(Chunk::ChunkHeader), MemoryAllocator::g_MIN_CHUNK_SIZE);
-    const std::size_t allocationsCount = 13;
+    const std::size_t allocationsCount = 9;
 
     std::vector<void*> ptrs;
     for (uint32_t i = 0; i < allocationsCount; ++i) {
         ptrs.push_back(MemoryAllocator::Allocate(allocaSize));
     }
-    MemoryAllocator::Deallocate(ptrs.at(1)); // rand() % ptrs.size()
-    MemoryAllocator::Deallocate(ptrs.at(3)); // rand() % ptrs.size()
-    MemoryAllocator::Deallocate(ptrs.at(5)); // rand() % ptrs.size()
-    MemoryAllocator::Deallocate(ptrs.at(7)); // rand() % ptrs.size()
-    MemoryAllocator::Deallocate(ptrs.at(9)); // rand() % ptrs.size()
+
+    MemoryAllocator::Deallocate(ptrs.at(1));
+    MemoryAllocator::Deallocate(ptrs.at(3));
+    MemoryAllocator::Deallocate(ptrs.at(5));
+    MemoryAllocator::Deallocate(ptrs.at(7));
+    
+    // simulate invalid free
+    MemoryAllocator::Deallocate((void*)0xdeadbeef);
+
+    // Simulate doublefree
+    // MemoryAllocator::Deallocate(ptrs.at(7));
+
     // MemoryManager::VisHeapLayout(std::cout);
-    MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout);
+    // MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout);
 }
 
 int main()

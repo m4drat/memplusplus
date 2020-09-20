@@ -1,13 +1,28 @@
 #pragma once
 
-// Utils to create graphical representation
-// of objects graph
-
 #include "mpplib/utils/profiler_definitions.hpp"
 #include <algorithm>
-#include <iostream>
 
 namespace mpp { namespace utils {
+
+    /**
+     * @brief Default backtrace size. 
+     */
+    static const uint32_t s_MAX_STACK_LEVELS = 50;
+
+    /**
+     * @brief Helper function to dump stacktrace. 
+     * @param t_out output stream to write to.
+     * @param t_skip number of functions to skip from backtrace.
+     */
+    void DumpStackTrace(std::ostream& t_out, int32_t t_skip = 1);
+
+    /**
+     * @brief Function to print error message and terminate program.
+     * @param message message to print
+     */
+    void ErrorAbort(const std::string& t_message);
+
     /**
      * @brief Finds first elemet, that is greater or equal to key.
      * @param first iterator to begin of the range
@@ -20,6 +35,7 @@ namespace mpp { namespace utils {
     ForwardIt LowerBound(ForwardIt first, ForwardIt last, const T& value, Compare comp)
     {
         PROFILE_FUNCTION();
+
         ForwardIt it;
         typename std::iterator_traits<ForwardIt>::difference_type count, step;
         count = std::distance(first, last);
@@ -50,6 +66,7 @@ namespace mpp { namespace utils {
     T1* BinarySearch(ForwardIt first, ForwardIt last, const T2& value, Compare comp)
     {
         PROFILE_FUNCTION();
+
         first = std::lower_bound(first, last, value, comp);
         if (!(first == last) && !(comp(value, *first)))
             return *first;
