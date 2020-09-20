@@ -26,7 +26,7 @@ TEST_CASE("Explicit constructor")
 {
     using namespace mpp;
 
-    SharedGcPtr<char> ptr(new char[40]);
+    SharedGcPtr<char> ptr((char*)MemoryAllocator::Allocate(40));
 
     REQUIRE(ptr.UseCount() == 1);
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
@@ -36,7 +36,7 @@ TEST_CASE("Assign to R-value reference")
 {
     using namespace mpp;
 
-    char* data1 = new char[40];
+    char* data1 = (char*)MemoryAllocator::Allocate(40);
     SharedGcPtr<char> ptr = SharedGcPtr<char>(data1);
 
     REQUIRE(ptr.UseCount() == 1);
@@ -48,8 +48,8 @@ TEST_CASE("Assign to const reference")
 {
     using namespace mpp;
 
-    char* data1 = new char[40];
-    char* data2 = new char[40];
+    char* data1 = (char*)MemoryAllocator::Allocate(40);
+    char* data2 = (char*)MemoryAllocator::Allocate(40);
 
     SharedGcPtr<char> ptr1(data1);
     SharedGcPtr<char> ptr2(data2);
@@ -73,7 +73,7 @@ TEST_CASE("Assign to Type*")
 {
     using namespace mpp;
 
-    char* data1 = new char[40];
+    char* data1 = (char*)MemoryAllocator::Allocate(40);
     SharedGcPtr<char> ptr1 = nullptr;
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
     REQUIRE(ptr1.UseCount() == 1);
@@ -101,7 +101,7 @@ TEST_CASE("Function call with shared ptr in parameters")
 {
     using namespace mpp;
 
-    char* data1 = new char[40];
+    char* data1 = (char*)MemoryAllocator::Allocate(40);
     SharedGcPtr<char> ptr1(data1);
     REQUIRE(ptr1.UseCount() == 1);
 
