@@ -98,7 +98,7 @@ Library options:
 
 - `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
 
-- __currently not supported__. `MPP_SECURE` - build in secure mode with additional security features
+- `MPP_SECURE` - build in secure mode with additional security features
 
 - `MPP_PROFILE` - enable profiling instrumentation
 
@@ -352,41 +352,41 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
 
         - Example output:
 
-        ```none
-        +============= STATISTICS DUMP START =============+
-        MPP: MIN_CHUNK_SIZE     : 32 bytes
-        MPP: CHUNK_HEADER_SIZE  : 16 bytes
-        MPP: DEFAULT_ARENA_SIZE : 32.000 MB
-        MPP: PAGE_SIZE          : 4.000 KB
-        ~~~~~~~~~~~~~~~~~~ General stats ~~~~~~~~~~~~~~~~~~
-        -----------------  Arena: 1  -----------------
-        MPP - Total amount of allocated memory inside arena : 960.000 Bytes
-        MPP - Total amount of freed memory inside arena     : 0 bytes
-        MPP - total freed == total allocated                : false
-        MPP - Biggest allocation size                       : 96.000 Bytes
-        MPP - Smallest allocation size                      : 96.000 Bytes
-        MPP - Full size of arena                            : 32.000 MB
-        MPP - Arena was allocated for big chunk             : false
-        MPP - Arena was allocated by GC                     : false
+            ```none
+            +============= STATISTICS DUMP START =============+
+            MPP: MIN_CHUNK_SIZE     : 32 bytes
+            MPP: CHUNK_HEADER_SIZE  : 16 bytes
+            MPP: DEFAULT_ARENA_SIZE : 32.000 MB
+            MPP: PAGE_SIZE          : 4.000 KB
+            ~~~~~~~~~~~~~~~~~~ General stats ~~~~~~~~~~~~~~~~~~
+            -----------------  Arena: 1  -----------------
+            MPP - Total amount of allocated memory inside arena : 960.000 Bytes
+            MPP - Total amount of freed memory inside arena     : 0 bytes
+            MPP - total freed == total allocated                : false
+            MPP - Biggest allocation size                       : 96.000 Bytes
+            MPP - Smallest allocation size                      : 96.000 Bytes
+            MPP - Full size of arena                            : 32.000 MB
+            MPP - Arena was allocated for big chunk             : false
+            MPP - Arena was allocated by GC                     : false
 
-        -----------------  Arena: 2  -----------------
-        MPP - Total amount of allocated memory inside arena : 960.000 Bytes
-        MPP - Total amount of freed memory inside arena     : 0 bytes
-        MPP - total freed == total allocated                : false
-        MPP - Biggest allocation size                       : "No allocations have been made yet"
-        MPP - Smallest allocation size                      : "No allocations have been made yet"
-        MPP - Full size of arena                            : 32.000 MB
-        MPP - Arena was allocated for big chunk             : false
-        MPP - Arena was allocated by GC                     : true
+            -----------------  Arena: 2  -----------------
+            MPP - Total amount of allocated memory inside arena : 960.000 Bytes
+            MPP - Total amount of freed memory inside arena     : 0 bytes
+            MPP - total freed == total allocated                : false
+            MPP - Biggest allocation size                       : "No allocations have been made yet"
+            MPP - Smallest allocation size                      : "No allocations have been made yet"
+            MPP - Full size of arena                            : 32.000 MB
+            MPP - Arena was allocated for big chunk             : false
+            MPP - Arena was allocated by GC                     : true
 
-        ~~~~~~~~~~~~~ Garbage Collector stats ~~~~~~~~~~~~~
-        -----------------  Cycle: 1  -----------------
-        GC - Time wasted inside   GC::Collect() : 2 ms
-        GC - Memory cleaned after GC::Collect() : 0 bytes
-        GC - Total size of active objects       : 960.000 Bytes
+            ~~~~~~~~~~~~~ Garbage Collector stats ~~~~~~~~~~~~~
+            -----------------  Cycle: 1  -----------------
+            GC - Time wasted inside   GC::Collect() : 2 ms
+            GC - Memory cleaned after GC::Collect() : 0 bytes
+            GC - Total size of active objects       : 960.000 Bytes
 
-        +============== STATISTICS DUMP END ==============+
-        ```
+            +============== STATISTICS DUMP END ==============+
+            ```
 
 ## Performance comparisons
 
