@@ -10,6 +10,7 @@ add_executable(unit_tests
     shared_gcptr_tests.cpp
     chunk_treap_test.cpp
     allocator_logic_tests.cpp
+    # security_tests.cpp # CATCH2 doesn't support catching of Abort signal 🤷‍♀️
 )
 
 target_link_libraries(${PROJECT_NAME}

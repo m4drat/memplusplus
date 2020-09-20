@@ -60,6 +60,9 @@ void logic()
     MemoryAllocator::Deallocate(ptrs[4]);
     MemoryAllocator::Deallocate(ptrs[6]);
     MemoryAllocator::Deallocate(ptrs[8]);
+    MemoryAllocator::Deallocate(ptrs[7]);
+    MemoryAllocator::Deallocate(ptrs[10]);
+    MemoryAllocator::Deallocate(ptrs[12]);
     // DoubleFree
     MemoryAllocator::Deallocate(ptrs[8]);
 
