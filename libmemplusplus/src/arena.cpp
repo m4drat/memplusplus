@@ -124,6 +124,7 @@ Chunk* Arena::AllocateFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
 Chunk* Arena::SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
 {
     PROFILE_FUNCTION();
+
     // Delete chunk, that we are currently working with from
     // free list
     freedChunks.RemoveChunk(t_chunk);
@@ -212,8 +213,19 @@ Chunk* Arena::SplitChunkFromFreeList(Chunk* t_chunk, std::size_t t_chunkSize)
 void Arena::DeallocateChunk(Chunk* t_chunk)
 {
     PROFILE_FUNCTION();
+
     // Delete chunk from active chunks
-    chunksInUse.erase(t_chunk);
+    // If erase returns 0, it means, that we haven't deleted
+    // any chunks from chunks in use. This can mean, that chunk
+    // already was deleted (aka DoubleFree occured), or some other
+    // kind of memory corruption occured. In SECURE/FULL_DEBUG build
+    // abort program.
+    if (!chunksInUse.erase(t_chunk))
+    {
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
+    utils::ErrorAbort("Arena::DeallocateChunk(): Double free or corruption detected!\n");
+#endif
+    }
 
     // Update currently used space variable
     m_CurrentlyAllocatedSpace -= t_chunk->GetSize();

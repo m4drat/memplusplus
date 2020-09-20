@@ -113,9 +113,13 @@ public:
      * (graphviz), to visualize tree structure. As inspiration i've used this article: 
      * https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
      *
+     * @param t_out std::ostream& to write to
+     * @param t_treapName std::string - name of digraph
+     * @param t_root root, to start from, if parameter is nullptr, dump whole
+     * tree starting from m_root.
      * @return std::ostream that was passed as parameter
      */
-    std::ostream& GenerateGraphvizLayout(std::ostream& t_out) const;
+    std::ostream& GenerateGraphvizLayout(std::ostream& t_out, std::string t_treapName = "Treap", Node* t_root = nullptr) const;
 
 private:
     /**
@@ -147,12 +151,13 @@ private:
      * @param t_root[out] new tree root
      */
     static void MergeNodes(Node* t_left, Node* t_right, Node*& t_root);
+    
     /**
      * @brief Separates tree into two subtrees by t_chunk.
      * @param t_root root, from which we shoul start splitting
-     * @param t_chunk chunk to split by
      * @param[out] t_left left subtree
      * @param[out] t_right right subtree
+     * @param t_chunk chunk to split by
      */
     static void SplitNodesByElement(Node* t_root, Node*& t_left, Node*& t_right, Chunk* t_chunk);
 };

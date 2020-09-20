@@ -83,7 +83,7 @@ std::size_t ChunkTreap::GetAmountOfFreedMemory()
     return m_freedMemory;
 }
 
-std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
+std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out, std::string t_treapName, Node* t_root) const
 {
     PROFILE_FUNCTION();
 
@@ -135,21 +135,23 @@ std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out) const
         }
     };
 
-    t_out << "digraph Treap {\n";
+    t_out << "digraph " << t_treapName << " {\n";
     t_out << "    node [shape=rectangle]\n";
 
-    if (m_root == nullptr)
+    Node* startRoot = (t_root == nullptr) ? m_root : t_root;
+
+    if (startRoot == nullptr)
     {
         t_out << std::endl;
     } 
-    else if (m_root->leftChild == nullptr && m_root->rightChild == nullptr)
+    else if (startRoot->leftChild == nullptr && startRoot->rightChild == nullptr)
     {
-        t_out << "    " << (reinterpret_cast<intptr_t>(m_root->chunk) ^ m_root->priority) 
-              << " [label=\"chunk: " << reinterpret_cast<void*>(m_root->chunk) << "\npriority: " << m_root->priority << "\"];" << std::endl;
+        t_out << "    " << (reinterpret_cast<intptr_t>(startRoot->chunk) ^ startRoot->priority) 
+              << " [label=\"chunk: " << reinterpret_cast<void*>(startRoot->chunk) << "\npriority: " << startRoot->priority << "\"];" << std::endl;
     }
     else 
     {
-        GenerateRecursive(m_root, t_out);
+        GenerateRecursive(startRoot, t_out);
     }
 
     t_out << "}" << std::endl;
@@ -189,10 +191,14 @@ void ChunkTreap::InsertChunk(Chunk* t_chunk)
 void ChunkTreap::InsertNode(Node* t_node)
 {
     PROFILE_FUNCTION();
+
     Node* leftSubtree = nullptr;
     Node* rightSubtree = nullptr;
 
+    // GenerateGraphvizLayout(std::cout, "root", m_root) << std::endl;
     SplitNodesByElement(m_root, leftSubtree, rightSubtree, t_node->chunk);
+    // GenerateGraphvizLayout(std::cout, "leftSubtree", leftSubtree) << std::endl;
+    // GenerateGraphvizLayout(std::cout, "rightSubtree", rightSubtree) << std::endl;
     MergeNodes(leftSubtree, t_node, leftSubtree);
     MergeNodes(leftSubtree, rightSubtree, m_root);
 }
@@ -200,6 +206,7 @@ void ChunkTreap::InsertNode(Node* t_node)
 void ChunkTreap::RemoveChunk(Chunk* t_chunk)
 {
     PROFILE_FUNCTION();
+    
     m_freedChunks--;
     m_freedMemory -= t_chunk->GetSize();
 
@@ -226,17 +233,18 @@ void ChunkTreap::RemoveChunk(Chunk* t_chunk)
     MergeNodes(leftSubtree, rightSubtree, m_root);
 }
 
-Chunk* ChunkTreap::FirstGreaterOrEqualThan(std::size_t desiredChunkSize) const
+Chunk* ChunkTreap::FirstGreaterOrEqualThan(std::size_t t_desiredChunkSize) const
 {
     PROFILE_FUNCTION();
+
     Node* currentNode = m_root;
 
     while (currentNode) {
-        if (currentNode->chunk->GetSize() < desiredChunkSize) {
+        if (currentNode->chunk->GetSize() < t_desiredChunkSize) {
             currentNode = currentNode->rightChild;
         } else {
             if (currentNode->leftChild &&
-                currentNode->leftChild->chunk->GetSize() >= desiredChunkSize) {
+                currentNode->leftChild->chunk->GetSize() >= t_desiredChunkSize) {
                 currentNode = currentNode->leftChild;
             } else {
                 return currentNode->chunk;

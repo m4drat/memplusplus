@@ -40,23 +40,37 @@ void logic()
     const std::size_t allocationsCount = 9;
 
     std::vector<void*> ptrs;
-    for (uint32_t i = 0; i < allocationsCount; ++i) {
-        ptrs.push_back(MemoryAllocator::Allocate(allocaSize));
-    }
+    ptrs.push_back(MemoryAllocator::Allocate(128));
+    ptrs.push_back(MemoryAllocator::Allocate(256));
+    ptrs.push_back(MemoryAllocator::Allocate(512));
+    ptrs.push_back(MemoryAllocator::Allocate(16));
+    ptrs.push_back(MemoryAllocator::Allocate(128));
+    ptrs.push_back(MemoryAllocator::Allocate(256));
+    ptrs.push_back(MemoryAllocator::Allocate(512));
+    ptrs.push_back(MemoryAllocator::Allocate(1024));
+    ptrs.push_back(MemoryAllocator::Allocate(128));
+    ptrs.push_back(MemoryAllocator::Allocate(128));
+    ptrs.push_back(MemoryAllocator::Allocate(2048));
+    ptrs.push_back(MemoryAllocator::Allocate(128));
+    ptrs.push_back(MemoryAllocator::Allocate(128));
+    ptrs.push_back(MemoryAllocator::Allocate(128));
 
-    MemoryAllocator::Deallocate(ptrs.at(1));
-    MemoryAllocator::Deallocate(ptrs.at(3));
-    MemoryAllocator::Deallocate(ptrs.at(5));
-    MemoryAllocator::Deallocate(ptrs.at(7));
-    
+    MemoryAllocator::Deallocate(ptrs[0]);
+    MemoryAllocator::Deallocate(ptrs[2]);
+    MemoryAllocator::Deallocate(ptrs[4]);
+    MemoryAllocator::Deallocate(ptrs[6]);
+    MemoryAllocator::Deallocate(ptrs[8]);
+    // DoubleFree
+    MemoryAllocator::Deallocate(ptrs[8]);
+
     // simulate invalid free
-    MemoryAllocator::Deallocate((void*)0xdeadbeef);
+    // MemoryAllocator::Deallocate((void*)0xdeadbeef);
 
     // Simulate doublefree
     // MemoryAllocator::Deallocate(ptrs.at(7));
 
-    // MemoryManager::VisHeapLayout(std::cout);
-    // MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout);
+    // MemoryManager::VisHeapLayout(std::cout)
+    MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout, "Treap") << std::endl;
 }
 
 int main()
