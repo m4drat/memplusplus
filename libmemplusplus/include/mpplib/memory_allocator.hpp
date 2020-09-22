@@ -82,7 +82,7 @@ public:
      * @return void* pointer to user data in allocated chunk
      */
     static void* Allocate(std::size_t t_userDataSize);
-    
+
     /**
      * @brief Deallocates chunk of memory.
      * @param t_chunkPtr pointer to start of user data.

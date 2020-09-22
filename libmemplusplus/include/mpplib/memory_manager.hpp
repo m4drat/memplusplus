@@ -92,7 +92,7 @@ public:
     static const std::size_t g_PAGE_SIZE = 4096;
 
     /**
-     * @brief fill char, to fill allocated chunks in debug mode or secure mode. 
+     * @brief fill char, to fill allocated chunks in debug mode or secure mode.
      */
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
     static const uint8_t g_FILL_CHAR = MPP_FILL_CHAR;

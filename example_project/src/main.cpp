@@ -1,10 +1,10 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <algorithm>
 
-#include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
@@ -36,7 +36,8 @@ void logic()
     using namespace std::literals::chrono_literals;
 
     const std::size_t allocaSize = 112;
-    const std::size_t realChunkSize = MemoryAllocator::Align(allocaSize + sizeof(Chunk::ChunkHeader), MemoryAllocator::g_MIN_CHUNK_SIZE);
+    const std::size_t realChunkSize = MemoryAllocator::Align(
+      allocaSize + sizeof(Chunk::ChunkHeader), MemoryAllocator::g_MIN_CHUNK_SIZE);
     const std::size_t allocationsCount = 9;
 
     std::vector<void*> ptrs;
@@ -73,7 +74,8 @@ void logic()
     // MemoryAllocator::Deallocate(ptrs.at(7));
 
     // MemoryManager::VisHeapLayout(std::cout)
-    MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout, "Treap") << std::endl;
+    MemoryAllocator::GetArenaList()[0]->freedChunks.GenerateGraphvizLayout(std::cout, "Treap")
+      << std::endl;
 }
 
 int main()

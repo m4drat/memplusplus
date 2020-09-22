@@ -6,12 +6,12 @@
 namespace mpp { namespace utils {
 
     /**
-     * @brief Default backtrace size. 
+     * @brief Default backtrace size.
      */
     static const uint32_t s_MAX_STACK_LEVELS = 50;
 
     /**
-     * @brief Helper function to dump stacktrace. 
+     * @brief Helper function to dump stacktrace.
      * @param t_out output stream to write to.
      * @param t_skip number of functions to skip from backtrace.
      */
@@ -21,7 +21,7 @@ namespace mpp { namespace utils {
      * @brief Function to print error message and terminate program.
      * @param message message to print
      */
-    [[ noreturn ]] void ErrorAbort(const std::string& t_message);
+    [[noreturn]] void ErrorAbort(const std::string& t_message);
 
     /**
      * @brief Finds first elemet, that is greater or equal to key.

@@ -4,8 +4,8 @@
 #include "mpplib/containers/node.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
-#include <iostream>
 #include <functional>
+#include <iostream>
 
 namespace mpp {
 /**
@@ -110,7 +110,7 @@ public:
 
     /**
      * @brief Generates tree representation in form, that can be used in dot
-     * (graphviz), to visualize tree structure. As inspiration i've used this article: 
+     * (graphviz), to visualize tree structure. As inspiration i've used this article:
      * https://eli.thegreenplace.net/2009/11/23/visualizing-binary-trees-with-graphviz
      *
      * @param t_out std::ostream& to write to
@@ -119,7 +119,9 @@ public:
      * tree starting from m_root.
      * @return std::ostream that was passed as parameter
      */
-    std::ostream& GenerateGraphvizLayout(std::ostream& t_out, std::string t_treapName = "Treap", Node* t_root = nullptr) const;
+    std::ostream& GenerateGraphvizLayout(std::ostream& t_out,
+                                         std::string t_treapName = "Treap",
+                                         Node* t_root = nullptr) const;
 
 private:
     /**
@@ -151,7 +153,7 @@ private:
      * @param t_root[out] new tree root
      */
     static void MergeNodes(Node* t_left, Node* t_right, Node*& t_root);
-    
+
     /**
      * @brief Separates tree into two subtrees by t_chunk.
      * @param t_root root, from which we shoul start splitting

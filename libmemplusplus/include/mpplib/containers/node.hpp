@@ -25,12 +25,12 @@ public:
      * @brief Сhunk related to the current node.
      */
     Chunk* chunk{ nullptr };
-    
+
     /**
      * @brief Reference to the left node.
      */
     Node* leftChild{ nullptr };
-    
+
     /**
      * @brief Reference to the right node.
      */
@@ -45,17 +45,17 @@ public:
      * @brief Copy-Constructor, that constructs node from const node reference.
      */
     Node(const Node& t_node);
-    
+
     /**
      * @brief Assigment operator, that constructs node from const node reference.
      */
     Node& operator=(const Node& t_node);
-    
+
     /**
      * @brief Copy-Constructor, that constructs node from r-value node reference.
      */
     Node(Node&& t_node);
-    
+
     /**
      * @brief Assigment operator, that constructs node from r-value node reference.
      */
@@ -72,7 +72,7 @@ public:
      * @brief Dump text represenation of the node.
      */
     static std::ostream& DumpNode(std::ostream& t_out, Node* t_node);
-    
+
     /**
      * @brief Overloaded output operator to print node using std::cout.
      */

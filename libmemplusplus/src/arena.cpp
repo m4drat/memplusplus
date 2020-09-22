@@ -218,10 +218,9 @@ void Arena::DeallocateChunk(Chunk* t_chunk)
     // If erase returns 0, it means, that we haven't deleted
     // any chunks from chunks in use. This can mean, that chunk
     // already was deleted (aka DoubleFree occured), or some other
-    // kind of memory corruption occured. Always abort program, because 
+    // kind of memory corruption occured. Always abort program, because
     // we don't have any performance impact.
-    if (!chunksInUse.erase(t_chunk))
-    {
+    if (!chunksInUse.erase(t_chunk)) {
         utils::ErrorAbort("Arena::DeallocateChunk(): Double free or corruption detected!\n");
     }
 

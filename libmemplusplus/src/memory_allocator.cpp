@@ -21,8 +21,7 @@ void* MemoryAllocator::SysAlloc(std::size_t t_size)
 
     void* rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (rawPtr == MAP_FAILED) {
-
-    // If we are using fuzzer just ignore out-of-memory errors and exit 
+        // If we are using fuzzer just ignore out-of-memory errors and exit
 #if MPP_FUZZER_INSECURE == 1
         exit(0);
 #else
@@ -126,7 +125,7 @@ void* MemoryAllocator::AllocateBigChunk(std::size_t t_userDataSize)
 void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
 {
     PROFILE_FUNCTION();
-    
+
     // Align, because we want to have metadata bits
     std::size_t realChunkSize =
       Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
@@ -137,7 +136,8 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
         void* bigChunk = AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
-        std::memset(bigChunk, g_FILL_CHAR, Align(realChunkSize, g_PAGE_SIZE) - sizeof(Chunk::ChunkHeader));
+        std::memset(
+          bigChunk, g_FILL_CHAR, Align(realChunkSize, g_PAGE_SIZE) - sizeof(Chunk::ChunkHeader));
         return bigChunk;
 #else
         return AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
@@ -155,7 +155,8 @@ void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     Chunk* chunk = GetSuitableChunk(realChunkSize);
     if (chunk != nullptr) {
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-        std::memset(Chunk::GetUserDataPtr(chunk), g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
+        std::memset(
+          Chunk::GetUserDataPtr(chunk), g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
         return Chunk::GetUserDataPtr(chunk);
 #else
         return Chunk::GetUserDataPtr(chunk);
