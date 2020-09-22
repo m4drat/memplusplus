@@ -21,7 +21,7 @@ namespace mpp { namespace utils {
      * @brief Function to print error message and terminate program.
      * @param message message to print
      */
-    void ErrorAbort(const std::string& t_message);
+    [[ noreturn ]] void ErrorAbort(const std::string& t_message);
 
     /**
      * @brief Finds first elemet, that is greater or equal to key.
