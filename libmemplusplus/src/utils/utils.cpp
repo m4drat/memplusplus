@@ -36,7 +36,7 @@ namespace mpp { namespace utils {
                 free(demangled);
             } else {
                 std::snprintf(
-                  buf, sizeof(buf), "%-3d %*p\n", i, (int)(2 + sizeof(void*) * 2), callstack[i]);
+                    buf, sizeof(buf), "%-3d %*p\n", i, (int)(2 + sizeof(void*) * 2), callstack[i]);
             }
             t_out << buf;
             std::snprintf(buf, sizeof(buf), "%s\n", symbols[i]);

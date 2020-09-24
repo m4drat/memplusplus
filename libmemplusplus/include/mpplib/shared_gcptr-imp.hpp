@@ -4,6 +4,7 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
+#include "mpplib/utils/utils.hpp"
 
 #include <algorithm>
 #include <iostream>
@@ -37,6 +38,20 @@ namespace mpp {
     , m_references{ new uint32_t(1) }
     {
         PROFILE_FUNCTION();
+
+        // In secure build add check for invalid Initialization.
+        // This check should prevent ability for use-after-free
+        // Due to invalid initialization (2 different SPs initialized
+        // with the same pointer)
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
+        // Iterate through all GcPtrs, and check where they point.
+        for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
+            if (gcPtr->GetVoid() == obj)
+                utils::ErrorAbort(
+                    "SharedGcPtr<Type>::SharedGcPtr(Type* obj): Invalid initialization!\n");
+        }
+#endif
+
         AddToGcList();
     }
     catch (...)
@@ -123,6 +138,20 @@ namespace mpp {
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(Type* t_newData)
     {
         PROFILE_FUNCTION();
+
+        // In secure build add check for invalid Initialization.
+        // This check should prevent ability for use-after-free
+        // Due to invalid initialization (2 different SPs initialized
+        // with the same pointer)
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
+        // Iterate through all GcPtrs, and check where they point.
+        for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
+            if (gcPtr->GetVoid() == t_newData)
+                utils::ErrorAbort(
+                    "SharedGcPtr<Type>::operator=(Type* t_newData): Invalid initialization!\n");
+        }
+#endif
+
         // Create temp object
         SharedGcPtr tmp(t_newData);
 
@@ -206,7 +235,7 @@ namespace mpp {
 
         // Delete shared ptr from list of all active gc ptrs
         auto toErase = std::find(
-          GC::GetInstance().GetGcPtrs().begin(), GC::GetInstance().GetGcPtrs().end(), this);
+            GC::GetInstance().GetGcPtrs().begin(), GC::GetInstance().GetGcPtrs().end(), this);
         if (toErase != GC::GetInstance().GetGcPtrs().end()) {
             GC::GetInstance().GetGcPtrs().erase(toErase);
             return true;

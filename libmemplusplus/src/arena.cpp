@@ -76,7 +76,7 @@ namespace mpp {
         if (t_chunkSize == topChunk->GetSize()) {
             // Construct new chunk from all memory, that belongs to top chunk
             Chunk* chunk =
-              Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
+                Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
 
             // make topChunk nullptr, to let allocator know, that we dont
             // have any more top-space in current arena. This field can be
@@ -94,11 +94,11 @@ namespace mpp {
 
         // Update top chunk
         topChunk = Chunk::ConstructChunk(
-          reinterpret_cast<Chunk*>(reinterpret_cast<size_t>(topChunk) + t_chunkSize),
-          t_chunkSize,
-          newTopChunkSize,
-          1,
-          1);
+            reinterpret_cast<Chunk*>(reinterpret_cast<size_t>(topChunk) + t_chunkSize),
+            t_chunkSize,
+            newTopChunkSize,
+            1,
+            1);
 
         return chunk;
     }
@@ -152,11 +152,11 @@ namespace mpp {
 
                 // Update the fields of the remaining chunk
                 Chunk* splittedChunk = Chunk::ConstructChunk(
-                  reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
-                  t_chunkSize,
-                  toSplitChunkSize - t_chunkSize,
-                  0,
-                  1);
+                    reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
+                    t_chunkSize,
+                    toSplitChunkSize - t_chunkSize,
+                    0,
+                    1);
 
                 // Update previous size for the next chunk after splitted
                 // current memory layout: [user-returned][splitted part][next chunk after
@@ -176,7 +176,7 @@ namespace mpp {
             if (t_chunk->GetSize() == t_chunkSize) {
                 // Construct new chunk
                 Chunk* chunk = Chunk::ConstructChunk(
-                  t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
+                    t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
 
                 // Update inuse bit
                 Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
@@ -190,15 +190,15 @@ namespace mpp {
 
                 // Construct chunk, that is going to be returned
                 Chunk* chunk = Chunk::ConstructChunk(
-                  t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
+                    t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
 
                 // Construct splitted chunk
                 Chunk* splittedChunk = Chunk::ConstructChunk(
-                  reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
-                  t_chunkSize,
-                  toSplitChunkSize - t_chunkSize,
-                  0,
-                  1);
+                    reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
+                    t_chunkSize,
+                    toSplitChunkSize - t_chunkSize,
+                    0,
+                    1);
 
                 // Update previous size field for next chunk, after
                 // splitted chunk
@@ -219,7 +219,8 @@ namespace mpp {
         // If erase returns 0, it means, that we haven't deleted
         // any chunks from chunks in use. This can mean, that chunk
         // already was deleted (aka DoubleFree occured), or some other
-        // kind of memory corruption occured. Always abort program, because
+        // kind of memory corruption occured (for example we tried to
+        // free invalid chunk). Always abort program, because
         // we don't have any performance impact.
         if (!chunksInUse.erase(t_chunk)) {
             utils::ErrorAbort("Arena::DeallocateChunk(): Double free or corruption detected!\n");
@@ -353,7 +354,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
         Chunk* chunk = Chunk::ConstructChunk(
-          t_chunk1, t_chunk1->GetPrevSize(), t_chunk1->GetSize() + t_chunk2->GetSize(), 0, 0);
+            t_chunk1, t_chunk1->GetPrevSize(), t_chunk1->GetSize() + t_chunk2->GetSize(), 0, 0);
         return chunk;
     }
 
@@ -363,9 +364,9 @@ namespace mpp {
         // Try to found in use chunk by ptr in some location
         // inside this chunk
         auto foundChunkIt = utils::LowerBound(
-          chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
-              return (t_ptr >= reinterpret_cast<void*>(t_ch));
-          });
+            chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
+                return (t_ptr >= reinterpret_cast<void*>(t_ch));
+            });
         if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
             return *foundChunkIt;
         }
@@ -430,7 +431,7 @@ namespace mpp {
         } else {
             t_out << std::fixed << std::setprecision(4)
                   << (t_arena->chunksInUse.size() * sizeof(Chunk::ChunkHeader_t)) /
-                       float(t_arena->m_CurrentlyAllocatedSpace) * 100
+                         float(t_arena->m_CurrentlyAllocatedSpace) * 100
                   << "% of currently allocated space)" << std::endl;
         }
 

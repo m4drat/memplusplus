@@ -146,7 +146,7 @@ namespace mpp {
         void SetSize(std::size_t size)
         {
             this->ChunkHeader.chunkHeader =
-              (size | (INFO_BITS_MASK & this->ChunkHeader.chunkHeader));
+                (size | (INFO_BITS_MASK & this->ChunkHeader.chunkHeader));
         }
 
         /**

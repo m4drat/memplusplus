@@ -58,8 +58,9 @@ namespace mpp {
 
         // Create arena with enough size to fit all objects
         std::size_t godArenaSize = MemoryAllocator::Align(
-          (layoutedData.second < g_DEFAULT_ARENA_SIZE) ? g_DEFAULT_ARENA_SIZE : layoutedData.second,
-          g_PAGE_SIZE);
+            (layoutedData.second < g_DEFAULT_ARENA_SIZE) ? g_DEFAULT_ARENA_SIZE
+                                                         : layoutedData.second,
+            g_PAGE_SIZE);
         Arena* godArena = MemoryAllocator::CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
@@ -83,7 +84,7 @@ namespace mpp {
 
             // Copy chunk data to new location
             std::memcpy(
-              currPtr, reinterpret_cast<void*>(vertex->GetCorrespondingChunk()), currSize);
+                currPtr, reinterpret_cast<void*>(vertex->GetCorrespondingChunk()), currSize);
 
             // Update required fields
             currChunk = reinterpret_cast<Chunk*>(currPtr);
@@ -95,9 +96,9 @@ namespace mpp {
             // Update GcPtr
             for (auto gcPtr : vertex->GetPointingToGcPtrs()) {
                 gcPtr->UpdatePtr(reinterpret_cast<void*>(
-                  reinterpret_cast<std::size_t>(currPtr) +
-                  (reinterpret_cast<std::size_t>(gcPtr->GetVoid()) -
-                   reinterpret_cast<std::size_t>(vertex->GetCorrespondingChunk()))));
+                    reinterpret_cast<std::size_t>(currPtr) +
+                    (reinterpret_cast<std::size_t>(gcPtr->GetVoid()) -
+                     reinterpret_cast<std::size_t>(vertex->GetCorrespondingChunk()))));
             }
 
             prevSize = currSize;
@@ -110,7 +111,7 @@ namespace mpp {
             // We still have some space in top chunk
         } else {
             Chunk* topChunk =
-              Chunk::ConstructChunk(currPtr, prevSize, godArenaSize - layoutedData.second, 1, 1);
+                Chunk::ConstructChunk(currPtr, prevSize, godArenaSize - layoutedData.second, 1, 1);
             godArena->SetUsedSpace(layoutedData.second);
             godArena->topChunk = topChunk;
         }

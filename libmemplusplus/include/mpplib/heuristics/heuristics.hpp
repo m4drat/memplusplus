@@ -48,7 +48,7 @@ namespace mpp {
          * datastructures.
          */
         std::vector<std::pair<GcGraph*, DataStructures>> ExtractGroups(
-          std::unique_ptr<GcGraph>& t_gcSubgraph);
+            std::unique_ptr<GcGraph>& t_gcSubgraph);
 
         /**
          * @brief Layouts heap.

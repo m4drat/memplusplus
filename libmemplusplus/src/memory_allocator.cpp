@@ -20,7 +20,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         void* rawPtr =
-          mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         if (rawPtr == MAP_FAILED) {
             // If we are using fuzzer just ignore out-of-memory errors and exit
 #if MPP_FUZZER_INSECURE == 1
@@ -129,7 +129,7 @@ namespace mpp {
 
         // Align, because we want to have metadata bits
         std::size_t realChunkSize =
-          Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
+            Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
 
         // If allocation size is bigger than default arena size
         // we will allocate new arena with chunk, which size is
@@ -193,6 +193,8 @@ namespace mpp {
         // to find the one that the chunk belongs to
         for (auto* arena : s_ArenaList) {
             if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
+                // In this case, we still can free invalid pointer, so
+                // add additional checks inside DeallocateChunk
                 arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
                 return true;
                 break;
@@ -203,7 +205,7 @@ namespace mpp {
         // state, because, we've tried to free invalid/non-existing chunk
         // Always abort program, because we don't have any performance impact.
         utils::ErrorAbort(
-          "MemoryAllocator::Deallocate(): Invalid pointer deallocation detected!\n");
+            "MemoryAllocator::Deallocate(): Invalid pointer deallocation detected!\n");
 
         // The given pointer doens't belong to any active arena
         return false;
