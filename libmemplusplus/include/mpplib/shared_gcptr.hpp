@@ -198,6 +198,13 @@ namespace mpp {
          * @return std::ostream& passed as parameter stream
          */
         std::ostream& Print(std::ostream& t_out) const override;
+
+        /**
+         * @brief Check, if user tries to initialize SharedGcPtr with 
+         * invalid object. If so, abort program.
+         * @param t_obj a pointer to the object that is used to initialize ShareGcPtr
+         */
+        void CheckInvalidInitialization(Type* t_obj);
     };
 
     /**

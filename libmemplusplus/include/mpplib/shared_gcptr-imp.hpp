@@ -44,12 +44,7 @@ namespace mpp {
         // Due to invalid initialization (2 different SPs initialized
         // with the same pointer)
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-        // Iterate through all GcPtrs, and check where they point.
-        for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
-            if (gcPtr->GetVoid() == obj)
-                utils::ErrorAbort(
-                    "SharedGcPtr<Type>::SharedGcPtr(Type* obj): Invalid initialization!\n");
-        }
+        CheckInvalidInitialization(obj);
 #endif
 
         AddToGcList();
@@ -144,12 +139,7 @@ namespace mpp {
         // Due to invalid initialization (2 different SPs initialized
         // with the same pointer)
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-        // Iterate through all GcPtrs, and check where they point.
-        for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
-            if (gcPtr->GetVoid() == t_newData)
-                utils::ErrorAbort(
-                    "SharedGcPtr<Type>::operator=(Type* t_newData): Invalid initialization!\n");
-        }
+        CheckInvalidInitialization(t_newData);
 #endif
 
         // Create temp object
@@ -351,6 +341,17 @@ namespace mpp {
             t_out << ", nullptr)";
         }
         return t_out;
+    }
+
+    template<class Type>
+    void SharedGcPtr<Type>::CheckInvalidInitialization(Type* t_obj)
+    {
+        // Iterate through all GcPtrs, and check where they point.
+        for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
+            if (gcPtr->GetVoid() == t_obj)
+                utils::ErrorAbort(
+                    "SharedGcPtr<Type>: Invalid initialization!\n");
+        }
     }
 
     template<class Type, class... Args>
