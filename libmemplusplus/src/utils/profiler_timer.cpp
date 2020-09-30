@@ -12,7 +12,9 @@ namespace mpp { namespace utils { namespace profile {
     ProfilerTimer::~ProfilerTimer()
     {
         if (!m_Stopped)
+        {
             Stop();
+        }
     }
 
     void ProfilerTimer::Stop()

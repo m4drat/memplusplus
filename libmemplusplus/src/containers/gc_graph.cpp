@@ -8,14 +8,18 @@ namespace mpp {
     GcGraph::GcGraph(GcGraph& t_other)
     {
         for (auto v : t_other.GetAdjList())
+        {
             m_adjList.insert(v);
+        }
     }
 
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(const std::vector<Vertex*>& t_other)
     {
         for (auto v : t_other)
+        {
             m_adjList.insert(v);
+        }
     }
 
     GcGraph::~GcGraph()
@@ -237,7 +241,9 @@ namespace mpp {
         std::unique_ptr<Vertex> vertex = std::make_unique<Vertex>(t_chunk);
         auto foundVertexIt = m_adjList.find(vertex.get());
         if (foundVertexIt != m_adjList.end())
+        {
             return *foundVertexIt;
+        }
 
         return nullptr;
     }

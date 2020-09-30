@@ -55,7 +55,7 @@ namespace mpp { namespace utils {
         // Prnt error message
         std::cerr << t_message;
 
-#ifdef MPP_DEBUG
+#if MPP_DEBUG == 1
         // Dump stacktrace in debug
         DumpStackTrace(std::cerr);
 #endif

@@ -43,7 +43,7 @@ endif()
 # endforeach()
 
 set(EXAMPLE_PROJECT_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/example_project/include)
-set(FUZZING_HARNESS_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/fuzzing_harness/include)
+set(FUZZING_HARNESS_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/fuzzer/include)
 set(LIBMEMPLUSPLUS_INCLUDES  ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/libmemplusplus/include)
 
 # Adding clang-tidy target if executable is found

@@ -15,4 +15,4 @@ set_target_properties(${PROJECT_NAME}
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -Wl,-export-dynamic -fpic -ldl)
-target_link_libraries(${PROJECT_NAME} PRIVATE -ldl lib::mpp)
+target_link_libraries(${PROJECT_NAME} PRIVATE -ldl lib::mpp -export-dynamic)

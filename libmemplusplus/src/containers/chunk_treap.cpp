@@ -10,7 +10,7 @@ namespace mpp {
 
     // TODO - smart pointers memory managment
     ChunkTreap::ChunkTreap(const ChunkTreap& t_treap)
-        : m_root(new Node(*t_treap.m_root))
+        : m_root(new Node(*t_treap.m_root)), m_freedChunks{ 0 }, m_freedMemory{ 0 }
     {}
 
     ChunkTreap& ChunkTreap::operator=(const ChunkTreap& t_treap)
@@ -35,7 +35,9 @@ namespace mpp {
     ChunkTreap& ChunkTreap::operator=(ChunkTreap&& t_treap)
     {
         if (&t_treap == this)
+        {
             return *this;
+        }
 
         Delete();
 
@@ -59,7 +61,9 @@ namespace mpp {
     void ChunkTreap::Delete(Node* t_root)
     {
         if (t_root == nullptr)
+        {
             return;
+        }
 
         // Delete recursively each node
         Delete(t_root->leftChild);
@@ -223,6 +227,11 @@ namespace mpp {
     void ChunkTreap::RemoveChunk(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
+
+        if (m_root == nullptr)
+        {
+            return;
+        }
 
         m_freedChunks--;
         m_freedMemory -= t_chunk->GetSize();

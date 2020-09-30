@@ -18,6 +18,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -fsanitize=fuzzer)
 
 set(FUZZ_RUNTIME
     30
-    CACHE STRING "Number of seconds to run fuzz tests during ctest run") # Default of 10 seconds
+    CACHE STRING "Number of seconds to run fuzz tests during ctest run")
 
 add_test(NAME fuzz_tester COMMAND ${PROJECT_NAME} -max_total_time=${FUZZ_RUNTIME})

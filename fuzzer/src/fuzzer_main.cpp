@@ -26,8 +26,10 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size)
                 break;
             }
             case Tokenizer::Tokens::Deallocate: {
-                if (allocatedChunks.size() == 0)
+                if (allocatedChunks.empty())
+                {
                     return 0;
+                }
                 uint32_t position = rand() % allocatedChunks.size();
                 void* chunk = allocatedChunks.at(position);
                 // std::cout << "Deallocating chunk: " << chunk << ". Of size: " <<

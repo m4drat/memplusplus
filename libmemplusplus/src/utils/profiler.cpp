@@ -39,7 +39,9 @@ namespace mpp { namespace utils { namespace profile {
                                 uint32_t t_threadId)
     {
         if (m_ProfileCount++ > 0)
+        {
             m_OutputStream << ",";
+        }
 
         std::string name = std::string(t_name);
         std::replace(name.begin(), name.end(), '"', '\'');

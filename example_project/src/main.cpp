@@ -36,12 +36,9 @@ void logic()
     using namespace std::literals::chrono_literals;
 
     char* ptr = (char*)MemoryAllocator::Allocate(1024);
-    SharedGcPtr<char> a;
+    SharedGcPtr<char> a(ptr);
     // Should trigger invalid initialization
-    SharedGcPtr<char> b;
-
-    a = ptr;
-    b = ptr;
+    SharedGcPtr<char> b(ptr);
 }
 
 int main()

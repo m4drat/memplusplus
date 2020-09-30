@@ -154,6 +154,13 @@ Library options:
 
 ## Debugging / profiling library
 
+If you want to use backtrace functionality add this flags to your project's CMakeLists.txt:
+
+```cmake
+target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -Wl,-export-dynamic -fpic -ldl)
+target_link_libraries(${PROJECT_NAME} PRIVATE -ldl lib::mpp -export-dynamic)
+```
+
 Memplusplus provides different debug-like features, such as: data visualizers, profiler, statistics collector.
 
 - Data visualizers:
@@ -348,7 +355,7 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
             ```
 
     2. After program termination, setting environment variable MPP_SHOW_STATISTICS=1.  
-        Important note. Runtime stats cannot be dumped using this approah.
+        Important note. Runtime stats cannot be dumped using this approach.
 
         - Example output:
 
