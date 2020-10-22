@@ -102,6 +102,7 @@ namespace mpp {
         static T* Allocate(Args&&... t_args)
         {
             PROFILE_FUNCTION();
+
             return new (Allocate(sizeof(T))) T(std::forward<Args>(t_args)...);
         }
 
@@ -116,6 +117,7 @@ namespace mpp {
         static bool Deallocate(T* t_objPtr)
         {
             PROFILE_FUNCTION();
+            
             if (std::is_destructible<T>::value) {
                 t_objPtr->~T();
             }

@@ -81,6 +81,7 @@ namespace mpp {
     SharedGcPtr<Type>::SharedGcPtr(SharedGcPtr<Type>&& t_other)
     {
         PROFILE_FUNCTION();
+
         Swap(t_other);
     }
 
@@ -89,6 +90,7 @@ namespace mpp {
     SharedGcPtr<Type>::~SharedGcPtr()
     {
         PROFILE_FUNCTION();
+
         DeleteReference();
     }
 
@@ -96,6 +98,7 @@ namespace mpp {
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(SharedGcPtr<Type>&& t_other) noexcept
     {
         PROFILE_FUNCTION();
+
         if (this != &t_other) {
             Swap(t_other);
         }
@@ -107,6 +110,7 @@ namespace mpp {
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(const SharedGcPtr<Type>& t_other)
     {
         PROFILE_FUNCTION();
+
         if (this == &t_other) {
             return *this;
         }
@@ -219,6 +223,7 @@ namespace mpp {
     bool SharedGcPtr<Type>::DeleteFromGcList()
     {
         PROFILE_FUNCTION();
+
         // If current object points to nullptr do nothing
         if (m_objectPtr == nullptr)
             return false;
@@ -237,6 +242,7 @@ namespace mpp {
     void SharedGcPtr<Type>::Reset()
     {
         PROFILE_FUNCTION();
+
         Reset(nullptr);
     }
 
@@ -244,6 +250,7 @@ namespace mpp {
     void SharedGcPtr<Type>::Reset(std::nullptr_t const)
     {
         PROFILE_FUNCTION();
+
         DeleteReference();
 
         m_references = new uint32_t(1);
@@ -254,6 +261,7 @@ namespace mpp {
     void SharedGcPtr<Type>::DeleteReference()
     {
         PROFILE_FUNCTION();
+
         DeleteFromGcList();
 
         // If m_references isn't nullptr
@@ -267,10 +275,10 @@ namespace mpp {
                 delete m_references;
                 m_references = nullptr;
 
-                // TODO: shoud we really deallocate data, or we just need to delete it
+                // TODO: should we really deallocate data, or we just need to delete it
                 // from chunksInUse + call object destructor
                 if (m_objectPtr) {
-                    MemoryAllocator::Deallocate<Type>(m_objectPtr);
+                        MemoryAllocator::Deallocate<Type>(m_objectPtr);
                 }
             }
         }

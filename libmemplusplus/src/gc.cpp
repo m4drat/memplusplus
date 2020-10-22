@@ -24,10 +24,10 @@ namespace mpp {
         PROFILE_FUNCTION();
         /*
         1.
-            1.1 Divide graph into subgraps (by connected components)
+            1.1 Divide graph into subgraphs (by connected components)
             1.2 for each component find structures, rearranges them
                 unite all of the components
-            1.3 Heuruistics returns pair<neededSpace, vector<Vertex*>>
+            1.3 Heuristics returns pair<neededSpace, vector<Vertex*>>
         2.
             2.1 iterate through all arenas
             2.2 reallocate chunks + update pointers
