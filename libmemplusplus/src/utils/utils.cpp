@@ -1,8 +1,10 @@
 #include "mpplib/utils/utils.hpp"
 
 #include <cstdio>
+#if MPP_DEBUG == 1
 #include <cxxabi.h> // for __cxa_demangle
 #include <dlfcn.h>  // for dladdr
+#endif
 #include <exception>
 #include <execinfo.h>
 #include <iostream>
@@ -12,6 +14,7 @@
 
 namespace mpp { namespace utils {
 
+#if MPP_DEBUG == 1
     void DumpStackTrace(std::ostream& t_out, int32_t t_skip)
     {
         void* callstack[s_MAX_STACK_LEVELS];
@@ -49,6 +52,7 @@ namespace mpp { namespace utils {
 
         free(symbols);
     }
+#endif
 
     void ErrorAbort(const std::string& t_message)
     {
