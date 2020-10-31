@@ -2,9 +2,11 @@
 
 #include "mpplib/memory_allocator.hpp"
 
-#include <new>
-
 namespace mpp {
+    /**
+     * @brief MppStlAllocator class. Implements basic stl allocator.
+     * @tparam Type of user object.
+     */
     template<class T> 
     struct MppStlAllocator {
         typedef size_t size_type;
@@ -25,16 +27,31 @@ namespace mpp {
         const_pointer address(const_reference x) const {return &x;}
         size_type max_size() const throw() {return size_t(-1) / sizeof(value_type);}
 
+        /**
+         * @brief Allocates memory using mpp::MemoryAllocator::Allocate().
+         * @param n 
+         * @return pointer to object
+         */
         pointer allocate(size_type n)
         {
             return static_cast<pointer>(mpp::MemoryAllocator::Allocate(n*sizeof(T)));
         }
 
+        /**
+         * @brief Deallocates memory using mpp::MemoryAllocator::Deallocate().
+         * @param p - pointer to object
+         * @param n 
+         */
         void deallocate(pointer p, size_type n)
         {
             mpp::MemoryAllocator::Deallocate(static_cast<void*>(p));
         }
 
+        /**
+         * @brief Constructs object.
+         * @param p pointer to object to construct
+         * @param val 
+         */
         void construct(pointer p, const T& val)
         {
             new(static_cast<void*>(p)) T(val);
@@ -45,6 +62,10 @@ namespace mpp {
             new(static_cast<void*>(p)) T();
         }
 
+        /**
+         * @brief Destroy object.
+         * @param p 
+         */
         void destroy(pointer p)
         {
             p->~T();
