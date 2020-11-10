@@ -20,6 +20,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Cla
 endif()
 
 option(MPP_BUILD_FUZZER "Build mpp fuzzing harness" OFF)
+option(MPP_USE_FUZZER_DEFINITIONS "Build mpp with fuzzing-friendly defines" OFF)
 option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
