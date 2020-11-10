@@ -196,7 +196,7 @@ add_library(lib::mpp ALIAS ${PROJECT_NAME})
 ################# SET DEBUG COMPILER OPTIONS #################
 if (CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# ADDED TO SUPPORT DEBUGGING
-	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -export-dynamic -ldl)	# to support backtrace dumping in debug mode
+	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)	# to support backtrace dumping in debug mode
 	target_link_libraries(${PROJECT_NAME} PRIVATE -ldl)
 endif()
 
