@@ -157,8 +157,8 @@ Library options:
 If you want to use backtrace functionality add this flags to your project's CMakeLists.txt:
 
 ```cmake
-target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -Wl,-export-dynamic -fpic -ldl)
-target_link_libraries(${PROJECT_NAME} PRIVATE -ldl lib::mpp -export-dynamic)
+target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -export-dynamic)
 ```
 
 Memplusplus provides different debug-like features, such as: data visualizers, profiler, statistics collector.

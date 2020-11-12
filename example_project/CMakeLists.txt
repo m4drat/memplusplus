@@ -14,5 +14,5 @@ set_target_properties(${PROJECT_NAME}
     RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -Wl,-export-dynamic -fpic -ldl)
-target_link_libraries(${PROJECT_NAME} PRIVATE -ldl lib::mpp -export-dynamic)
+target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -export-dynamic)

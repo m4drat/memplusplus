@@ -246,6 +246,7 @@ namespace mpp {
     // if it is, then we must check that chunk
     // is top, and after merging everything, we should update topChunk
     // to point to new chunk
+    // TODO: Add more sanity checks for this function
     Chunk* Arena::MergeNeighborsChunks(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
@@ -314,6 +315,7 @@ namespace mpp {
     Chunk* Arena::MergeWithTop(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
+
         Chunk* newChunk{ t_chunk };
 
         // Merge backwards
@@ -353,6 +355,7 @@ namespace mpp {
     Chunk* Arena::MergeTwoSequenceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
     {
         PROFILE_FUNCTION();
+
         Chunk* chunk = Chunk::ConstructChunk(
             t_chunk1, t_chunk1->GetPrevSize(), t_chunk1->GetSize() + t_chunk2->GetSize(), 0, 0);
         return chunk;
@@ -361,7 +364,8 @@ namespace mpp {
     Chunk* Arena::GetInUseChunkByPtr(void* t_ptr)
     {
         PROFILE_FUNCTION();
-        // Try to found in use chunk by ptr in some location
+
+        // Try to find InUse chunk by ptr in some location
         // inside this chunk
         auto foundChunkIt = utils::LowerBound(
             chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
@@ -390,6 +394,7 @@ namespace mpp {
                                    bool t_DumpInUseChunks)
     {
         PROFILE_FUNCTION();
+
         t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena) << " --------------"
               << std::endl;
 
