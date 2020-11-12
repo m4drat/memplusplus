@@ -53,7 +53,7 @@ namespace mpp {
     {
         // exception occured (e.g. new throwed std::bad_alloc)
         // Delete object, and call it's destructor
-        MemoryAllocator::Deallocate<Type>(m_objectPtr);
+        // MemoryAllocator::Deallocate<Type>(m_objectPtr);
         throw;
     }
 

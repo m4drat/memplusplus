@@ -20,6 +20,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES ".*Cla
 endif()
 
 option(MPP_BUILD_FUZZER "Build mpp fuzzing harness" OFF)
+option(MPP_USE_FUZZER_DEFINITIONS "Build mpp with fuzzing-friendly defines" OFF)
 option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
@@ -27,12 +28,13 @@ option(MPP_BUILD_BENCHMARK "Build mpp benchmark (tcmalloc, jemalloc, malloc, mpp
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)
 
 message(STATUS "##################### GLOBAL OPTIONS #####################")
-message(STATUS "MPP_ENABLE_COVERAGE : ${MPP_ENABLE_COVERAGE}")
-message(STATUS "MPP_BUILD_FUZZER    : ${MPP_BUILD_FUZZER}")
-message(STATUS "MPP_BUILD_EXAMPLE   : ${MPP_BUILD_EXAMPLE}")
-message(STATUS "MPP_BUILD_TESTS     : ${MPP_BUILD_TESTS}")
-message(STATUS "MPP_BUILD_DOCS      : ${MPP_BUILD_DOCS}")
-message(STATUS "MPP_BUILD_BENCHMARK : ${MPP_BUILD_BENCHMARK}")
+message(STATUS "MPP_ENABLE_COVERAGE        : ${MPP_ENABLE_COVERAGE}")
+message(STATUS "MPP_BUILD_FUZZER           : ${MPP_BUILD_FUZZER}")
+message(STATUS "MPP_USE_FUZZER_DEFINITIONS : ${MPP_USE_FUZZER_DEFINITIONS}")
+message(STATUS "MPP_BUILD_EXAMPLE          : ${MPP_BUILD_EXAMPLE}")
+message(STATUS "MPP_BUILD_TESTS            : ${MPP_BUILD_TESTS}")
+message(STATUS "MPP_BUILD_DOCS             : ${MPP_BUILD_DOCS}")
+message(STATUS "MPP_BUILD_BENCHMARK        : ${MPP_BUILD_BENCHMARK}")
 
 ################# ADD PROJECTS + DOCS + TESTS #################
 add_subdirectory(libmemplusplus)
