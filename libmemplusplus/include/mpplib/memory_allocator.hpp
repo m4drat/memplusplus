@@ -63,6 +63,17 @@ namespace mpp {
          * @return Chunk* allocated chunk, or nullptr
          */
         static Chunk* GetSuitableChunk(std::size_t t_realSize);
+
+        /**
+         * @brief User specified hook to call before Allocate 
+         */
+        static std::function<void*(std::size_t)> g_MppAllocateHook;
+
+        /**
+         * @brief User specified hook to call before Deallocate
+         */
+        static std::function<bool(void*)> g_MppDeallocateHook;
+        
         friend class GC;
         friend class Arena;
 
@@ -123,5 +134,17 @@ namespace mpp {
             }
             return Deallocate(reinterpret_cast<void*>(t_objPtr));
         }
+
+        /**
+         * @brief Sets hook for Allocate method
+         * @param t_AllocateHook std::function to set as hook
+         */
+        static void SetAllocateHook(const std::function<void*(std::size_t)>& t_AllocateHook);
+
+        /**
+         * @brief Sets hook for DeAllocate method
+         * @param t_DeallocateHook std::function to set as hook
+         */
+        static void SetDeallocateHook(const std::function<bool(void*)>& t_DeallocateHook);
     };
 }

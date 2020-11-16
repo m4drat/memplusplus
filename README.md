@@ -395,6 +395,35 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
             +============== STATISTICS DUMP END ==============+
             ```
 
+- Allocate/Deallocate hooks
+
+  This feature allows you to install your hooks on Allocate and Deallocate. Example:
+
+  ```c++
+  // Lambda as an Allocate hook. Important, all hooks should be static!
+  static std::function<void*(std::size_t)> allocHook = [&](std::size_t t_AllocSize) {
+      mpp::MemoryAllocator::SetAllocateHook(nullptr);
+      void* ptr = mpp::MemoryAllocator::Allocate(t_AllocSize);
+      mpp::MemoryAllocator::SetAllocateHook(allocHook);
+      std::cout << "[mpp] Allocate(" << t_AllocSize << ") -> ";
+      mpp::Chunk::DumpChunk(std::cout, mpp::Chunk::GetHeaderPtr(ptr)) << std::endl;
+      return ptr;
+  };
+  // Set actual Allocate hook.
+  mpp::MemoryAllocator::SetAllocateHook(allocHook);
+
+  // Lambda as an Deallocate hook. Important, all hooks should be static!
+  static std::function<bool(void*)> deallocHook = [&](void* t_Addr) {
+      mpp::MemoryAllocator::SetDeallocateHook(nullptr);
+      bool res = mpp::MemoryAllocator::Deallocate(t_Addr);
+      mpp::MemoryAllocator::SetDeallocateHook(deallocHook);
+      std::cout << "[mpp] Deallocate(" << t_Addr << ") -> " << res << std::endl;
+      return res;
+  };
+  // Set actual Deallocate hook.
+  mpp::MemoryAllocator::SetDeallocateHook(deallocHook);
+  ```
+
 ## Performance comparisons
 
 ## Documentation

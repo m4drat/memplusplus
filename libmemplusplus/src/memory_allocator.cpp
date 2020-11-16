@@ -5,6 +5,8 @@
 #include <sys/mman.h>
 
 namespace mpp {
+    std::function<void*(std::size_t)> MemoryAllocator::g_MppAllocateHook{ nullptr };
+    std::function<bool(void*)> MemoryAllocator::g_MppDeallocateHook{ nullptr };
 
     std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
     {
@@ -127,6 +129,11 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
+        // User placed hook to call before actual Allocate
+        if (g_MppAllocateHook != nullptr) {
+            return g_MppAllocateHook(t_userDataSize);
+        }
+
         // Align, because we want to have metadata bits
         std::size_t realChunkSize =
             Align(t_userDataSize + sizeof(Chunk::ChunkHeader), g_MIN_CHUNK_SIZE);
@@ -182,6 +189,11 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
+        // User placed hook to call before actual Allocate
+        if (g_MppDeallocateHook != nullptr) {
+            return g_MppDeallocateHook(t_chunkPtr);
+        }
+
         // If given pointer is nullptr just return false
         // because we dont want to waste time, trying to search
         // for arena
@@ -210,4 +222,15 @@ namespace mpp {
         // The given pointer doens't belong to any active arena
         return false;
     }
+
+    void MemoryAllocator::SetAllocateHook(const std::function<void*(std::size_t)>& t_AllocateHook) 
+    {
+        g_MppAllocateHook = t_AllocateHook;
+    }
+    
+    void MemoryAllocator::SetDeallocateHook(const std::function<bool(void*)>& t_DeallocateHook) 
+    {
+        g_MppDeallocateHook = t_DeallocateHook;
+    }
 }
+
