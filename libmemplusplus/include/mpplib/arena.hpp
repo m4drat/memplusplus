@@ -190,7 +190,7 @@ namespace mpp {
          * @param t_chunk2 second chunk to merge with.
          * @return start of merged chunk (t_chunk1)
          */
-        Chunk* MergeTwoSequnceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
+        Chunk* MergeTwoSequenceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
 
         /**
          * @brief Merge freed chunk with top. Updates corresponding pointers.

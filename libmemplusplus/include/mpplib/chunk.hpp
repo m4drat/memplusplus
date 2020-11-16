@@ -24,6 +24,7 @@ namespace mpp {
              * @brief Size of the previous chunk.
              */
             std::size_t prevChunkSize;
+
             /**
              * @brief actual chunk header.
              *
