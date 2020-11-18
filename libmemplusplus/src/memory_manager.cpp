@@ -41,6 +41,7 @@ namespace mpp {
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed() << "]";
 #endif
             }
+            t_out << std::endl;
         }
         return t_out;
     }
