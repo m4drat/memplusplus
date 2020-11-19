@@ -27,17 +27,22 @@ namespace mpp {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
 
 #if MPP_COLOUR == 1
-                if (currChunk->IsUsed()) {
-                    t_out << "[" << col::GREEN << currChunk->GetPrevSize() << "/"
-                          << currChunk->GetSize() << "/P:" << currChunk->IsPrevInUse()
-                          << "/U:" << currChunk->IsUsed() << col::RESET << "]";
+                t_out << col::BLUE << "[" << col::GREEN << "PTR:" << static_cast<void*>(currChunk) << col::RESET << "/"
+                      << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET << "/"
+                      << col::GREEN << "CS:"<< currChunk->GetSize() << col::RESET << "/";
+                if (currChunk->IsPrevInUse()) {
+                    t_out << col::GREEN << "P:" << currChunk->IsPrevInUse() << col::RESET << "/";
                 } else {
-                    t_out << "[" << col::RED << currChunk->GetPrevSize() << "/"
-                          << currChunk->GetSize() << "/P:" << currChunk->IsPrevInUse()
-                          << "/U:" << currChunk->IsUsed() << col::RESET << "]";
+                    t_out << col::RED << "P:" << currChunk->IsPrevInUse() << col::RESET << "/";
                 }
+                if (currChunk->IsUsed()) {
+                    t_out << col::GREEN << "U:" << currChunk->IsUsed();
+                } else {
+                    t_out << col::RED << "U:" << currChunk->IsUsed();
+                }
+                t_out << col::BLUE << "]" << col::RESET;
 #else
-                t_out << "[" << currChunk->GetPrevSize() << "/" << currChunk->GetSize()
+                t_out << "[PTR:" << static_cast<void*>(currChunk) << "/PS:" << currChunk->GetPrevSize() << "/CS:" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed() << "]";
 #endif
             }
