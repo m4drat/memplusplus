@@ -15,9 +15,10 @@ namespace mpp {
     }
 
 #if MPP_STATS == 1
-    std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out)
+    std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out, void* t_ptr = nullptr)
     {
-        PROFILE_FUNCTION();
+        PROFILE_FUNCTION(); 
+
         for (auto* arena : s_ArenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
                   << std::endl;
@@ -26,10 +27,24 @@ namespace mpp {
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
 
+                bool currentChunkPtr = ((t_ptr >= currChunk) && (t_ptr < (reinterpret_cast<char*>(currChunk) + currChunk->GetSize())));
+
 #if MPP_COLOUR == 1
-                t_out << col::BLUE << "[" << col::GREEN << "PTR:" << static_cast<void*>(currChunk) << col::RESET << "/"
-                      << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET << "/"
-                      << col::GREEN << "CS:"<< currChunk->GetSize() << col::RESET << "/";
+                if (t_ptr != nullptr && currentChunkPtr) {
+                    t_out << col::MAGENTA << "<(";
+                } else {
+                    t_out << col::BLUE << "[";
+                }
+
+                if (currChunk->IsUsed()) {
+                    t_out << col::GREEN << "PTR:" << static_cast<void*>(currChunk) << col::RESET << "/"
+                          << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET << "/"
+                          << col::GREEN << "CS:"<< currChunk->GetSize() << col::RESET << "/";
+                } else {
+                    t_out <<   col::RED << "PTR:" << static_cast<void*>(currChunk) << col::RESET << "/"
+                          << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET << "/"
+                          << col::GREEN << "CS:"<< currChunk->GetSize() << col::RESET << "/";
+                }
                 if (currChunk->IsPrevInUse()) {
                     t_out << col::GREEN << "P:" << currChunk->IsPrevInUse() << col::RESET << "/";
                 } else {
@@ -40,10 +55,26 @@ namespace mpp {
                 } else {
                     t_out << col::RED << "U:" << currChunk->IsUsed();
                 }
-                t_out << col::BLUE << "]" << col::RESET;
+                
+                if (t_ptr != nullptr && currentChunkPtr) {
+                    t_out << col::MAGENTA << ")>" << col::RESET;
+                } else {
+                    t_out << col::BLUE << "]" << col::RESET;
+                }
 #else
-                t_out << "[PTR:" << static_cast<void*>(currChunk) << "/PS:" << currChunk->GetPrevSize() << "/CS:" << currChunk->GetSize()
-                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed() << "]";
+                if (t_ptr != nullptr && currentChunkPtr) {
+                    t_out << "<(";
+                } else {
+                    t_out << "[";
+                }
+                t_out << "PTR:" << static_cast<void*>(currChunk) << "/PS:" << currChunk->GetPrevSize() << "/CS:" << currChunk->GetSize()
+                      << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed();
+                
+                if (t_ptr != nullptr && currentChunkPtr) {
+                    t_out << ")>";
+                } else {
+                    t_out << "]";
+                }
 #endif
             }
             t_out << std::endl;

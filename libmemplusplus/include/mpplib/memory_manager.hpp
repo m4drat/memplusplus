@@ -39,7 +39,7 @@ namespace mpp {
          * @param t_out output sream to write to.
          * @return std::ostream& stream reference
          */
-        static std::ostream& VisHeapLayout(std::ostream& t_out);
+        static std::ostream& VisHeapLayout(std::ostream& t_out, void* t_ptr);
 #endif
 
         /**
