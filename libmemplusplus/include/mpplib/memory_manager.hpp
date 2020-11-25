@@ -92,6 +92,14 @@ namespace mpp {
         static const std::size_t g_PAGE_SIZE = 4096;
 
         /**
+         * @brief Defines base location of all arenas. Allocator
+         * will try to allocate memory from this address + random offset.
+         * If it isn't possible to allocate memory at desired address, just
+         * call mmap(NULL, ...).
+         */
+        static const std::uintptr_t g_MMAP_START = 1ull << 40;
+
+        /**
          * @brief fill char, to fill allocated chunks in debug mode or secure mode.
          */
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1

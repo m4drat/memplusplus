@@ -24,6 +24,12 @@ namespace mpp {
     {
     private:
         /**
+         * @brief Generate MMAP hint.
+         * @return std::intptr_t base address for new page. 
+         */
+        static std::uintptr_t MmapHint();
+
+        /**
          * @brief mmap(2) wrapper, that maps readble and writable, not shared
          * memory page of given size.
          * @throw NoMemoryException, if system cannot map new memory.

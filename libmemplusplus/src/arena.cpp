@@ -229,6 +229,8 @@ namespace mpp {
         // Update currently used space variable
         m_CurrentlyAllocatedSpace -= t_chunk->GetSize();
 
+        // TODO: Null out memory that belongs to current chunk in secure build
+
         // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
         if (newChunk != topChunk) {

@@ -7,9 +7,10 @@ namespace mpp {
 
     void MemoryManager::InitAllocatorState()
     {
-#if MPP_FUZZER_INSECURE == 1
+#if MPP_FUZZER_INSECURE == 1 || MPP_DEBUG == 1
         std::srand(0);
 #else
+        // Random that is used only inside ChunkTreap to balance it
         std::srand(std::time(NULL));
 #endif
     }

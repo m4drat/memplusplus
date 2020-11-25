@@ -88,6 +88,10 @@ namespace mpp {
             return s_activeGcPtrs;
         }
 
+        /**
+         * @brief Get the Instance of GC object
+         * @return GC& Global Garbage Collector
+         */
         static GC& GetInstance()
         {
             static GC gcInstance;
