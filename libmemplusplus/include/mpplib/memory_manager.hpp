@@ -33,7 +33,7 @@ namespace mpp {
         static std::vector<Arena*> s_ArenaList;
 
     public:
-#if MPP_STATS == 1
+#if MPP_STATS == 1 || MPP_DEBUG == 1
         /**
          * @brief Visualizes heap layout.
          * @param t_out output sream to write to.

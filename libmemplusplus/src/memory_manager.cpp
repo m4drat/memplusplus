@@ -15,7 +15,7 @@ namespace mpp {
 #endif
     }
 
-#if MPP_STATS == 1
+#if MPP_STATS == 1 || MPP_DEBUG == 1
     std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out, void* t_ptr = nullptr)
     {
         PROFILE_FUNCTION(); 
