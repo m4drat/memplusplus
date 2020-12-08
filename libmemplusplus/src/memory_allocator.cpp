@@ -88,34 +88,26 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
+        Chunk* chunkToReturn = nullptr;
+
         // Try iterating through all available arenas
         // to try to find enought space for user-requested chunk
-        // in top chunk
+        // in top chunk/free-list
         for (auto* arena : s_ArenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
             if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
-                Chunk* chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
-#if MPP_STATS == 1
-                if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
-                    arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
-                }
-                if (chunkToReturn->GetSize() < arena->m_ArenaStats->smallestAllocation) {
-                    arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
-                }
-#endif
-                return chunkToReturn;
-            }
-        }
+                chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
+            } else { // Check if current arena has enough free space
+                chunkToReturn = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
 
-        // If we cant find arena with enough right space (aka topchunk size),
-        // we will iterate through ChunkTreap to find chunk to reuse
-        for (Arena* arena : s_ArenaList) {
-            Chunk* chunk = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
-            if (chunk == nullptr) {
-                continue;
+                // If we are here, current arena doesn't have any free space, 
+                // proceed to the next one
+                if (chunkToReturn == nullptr) {
+                    continue;
+                }
+                chunkToReturn = arena->AllocateFromFreeList(chunkToReturn, t_realSize);
             }
-            Chunk* chunkToReturn = arena->AllocateFromFreeList(chunk, t_realSize);
 #if MPP_STATS == 1
             if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
                 arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
@@ -124,6 +116,7 @@ namespace mpp {
                 arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
             }
 #endif
+
             return chunkToReturn;
         }
 
