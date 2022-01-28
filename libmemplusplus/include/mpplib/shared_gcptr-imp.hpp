@@ -278,7 +278,7 @@ namespace mpp {
                 // TODO: should we really deallocate data, or we just need to delete it
                 // from chunksInUse + call object destructor
                 if (m_objectPtr) {
-                        MemoryAllocator::Deallocate<Type>(m_objectPtr);
+                    MemoryAllocator::Deallocate<Type>(m_objectPtr);
                 }
             }
         }

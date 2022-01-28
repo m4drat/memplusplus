@@ -229,6 +229,11 @@ namespace mpp {
         // Update currently used space variable
         m_CurrentlyAllocatedSpace -= t_chunk->GetSize();
 
+        // Null out memory that belongs to current chunk in secure build
+        // #if MPP_SECURE == 1
+        //         std::memset(Chunk::GetUserDataPtr(t_chunk), MemoryAllocator::g_FILL_CHAR, t_chunk->GetSize() - sizeof(Chunk::ChunkHeader));
+        // #endif
+
         // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
         if (newChunk != topChunk) {

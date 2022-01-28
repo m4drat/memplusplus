@@ -1,10 +1,26 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/exception.hpp"
 #include "mpplib/utils/utils.hpp"
+#include "mpplib/utils/random.hpp"
 
 #include <sys/mman.h>
 
 namespace mpp {
+    std::function<void*(std::size_t)> MemoryAllocator::g_MppAllocateHook{ nullptr };
+    std::function<bool(void*)> MemoryAllocator::g_MppDeallocateHook{ nullptr };
+
+    std::uintptr_t MemoryAllocator::MmapHint() {
+        std::uintptr_t randOffset = static_cast<std::uintptr_t>(Random::GetInstance()()); // generates random value [0, (2 << 63) - 1]
+        
+        // Min value: 0x10000000000
+        // Max value: 0x40ffffc00000
+        // User can allocate memory in this range: [0, 0x0007fffffffffff]
+        // In theory, hint can overlap with an existing allocation, because default arena size is 32mb, and we use only 6mb as an offset between maps.
+        // But that still should be sufficient, cause probability of this event is negligible.
+        // Using 0xFFFFFF as a random mask we should have 24 random bits, which will give us enough entropy.
+        std::uintptr_t mmapHint = MemoryManager::g_MMAP_START + (6 * 1024 * 1024) * (randOffset & 0xFFFFFF);
+        return mmapHint;
+    }
 
     std::size_t MemoryAllocator::Align(std::size_t t_size, int32_t t_alignment)
     {
@@ -19,8 +35,16 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        void* rawPtr =
-            mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        // In secure build try to randomize mmap base (to protect against attacks like Offset-to-lib)
+        // If attemp failed, just call mmap(NULL, ...)
+#if MPP_SECURE == 1
+        void* rawPtr = mmap(reinterpret_cast<void*>(MmapHint()), t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        if (rawPtr == MAP_FAILED) { // This time try to allocate without any hints
+            rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        }
+#else
+        void* rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+#endif
         if (rawPtr == MAP_FAILED) {
             // If we are using fuzzer just ignore out-of-memory errors and exit
 #if MPP_FUZZER_INSECURE == 1
@@ -64,6 +88,8 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
+        Chunk* chunkToReturn = nullptr;
+
         // Try iterating through all available arenas
         // to try to find enough space for user-requested chunk
         // in top chunk
@@ -71,27 +97,17 @@ namespace mpp {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
             if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
-                Chunk* chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
-#if MPP_STATS == 1
-                if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
-                    arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
-                }
-                if (chunkToReturn->GetSize() < arena->m_ArenaStats->smallestAllocation) {
-                    arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
-                }
-#endif
-                return chunkToReturn;
-            }
-        }
+                chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
+            } else { // Check if current arena has enough free space
+                chunkToReturn = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
 
-        // If we cant find arena with enough right space (aka topchunk size),
-        // we will iterate through ChunkTreap to find chunk to reuse
-        for (Arena* arena : s_ArenaList) {
-            Chunk* chunk = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
-            if (chunk == nullptr) {
-                continue;
+                // If we are here, current arena doesn't have any free space, 
+                // proceed to the next one
+                if (chunkToReturn == nullptr) {
+                    continue;
+                }
+                chunkToReturn = arena->AllocateFromFreeList(chunkToReturn, t_realSize);
             }
-            Chunk* chunkToReturn = arena->AllocateFromFreeList(chunk, t_realSize);
 #if MPP_STATS == 1
             if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
                 arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
@@ -100,6 +116,7 @@ namespace mpp {
                 arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
             }
 #endif
+
             return chunkToReturn;
         }
 
@@ -126,6 +143,11 @@ namespace mpp {
     void* MemoryAllocator::Allocate(std::size_t t_userDataSize)
     {
         PROFILE_FUNCTION();
+
+        // User placed hook to call before actual Allocate
+        if (g_MppAllocateHook != nullptr) {
+            return g_MppAllocateHook(t_userDataSize);
+        }
 
         // Align, because we want to have metadata bits
         std::size_t realChunkSize =
@@ -182,6 +204,11 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
+        // User placed hook to call before actual Allocate
+        if (g_MppDeallocateHook != nullptr) {
+            return g_MppDeallocateHook(t_chunkPtr);
+        }
+
         // If given pointer is nullptr just return false
         // because we dont want to waste time, trying to search
         // for arena
@@ -210,4 +237,15 @@ namespace mpp {
         // The given pointer doesn't belong to any active arena
         return false;
     }
+
+    void MemoryAllocator::SetAllocateHook(const std::function<void*(std::size_t)>& t_AllocateHook) 
+    {
+        g_MppAllocateHook = t_AllocateHook;
+    }
+    
+    void MemoryAllocator::SetDeallocateHook(const std::function<bool(void*)>& t_DeallocateHook) 
+    {
+        g_MppDeallocateHook = t_DeallocateHook;
+    }
 }
+

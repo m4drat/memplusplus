@@ -33,13 +33,13 @@ namespace mpp {
         static std::vector<Arena*> s_ArenaList;
 
     public:
-#if MPP_STATS == 1
+#if MPP_STATS == 1 || MPP_DEBUG == 1
         /**
          * @brief Visualizes heap layout.
          * @param t_out output stream to write to.
          * @return std::ostream& stream reference
          */
-        static std::ostream& VisHeapLayout(std::ostream& t_out);
+        static std::ostream& VisHeapLayout(std::ostream& t_out, void* t_ptr);
 #endif
 
         /**
@@ -90,6 +90,14 @@ namespace mpp {
          * @brief Page size for mmap request.
          */
         static const std::size_t g_PAGE_SIZE = 4096;
+
+        /**
+         * @brief Defines base location of all arenas. Allocator
+         * will try to allocate memory from this address + random offset.
+         * If it isn't possible to allocate memory at desired address, just
+         * call mmap(NULL, ...).
+         */
+        static const std::uintptr_t g_MMAP_START = 1ull << 40;
 
         /**
          * @brief fill char, to fill allocated chunks in debug mode or secure mode.
