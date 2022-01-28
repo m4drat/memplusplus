@@ -112,7 +112,7 @@ namespace mpp { namespace utils {
 
         /**
          * @brief Dump information about arenas.
-         * @param t_out output sream to write to.
+         * @param t_out output stream to write to.
          * @param t_dumpActiveArenas dump active arenas.
          * @param t_DumpFreedChunks dump freed chunks.
          * @param t_DumpInUseChunks dump in use chunks.

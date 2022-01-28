@@ -46,7 +46,7 @@ namespace mpp {
     }
 #endif
 
-    // TODO: make it work better (probably add smart pointers memory managment)
+    // TODO: make it work better (probably add smart pointers memory management)
     // This is just ugly thing to reset allocator state
     // exists only to make possible running of unit-tests
     bool MemoryManager::ResetAllocatorState()

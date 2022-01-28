@@ -1,8 +1,7 @@
 # mem++
 
-Here presented a lot of information, that was used in phase of active development.
+### Technologies
 
-### Технологии:
 1. cmake - build system
 2. sphnix/doxygen - documentation
 3. clang/g++ - compiler
@@ -10,27 +9,30 @@ Here presented a lot of information, that was used in phase of active developmen
 5. clang-tidy - linting tool
 6. catch2 - unit-testing
 
-### Обновление версий
-- Обновлять только в CMakeLists.txt в ./libmemplusplus
-- Пример: 1.2.3
-    - 1 - Major version - обновляется при изменении API
-    - 2 - Minor version - обновляется при добавлении чего-то в API
-    - 3 - Patch - обновляется при багфиксе
+### Version control
 
-### Правила форматирования
+- Defined inside CMakeLists.txt in ./libmemplusplus
+- Examples: 1.2.3
+  - 1 - Major version - API changes
+  - 2 - Minor version - if something added as an API
+  - 3 - Patch - bugfixes
+
+### Formatting rules
+
 1. namespace `mpp`
-2. Классы - с большой буквы (`GarbageCollector`), Функции - тоже (`Collect(std::size_t)`)
-3. Переменные - с маленькой буквы, с необходимыми префиксами (`c_ArenaSizeMax`).  
-    |Условие|Префикс|
+2. Classes - using capital first letter (`GarbageCollector`), Functions - the same (`Collect(std::size_t)`)
+3. Variables - using lowercase letters with required prefix (`c_ArenaSizeMax`).  
+    |Condition|Prefix|
     |---|:----|
-    |приватные члены классов|m_|
-    |параметры функций|t_|
-    |статичные объекты|s_|
-    |глобальные объекты|g_|
-    |глобальные константы|c_|
-4. Названия .cpp/.hpp файлов с маленькой буквы 
+    |Private class members|m_|
+    |Function parameters|t_|
+    |Static objects|s_|
+    |Global objects|g_|
+    |Global constants|c_|
+4. Source files are named using lowercase letters
 
-### Псевдокод алгоритма:
+### Algorithm pseudocode
+
 ```c++
 auto rawPtr = MemoryAllocator::Allocate(sizeof(UserData));
 // ======================================================== {
@@ -181,26 +183,13 @@ OR
 // } ========================================================
 ```
 
-### Этапы разработки:
-1. Основные структуры (chunk, arena) + Документация!
-2. Системный аллокатор (враппер над mmap)
-3. Базовый менеджмент free'd блоков (LinkedList + first-fit с разделением чанков) + Документация!
-4. Ручная реализация ф-ции move?
-5. __Тесты для пунктов 1-4 + Документация__
-6. Advanced менеджмент free'd блоков (segregated-fit/best-fit)
-7. Реализация умных указателей для GC
-8. Базовая версия GC (ф-ция вида gc.collect(), строит граф связей объектов + удаляет те, на которые нету ссылок)
-9. __Тесты для пунктов 6-8 + Документация__
-10. Advanced версия GC - распознование структур (Уметь находить Связные списки, Деревья поиска)
-11. Advanced версия GC - менеджмент свободных чанков (Во время копирования структуры (например linked list): необходимо попытаться разместить его ноды в памяти друг за другом)
-12. Advanced версия GC - доработка для работы с другими структурами (деревья поиска)
-13. __Тесты для пунктов 10-12 + Документация__
+### Tech specs
 
-### Техническая спецификация
-1. Free-list аллокатор памяти. Аллокатор сам по себе типа: best-fit/segregated-fit.
-2. умный GC типа "mark-compact" + "mark and sweep", который будет пытаться распределить объекты в памяти опираясь на тип структуры, которую они реализуют.
+1. Free-list memory allocator. Allocator itself is a kind of: best-fit/segregated-fit.
+2. Smart GC "mark-compact" + "mark and sweep", which tries to layout memory according to the data structure used in the code (in optimal for this DS way).
 
-### Ссылки
+### Links
+
 1. Custom allocator in c++: http://dmitrysoshnikov.com/compilers/writing-a-memory-allocator/
 2. Mark and sweep GC in c++: http://dmitrysoshnikov.com/compilers/writing-a-mark-sweep-garbage-collector/
 3. Memory allocator for custom game engine: https://www.gamedev.net/articles/programming/general-and-gameplay-programming/c-custom-memory-allocation-r3010/
@@ -210,7 +199,7 @@ OR
 7. Article about memory allocators in c++: https://www.bogotobogo.com/cplusplus/memoryallocation.php
 8. Precise GC in c++: http://oops.math.spbu.ru/papers/gcpp.pdf
 9. A garbage collection framework for C++: https://www.codeproject.com/Articles/912/A-garbage-collection-framework-for-C
-10. Memory managment with linked lists and bitmaps: http://examradar.com/memory-management-linked-list-bit-maps-questions-answers/
+10. Memory management with linked lists and bitmaps: http://examradar.com/memory-management-linked-list-bit-maps-questions-answers/
 11. Memory Allocator Implementation (next video in series will show how to write GC): https://www.youtube.com/watch?v=74s0m4YoHgM
 12. CppCon 2017 Memory Allocators (1/2): https://www.youtube.com/watch?v=nZNd5FjSquk
 13. CppCon 2017 Memory Allocators (2/2): https://www.youtube.com/watch?v=CFzuFNSpycI
@@ -244,7 +233,9 @@ OR
 41. Boost graph library: https://www.boost.org/doc/libs/1_46_1/libs/graph/doc/index.html
 42. Find all weakly connected graph components: https://cs.stackexchange.com/questions/56504/efficient-algorithm-for-finding-weakly-connected-components
 43. Connected components in an undirected graph: https://www.geeksforgeeks.org/connected-components-in-an-undirected-graph/
+
 ---
+
 1. Cmake intro: https://www.youtube.com/watch?v=wl2Srog-j7I
 2. Cmake library intro: https://www.youtube.com/watch?v=5i6uLMP5VcY
 3. Cmake library example project: https://github.com/YansonTech/Introduction-to-libraries-with-CMake
@@ -254,13 +245,17 @@ OR
 7. Cmake simple example: https://www.jetbrains.com/help/clion/quick-cmake-tutorial.html
 8. Configure VScode to debug cmake projects: https://medium.com/audelabs/c-development-using-visual-studio-code-cmake-and-lldb-d0f13d38c563
 9. c++ best practices: https://lefticus.gitbooks.io/cpp-best-practices/03-Style.html
-10. c++ core guidelines: https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md 
+10. c++ core guidelines: https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md
 11. c++ guide: https://www.youtube.com/watch?v=18c3MTX0PK0&list=PLlrATfBNZ98dudnM48yfGUldqGD0S4FFb
+
 ---
+
 1. Diving into windows memory allocator: https://www.corelan.be/index.php/2016/07/05/windows-10-x86wow64-userland-heap/
 2. Segment heap internals (windows): https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
 3. Windows 10 Nt Heap Exploitation: https://www.slideshare.net/AngelBoy1/windows-10-nt-heap-exploitation-english-version
----
+
+--
+
 1. Doxygen directives: https://breathe.readthedocs.io/en/latest/directives.html
 2. Doxygen advanced directives: https://www.sphinx-doc.org/en/master/usage/restructuredtext/directives.html
 3. c++ and sphinx: https://stackoverflow.com/questions/835043/has-anyone-used-sphinx-to-document-a-c-project

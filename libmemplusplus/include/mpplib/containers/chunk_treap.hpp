@@ -85,7 +85,7 @@ namespace mpp {
         }
 
         /**
-         * @brief Wrapper around Delete(Node* t_root), to deletye from root.
+         * @brief Wrapper around Delete(Node* t_root), to delete from the root.
          * @sa Delete(Node* t_root)
          */
         void Delete();
@@ -156,7 +156,7 @@ namespace mpp {
 
         /**
          * @brief Separates tree into two subtrees by t_chunk.
-         * @param t_root root, from which we shoul start splitting
+         * @param t_root root, from which we should start splitting
          * @param[out] t_left left subtree
          * @param[out] t_right right subtree
          * @param t_chunk chunk to split by

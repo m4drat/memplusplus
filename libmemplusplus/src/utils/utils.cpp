@@ -56,7 +56,7 @@ namespace mpp { namespace utils {
 
     void ErrorAbort(const std::string& t_message)
     {
-        // Prnt error message
+        // Print error message
         std::cerr << t_message;
 
 #if MPP_DEBUG == 1

@@ -6,9 +6,9 @@ namespace mpp {
         m_correspondingChunk = t_chunk;
     }
 
-    void Vertex::AddNeighbor(Vertex* t_neigbor)
+    void Vertex::AddNeighbor(Vertex* t_neighbor)
     {
-        m_neighbors.insert(t_neigbor);
+        m_neighbors.insert(t_neighbor);
     }
 
     void Vertex::AddPointingVertex(Vertex* t_pointingVertex)
@@ -21,9 +21,9 @@ namespace mpp {
         return m_pointingToVertices;
     }
 
-    bool Vertex::RemoveNeighbor(Vertex* t_neigbor)
+    bool Vertex::RemoveNeighbor(Vertex* t_neighbor)
     {
-        return m_neighbors.erase(t_neigbor);
+        return m_neighbors.erase(t_neighbor);
     }
 
     std::set<Vertex*>& Vertex::GetNeighbors()

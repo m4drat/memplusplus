@@ -51,7 +51,7 @@ namespace mpp {
         // Allocate memory for arena
         void* arenaSpace = SysAlloc(t_arenaSize);
 
-        // TODO - smart pointers memory managment
+        // TODO - smart pointers memory management
         Arena* arena = new Arena(t_arenaSize, arenaSpace);
 
         // Add newly created arena to vector of active arenas
@@ -65,7 +65,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // Try iterating through all available arenas
-        // to try to find enought space for user-requested chunk
+        // to try to find enough space for user-requested chunk
         // in top chunk
         for (auto* arena : s_ArenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
@@ -207,7 +207,7 @@ namespace mpp {
         utils::ErrorAbort(
             "MemoryAllocator::Deallocate(): Invalid pointer deallocation detected!\n");
 
-        // The given pointer doens't belong to any active arena
+        // The given pointer doesn't belong to any active arena
         return false;
     }
 }

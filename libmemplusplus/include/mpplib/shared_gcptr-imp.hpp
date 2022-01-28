@@ -21,7 +21,7 @@ namespace mpp {
     {}
     catch (...)
     {
-        // exception occured (e.g. new throwed std::bad_alloc)
+        // exception occurred (e.g. new throwed std::bad_alloc)
         throw;
     }
 
@@ -51,7 +51,7 @@ namespace mpp {
     }
     catch (...)
     {
-        // exception occured (e.g. new throwed std::bad_alloc)
+        // exception occurred (e.g. new throwed std::bad_alloc)
         // Delete object, and call it's destructor
         // MemoryAllocator::Deallocate<Type>(m_objectPtr);
         throw;
@@ -118,7 +118,7 @@ namespace mpp {
         // Delete reference
         DeleteReference();
 
-        // Update fileds of assigned object
+        // Update fields of assigned object
         m_objectPtr = t_other.m_objectPtr;
         m_references = t_other.m_references;
 

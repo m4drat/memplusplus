@@ -7,7 +7,7 @@ namespace mpp {
     /**
      * @brief Defines general exceptions class for all project.
      *
-     * All other exceptions shoul be inherited from this class.
+     * All other exceptions should be inherited from this class.
      */
     class Exception : virtual public std::exception
     {

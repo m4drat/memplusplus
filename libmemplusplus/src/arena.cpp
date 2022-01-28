@@ -181,7 +181,7 @@ namespace mpp {
                 // Update inuse bit
                 Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
 
-                // Update previous sizse
+                // Update previous size
                 Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
                 return chunk;
             } else {
@@ -218,8 +218,8 @@ namespace mpp {
         // Delete chunk from active chunks
         // If erase returns 0, it means, that we haven't deleted
         // any chunks from chunks in use. This can mean, that chunk
-        // already was deleted (aka DoubleFree occured), or some other
-        // kind of memory corruption occured (for example we tried to
+        // already was deleted (aka DoubleFree occurred), or some other
+        // kind of memory corruption occurred (for example we tried to
         // free invalid chunk). Always abort program, because
         // we don't have any performance impact.
         if (!chunksInUse.erase(t_chunk)) {

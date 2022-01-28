@@ -175,13 +175,13 @@ namespace mpp {
         Type* Get() const;
 
         /**
-         * @brief Overrided function, that returns raw pointer to user data.
+         * @brief Overridden function, that returns raw pointer to user data.
          * @return void* pointer to user data.
          */
         void* GetVoid() const override;
 
         /**
-         * @brief Overrided function, that sets new value for object pointer.
+         * @brief Overridden function, that sets new value for object pointer.
          * @param t_newPtr new pointer.
          */
         void UpdatePtr(void* t_newPtr) override;
@@ -208,7 +208,7 @@ namespace mpp {
     };
 
     /**
-     * @brief Method to construct new SharedGcPtr. It will allocate enought space, create
+     * @brief Method to construct new SharedGcPtr. It will allocate enough space, create
      * object and construct it.
      *
      * @tparam T type of user object.

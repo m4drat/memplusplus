@@ -116,7 +116,7 @@ Library options:
 
 ## Examples
 
-- Manual memory managment
+- Manual memory management
 
     ```c++
     #include <mpplib/mpp.hpp>
@@ -136,7 +136,7 @@ Library options:
     mpp::MemoryAllocator::Deallocate(ptr);
     ```
 
-- Automatic memory managment
+- Automatic memory management
 
     ```c++
     #include <mpplib/mpp.hpp>

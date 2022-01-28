@@ -36,7 +36,7 @@ namespace mpp {
 #if MPP_STATS == 1
         /**
          * @brief Visualizes heap layout.
-         * @param t_out output sream to write to.
+         * @param t_out output stream to write to.
          * @return std::ostream& stream reference
          */
         static std::ostream& VisHeapLayout(std::ostream& t_out);

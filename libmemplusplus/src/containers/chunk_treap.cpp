@@ -8,7 +8,7 @@ namespace mpp {
         , m_freedMemory{ 0 }
     {}
 
-    // TODO - smart pointers memory managment
+    // TODO - smart pointers memory management
     ChunkTreap::ChunkTreap(const ChunkTreap& t_treap)
         : m_root(new Node(*t_treap.m_root)), m_freedChunks{ 0 }, m_freedMemory{ 0 }
     {}
@@ -20,7 +20,7 @@ namespace mpp {
 
         Delete();
 
-        // TODO - smart pointers memory managment
+        // TODO - smart pointers memory management
         m_root = new Node(*t_treap.m_root);
 
         return *this;
@@ -205,7 +205,7 @@ namespace mpp {
         m_freedChunks++;
         m_freedMemory += t_chunk->GetSize();
 
-        // TODO - smart pointers memory managment
+        // TODO - smart pointers memory management
         InsertNode(new Node(t_chunk));
     }
 

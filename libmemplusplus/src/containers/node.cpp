@@ -12,7 +12,7 @@ namespace mpp {
         : priority(t_node.priority)
         , chunk(t_node.chunk)
     {
-        // TODO - smart pointers memory managment
+        // TODO - smart pointers memory management
         leftChild = t_node.leftChild ? new Node(*t_node.leftChild) : nullptr;
         rightChild = t_node.rightChild ? new Node(*t_node.rightChild) : nullptr;
     }
@@ -27,7 +27,7 @@ namespace mpp {
         priority = t_node.priority;
         chunk = t_node.chunk;
 
-        // TODO - smart pointers memory managment
+        // TODO - smart pointers memory management
         leftChild = t_node.leftChild ? new Node(*t_node.leftChild) : nullptr;
         rightChild = t_node.rightChild ? new Node(*t_node.rightChild) : nullptr;
 

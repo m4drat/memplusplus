@@ -24,7 +24,7 @@ namespace mpp { namespace utils {
     [[noreturn]] void ErrorAbort(const std::string& t_message);
 
     /**
-     * @brief Finds first elemet, that is greater or equal to key.
+     * @brief Finds first element, that is greater or equal to key.
      * @param first iterator to begin of the range
      * @param last iterator to end of the range
      * @param value element to find

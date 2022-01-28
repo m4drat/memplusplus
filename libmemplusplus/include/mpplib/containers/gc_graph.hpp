@@ -105,8 +105,8 @@ namespace mpp {
         /**
          * @brief Adds vertex to the graph adjacency list.
          * @param t_vertex vertex, to create edge from.
-         * @return pair of iterastor to inserted element, and result of insertion (if
-         * vertex already in graph) result of insertion will be false
+         * @return pair of iterator to inserted element, and result of insertion (if
+         * vertex already in the graph) result of insertion will be false
          */
         std::pair<std::set<Vertex*>::iterator, bool> AddVertex(Vertex* t_vertex);
 

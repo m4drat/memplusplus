@@ -47,7 +47,7 @@ namespace mpp {
         Node(const Node& t_node);
 
         /**
-         * @brief Assigment operator, that constructs node from const node reference.
+         * @brief Assignment operator, that constructs node from const node reference.
          */
         Node& operator=(const Node& t_node);
 
@@ -57,7 +57,7 @@ namespace mpp {
         Node(Node&& t_node);
 
         /**
-         * @brief Assigment operator, that constructs node from r-value node reference.
+         * @brief Assignment operator, that constructs node from r-value node reference.
          */
         Node& operator=(Node&& t_node);
 
@@ -69,7 +69,7 @@ namespace mpp {
 
 #if MPP_STATS == 1
         /**
-         * @brief Dump text represenation of the node.
+         * @brief Dump text representation of the node.
          */
         static std::ostream& DumpNode(std::ostream& t_out, Node* t_node);
 

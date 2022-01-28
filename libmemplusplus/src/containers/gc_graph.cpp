@@ -86,9 +86,9 @@ namespace mpp {
 
         // iterate for each vertex in adjacency list
         for (auto v1 : m_adjList) {
-            // if current vertex has neighbours draw all connections
+            // if current vertex has neighbors draw all connections
             if (!v1->GetNeighbors().empty()) {
-                // for each neigbour draw connection between v1 and its neighbour
+                // for each neighbor draw connection between v1 and its neighbour
                 for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
                     t_out << "\"" << v1->ToString() << "\" [label=\"chunk = " << v1->ToString()
                           << "\n"
@@ -156,10 +156,10 @@ namespace mpp {
         std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>>
             weaklyConnectedComponents;
 
-        // Copy of adjacence list to use with DFS
+        // Copy of adjacency list to use with DFS
         std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
 
-        // iteraste through all vertices
+        // iterate through all vertices
         while (adjListCopy.empty() != true) {
             // Find connected component inside graph
             std::unique_ptr<GcGraph, std::function<void(GcGraph*)>> connectedComponent(

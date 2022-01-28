@@ -64,18 +64,18 @@ namespace mpp {
 
         /**
          * @brief Add the vertex, that current vertex points to.
-         * @param t_neigbor vertex, to add to neighbors.
+         * @param t_neighbor vertex, to add to neighbors.
          */
-        void AddNeighbor(Vertex* t_neigbor);
+        void AddNeighbor(Vertex* t_neighbor);
 
         /**
          * @brief Remove the vertex that the current vertex points to.
-         * @param t_neigbor vertex, to remove from neighbors.
+         * @param t_neighbor vertex, to remove from neighbors.
          */
-        bool RemoveNeighbor(Vertex* t_neigbor);
+        bool RemoveNeighbor(Vertex* t_neighbor);
 
         /**
-         * @brief Get All vertices, that cureent vertex points to.
+         * @brief Get All vertices, that current vertex points to.
          * @return set of vertices
          */
         std::set<Vertex*>& GetNeighbors();
