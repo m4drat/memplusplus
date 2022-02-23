@@ -152,22 +152,22 @@ Library options:
     GC::GetInstance().Collect();
     ```
 
-## Debugging / profiling library
+## Debugging/profiling library
 
-If you want to use backtrace functionality add this flags to your project's CMakeLists.txt:
+To enable backtrace functionality add this flags to your project's CMakeLists.txt:
 
 ```cmake
 target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
 target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -export-dynamic)
 ```
 
-Memplusplus provides different debug-like features, such as: data visualizers, profiler, statistics collector.
+Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.
 
 - Data visualizers:
   
-  In Debug builds you are able to dump .dot representation of ChunkTreap and GcGraph (only using specific environment variable). Later you can "render" this .dot files using dot from graphviz.  
+    In Debug builds, you can dump .dot representation of the ChunkTreap and GcGraph (only using specific environment variable). Later you can "render" this .dot files using dot from graphviz.  
 
-  - ChunkTreap visualizer
+    __ChunkTreap visualizer__
 
     How to dump ChunkTreap in code (don't forget to redirect program output to file treap.dot):
 
@@ -186,18 +186,20 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
     dot -Tsvg treap.dot -o treap.svg
     ```
 
-    After that you will get .svg file with your freed chunks treap:
+    After that you will get .svg file with your freed chunks treap:  
     ![treap](./additional_info/images/treap.svg)
 
-  - GcGraph visualizer
+    __GcGraph visualizer__
 
-    Visualization of GcGraph is much simplier. Just build library in Debug mode, and set MPP_DUMP_OBJECTS_GRAPH=1 before running target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot". Then just generate .svg file with dot.
+    To visualization the GcGraph you have to:
+    1. Build the library in debug mode, and set `MPP_DUMP_OBJECTS_GRAPH=1` before running the target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot".
+    2. Then generate .svg file using dot as follows:
 
-    ```bash
-    dot -Tsvg objects_cycle<N>.dot -o objects_cycle<N>.svg
-    ```
+        ```bash
+        dot -Tsvg objects_cycle<N>.dot -o objects_cycle<N>.svg
+        ```
 
-    For example, for this code (it creates simple linked list and tree):
+    For example, for this code (it creates linked list and tree):
 
     ```c++
     // Linked List node
@@ -243,7 +245,7 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
         }
     };
 
-    // Create Random tree
+    // Create a random tree
     SharedGcPtr<TreeNode> root = MakeSharedGcPtr<TreeNode>(0, nullptr, nullptr, nullptr);
     SharedGcPtr<TreeNode> treeNode1 = MakeSharedGcPtr<TreeNode>(1, nullptr, nullptr, nullptr);
     SharedGcPtr<TreeNode> treeNode2 = MakeSharedGcPtr<TreeNode>(2, nullptr, nullptr, nullptr);
@@ -283,146 +285,149 @@ Memplusplus provides different debug-like features, such as: data visualizers, p
 
 - Profiler
 
-  Using build flag `MPP_PROFILE` you are able to build library with additional debugging feature, which will add specific instrumentation to the code, to collect timing information. After successfull build just run the aplication until it exits, and after that in your current working directory you should find file called "mpplib-profilng.json", which can be viewed using chrome tracing tool. To do it, open chrome, and navigate to chrome://tracing, after that drag and drop profiling trace to chrome window.
+    Using compilation flag `MPP_PROFILE`, you can build the library with profiler enabled. To do so:
+    1. Set the `MPP_PROFILE` before building the library
+    2. Run the application until it exits
+    3. In your current directory, find the file called __mpplib-profilng.json__
+    4. Open this file using the chrome tracing tool. To do so, open chrome and navigate to the `chrome://tracing` page.
 
-  Example output:
+    Example output:
 
-  ![profiler](./additional_info/images/profiling.png)
+    ![profiler](./additional_info/images/profiling.png)
 
 - Statistics collector
 
-  This feature allows you to dump memory allocator statistics. To build library with support of this feature add `MPP_STATS` while building project. You can use this feature in 2 ways:
+    This feature allows you to dump memory allocator statistics. To build the library with this feature, add `MPP_STATS` while building the project. You can use this feature in 2 ways:
 
-    1. In runtime using c++ API:
+    __In runtime using c++ API:__
 
-        - Example code to dump statistics:
+    Example code to dump statistics:
 
-            ```c++
-            utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
+    ```c++
+    utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
 
-            ```
+    ```
 
-        - Example output:
+    Example output:
 
-            ```none
-            +============= STATISTICS DUMP START =============+
-            MPP: MIN_CHUNK_SIZE     : 32 bytes
-            MPP: CHUNK_HEADER_SIZE  : 16 bytes
-            MPP: DEFAULT_ARENA_SIZE : 32.000 MB
-            MPP: PAGE_SIZE          : 4.000 KB
-            ~~~~~~~~~~~~~~~~ All active arenas ~~~~~~~~~~~~~~~~
-            -------------- Arena: 0x1ffaf50 --------------
-            MPP - Total arena size           : 32.000 MB
-            MPP - Currently Allocated Space  : 960.000 Bytes
-            MPP - Amount of free memory      : 31.999 MB (99.9971% of total arena size)
-            MPP - Amount of allocated memory : 960.000 Bytes (0.0029% of total arena size)
-            MPP - Allocated memory == 0      : false
-            MPP - Memory used for metadata   : 160.000 Bytes (16.6667% of currently allocated space)
-            MPP - TopChunk                   : [0x7f329dd803c0](96, 33553472|InUse:1|PrevInUse:1)
-            MPP - Arena begin pointer        : 0x7f329dd80000
-            MPP - Arena end pointer          : 0x7f329fd80000
-            MPP - Freed chunks nodes (0)
-            MPP - Chunks in use (10)
+    ```none
+    +============= STATISTICS DUMP START =============+
+    MPP: MIN_CHUNK_SIZE     : 32 bytes
+    MPP: CHUNK_HEADER_SIZE  : 16 bytes
+    MPP: DEFAULT_ARENA_SIZE : 32.000 MB
+    MPP: PAGE_SIZE          : 4.000 KB
+    ~~~~~~~~~~~~~~~~ All active arenas ~~~~~~~~~~~~~~~~
+    -------------- Arena: 0x1ffaf50 --------------
+    MPP - Total arena size           : 32.000 MB
+    MPP - Currently Allocated Space  : 960.000 Bytes
+    MPP - Amount of free memory      : 31.999 MB (99.9971% of total arena size)
+    MPP - Amount of allocated memory : 960.000 Bytes (0.0029% of total arena size)
+    MPP - Allocated memory == 0      : false
+    MPP - Memory used for metadata   : 160.000 Bytes (16.6667% of currently allocated space)
+    MPP - TopChunk                   : [0x7f329dd803c0](96, 33553472|InUse:1|PrevInUse:1)
+    MPP - Arena begin pointer        : 0x7f329dd80000
+    MPP - Arena end pointer          : 0x7f329fd80000
+    MPP - Freed chunks nodes (0)
+    MPP - Chunks in use (10)
 
-            ~~~~~~~~~~~~~~~~~~ General stats ~~~~~~~~~~~~~~~~~~
-            -----------------  Arena: 1  -----------------
-            MPP - Total amount of allocated memory inside arena : 960.000 Bytes
-            MPP - Total amount of freed memory inside arena     : 0 bytes
-            MPP - total freed == total allocated                : false
-            MPP - Biggest allocation size                       : 96.000 Bytes
-            MPP - Smallest allocation size                      : 96.000 Bytes
-            MPP - Full size of arena                            : 32.000 MB
-            MPP - Arena was allocated for big chunk             : false
-            MPP - Arena was allocated by GC                     : false
+    ~~~~~~~~~~~~~~~~~~ General stats ~~~~~~~~~~~~~~~~~~
+    -----------------  Arena: 1  -----------------
+    MPP - Total amount of allocated memory inside arena : 960.000 Bytes
+    MPP - Total amount of freed memory inside arena     : 0 bytes
+    MPP - total freed == total allocated                : false
+    MPP - Biggest allocation size                       : 96.000 Bytes
+    MPP - Smallest allocation size                      : 96.000 Bytes
+    MPP - Full size of arena                            : 32.000 MB
+    MPP - Arena was allocated for big chunk             : false
+    MPP - Arena was allocated by GC                     : false
 
-            -----------------  Arena: 2  -----------------
-            MPP - Total amount of allocated memory inside arena : 960.000 Bytes
-            MPP - Total amount of freed memory inside arena     : 0 bytes
-            MPP - total freed == total allocated                : false
-            MPP - Biggest allocation size                       : "No allocations have been made yet"
-            MPP - Smallest allocation size                      : "No allocations have been made yet"
-            MPP - Full size of arena                            : 32.000 MB
-            MPP - Arena was allocated for big chunk             : false
-            MPP - Arena was allocated by GC                     : true
+    -----------------  Arena: 2  -----------------
+    MPP - Total amount of allocated memory inside arena : 960.000 Bytes
+    MPP - Total amount of freed memory inside arena     : 0 bytes
+    MPP - total freed == total allocated                : false
+    MPP - Biggest allocation size                       : "No allocations have been made yet"
+    MPP - Smallest allocation size                      : "No allocations have been made yet"
+    MPP - Full size of arena                            : 32.000 MB
+    MPP - Arena was allocated for big chunk             : false
+    MPP - Arena was allocated by GC                     : true
 
-            ~~~~~~~~~~~~~ Garbage Collector stats ~~~~~~~~~~~~~
-            -----------------  Cycle: 1  -----------------
-            GC - Time wasted inside   GC::Collect() : 2.0000 ms
-            GC - Memory cleaned after GC::Collect() : 0 bytes
-            GC - Total size of active objects       : 960.000 Bytes
+    ~~~~~~~~~~~~~ Garbage Collector stats ~~~~~~~~~~~~~
+    -----------------  Cycle: 1  -----------------
+    GC - Time wasted inside   GC::Collect() : 2.0000 ms
+    GC - Memory cleaned after GC::Collect() : 0 bytes
+    GC - Total size of active objects       : 960.000 Bytes
 
-            +============== STATISTICS DUMP END ==============+
-            ```
+    +============== STATISTICS DUMP END ==============+
+    ```
 
-    2. After program termination, setting environment variable MPP_SHOW_STATISTICS=1.  
-        Important note. Runtime stats cannot be dumped using this approach.
+    __After program termination__, setting environment variable `MPP_SHOW_STATISTICS=1`. Important note. Runtime stats cannot be dumped using this approach.
 
-        - Example output:
+    Example output:
 
-            ```none
-            +============= STATISTICS DUMP START =============+
-            MPP: MIN_CHUNK_SIZE     : 32 bytes
-            MPP: CHUNK_HEADER_SIZE  : 16 bytes
-            MPP: DEFAULT_ARENA_SIZE : 32.000 MB
-            MPP: PAGE_SIZE          : 4.000 KB
-            ~~~~~~~~~~~~~~~~~~ General stats ~~~~~~~~~~~~~~~~~~
-            -----------------  Arena: 1  -----------------
-            MPP - Total amount of allocated memory inside arena : 960.000 Bytes
-            MPP - Total amount of freed memory inside arena     : 0 bytes
-            MPP - total freed == total allocated                : false
-            MPP - Biggest allocation size                       : 96.000 Bytes
-            MPP - Smallest allocation size                      : 96.000 Bytes
-            MPP - Full size of arena                            : 32.000 MB
-            MPP - Arena was allocated for big chunk             : false
-            MPP - Arena was allocated by GC                     : false
+    ```none
+    +============= STATISTICS DUMP START =============+
+    MPP: MIN_CHUNK_SIZE     : 32 bytes
+    MPP: CHUNK_HEADER_SIZE  : 16 bytes
+    MPP: DEFAULT_ARENA_SIZE : 32.000 MB
+    MPP: PAGE_SIZE          : 4.000 KB
+    ~~~~~~~~~~~~~~~~~~ General stats ~~~~~~~~~~~~~~~~~~
+    -----------------  Arena: 1  -----------------
+    MPP - Total amount of allocated memory inside arena : 960.000 Bytes
+    MPP - Total amount of freed memory inside arena     : 0 bytes
+    MPP - total freed == total allocated                : false
+    MPP - Biggest allocation size                       : 96.000 Bytes
+    MPP - Smallest allocation size                      : 96.000 Bytes
+    MPP - Full size of arena                            : 32.000 MB
+    MPP - Arena was allocated for big chunk             : false
+    MPP - Arena was allocated by GC                     : false
 
-            -----------------  Arena: 2  -----------------
-            MPP - Total amount of allocated memory inside arena : 960.000 Bytes
-            MPP - Total amount of freed memory inside arena     : 0 bytes
-            MPP - total freed == total allocated                : false
-            MPP - Biggest allocation size                       : "No allocations have been made yet"
-            MPP - Smallest allocation size                      : "No allocations have been made yet"
-            MPP - Full size of arena                            : 32.000 MB
-            MPP - Arena was allocated for big chunk             : false
-            MPP - Arena was allocated by GC                     : true
+    -----------------  Arena: 2  -----------------
+    MPP - Total amount of allocated memory inside arena : 960.000 Bytes
+    MPP - Total amount of freed memory inside arena     : 0 bytes
+    MPP - total freed == total allocated                : false
+    MPP - Biggest allocation size                       : "No allocations have been made yet"
+    MPP - Smallest allocation size                      : "No allocations have been made yet"
+    MPP - Full size of arena                            : 32.000 MB
+    MPP - Arena was allocated for big chunk             : false
+    MPP - Arena was allocated by GC                     : true
 
-            ~~~~~~~~~~~~~ Garbage Collector stats ~~~~~~~~~~~~~
-            -----------------  Cycle: 1  -----------------
-            GC - Time wasted inside   GC::Collect() : 2 ms
-            GC - Memory cleaned after GC::Collect() : 0 bytes
-            GC - Total size of active objects       : 960.000 Bytes
+    ~~~~~~~~~~~~~ Garbage Collector stats ~~~~~~~~~~~~~
+    -----------------  Cycle: 1  -----------------
+    GC - Time wasted inside   GC::Collect() : 2 ms
+    GC - Memory cleaned after GC::Collect() : 0 bytes
+    GC - Total size of active objects       : 960.000 Bytes
 
-            +============== STATISTICS DUMP END ==============+
-            ```
+    +============== STATISTICS DUMP END ==============+
+    ```
 
 - Allocate/Deallocate hooks
 
-  This feature allows you to install your hooks on Allocate and Deallocate. Example:
+    This feature allows you to install your hooks on Allocate and Deallocate. Example:
 
-  ```c++
-  // Lambda as an Allocate hook. Important, all hooks should be static!
-  static std::function<void*(std::size_t)> allocHook = [&](std::size_t t_AllocSize) {
-      mpp::MemoryAllocator::SetAllocateHook(nullptr);
-      void* ptr = mpp::MemoryAllocator::Allocate(t_AllocSize);
-      mpp::MemoryAllocator::SetAllocateHook(allocHook);
-      std::cout << "[mpp] Allocate(" << t_AllocSize << ") -> ";
-      mpp::Chunk::DumpChunk(std::cout, mpp::Chunk::GetHeaderPtr(ptr)) << std::endl;
-      return ptr;
-  };
-  // Set actual Allocate hook.
-  mpp::MemoryAllocator::SetAllocateHook(allocHook);
+    ```c++
+    // Lambda as an Allocate hook. Important, all hooks should be static!
+    static std::function<void*(std::size_t)> allocHook = [&](std::size_t t_AllocSize) {
+        mpp::MemoryAllocator::SetAllocateHook(nullptr);
+        void* ptr = mpp::MemoryAllocator::Allocate(t_AllocSize);
+        mpp::MemoryAllocator::SetAllocateHook(allocHook);
+        std::cout << "[mpp] Allocate(" << t_AllocSize << ") -> ";
+        mpp::Chunk::DumpChunk(std::cout, mpp::Chunk::GetHeaderPtr(ptr)) << std::endl;
+        return ptr;
+    };
+    // Set actual Allocate hook.
+    mpp::MemoryAllocator::SetAllocateHook(allocHook);
 
-  // Lambda as an Deallocate hook. Important, all hooks should be static!
-  static std::function<bool(void*)> deallocHook = [&](void* t_Addr) {
-      mpp::MemoryAllocator::SetDeallocateHook(nullptr);
-      bool res = mpp::MemoryAllocator::Deallocate(t_Addr);
-      mpp::MemoryAllocator::SetDeallocateHook(deallocHook);
-      std::cout << "[mpp] Deallocate(" << t_Addr << ") -> " << res << std::endl;
-      return res;
-  };
-  // Set actual Deallocate hook.
-  mpp::MemoryAllocator::SetDeallocateHook(deallocHook);
-  ```
+    // Lambda as an Deallocate hook. Important, all hooks should be static!
+    static std::function<bool(void*)> deallocHook = [&](void* t_Addr) {
+        mpp::MemoryAllocator::SetDeallocateHook(nullptr);
+        bool res = mpp::MemoryAllocator::Deallocate(t_Addr);
+        mpp::MemoryAllocator::SetDeallocateHook(deallocHook);
+        std::cout << "[mpp] Deallocate(" << t_Addr << ") -> " << res << std::endl;
+        return res;
+    };
+    // Set actual Deallocate hook.
+    mpp::MemoryAllocator::SetDeallocateHook(deallocHook);
+    ```
 
 ## Performance comparisons
 
