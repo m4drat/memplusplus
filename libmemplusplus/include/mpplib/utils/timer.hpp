@@ -54,23 +54,23 @@ namespace mpp { namespace utils { namespace profile {
         template<class T = std::chrono::milliseconds>
         auto GetElapsed() -> auto
         {
-            return std::chrono::duration_cast<T>(m_EndTimePoint - m_StartTimepoint);
+            return std::chrono::duration_cast<T>(m_endTimePoint - m_startTimepoint);
         }
 
     private:
         /**
          * @brief Name of the timer
          */
-        const char* m_Name;
+        const char* m_name;
 
         /**
          * @brief Start time point
          */
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_StartTimepoint;
+        std::chrono::time_point<std::chrono::high_resolution_clock> m_startTimepoint;
 
         /**
          * @brief End time point
          */
-        std::chrono::time_point<std::chrono::high_resolution_clock> m_EndTimePoint;
+        std::chrono::time_point<std::chrono::high_resolution_clock> m_endTimePoint;
     };
 }}}

@@ -4,14 +4,14 @@ namespace mpp { namespace utils { namespace profile {
 
     ProfilerTimer::ProfilerTimer(const char* t_name)
         : Timer(t_name)
-        , m_Stopped(false)
+        , m_stopped(false)
     {
         this->TimerStart();
     }
 
     ProfilerTimer::~ProfilerTimer()
     {
-        if (!m_Stopped)
+        if (!m_stopped)
         {
             Stop();
         }
@@ -31,6 +31,6 @@ namespace mpp { namespace utils { namespace profile {
         uint32_t threadId = std::hash<std::thread::id>{}(std::this_thread::get_id());
         mpp::utils::profile::Profiler::Get().WriteProfile(GetName(), start, end, threadId);
 
-        m_Stopped = true;
+        m_stopped = true;
     }
 }}}

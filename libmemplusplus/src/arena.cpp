@@ -8,15 +8,15 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 #if MPP_STATS == 1
-        m_ArenaStats = std::make_shared<utils::Statistics::ArenaStats>();
-        utils::Statistics::GetInstance().AddArenaStats(m_ArenaStats);
-        m_ArenaStats->totalAllocated = 0;
-        m_ArenaStats->totalFreed = 0;
-        m_ArenaStats->biggestAllocation = 0;
-        m_ArenaStats->smallestAllocation = std::numeric_limits<std::size_t>::max();
-        m_ArenaStats->fullArenaSize = t_size;
-        m_ArenaStats->bigArena = false;
-        m_ArenaStats->gcCreatedArena = false;
+        m_arenaStats = std::make_shared<utils::Statistics::ArenaStats>();
+        utils::Statistics::GetInstance().AddArenaStats(m_arenaStats);
+        m_arenaStats->totalAllocated = 0;
+        m_arenaStats->totalFreed = 0;
+        m_arenaStats->biggestAllocation = 0;
+        m_arenaStats->smallestAllocation = std::numeric_limits<std::size_t>::max();
+        m_arenaStats->fullArenaSize = t_size;
+        m_arenaStats->bigArena = false;
+        m_arenaStats->gcCreatedArena = false;
 #endif
         size = t_size;
         topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
@@ -52,12 +52,12 @@ namespace mpp {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
 
 #if MPP_STATS == 1
-        m_ArenaStats->totalAllocated += t_chunkSize;
-        if (chunk->GetSize() > m_ArenaStats->biggestAllocation) {
-            m_ArenaStats->biggestAllocation = chunk->GetSize();
+        m_arenaStats->totalAllocated += t_chunkSize;
+        if (chunk->GetSize() > m_arenaStats->biggestAllocation) {
+            m_arenaStats->biggestAllocation = chunk->GetSize();
         }
-        if (chunk->GetSize() < m_ArenaStats->smallestAllocation) {
-            m_ArenaStats->smallestAllocation = chunk->GetSize();
+        if (chunk->GetSize() < m_arenaStats->smallestAllocation) {
+            m_arenaStats->smallestAllocation = chunk->GetSize();
         }
 #endif
 
@@ -65,7 +65,7 @@ namespace mpp {
         chunksInUse.insert(chunk);
 
         // update current allocated space
-        m_CurrentlyAllocatedSpace += t_chunkSize;
+        m_currentlyAllocatedSpace += t_chunkSize;
         return chunk;
     }
 
@@ -94,7 +94,7 @@ namespace mpp {
 
         // Update top chunk
         topChunk = Chunk::ConstructChunk(
-            reinterpret_cast<Chunk*>(reinterpret_cast<size_t>(topChunk) + t_chunkSize),
+            reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(topChunk) + t_chunkSize),
             t_chunkSize,
             newTopChunkSize,
             1,
@@ -113,11 +113,11 @@ namespace mpp {
         chunksInUse.insert(chunk);
 
 #if MPP_STATS == 1
-        m_ArenaStats->totalAllocated += t_chunkSize;
+        m_arenaStats->totalAllocated += t_chunkSize;
 #endif
 
         // Updatede used space variable
-        m_CurrentlyAllocatedSpace += t_chunkSize;
+        m_currentlyAllocatedSpace += t_chunkSize;
 
         return chunk;
     }
@@ -194,7 +194,7 @@ namespace mpp {
 
                 // Construct splitted chunk
                 Chunk* splittedChunk = Chunk::ConstructChunk(
-                    reinterpret_cast<void*>(reinterpret_cast<size_t>(chunk) + t_chunkSize),
+                    reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
                     t_chunkSize,
                     toSplitChunkSize - t_chunkSize,
                     0,
@@ -227,7 +227,7 @@ namespace mpp {
         }
 
         // Update currently used space variable
-        m_CurrentlyAllocatedSpace -= t_chunk->GetSize();
+        m_currentlyAllocatedSpace -= t_chunk->GetSize();
 
         // Null out memory that belongs to current chunk in secure build
         // #if MPP_SECURE == 1
@@ -242,7 +242,7 @@ namespace mpp {
         }
 
 #if MPP_STATS == 1
-        m_ArenaStats->totalFreed += t_chunk->GetSize();
+        m_arenaStats->totalFreed += t_chunk->GetSize();
 #endif
         return;
     }
@@ -384,19 +384,19 @@ namespace mpp {
 
     std::size_t Arena::GetUsedSpace()
     {
-        return m_CurrentlyAllocatedSpace;
+        return m_currentlyAllocatedSpace;
     }
 
     void Arena::SetUsedSpace(std::size_t t_newSize)
     {
-        m_CurrentlyAllocatedSpace = t_newSize;
+        m_currentlyAllocatedSpace = t_newSize;
     }
 
 #if MPP_STATS == 1
     std::ostream& Arena::DumpArena(std::ostream& t_out,
                                    Arena* t_arena,
-                                   bool t_DumpFreedChunks,
-                                   bool t_DumpInUseChunks)
+                                   bool t_dumpFreedChunks,
+                                   bool t_dumpInUseChunks)
     {
         PROFILE_FUNCTION();
 
@@ -406,20 +406,20 @@ namespace mpp {
         t_out << "MPP - Total arena size           : "
               << utils::Statistics::FormattedSize(t_arena->size) << std::endl;
         t_out << "MPP - Currently Allocated Space  : "
-              << utils::Statistics::FormattedSize(t_arena->m_CurrentlyAllocatedSpace) << std::endl;
+              << utils::Statistics::FormattedSize(t_arena->m_currentlyAllocatedSpace) << std::endl;
         t_out << "MPP - Amount of free memory      : "
               << utils::Statistics::FormattedSize(t_arena->size -
-                                                  t_arena->m_CurrentlyAllocatedSpace)
+                                                  t_arena->m_currentlyAllocatedSpace)
               << " (" << std::fixed << std::setprecision(4)
-              << (t_arena->size - t_arena->m_CurrentlyAllocatedSpace) / float(t_arena->size) * 100
+              << (t_arena->size - t_arena->m_currentlyAllocatedSpace) / float(t_arena->size) * 100
               << "% of total arena size)" << std::endl;
         t_out << "MPP - Amount of allocated memory : "
-              << utils::Statistics::FormattedSize(t_arena->m_CurrentlyAllocatedSpace) << " ("
+              << utils::Statistics::FormattedSize(t_arena->m_currentlyAllocatedSpace) << " ("
               << std::fixed << std::setprecision(4)
-              << t_arena->m_CurrentlyAllocatedSpace / float(t_arena->size) * 100
+              << t_arena->m_currentlyAllocatedSpace / float(t_arena->size) * 100
               << "% of total arena size)" << std::endl;
         t_out << "MPP - Allocated memory == 0      : ";
-        if (t_arena->m_CurrentlyAllocatedSpace == 0) {
+        if (t_arena->m_currentlyAllocatedSpace == 0) {
 #if MPP_COLOUR == 1
             t_out << col::GREEN << "true" << col::RESET << std::endl;
 #else
@@ -436,12 +436,12 @@ namespace mpp {
               << utils::Statistics::FormattedSize(t_arena->chunksInUse.size() *
                                                   sizeof(Chunk::ChunkHeader_t))
               << " (";
-        if (t_arena->m_CurrentlyAllocatedSpace == 0) {
+        if (t_arena->m_currentlyAllocatedSpace == 0) {
             t_out << "0% of currently allocated space)" << std::endl;
         } else {
             t_out << std::fixed << std::setprecision(4)
                   << (t_arena->chunksInUse.size() * sizeof(Chunk::ChunkHeader_t)) /
-                         float(t_arena->m_CurrentlyAllocatedSpace) * 100
+                         float(t_arena->m_currentlyAllocatedSpace) * 100
                   << "% of currently allocated space)" << std::endl;
         }
 
@@ -469,13 +469,13 @@ namespace mpp {
             idx1++;
             Iterate(out, node->leftChild);
         };
-        if (t_DumpFreedChunks == true) {
+        if (t_dumpFreedChunks == true) {
             Iterate(std::cout, t_arena->freedChunks.GetRootNode());
         }
 
         t_out << "MPP - Chunks in use (" << t_arena->chunksInUse.size() << ")" << std::endl;
         int32_t idx2 = 0;
-        if (t_DumpInUseChunks == true) {
+        if (t_dumpInUseChunks == true) {
             for (auto ch : t_arena->chunksInUse) {
                 t_out << "\t" << idx2 << ". ";
                 Chunk::DumpChunk(t_out, ch) << std::endl;

@@ -30,7 +30,7 @@ namespace mpp {
         /**
          * @brief All existing arenas.
          */
-        static std::vector<Arena*> s_ArenaList;
+        static std::vector<Arena*> s_arenaList;
 
     public:
 #if MPP_STATS == 1 || MPP_DEBUG == 1
@@ -48,7 +48,7 @@ namespace mpp {
          */
         static const std::vector<Arena*>& GetArenaList()
         {
-            return s_ArenaList;
+            return s_arenaList;
         }
 
         /**

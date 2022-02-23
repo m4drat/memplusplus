@@ -15,47 +15,47 @@ namespace mpp {
          * it should be secure enough to use it to randomize mmap
          * base, and create headers keys.
          */
-        std::random_device m_OsRandomDev;
+        std::random_device m_osRandomDev;
 
         /**
          * @brief Random values generator. Will use previously 
          * created random device.
          */
-        std::mt19937_64 m_Gen;
+        std::mt19937_64 m_gen;
 
         /**
          * @brief Generate random uniformally distributed numbers. 
          */
-        std::uniform_int_distribution<size_t> m_Distribution;
+        std::uniform_int_distribution<std::size_t> m_distribution;
     
     public:
         /**
          * @brief Construct a new Random object
-         * @param t_Min min value to generate 
-         * @param t_Max max value to generate (limited to (2 << 63) - 1)
-         * @param t_RandSeed Seed source (by default system random seed /dev/random)
+         * @param t_min min value to generate 
+         * @param t_max max value to generate (limited to (2 << 63) - 1)
+         * @param t_randSeed Seed source (by default system random seed /dev/random)
          */
-        Random(std::size_t t_Min = 0x0, std::size_t t_Max = 18446744073709551615ull, std::size_t t_RandSeed = std::random_device{}())
-            : m_Gen{t_RandSeed}, m_Distribution{t_Min, t_Max}
+        Random(std::size_t t_min = 0x0, std::size_t t_max = 18446744073709551615ull, std::size_t t_randSeed = std::random_device{}())
+            : m_gen{t_randSeed}, m_distribution{t_min, t_max}
         {}
 
         /**
          * @brief Sets seed, to generate predictable values. Used only
          * in debug/fuzzer builds.
-         * @param t_Seed new seed value
+         * @param t_seed new seed value
          * @return Random& instance of current object
          */
-        Random& SetSeed(uint32_t t_Seed) {
-            m_Gen.seed(t_Seed);
+        Random& SetSeed(uint32_t t_seed) {
+            m_gen.seed(t_seed);
             return *this;
         }
 
         /**
-         * @brief Generate uniformally distributed random value [t_Min, t_Max] 
+         * @brief Generate uniformally distributed random value [t_min, t_max] 
          * @return std::size_t 64bit random value 
          */
         std::size_t operator()() {
-            return m_Distribution(m_Gen);
+            return m_distribution(m_gen);
         }
 
         /**
@@ -64,11 +64,11 @@ namespace mpp {
          */
         static Random& GetInstance()
         {
-            static Random s_RandomInstance;
+            static Random s_randomInstance;
 #if MPP_FUZZER_INSECURE == 1 || MPP_DEBUG == 1
-            s_RandomInstance.SetSeed(0);
+            s_randomInstance.SetSeed(0);
 #endif
-            return s_RandomInstance;
+            return s_randomInstance;
         }
     };
 }

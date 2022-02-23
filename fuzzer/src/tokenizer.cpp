@@ -35,7 +35,7 @@ namespace mpp { namespace fuzzer {
     }
 
     std::deque<std::pair<Tokenizer::Tokens, std::size_t>> Tokenizer::Tokenize(const uint8_t* t_data,
-                                                                              size_t t_size)
+                                                                              std::size_t t_size)
     {
         std::deque<std::pair<Tokenizer::Tokens, std::size_t>> commands;
         std::size_t current_size = t_size;

@@ -114,14 +114,14 @@ namespace mpp { namespace utils {
          * @brief Dump information about arenas.
          * @param t_out output stream to write to.
          * @param t_dumpActiveArenas dump active arenas.
-         * @param t_DumpFreedChunks dump freed chunks.
-         * @param t_DumpInUseChunks dump in use chunks.
+         * @param t_dumpFreedChunks dump freed chunks.
+         * @param t_dumpInUseChunks dump in use chunks.
          * @return std::ostream& stream reference
          */
         std::ostream& DumpStats(std::ostream& t_out,
                                 bool t_dumpActiveArenas,
-                                bool t_DumpFreedChunks,
-                                bool t_DumpInUseChunks);
+                                bool t_dumpFreedChunks,
+                                bool t_dumpInUseChunks);
 
         /**
          * @brief Add gc stats to vector of all gc statistics
@@ -157,11 +157,11 @@ namespace mpp { namespace utils {
         /**
          * @brief vector of all arenas statistics
          */
-        std::vector<std::shared_ptr<ArenaStats>> m_ArenasStats;
+        std::vector<std::shared_ptr<ArenaStats>> m_arenasStats;
 
         /**
          * @brief Garbage Collector stats
          */
-        std::vector<std::unique_ptr<GcStats>> m_GcCyclesStats;
+        std::vector<std::unique_ptr<GcStats>> m_gcCyclesStats;
     };
 }}

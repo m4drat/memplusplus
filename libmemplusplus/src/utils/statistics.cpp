@@ -31,7 +31,7 @@ namespace mpp { namespace utils {
     std::ostream& Statistics::DumpArenasGeneralStats(std::ostream& t_out)
     {
         uint32_t arenaIdx = 1;
-        for (const auto& arenaStats : m_ArenasStats) {
+        for (const auto& arenaStats : m_arenasStats) {
             t_out << "  -----------------  Arena: " << arenaIdx << "  -----------------  "
                   << std::endl;
             t_out << "MPP - Total amount of allocated memory inside arena : "
@@ -84,7 +84,7 @@ namespace mpp { namespace utils {
     std::ostream& Statistics::DumpGcStats(std::ostream& t_out)
     {
         uint32_t cycleIdx = 1;
-        for (const auto& gcStats : m_GcCyclesStats) {
+        for (const auto& gcStats : m_gcCyclesStats) {
             t_out << "  -----------------  Cycle: " << cycleIdx << "  -----------------  "
                   << std::endl;
             t_out << "GC - Time wasted inside   GC::Collect() : " << gcStats->timeWasted.count()
@@ -101,8 +101,8 @@ namespace mpp { namespace utils {
 
     std::ostream& Statistics::DumpStats(std::ostream& t_out,
                                         bool t_dumpActiveArenas,
-                                        bool t_DumpFreedChunks,
-                                        bool t_DumpInUseChunks)
+                                        bool t_dumpFreedChunks,
+                                        bool t_dumpInUseChunks)
     {
         t_out << "+============= STATISTICS DUMP START =============+" << std::endl;
 
@@ -118,7 +118,7 @@ namespace mpp { namespace utils {
         if (t_dumpActiveArenas == true) {
             t_out << "~~~~~~~~~~~~~~~~ All active arenas ~~~~~~~~~~~~~~~~" << std::endl;
             for (auto* arena : MemoryManager::GetArenaList()) {
-                Arena::DumpArena(t_out, arena, t_DumpFreedChunks, t_DumpInUseChunks) << std::endl;
+                Arena::DumpArena(t_out, arena, t_dumpFreedChunks, t_dumpInUseChunks) << std::endl;
             }
         }
 
@@ -134,27 +134,27 @@ namespace mpp { namespace utils {
 
     void Statistics::AddGcCycleStats(std::unique_ptr<Statistics::GcStats> t_gcCycleStats)
     {
-        m_GcCyclesStats.push_back(std::move(t_gcCycleStats));
+        m_gcCyclesStats.push_back(std::move(t_gcCycleStats));
     }
 
     void Statistics::AddArenaStats(std::shared_ptr<ArenaStats> t_arenaStats)
     {
-        m_ArenasStats.push_back(t_arenaStats);
+        m_arenasStats.push_back(t_arenaStats);
     }
 
     std::vector<std::unique_ptr<Statistics::GcStats>>& Statistics::GetGcStats()
     {
-        return m_GcCyclesStats;
+        return m_gcCyclesStats;
     }
 
     std::vector<std::shared_ptr<Statistics::ArenaStats>>& Statistics::GetArenaStats()
     {
-        return m_ArenasStats;
+        return m_arenasStats;
     }
 
     Statistics& Statistics::GetInstance()
     {
-        static Statistics s_Stats;
-        return s_Stats;
+        static Statistics s_stats;
+        return s_stats;
     }
 }}

@@ -2,33 +2,33 @@
 
 namespace mpp { namespace utils { namespace profile {
     Timer::Timer(const char* t_name)
-        : m_Name(t_name)
+        : m_name(t_name)
     {}
 
     Timer& Timer::TimerStart()
     {
-        m_StartTimepoint = std::chrono::high_resolution_clock::now();
+        m_startTimepoint = std::chrono::high_resolution_clock::now();
         return *this;
     }
 
     Timer& Timer::TimerEnd()
     {
-        m_EndTimePoint = std::chrono::high_resolution_clock::now();
+        m_endTimePoint = std::chrono::high_resolution_clock::now();
         return *this;
     }
 
     std::chrono::time_point<std::chrono::high_resolution_clock> Timer::GetStartTimepoint()
     {
-        return m_StartTimepoint;
+        return m_startTimepoint;
     }
 
     std::chrono::time_point<std::chrono::high_resolution_clock> Timer::GetEndTimepoint()
     {
-        return m_EndTimePoint;
+        return m_endTimePoint;
     }
 
     const char* Timer::GetName()
     {
-        return m_Name;
+        return m_name;
     }
 }}}

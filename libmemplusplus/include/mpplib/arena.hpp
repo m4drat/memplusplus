@@ -26,14 +26,14 @@ namespace mpp {
         /**
          * @brief Currently used space in arena.
          */
-        std::size_t m_CurrentlyAllocatedSpace{ 0 };
+        std::size_t m_currentlyAllocatedSpace{ 0 };
 
     public:
 #if MPP_STATS == 1
         /**
          * @brief Unique ptr with arena metadata to use with Statistics.
          */
-        std::shared_ptr<utils::Statistics::ArenaStats> m_ArenaStats;
+        std::shared_ptr<utils::Statistics::ArenaStats> m_arenaStats;
 #endif
 
         /**
@@ -218,14 +218,14 @@ namespace mpp {
          * @brief Dump arena statistics in human-readable format.
          * @param t_out file stream, to write to. (std::cout / std::ofstream)
          * @param t_arena arena, that is going to be dumped.
-         * @param t_DumpFreedChunks dump all freed chunks
-         * @param t_DempInUseChunks dump all in use chunks
+         * @param t_dumpFreedChunks dump all freed chunks
+         * @param t_dumpInUseChunks dump all in use chunks
          * @return std::ostream, that earlier was passed as t_out
          */
         static std::ostream& DumpArena(std::ostream& t_out,
                                        Arena* t_arena,
-                                       bool t_DumpFreedChunks,
-                                       bool t_DumpInUseChunks);
+                                       bool t_dumpFreedChunks,
+                                       bool t_dumpInUseChunks);
 #endif
     };
 }

@@ -32,6 +32,6 @@ namespace mpp { namespace utils { namespace profile {
         /**
          * @brief is profiler timer stopped
          */
-        bool m_Stopped;
+        bool m_stopped;
     };
 }}}

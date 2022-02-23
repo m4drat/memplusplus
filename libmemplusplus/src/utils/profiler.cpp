@@ -3,7 +3,7 @@
 
 namespace mpp { namespace utils { namespace profile {
     Profiler::Profiler()
-        : m_ProfileCount(0)
+        : m_profileCount(0)
     {}
 
     Profiler::~Profiler()
@@ -15,15 +15,15 @@ namespace mpp { namespace utils { namespace profile {
 
     void Profiler::BeginSession(const std::string& t_name, const std::string& t_filepath)
     {
-        m_OutputStream.open(t_filepath);
+        m_outputStream.open(t_filepath);
         WriteHeader();
     }
 
     void Profiler::EndSession()
     {
         WriteFooter();
-        m_OutputStream.close();
-        m_ProfileCount = 0;
+        m_outputStream.close();
+        m_profileCount = 0;
     }
 
 #if MPP_PROFILE == 1
@@ -38,37 +38,37 @@ namespace mpp { namespace utils { namespace profile {
                                 int64_t t_end,
                                 uint32_t t_threadId)
     {
-        if (m_ProfileCount++ > 0)
+        if (m_profileCount++ > 0)
         {
-            m_OutputStream << ",";
+            m_outputStream << ",";
         }
 
         std::string name = std::string(t_name);
         std::replace(name.begin(), name.end(), '"', '\'');
 
-        m_OutputStream << "{";
-        m_OutputStream << "\"cat\":\"function\",";
-        m_OutputStream << "\"dur\":" << (t_end - t_start) << ',';
-        m_OutputStream << "\"name\":\"" << name << "\",";
-        m_OutputStream << "\"ph\":\"X\",";
-        m_OutputStream << "\"pid\":0,";
-        m_OutputStream << "\"tid\":" << t_threadId << ",";
-        m_OutputStream << "\"ts\":" << t_start;
-        m_OutputStream << "}";
+        m_outputStream << "{";
+        m_outputStream << "\"cat\":\"function\",";
+        m_outputStream << "\"dur\":" << (t_end - t_start) << ',';
+        m_outputStream << "\"name\":\"" << name << "\",";
+        m_outputStream << "\"ph\":\"X\",";
+        m_outputStream << "\"pid\":0,";
+        m_outputStream << "\"tid\":" << t_threadId << ",";
+        m_outputStream << "\"ts\":" << t_start;
+        m_outputStream << "}";
 
-        m_OutputStream.flush();
+        m_outputStream.flush();
     }
 
     void Profiler::WriteHeader()
     {
-        m_OutputStream << "{\"otherData\": {},\"traceEvents\":[";
-        m_OutputStream.flush();
+        m_outputStream << "{\"otherData\": {},\"traceEvents\":[";
+        m_outputStream.flush();
     }
 
     void Profiler::WriteFooter()
     {
-        m_OutputStream << "]}";
-        m_OutputStream.flush();
+        m_outputStream << "]}";
+        m_outputStream.flush();
     }
 
     Profiler& Profiler::Get()

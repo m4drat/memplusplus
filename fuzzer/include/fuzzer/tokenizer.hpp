@@ -36,6 +36,6 @@ namespace mpp { namespace fuzzer {
          * @return std::deque<std::pair<Tokens, std::size_t>> of opcodes and their parameters
          */
         static std::deque<std::pair<Tokens, std::size_t>> Tokenize(const uint8_t* t_data,
-                                                                   size_t t_size);
+                                                                   std::size_t t_size);
     };
 }}

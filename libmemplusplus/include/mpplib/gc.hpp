@@ -52,7 +52,7 @@ namespace mpp {
         /**
          * @brief Used to keep track of garbage collector stats
          */
-        std::unique_ptr<utils::Statistics::GcStats> m_GcStats;
+        std::unique_ptr<utils::Statistics::GcStats> m_gcStats;
 #endif
 
 #if MPP_DEBUG == 1

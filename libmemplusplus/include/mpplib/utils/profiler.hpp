@@ -15,12 +15,12 @@ namespace mpp { namespace utils { namespace profile {
         /**
          * @brief Stream to write to
          */
-        std::ofstream m_OutputStream;
+        std::ofstream m_outputStream;
 
         /**
          * @brief profile counts
          */
-        int32_t m_ProfileCount;
+        int32_t m_profileCount;
 
     public:
         /**

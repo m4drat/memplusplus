@@ -11,7 +11,7 @@ namespace mpp {
         m_currentCycle = 1;
 #endif
 #if MPP_STATS == 1
-        m_GcStats = std::make_unique<utils::Statistics::GcStats>();
+        m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
     }
 
@@ -64,8 +64,8 @@ namespace mpp {
         Arena* godArena = MemoryAllocator::CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
-        m_GcStats->activeObjectsTotalSize = layoutedData.second;
-        godArena->m_ArenaStats->gcCreatedArena = true;
+        m_gcStats->activeObjectsTotalSize = layoutedData.second;
+        godArena->m_arenaStats->gcCreatedArena = true;
 #endif
 
         void* currPtr{ godArena->begin };
@@ -79,7 +79,7 @@ namespace mpp {
             currSize = vertex->GetCorrespondingChunk()->GetSize();
 
 #if MPP_STATS == 1
-            godArena->m_ArenaStats->totalAllocated += currSize;
+            godArena->m_arenaStats->totalAllocated += currSize;
 #endif
 
             // Copy chunk data to new location
@@ -102,7 +102,7 @@ namespace mpp {
             }
 
             prevSize = currSize;
-            currPtr = reinterpret_cast<void*>(reinterpret_cast<size_t>(currPtr) + currSize);
+            currPtr = reinterpret_cast<void*>(reinterpret_cast<std::size_t>(currPtr) + currSize);
         }
 
         // If we have used all space in the arena
@@ -117,15 +117,15 @@ namespace mpp {
         }
 
         // Delete all arenas
-        auto it = s_ArenaList.begin();
-        while (it != s_ArenaList.end()) {
+        auto it = s_arenaList.begin();
+        while (it != s_arenaList.end()) {
             if (*it != godArena) {
 #if MPP_STATS == 1
-                m_GcStats->memoryCleaned += (*it)->FreeMemoryInsideChunkTreap();
+                m_gcStats->memoryCleaned += (*it)->FreeMemoryInsideChunkTreap();
 #endif
                 delete *it;
                 *it = nullptr;
-                it = s_ArenaList.erase(it);
+                it = s_arenaList.erase(it);
             } else {
                 ++it;
             }
@@ -133,9 +133,9 @@ namespace mpp {
 
 #if MPP_STATS == 1
         timer.TimerEnd();
-        m_GcStats->timeWasted = timer.GetElapsed<std::chrono::milliseconds>();
-        utils::Statistics::GetInstance().AddGcCycleStats(std::move(m_GcStats));
-        m_GcStats = std::make_unique<utils::Statistics::GcStats>();
+        m_gcStats->timeWasted = timer.GetElapsed<std::chrono::milliseconds>();
+        utils::Statistics::GetInstance().AddGcCycleStats(std::move(m_gcStats));
+        m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
 
         return true;

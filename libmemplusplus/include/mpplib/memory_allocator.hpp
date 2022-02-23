@@ -73,12 +73,12 @@ namespace mpp {
         /**
          * @brief User specified hook to call before Allocate 
          */
-        static std::function<void*(std::size_t)> g_MppAllocateHook;
+        static std::function<void*(std::size_t)> g_mppAllocateHook;
 
         /**
          * @brief User specified hook to call before Deallocate
          */
-        static std::function<bool(void*)> g_MppDeallocateHook;
+        static std::function<bool(void*)> g_mppDeallocateHook;
         
         friend class GC;
         friend class Arena;
@@ -143,14 +143,14 @@ namespace mpp {
 
         /**
          * @brief Sets hook for Allocate method
-         * @param t_AllocateHook std::function to set as hook
+         * @param t_allocateHook std::function to set as hook
          */
-        static void SetAllocateHook(const std::function<void*(std::size_t)>& t_AllocateHook);
+        static void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook);
 
         /**
          * @brief Sets hook for DeAllocate method
-         * @param t_DeallocateHook std::function to set as hook
+         * @param t_deallocateHook std::function to set as hook
          */
-        static void SetDeallocateHook(const std::function<bool(void*)>& t_DeallocateHook);
+        static void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook);
     };
 }

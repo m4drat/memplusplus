@@ -3,7 +3,7 @@
 #include <string>
 
 namespace mpp {
-    std::vector<Arena*> MemoryManager::s_ArenaList;
+    std::vector<Arena*> MemoryManager::s_arenaList;
 
     void MemoryManager::InitAllocatorState()
     {
@@ -20,7 +20,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION(); 
 
-        for (auto* arena : s_ArenaList) {
+        for (auto* arena : s_arenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
                   << std::endl;
             for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
@@ -90,11 +90,11 @@ namespace mpp {
     bool MemoryManager::ResetAllocatorState()
     {
         PROFILE_FUNCTION();
-        auto it = s_ArenaList.begin();
-        while (it != s_ArenaList.end()) {
+        auto it = s_arenaList.begin();
+        while (it != s_arenaList.end()) {
             delete *it;
             *it = nullptr;
-            it = s_ArenaList.erase(it);
+            it = s_arenaList.erase(it);
         }
 
         return true;
@@ -103,7 +103,7 @@ namespace mpp {
     Arena* MemoryManager::GetArenaByPtr(void* t_ptr)
     {
         PROFILE_FUNCTION();
-        for (auto* arena : s_ArenaList) {
+        for (auto* arena : s_arenaList) {
             if (t_ptr >= arena->begin && t_ptr <= arena->end) {
                 return arena;
             }

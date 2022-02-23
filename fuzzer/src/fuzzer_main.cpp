@@ -8,7 +8,7 @@
 
 using namespace mpp::fuzzer;
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, size_t Size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
 {
     // translate input string into sequence of opcodes
     std::deque<std::pair<Tokenizer::Tokens, std::size_t>> commands =

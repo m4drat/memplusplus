@@ -6,8 +6,8 @@
 #include <sys/mman.h>
 
 namespace mpp {
-    std::function<void*(std::size_t)> MemoryAllocator::g_MppAllocateHook{ nullptr };
-    std::function<bool(void*)> MemoryAllocator::g_MppDeallocateHook{ nullptr };
+    std::function<void*(std::size_t)> MemoryAllocator::g_mppAllocateHook{ nullptr };
+    std::function<bool(void*)> MemoryAllocator::g_mppDeallocateHook{ nullptr };
 
     std::uintptr_t MemoryAllocator::MmapHint() {
         std::uintptr_t randOffset = static_cast<std::uintptr_t>(Random::GetInstance()()); // generates random value [0, (2 << 63) - 1]
@@ -79,7 +79,7 @@ namespace mpp {
         Arena* arena = new Arena(t_arenaSize, arenaSpace);
 
         // Add newly created arena to vector of active arenas
-        s_ArenaList.push_back(arena);
+        s_arenaList.push_back(arena);
 
         return arena;
     }
@@ -93,7 +93,7 @@ namespace mpp {
         // Try iterating through all available arenas
         // to try to find enough space for user-requested chunk
         // in top chunk
-        for (auto* arena : s_ArenaList) {
+        for (auto* arena : s_arenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
             if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
@@ -109,11 +109,11 @@ namespace mpp {
                 chunkToReturn = arena->AllocateFromFreeList(chunkToReturn, t_realSize);
             }
 #if MPP_STATS == 1
-            if (chunkToReturn->GetSize() > arena->m_ArenaStats->biggestAllocation) {
-                arena->m_ArenaStats->biggestAllocation = chunkToReturn->GetSize();
+            if (chunkToReturn->GetSize() > arena->m_arenaStats->biggestAllocation) {
+                arena->m_arenaStats->biggestAllocation = chunkToReturn->GetSize();
             }
-            if (chunkToReturn->GetSize() < arena->m_ArenaStats->smallestAllocation) {
-                arena->m_ArenaStats->smallestAllocation = chunkToReturn->GetSize();
+            if (chunkToReturn->GetSize() < arena->m_arenaStats->smallestAllocation) {
+                arena->m_arenaStats->smallestAllocation = chunkToReturn->GetSize();
             }
 #endif
 
@@ -132,7 +132,7 @@ namespace mpp {
         // Create new arena with requested size
         Arena* arena = CreateArena(t_userDataSize);
 #if MPP_STATS == 1
-        arena->m_ArenaStats->bigArena = true;
+        arena->m_arenaStats->bigArena = true;
 #endif
 
         // Allocate chunk from right space of that arena
@@ -145,8 +145,8 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // User placed hook to call before actual Allocate
-        if (g_MppAllocateHook != nullptr) {
-            return g_MppAllocateHook(t_userDataSize);
+        if (g_mppAllocateHook != nullptr) {
+            return g_mppAllocateHook(t_userDataSize);
         }
 
         // Align, because we want to have metadata bits
@@ -170,7 +170,7 @@ namespace mpp {
 
         // If we dont have active arenas yet
         // we will create new one
-        if (s_ArenaList.empty()) {
+        if (s_arenaList.empty()) {
             CreateArena(g_DEFAULT_ARENA_SIZE);
         }
 
@@ -205,8 +205,8 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // User placed hook to call before actual Allocate
-        if (g_MppDeallocateHook != nullptr) {
-            return g_MppDeallocateHook(t_chunkPtr);
+        if (g_mppDeallocateHook != nullptr) {
+            return g_mppDeallocateHook(t_chunkPtr);
         }
 
         // If given pointer is nullptr just return false
@@ -218,7 +218,7 @@ namespace mpp {
 
         // iterating through all the areas in an attempt
         // to find the one that the chunk belongs to
-        for (auto* arena : s_ArenaList) {
+        for (auto* arena : s_arenaList) {
             if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
                 // In this case, we still can free invalid pointer, so
                 // add additional checks inside DeallocateChunk
@@ -238,14 +238,14 @@ namespace mpp {
         return false;
     }
 
-    void MemoryAllocator::SetAllocateHook(const std::function<void*(std::size_t)>& t_AllocateHook) 
+    void MemoryAllocator::SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook) 
     {
-        g_MppAllocateHook = t_AllocateHook;
+        g_mppAllocateHook = t_allocateHook;
     }
     
-    void MemoryAllocator::SetDeallocateHook(const std::function<bool(void*)>& t_DeallocateHook) 
+    void MemoryAllocator::SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook) 
     {
-        g_MppDeallocateHook = t_DeallocateHook;
+        g_mppDeallocateHook = t_deallocateHook;
     }
 }
 
