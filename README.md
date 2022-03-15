@@ -26,7 +26,7 @@ Current library version: 2.3.5
 ## Usage
 
 1. Install latest build systems: `apt install cmake g++ clang`
-2. Clone library sources: `git clone https://github.com/m4drat/memplusplus/`
+2. Clone library sources: `git clone --recurse-submodules https://github.com/m4drat/memplusplus/`
 
 ### How to use the library as a dependency (external project)
 
@@ -90,7 +90,7 @@ Global options:
 
 - `MPP_BUILD_DOCS` - build documentation
 
-- __currently not supported__. `MPP_BUILD_BENCMARK` - build benchmarks
+- `MPP_BUILD_BENCHMARK` - build benchmarks
 
 Library options:
 
@@ -288,7 +288,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     Using compilation flag `MPP_PROFILE`, you can build the library with profiler enabled. To do so:
     1. Set the `MPP_PROFILE` before building the library
     2. Run the application until it exits
-    3. In your current directory, find the file called __mpplib-profilng.json__
+    3. In your current directory, find the file called __mpplib-profiling.json__
     4. Open this file using the chrome tracing tool. To do so, open chrome and navigate to the `chrome://tracing` page.
 
     Example output:

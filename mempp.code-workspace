@@ -81,6 +81,12 @@
 			"any": "cpp",
 			"bit": "cpp",
 			"queue": "cpp"
-		}
+		},
+		"cSpell.words": [
+			"alloc",
+			"mmap",
+			"nullptr"
+		],
+		"codechecker.backend.compilationDatabasePath": "/home/madrat/memplusplus/compile_commands.json"
 	}
 }

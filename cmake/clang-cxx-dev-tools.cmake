@@ -47,7 +47,7 @@ set(FUZZING_HARNESS_INCLUDES ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/fu
 set(LIBMEMPLUSPLUS_INCLUDES  ${ALL_INCLUDE_DIRECTORIES} ${PROJECT_SOURCE_DIR}/libmemplusplus/include)
 
 # Adding clang-tidy target if executable is found
-find_program(CLANG_TIDY "clang-tidy")
+find_program(CLANG_TIDY "clang-tidy-15")
 if(CLANG_TIDY)
     add_custom_target(
         clang-tidy
@@ -59,5 +59,14 @@ if(CLANG_TIDY)
         -I${EXAMPLE_PROJECT_INCLUDES}
         -I${FUZZING_HARNESS_INCLUDES}
         -I${LIBMEMPLUSPLUS_INCLUDES}
+    )
+endif()
+
+# Adding clang-tidy target if executable is found
+find_program(CLANG_STATIC_ANALYZER "scan-build")
+if(CLANG_STATIC_ANALYZER)
+    add_custom_target(
+        clang-static-analyzer
+        COMMAND ${CLANG_STATIC_ANALYZER} ./build.sh
     )
 endif()

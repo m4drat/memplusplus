@@ -1,7 +1,7 @@
 #include "mpplib/memory_allocator.hpp"
 #include "mpplib/exception.hpp"
-#include "mpplib/utils/utils.hpp"
 #include "mpplib/utils/random.hpp"
+#include "mpplib/utils/utils.hpp"
 
 #include <sys/mman.h>
 
@@ -9,16 +9,20 @@ namespace mpp {
     std::function<void*(std::size_t)> MemoryAllocator::g_mppAllocateHook{ nullptr };
     std::function<bool(void*)> MemoryAllocator::g_mppDeallocateHook{ nullptr };
 
-    std::uintptr_t MemoryAllocator::MmapHint() {
-        std::uintptr_t randOffset = static_cast<std::uintptr_t>(Random::GetInstance()()); // generates random value [0, (2 << 63) - 1]
-        
+    std::uintptr_t MemoryAllocator::MmapHint()
+    {
+        std::uintptr_t randOffset = static_cast<std::uintptr_t>(
+            Random::GetInstance()()); // generates random value [0, (2 << 63) - 1]
+
         // Min value: 0x10000000000
         // Max value: 0x40ffffc00000
         // User can allocate memory in this range: [0, 0x0007fffffffffff]
-        // In theory, hint can overlap with an existing allocation, because default arena size is 32mb, and we use only 6mb as an offset between maps.
-        // But that still should be sufficient, cause probability of this event is negligible.
-        // Using 0xFFFFFF as a random mask we should have 24 random bits, which will give us enough entropy.
-        std::uintptr_t mmapHint = MemoryManager::g_MMAP_START + (6 * 1024 * 1024) * (randOffset & 0xFFFFFF);
+        // In theory, hint can overlap with an existing allocation, because default arena size is
+        // 32mb, and we use only 6mb as an offset between maps. But that still should be sufficient,
+        // cause probability of this event is negligible. Using 0xFFFFFF as a random mask we should
+        // have 24 random bits, which will give us enough entropy.
+        std::uintptr_t mmapHint =
+            MemoryManager::g_MMAP_START + (6 * 1024 * 1024) * (randOffset & 0xFFFFFF);
         return mmapHint;
     }
 
@@ -35,15 +39,23 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        // In secure build try to randomize mmap base (to protect against attacks like Offset-to-lib)
-        // If attemp failed, just call mmap(NULL, ...)
+        // In secure build try to randomize mmap base (to protect against attacks like
+        // Offset-to-lib) If attemp failed, just call mmap(NULL, ...)
+        // @FIXME: Currently we are using default uniform_int_distribution, which is not
+        // cryptographically secure!
 #if MPP_SECURE == 1
-        void* rawPtr = mmap(reinterpret_cast<void*>(MmapHint()), t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        void* rawPtr = mmap(reinterpret_cast<void*>(MmapHint()),
+                            t_size,
+                            PROT_READ | PROT_WRITE,
+                            MAP_PRIVATE | MAP_ANONYMOUS,
+                            -1,
+                            0);
         if (rawPtr == MAP_FAILED) { // This time try to allocate without any hints
             rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
         }
 #else
-        void* rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        void* rawPtr =
+            mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 #endif
         if (rawPtr == MAP_FAILED) {
             // If we are using fuzzer just ignore out-of-memory errors and exit
@@ -101,7 +113,7 @@ namespace mpp {
             } else { // Check if current arena has enough free space
                 chunkToReturn = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
 
-                // If we are here, current arena doesn't have any free space, 
+                // If we are here, current arena doesn't have any free space,
                 // proceed to the next one
                 if (chunkToReturn == nullptr) {
                     continue;
@@ -238,14 +250,13 @@ namespace mpp {
         return false;
     }
 
-    void MemoryAllocator::SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook) 
+    void MemoryAllocator::SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook)
     {
         g_mppAllocateHook = t_allocateHook;
     }
-    
-    void MemoryAllocator::SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook) 
+
+    void MemoryAllocator::SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook)
     {
         g_mppDeallocateHook = t_deallocateHook;
     }
 }
-

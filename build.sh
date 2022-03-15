@@ -1,11 +1,13 @@
-CXX=clang++-11 cmake -S . -B build \
+#!/bin/bash
+
+CXX=clang++-15 cmake -S . -B build \
 	-DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE \
 	-DCMAKE_BUILD_TYPE=Debug \
 	-DMPP_BUILD_FUZZER=OFF \
 	-DMPP_BUILD_EXAMPLE=ON \
 	-DMPP_BUILD_TESTS=OFF \
 	-DMPP_BUILD_DOCS=OFF \
-	-DMPP_BUILD_BENCHMARK=OFF \
+	-DMPP_BUILD_BENCHMARK=ON \
 	-DMPP_SANITIZERS=OFF \
 	-DMPP_BUILD_SHARED_LIBS=OFF \
 	-DMPP_FULL_DEBUG=ON \
@@ -14,4 +16,4 @@ CXX=clang++-11 cmake -S . -B build \
 	-DMPP_COLOUR=ON \
 	-DMPP_STATS=ON
 
-CXX=clang++-11 cmake --build build --config Debug --target all
+CXX=clang++-15 cmake --build build --config Debug --target all -- -j 16

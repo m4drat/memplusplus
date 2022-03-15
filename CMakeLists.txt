@@ -24,7 +24,7 @@ option(MPP_USE_FUZZER_DEFINITIONS "Build mpp with fuzzing-friendly defines" OFF)
 option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
-option(MPP_BUILD_BENCHMARK "Build mpp benchmark (tcmalloc, jemalloc, malloc, mpp)" OFF)
+option(MPP_BUILD_BENCHMARK "Build mpp benchmark (tcmalloc, jemalloc, malloc, mpp)" ON)
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)
 
 message(STATUS "##################### GLOBAL OPTIONS #####################")
@@ -72,7 +72,15 @@ if (MPP_BUILD_DOCS)
 endif()
 
 if (MPP_BUILD_BENCHMARK)
+	list(APPEND CMAKE_ARGS "-DBENCHMARK_ENABLE_GTEST_TESTS=OFF")
+	include_directories("libraries")
+
 	message(STATUS "[+] Building with benchmark")
+	enable_testing()
+	
+	add_subdirectory(libraries/googletest)
+	add_subdirectory(libraries/benchmark)
+
 	add_subdirectory(benchmark)
 endif()
 
