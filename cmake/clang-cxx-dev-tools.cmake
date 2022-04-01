@@ -18,7 +18,7 @@ foreach (SOURCE_FILE ${ALL_CXX_SOURCE_FILES})
 endforeach ()
 
 # Adding clang-format target if executable is found
-find_program(CLANG_FORMAT "clang-format")
+find_program(CLANG_FORMAT "clang-format-15")
 if(CLANG_FORMAT)
     add_custom_target(
         clang-format
@@ -63,7 +63,7 @@ if(CLANG_TIDY)
 endif()
 
 # Adding clang-tidy target if executable is found
-find_program(CLANG_STATIC_ANALYZER "scan-build")
+find_program(CLANG_STATIC_ANALYZER "scan-build-15")
 if(CLANG_STATIC_ANALYZER)
     add_custom_target(
         clang-static-analyzer

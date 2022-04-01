@@ -5,7 +5,7 @@ namespace mpp { namespace utils {
     Statistics::~Statistics()
     {
 #if MPP_STATS == 1
-        if (Options::GetMppShowStatistics()) {
+        if (EnvOptions::Get().GetMppShowStatistics()) {
             DumpStats(std::cerr, false, false, false);
         }
 #endif

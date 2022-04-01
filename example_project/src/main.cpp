@@ -32,11 +32,16 @@ void logic()
 
     char* ptr = (char*)MemoryAllocator::Allocate(1024);
     SharedGcPtr<char> a(ptr);
-    auto b = a;
-    auto c = a;
-    auto d = a;
-    auto e = c;
-    auto f = c;
+    SharedGcPtr<UserData> b = MakeSharedGcPtr<UserData>(1337);
+    SharedGcPtr<UserData> c = MakeSharedGcPtr<UserData>(1337);
+    SharedGcPtr<UserData> d = MakeSharedGcPtr<UserData>(1337);
+    
+    a = nullptr;
+    // b = nullptr;
+    c = nullptr;
+    // d = nullptr;
+    
+    GC::GetInstance().Collect();
     // Should trigger invalid initialization
     // SharedGcPtr<char> b(ptr);
 }

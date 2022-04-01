@@ -2,8 +2,6 @@
 
 #include <string>
 
-namespace col = mpp::utils::colours;
-
 namespace mpp {
     std::vector<Arena*> MemoryManager::s_arenaList;
 
@@ -92,6 +90,7 @@ namespace mpp {
     bool MemoryManager::ResetAllocatorState()
     {
         PROFILE_FUNCTION();
+
         auto it = s_arenaList.begin();
         while (it != s_arenaList.end()) {
             delete *it;
@@ -105,6 +104,7 @@ namespace mpp {
     Arena* MemoryManager::GetArenaByPtr(void* t_ptr)
     {
         PROFILE_FUNCTION();
+
         for (auto* arena : s_arenaList) {
             if (t_ptr >= arena->begin && t_ptr <= arena->end) {
                 return arena;

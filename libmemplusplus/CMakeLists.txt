@@ -18,9 +18,9 @@ endif()
 option(MPP_BUILD_SHARED_LIBS "Request build of shared libraries" ON)
 option(MPP_FULL_DEBUG "Build mpp in full debug mode. Added extended security checks" OFF)
 option(MPP_SECURE "Build mpp in secure mode" OFF)
-option(MPP_PROFILE "Build mpp with support of profiling" OFF)
+option(MPP_PROFILE "Build mpp with support of profiling" ON)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
-option(MPP_STATS "Build mpp with support of statistics dumping" OFF)
+option(MPP_STATS "Build mpp with support of statistics dumping" ON)
 
 ################# BENCHMARKS OPTIONS CHECKING #################
 if (MPP_BUILD_BENCHMARK MATCHES "ON")
@@ -156,7 +156,7 @@ list(APPEND MPP_SOURCES
 
 ################# ADD SPECIFIC SOURCES #################
 if(MPP_DEBUG MATCHES "ON" OR MPP_STATS MATCHES "ON")
-	list(APPEND MPP_SOURCES src/utils/options.cpp)
+	list(APPEND MPP_SOURCES src/utils/env_options.cpp)
 endif()
 
 if(MPP_STATS MATCHES "ON")

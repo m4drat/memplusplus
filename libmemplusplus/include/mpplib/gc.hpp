@@ -15,7 +15,7 @@
 #endif
 
 #if MPP_DEBUG == 1
-#include "mpplib/utils/options.hpp"
+#include "mpplib/utils/env_options.hpp"
 #include <fstream>
 #endif
 
