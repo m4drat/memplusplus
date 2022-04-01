@@ -191,6 +191,9 @@ else()
 	add_library(${PROJECT_NAME} STATIC ${MPP_SOURCES})
 endif()
 
+################# ENABLE LTO OPTIMIZATIONS #################
+# target_compile_options(${PROJECT_NAME} PRIVATE -flto)
+
 ################# ALIAS TO USE AS AN INTERNAL PROJECT #################
 add_library(lib::mpp ALIAS ${PROJECT_NAME})
 

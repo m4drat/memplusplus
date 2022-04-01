@@ -7,9 +7,7 @@ add_executable(benchmarks
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
     lib::mpp
-    PRIVATE
     benchmark::benchmark
 )
 
