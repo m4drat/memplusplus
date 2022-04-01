@@ -4,7 +4,11 @@
 namespace mpp { namespace utils { namespace profile {
     Profiler::Profiler()
         : m_profileCount(0)
-    {}
+    {
+#if MPP_PROFILE == 1
+        BeginSession("Mpplib profiling", "mpplib-profiling.json");
+#endif
+    }
 
     Profiler::~Profiler()
     {
@@ -25,13 +29,6 @@ namespace mpp { namespace utils { namespace profile {
         m_outputStream.close();
         m_profileCount = 0;
     }
-
-#if MPP_PROFILE == 1
-    void Profiler::BeginGlobalSession()
-    {
-        Profiler::Get().BeginSession("Mpplib profiling", "mpplib-profiling.json");
-    }
-#endif
 
     void Profiler::WriteProfile(const char* t_name,
                                 int64_t t_start,

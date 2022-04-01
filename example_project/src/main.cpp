@@ -14,14 +14,9 @@ class UserData
 {
 private:
     int m_data{ 0 };
-    char data[2048];
-
 public:
     UserData(int val)
         : m_data{ val }
-    {}
-
-    ~UserData()
     {}
 
     int GetData()
@@ -37,8 +32,13 @@ void logic()
 
     char* ptr = (char*)MemoryAllocator::Allocate(1024);
     SharedGcPtr<char> a(ptr);
+    auto b = a;
+    auto c = a;
+    auto d = a;
+    auto e = c;
+    auto f = c;
     // Should trigger invalid initialization
-    SharedGcPtr<char> b(ptr);
+    // SharedGcPtr<char> b(ptr);
 }
 
 int main()

@@ -6,7 +6,6 @@
 
 #if MPP_COLOUR == 1
 #include "mpplib/utils/colours.hpp"
-namespace col = mpp::utils::colours;
 #endif
 
 #include <iostream>

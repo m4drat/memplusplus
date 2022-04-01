@@ -22,6 +22,19 @@ option(MPP_PROFILE "Build mpp with support of profiling" OFF)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
 option(MPP_STATS "Build mpp with support of statistics dumping" OFF)
 
+################# BENCHMARKS OPTIONS CHECKING #################
+if (MPP_BUILD_BENCHMARK MATCHES "ON")
+	if (MPP_FULL_DEBUG MATCHES "ON")
+		message(WARNING "Building benchmarks in MPP_FULL_DEBUG mode! This may show inaccurate benchmark results.")
+	endif()
+	if (MPP_PROFILE MATCHES "ON")
+		message(WARNING "Building benchmarks with profiling enabled! This may show inaccurate benchmark results.")
+	endif()
+	if (MPP_STATS MATCHES "ON")
+		message(WARNING "Building benchmarks with statistics enabled! This may show inaccurate benchmark results.")
+	endif()
+endif()
+
 ################# DEFAULT BUILD TYPE #################
 if (NOT CMAKE_BUILD_TYPE)
 	if ("${CMAKE_BINARY_DIR}" MATCHES ".*(D|d)ebug$")
