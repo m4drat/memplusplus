@@ -1,11 +1,11 @@
-#include "catch2/catch.hpp"
+#include <catch2/catch_all.hpp>
 
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
-#include "mpplib/memory_allocator.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/memory_allocator.hpp"
 
 TEST_CASE("DoubleFree - detect 1")
 {
@@ -71,4 +71,3 @@ TEST_CASE("Invalid free test")
     // InvalidFree
     CHECK(CHECK_ABORT(MemoryAllocator::Deallocate<void*>, (void*)0xdeadbeef));
 }
-

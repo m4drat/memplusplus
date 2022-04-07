@@ -24,7 +24,7 @@ option(MPP_USE_FUZZER_DEFINITIONS "Build mpp with fuzzing-friendly defines" OFF)
 option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
-option(MPP_BUILD_BENCHMARK "Build mpp benchmark (tcmalloc, jemalloc, malloc, mpp)" ON)
+option(MPP_BUILD_BENCHMARKS "Build mpp benchmark (tcmalloc, jemalloc, malloc, mpp)" ON)
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)
 
 message(STATUS "##################### GLOBAL OPTIONS #####################")
@@ -34,7 +34,7 @@ message(STATUS "MPP_USE_FUZZER_DEFINITIONS : ${MPP_USE_FUZZER_DEFINITIONS}")
 message(STATUS "MPP_BUILD_EXAMPLE          : ${MPP_BUILD_EXAMPLE}")
 message(STATUS "MPP_BUILD_TESTS            : ${MPP_BUILD_TESTS}")
 message(STATUS "MPP_BUILD_DOCS             : ${MPP_BUILD_DOCS}")
-message(STATUS "MPP_BUILD_BENCHMARK        : ${MPP_BUILD_BENCHMARK}")
+message(STATUS "MPP_BUILD_BENCHMARKS       : ${MPP_BUILD_BENCHMARKS}")
 
 ################# ADD PROJECTS + DOCS + TESTS #################
 add_subdirectory(libmemplusplus)
@@ -59,7 +59,10 @@ endif()
 if (MPP_BUILD_TESTS)
 	message(STATUS "[+] Building with tests")
 	enable_testing()
+
+	add_subdirectory(libraries/Catch2)
 	add_subdirectory(tests)
+
 	if (MPP_ENABLE_COVERAGE)
 		target_compile_options(unit_tests PRIVATE --coverage -O0 -g -fno-inline)
 		target_link_options(unit_tests INTERFACE --coverage)
@@ -71,7 +74,7 @@ if (MPP_BUILD_DOCS)
 	add_subdirectory(docs)
 endif()
 
-if (MPP_BUILD_BENCHMARK)
+if (MPP_BUILD_BENCHMARKS)
 	list(APPEND CMAKE_ARGS "-DBENCHMARK_ENABLE_GTEST_TESTS=OFF")
 	include_directories("libraries")
 
@@ -81,7 +84,7 @@ if (MPP_BUILD_BENCHMARK)
 	add_subdirectory(libraries/googletest)
 	add_subdirectory(libraries/benchmark)
 
-	add_subdirectory(benchmark)
+	add_subdirectory(benchmarks)
 endif()
 
 ################# CLANG FORMAT / CLANG-TIDY #################

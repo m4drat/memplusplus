@@ -18,7 +18,7 @@ namespace mpp {
 #if MPP_STATS == 1 || MPP_DEBUG == 1
     std::ostream& MemoryManager::VisHeapLayout(std::ostream& t_out, void* t_ptr = nullptr)
     {
-        PROFILE_FUNCTION(); 
+        PROFILE_FUNCTION();
 
         for (auto* arena : s_arenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
@@ -28,7 +28,9 @@ namespace mpp {
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
 
-                bool currentChunkPtr = ((t_ptr >= currChunk) && (t_ptr < (reinterpret_cast<char*>(currChunk) + currChunk->GetSize())));
+                bool currentChunkPtr =
+                    ((t_ptr >= currChunk) &&
+                     (t_ptr < (reinterpret_cast<char*>(currChunk) + currChunk->GetSize())));
 
 #if MPP_COLOUR == 1
                 if (t_ptr != nullptr && currentChunkPtr) {
@@ -38,13 +40,15 @@ namespace mpp {
                 }
 
                 if (currChunk->IsUsed()) {
-                    t_out << col::GREEN << "PTR:" << static_cast<void*>(currChunk) << col::RESET << "/"
-                          << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET << "/"
-                          << col::GREEN << "CS:"<< currChunk->GetSize() << col::RESET << "/";
+                    t_out << col::GREEN << "PTR:" << static_cast<void*>(currChunk) << col::RESET
+                          << "/" << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET
+                          << "/" << col::GREEN << "CS:" << currChunk->GetSize() << col::RESET
+                          << "/";
                 } else {
-                    t_out <<   col::RED << "PTR:" << static_cast<void*>(currChunk) << col::RESET << "/"
-                          << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET << "/"
-                          << col::GREEN << "CS:"<< currChunk->GetSize() << col::RESET << "/";
+                    t_out << col::RED << "PTR:" << static_cast<void*>(currChunk) << col::RESET
+                          << "/" << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET
+                          << "/" << col::GREEN << "CS:" << currChunk->GetSize() << col::RESET
+                          << "/";
                 }
                 if (currChunk->IsPrevInUse()) {
                     t_out << col::GREEN << "P:" << currChunk->IsPrevInUse() << col::RESET << "/";
@@ -56,7 +60,7 @@ namespace mpp {
                 } else {
                     t_out << col::RED << "U:" << currChunk->IsUsed();
                 }
-                
+
                 if (t_ptr != nullptr && currentChunkPtr) {
                     t_out << col::MAGENTA << ")>" << col::RESET;
                 } else {
@@ -68,9 +72,10 @@ namespace mpp {
                 } else {
                     t_out << "[";
                 }
-                t_out << "PTR:" << static_cast<void*>(currChunk) << "/PS:" << currChunk->GetPrevSize() << "/CS:" << currChunk->GetSize()
+                t_out << "PTR:" << static_cast<void*>(currChunk)
+                      << "/PS:" << currChunk->GetPrevSize() << "/CS:" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed();
-                
+
                 if (t_ptr != nullptr && currentChunkPtr) {
                     t_out << ")>";
                 } else {
@@ -86,7 +91,7 @@ namespace mpp {
 
     // TODO: make it work better (probably add smart pointers memory management)
     // This is just ugly thing to reset allocator state
-    // exists only to make possible running of unit-tests
+    // exists only to supprot unit-tests execution
     bool MemoryManager::ResetAllocatorState()
     {
         PROFILE_FUNCTION();

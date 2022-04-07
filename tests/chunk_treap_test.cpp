@@ -1,20 +1,19 @@
-#include "catch2/catch.hpp"
+#include "mpplib/chunk.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/memory_allocator.hpp"
-#include "mpplib/chunk.hpp"
+#include <catch2/catch_all.hpp>
 
 TEST_CASE("Check that chunk to delete is in the middle of another chunks")
 {
     using namespace mpp;
-    
+
     ChunkTreap* cTreap = new ChunkTreap();
 
     Chunk* ch1 = (Chunk*)MemoryAllocator::Allocate(50);
     Chunk* ch2 = (Chunk*)MemoryAllocator::Allocate(50);
     Chunk* ch3 = (Chunk*)MemoryAllocator::Allocate(50);
 
-    REQUIRE((((std::size_t)ch1 < (std::size_t)ch2) && 
-             ((std::size_t)ch2 < (std::size_t)ch3)));
+    REQUIRE((((std::size_t)ch1 < (std::size_t)ch2) && ((std::size_t)ch2 < (std::size_t)ch3)));
 
     ch1->SetSize(16);
     ch2->SetSize(16);
@@ -26,24 +25,21 @@ TEST_CASE("Check that chunk to delete is in the middle of another chunks")
 
     cTreap->RemoveChunk(ch2);
 
-    if (cTreap->GetRootNode()->leftChild != nullptr)
-    {
-        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) ||
-                 (cTreap->GetRootNode()->chunk == ch3))); 
-        REQUIRE(((cTreap->GetRootNode()->leftChild->chunk == ch1) || 
-                 (cTreap->GetRootNode()->leftChild->chunk == ch3))); 
+    if (cTreap->GetRootNode()->leftChild != nullptr) {
+        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
+        REQUIRE(((cTreap->GetRootNode()->leftChild->chunk == ch1) ||
+                 (cTreap->GetRootNode()->leftChild->chunk == ch3)));
     } else {
-        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) ||
-                 (cTreap->GetRootNode()->chunk == ch3))); 
-        REQUIRE(((cTreap->GetRootNode()->rightChild->chunk == ch1) || 
-                 (cTreap->GetRootNode()->rightChild->chunk == ch3))); 
+        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
+        REQUIRE(((cTreap->GetRootNode()->rightChild->chunk == ch1) ||
+                 (cTreap->GetRootNode()->rightChild->chunk == ch3)));
     }
 }
 
 TEST_CASE("Check big tree")
 {
     using namespace mpp;
-    
+
     ChunkTreap* cTreap = new ChunkTreap();
 
     Chunk* ch1 = (Chunk*)malloc(128);
@@ -55,7 +51,7 @@ TEST_CASE("Check big tree")
     Chunk* ch7 = (Chunk*)malloc(128);
     Chunk* ch8 = (Chunk*)malloc(128);
     Chunk* ch9 = (Chunk*)malloc(128);
-    
+
     ch1->SetSize(32);
     ch2->SetSize(64);
     ch3->SetSize(96);
@@ -79,7 +75,7 @@ TEST_CASE("Check big tree")
     cTreap->RemoveChunk(ch1);
     cTreap->RemoveChunk(ch9);
 
-    REQUIRE(cTreap->MaxSizeChunk()->GetSize() == 256); 
+    REQUIRE(cTreap->MaxSizeChunk()->GetSize() == 256);
     REQUIRE(cTreap->MinSizeChunk()->GetSize() == 64);
 }
 
@@ -87,7 +83,7 @@ TEST_CASE("Check for correct chunk insertion")
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();     
+    ChunkTreap* cTreap = new ChunkTreap();
     Chunk* insertedChunk = (Chunk*)malloc(64);
 
     std::size_t insertedChunkSize = 128;
@@ -106,8 +102,8 @@ TEST_CASE("Check for nonexistent large chunk")
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap(); 
-    
+    ChunkTreap* cTreap = new ChunkTreap();
+
     Chunk* chunk1 = (Chunk*)malloc(64);
     Chunk* chunk2 = (Chunk*)malloc(64);
     Chunk* chunk3 = (Chunk*)malloc(64);
@@ -130,14 +126,14 @@ TEST_CASE("Check for nonexistent large chunk")
 TEST_CASE("Check basic functions")
 {
     using namespace mpp;
-    
+
     ChunkTreap* cTreap = new ChunkTreap();
 
     Chunk* ch1 = (Chunk*)malloc(64);
     Chunk* ch2 = (Chunk*)malloc(64);
     Chunk* ch3 = (Chunk*)malloc(64);
     Chunk* ch4 = (Chunk*)malloc(64);
-    
+
     ch1->SetSize(32);
     ch2->SetSize(32);
     ch3->SetSize(32);
@@ -148,20 +144,20 @@ TEST_CASE("Check basic functions")
     cTreap->InsertChunk(ch3);
     cTreap->InsertChunk(ch4);
 
-    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32 ));
+    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
 }
 
 TEST_CASE("Check delete many")
 {
     using namespace mpp;
-    
+
     ChunkTreap* cTreap = new ChunkTreap();
 
     Chunk* ch1 = (Chunk*)malloc(128);
     Chunk* ch2 = (Chunk*)malloc(128);
     Chunk* ch3 = (Chunk*)malloc(128);
     Chunk* ch4 = (Chunk*)malloc(128);
-    
+
     ch1->SetSize(32);
     ch2->SetSize(32);
     ch3->SetSize(32);
@@ -175,5 +171,5 @@ TEST_CASE("Check delete many")
     cTreap->RemoveChunk(ch2);
     cTreap->RemoveChunk(ch3);
 
-    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32 ));
+    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
 }

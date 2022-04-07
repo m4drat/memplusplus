@@ -26,7 +26,9 @@ Current library version: 2.3.5
 ## Usage
 
 1. Install latest build systems: `apt install cmake g++ clang`
-2. Clone library sources: `git clone --recurse-submodules https://github.com/m4drat/memplusplus/`
+2. Clone just the library: `git clone https://github.com/m4drat/memplusplus/`
+3. Clone the library (with benchmarks and tests support): `git clone --recurse-submodules https://github.com/m4drat/memplusplus/`
+4. Clone the library (with tests support): `git clone --recurse-submodules=./libraries/Catch2 https://github.com/m4drat/memplusplus/`
 
 ### How to use the library as a dependency (external project)
 
@@ -90,7 +92,7 @@ Global options:
 
 - `MPP_BUILD_DOCS` - build documentation
 
-- `MPP_BUILD_BENCHMARK` - build benchmarks
+- `MPP_BUILD_BENCHMARKS` - build benchmarks
 
 Library options:
 

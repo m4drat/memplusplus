@@ -23,7 +23,7 @@ option(MPP_COLOUR "Build mpp with support of coloured output" ON)
 option(MPP_STATS "Build mpp with support of statistics dumping" ON)
 
 ################# BENCHMARKS OPTIONS CHECKING #################
-if (MPP_BUILD_BENCHMARK MATCHES "ON")
+if (MPP_BUILD_BENCHMARKS MATCHES "ON")
 	if (MPP_FULL_DEBUG MATCHES "ON")
 		message(WARNING "Building benchmarks in MPP_FULL_DEBUG mode! This may show inaccurate benchmark results.")
 	endif()

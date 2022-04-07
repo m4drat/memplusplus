@@ -1,6 +1,6 @@
-#include "catch2/catch.hpp"
-#include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/containers/gc_graph.hpp"
+#include <catch2/catch_all.hpp>
 #include <memory>
 
 TEST_CASE("Check, that set is correctly ordered")
@@ -21,22 +21,20 @@ TEST_CASE("Check, that set is correctly ordered")
     REQUIRE(objectsGraph->GetGraphVerticesCount() == 4);
 
     int32_t idx = 0;
-    for (Vertex* v : objectsGraph->GetAdjList())
-    {
-        switch (idx)
-        {
-        case 0:
-            REQUIRE(v == v1);
-            break;
-        case 1:
-            REQUIRE(v == v2);
-            break;
-        case 2:
-            REQUIRE(v == v3);
-            break;
-        case 3:
-            REQUIRE(v == v4);
-            break;
+    for (Vertex* v : objectsGraph->GetAdjList()) {
+        switch (idx) {
+            case 0:
+                REQUIRE(v == v1);
+                break;
+            case 1:
+                REQUIRE(v == v2);
+                break;
+            case 2:
+                REQUIRE(v == v3);
+                break;
+            case 3:
+                REQUIRE(v == v4);
+                break;
         }
         idx++;
     }
@@ -71,6 +69,6 @@ TEST_CASE("Check workability of FindVertex method of gc_graph")
 TEST_CASE("")
 {
     using namespace mpp;
-    
+
 }
 */
