@@ -1,6 +1,6 @@
 #include "fuzzer/crc_calculator.hpp"
 #include "fuzzer/tokenizer.hpp"
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 
 #include <deque>
 #include <iostream>
@@ -21,7 +21,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
         switch (cmd.first) {
             case Tokenizer::Tokens::Allocate: {
                 // std::cout << "Allocating chunk of size: " << cmd.second;
-                allocatedChunks.push_back(mpp::MemoryAllocator::Allocate(cmd.second));
+                allocatedChunks.push_back(mpp::MemoryManager::Allocate(cmd.second));
                 // std::cout << ". Chunk allocated: " << allocatedChunks.back() << std::endl;
                 break;
             }
@@ -34,12 +34,12 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
                 void* chunk = allocatedChunks.at(position);
                 // std::cout << "Deallocating chunk: " << chunk << ". Of size: " <<
                 // mpp::Chunk::GetHeaderPtr(chunk)->GetSize() << std::endl;
-                mpp::MemoryAllocator::Deallocate(chunk);
+                mpp::MemoryManager::Deallocate(chunk);
                 allocatedChunks.erase(allocatedChunks.begin() + position);
                 break;
             }
             case Tokenizer::Tokens::Invalid: {
-                mpp::MemoryAllocator::ResetAllocatorState();
+                mpp::MemoryManager::ResetAllocatorState();
                 return 0;
                 break;
             }
@@ -48,7 +48,7 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
         commands.pop_front();
     }
 
-    mpp::MemoryAllocator::ResetAllocatorState();
+    mpp::MemoryManager::ResetAllocatorState();
     return 0;
 }
 
@@ -71,7 +71,7 @@ uint8_t*)data.c_str(), data.length()); std::vector <void*> allocatedChunks;
         {
         case Tokenizer::Tokens::Allocate: {
             // std::cout << "Allocating chunk of size: " << cmd.second;
-            allocatedChunks.push_back(mpp::MemoryAllocator::Allocate(cmd.second));
+            allocatedChunks.push_back(mpp::MemoryManager::Allocate(cmd.second));
             // std::cout << ". Chunk allocated: " << allocatedChunks.back() << std::endl;
             break;
         }
@@ -81,7 +81,7 @@ uint8_t*)data.c_str(), data.length()); std::vector <void*> allocatedChunks;
             uint32_t position = rand() % allocatedChunks.size();
             void* chunk = allocatedChunks.at(position);
             // std::cout << "Deallocating chunk: " << chunk << ". Of size: " <<
-mpp::Chunk::GetHeaderPtr(chunk)->GetSize() << std::endl; mpp::MemoryAllocator::Deallocate(chunk);
+mpp::Chunk::GetHeaderPtr(chunk)->GetSize() << std::endl; mpp::MemoryManager::Deallocate(chunk);
             allocatedChunks.erase(allocatedChunks.begin() + position);
             break;
         }

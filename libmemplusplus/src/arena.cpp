@@ -1,5 +1,5 @@
 #include "mpplib/arena.hpp"
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 
 #include <functional>
 
@@ -29,7 +29,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         chunksInUse.clear();
-        MemoryAllocator::SysDealloc(this->begin, size);
+        MemoryManager::SysDealloc(this->begin, size);
     }
 
     std::size_t Arena::FreeMemoryInsideChunkTreap()

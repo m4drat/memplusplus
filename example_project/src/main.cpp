@@ -30,7 +30,7 @@ void logic()
     using namespace mpp;
     using namespace std::literals::chrono_literals;
 
-    char* ptr = (char*)MemoryAllocator::Allocate(1024);
+    char* ptr = (char*)MemoryManager::Allocate(1024);
     SharedGcPtr<char> a(ptr);
     SharedGcPtr<UserData> b = MakeSharedGcPtr<UserData>(1337);
     SharedGcPtr<UserData> c = MakeSharedGcPtr<UserData>(1337);

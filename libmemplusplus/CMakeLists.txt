@@ -148,7 +148,6 @@ list(APPEND MPP_SOURCES
 	src/containers/vertex.cpp
 	src/shared_gcptr.cpp
 	src/arena.cpp
-	src/memory_allocator.cpp
 	src/memory_manager.cpp
 	src/gc.cpp
 	src/utils/utils.cpp

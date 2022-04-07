@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mpplib/gc.hpp"
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include "mpplib/utils/utils.hpp"
@@ -278,7 +278,7 @@ namespace mpp {
                 // TODO: should we really deallocate data, or we just need to delete it
                 // from chunksInUse + call object destructor
                 if (m_objectPtr) {
-                    MemoryAllocator::Deallocate<Type>(m_objectPtr);
+                    MemoryManager::Deallocate<Type>(m_objectPtr);
                 }
             }
         }
@@ -366,6 +366,6 @@ namespace mpp {
     SharedGcPtr<Type> MakeSharedGcPtr(Args&&... t_args)
     {
         PROFILE_FUNCTION();
-        return SharedGcPtr<Type>(MemoryAllocator::Allocate<Type>(std::forward<Args>(t_args)...));
+        return SharedGcPtr<Type>(MemoryManager::Allocate<Type>(std::forward<Args>(t_args)...));
     }
 }

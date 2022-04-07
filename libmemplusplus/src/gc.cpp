@@ -57,11 +57,11 @@ namespace mpp {
         auto layoutedData = heuristics->Layout(objectsGraph);
 
         // Create arena with enough size to fit all objects
-        std::size_t godArenaSize = MemoryAllocator::Align(
+        std::size_t godArenaSize = MemoryManager::Align(
             (layoutedData.second < g_DEFAULT_ARENA_SIZE) ? g_DEFAULT_ARENA_SIZE
                                                          : layoutedData.second,
             g_PAGE_SIZE);
-        Arena* godArena = MemoryAllocator::CreateArena(godArenaSize);
+        Arena* godArena = MemoryManager::CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.second;

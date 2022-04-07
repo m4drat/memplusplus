@@ -1,6 +1,6 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 #include <catch2/catch_all.hpp>
 
 TEST_CASE("Check that chunk to delete is in the middle of another chunks")
@@ -9,9 +9,9 @@ TEST_CASE("Check that chunk to delete is in the middle of another chunks")
 
     ChunkTreap* cTreap = new ChunkTreap();
 
-    Chunk* ch1 = (Chunk*)MemoryAllocator::Allocate(50);
-    Chunk* ch2 = (Chunk*)MemoryAllocator::Allocate(50);
-    Chunk* ch3 = (Chunk*)MemoryAllocator::Allocate(50);
+    Chunk* ch1 = (Chunk*)MemoryManager::Allocate(50);
+    Chunk* ch2 = (Chunk*)MemoryManager::Allocate(50);
+    Chunk* ch3 = (Chunk*)MemoryManager::Allocate(50);
 
     REQUIRE((((std::size_t)ch1 < (std::size_t)ch2) && ((std::size_t)ch2 < (std::size_t)ch3)));
 

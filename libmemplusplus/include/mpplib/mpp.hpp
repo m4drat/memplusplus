@@ -7,7 +7,7 @@
 #include "mpplib/gc.hpp"
 
 // Memory allocator part
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 
 // std::allocator interface
 #include "mpplib/stl_allocator_interface.hpp"

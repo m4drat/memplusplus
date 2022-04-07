@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 
 namespace mpp {
     /**

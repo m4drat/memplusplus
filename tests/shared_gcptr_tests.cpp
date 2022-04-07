@@ -1,5 +1,5 @@
 #include "mpplib/gc.hpp"
-#include "mpplib/memory_allocator.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include <catch2/catch_all.hpp>
 
@@ -26,7 +26,7 @@ TEST_CASE("Explicit constructor")
 {
     using namespace mpp;
 
-    SharedGcPtr<char> ptr((char*)MemoryAllocator::Allocate(40));
+    SharedGcPtr<char> ptr((char*)MemoryManager::Allocate(40));
 
     REQUIRE(ptr.UseCount() == 1);
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
@@ -36,7 +36,7 @@ TEST_CASE("Assign to R-value reference")
 {
     using namespace mpp;
 
-    char* data1 = (char*)MemoryAllocator::Allocate(40);
+    char* data1 = (char*)MemoryManager::Allocate(40);
     SharedGcPtr<char> ptr = SharedGcPtr<char>(data1);
 
     REQUIRE(ptr.UseCount() == 1);
@@ -48,8 +48,8 @@ TEST_CASE("Assign to const reference")
 {
     using namespace mpp;
 
-    char* data1 = (char*)MemoryAllocator::Allocate(40);
-    char* data2 = (char*)MemoryAllocator::Allocate(40);
+    char* data1 = (char*)MemoryManager::Allocate(40);
+    char* data2 = (char*)MemoryManager::Allocate(40);
 
     SharedGcPtr<char> ptr1(data1);
     SharedGcPtr<char> ptr2(data2);
@@ -73,7 +73,7 @@ TEST_CASE("Assign to Type*")
 {
     using namespace mpp;
 
-    char* data1 = (char*)MemoryAllocator::Allocate(40);
+    char* data1 = (char*)MemoryManager::Allocate(40);
     SharedGcPtr<char> ptr1 = nullptr;
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
     REQUIRE(ptr1.UseCount() == 1);
@@ -101,7 +101,7 @@ TEST_CASE("Function call with shared ptr in parameters")
 {
     using namespace mpp;
 
-    char* data1 = (char*)MemoryAllocator::Allocate(40);
+    char* data1 = (char*)MemoryManager::Allocate(40);
     SharedGcPtr<char> ptr1(data1);
     REQUIRE(ptr1.UseCount() == 1);
 
@@ -139,7 +139,7 @@ TEST_CASE("Create new pointer through assigment")
     SharedGcPtr<char> ptr4(ptr3);
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
 
-    ptr1 = (char*)MemoryAllocator::Allocate(64);
+    ptr1 = (char*)MemoryManager::Allocate(64);
 
     REQUIRE((ptr1.UseCount() == 1 && ptr2.UseCount() == 3 && ptr3.UseCount() == 3 &&
              ptr4.UseCount() == 3));
@@ -151,10 +151,10 @@ TEST_CASE("Integration test - 1")
 {
     using namespace mpp;
 
-    SharedGcPtr<char> ptr1((char*)MemoryAllocator::Allocate(64));
-    SharedGcPtr<char> ptr2((char*)MemoryAllocator::Allocate(64));
-    SharedGcPtr<char> ptr3((char*)MemoryAllocator::Allocate(64));
-    SharedGcPtr<char> ptr4((char*)MemoryAllocator::Allocate(64));
+    SharedGcPtr<char> ptr1((char*)MemoryManager::Allocate(64));
+    SharedGcPtr<char> ptr2((char*)MemoryManager::Allocate(64));
+    SharedGcPtr<char> ptr3((char*)MemoryManager::Allocate(64));
+    SharedGcPtr<char> ptr4((char*)MemoryManager::Allocate(64));
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 4);
     REQUIRE((ptr1.UseCount() == 1 && ptr2.UseCount() == 1 && ptr3.UseCount() == 1 &&
              ptr4.UseCount() == 1));
@@ -191,7 +191,7 @@ TEST_CASE("Integration test - 2")
 {
     using namespace mpp;
 
-    SharedGcPtr<char> ptr1((char*)MemoryAllocator::Allocate(64));
+    SharedGcPtr<char> ptr1((char*)MemoryManager::Allocate(64));
     SharedGcPtr<char> ptr2 = ptr1;
     SharedGcPtr<char> ptr3 = ptr1;
 
@@ -211,7 +211,7 @@ TEST_CASE("Integration test - 2")
     REQUIRE(ptr3.UseCount() == 1);
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
 
-    ptr3 = (char*)MemoryAllocator::Allocate(64);
+    ptr3 = (char*)MemoryManager::Allocate(64);
     REQUIRE(ptr3.UseCount() == 1);
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
 
@@ -227,16 +227,16 @@ TEST_CASE("Integration test - 3")
     SharedGcPtr<char> ptr1 = nullptr;
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
 
-    ptr1 = SharedGcPtr<char>((char*)MemoryAllocator::Allocate(64));
+    ptr1 = SharedGcPtr<char>((char*)MemoryManager::Allocate(64));
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
 
-    ptr1 = SharedGcPtr<char>((char*)MemoryAllocator::Allocate(64));
+    ptr1 = SharedGcPtr<char>((char*)MemoryManager::Allocate(64));
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
 
     ptr1 = nullptr;
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
 
-    SharedGcPtr<char> ptr2(SharedGcPtr<char>((char*)MemoryAllocator::Allocate(64)));
+    SharedGcPtr<char> ptr2(SharedGcPtr<char>((char*)MemoryManager::Allocate(64)));
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
     REQUIRE(ptr2.GetVoid() != nullptr);
 
@@ -251,7 +251,7 @@ TEST_CASE("Integration test - 4")
     SharedGcPtr<char> ptr1 = nullptr;
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
 
-    ptr1 = SharedGcPtr<char>((char*)MemoryAllocator::Allocate(64));
+    ptr1 = SharedGcPtr<char>((char*)MemoryManager::Allocate(64));
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
 
     ptr1.Reset();

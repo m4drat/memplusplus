@@ -18,7 +18,10 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-          
+    
+    - name: checkout submodules
+      run: git clone --recurse-submodules=./libraries/Catch2
+
     - name: configure_g++
       run: |
         CXX=g++ cmake -S . -B build \
