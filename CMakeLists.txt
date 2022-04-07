@@ -84,7 +84,7 @@ if (MPP_BUILD_BENCHMARKS)
 	add_subdirectory(libraries/googletest)
 	add_subdirectory(libraries/benchmark)
 
-	add_subdirectory(benchmarks)
+	add_subdirectory(memplusplus-benchmarks)
 endif()
 
 ################# CLANG FORMAT / CLANG-TIDY #################
