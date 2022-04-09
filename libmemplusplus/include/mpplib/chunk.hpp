@@ -79,7 +79,7 @@ namespace mpp {
         }
 
         /**
-         * @brief Get pointer to chunk header from usert data pointer.
+         * @brief Get pointer to chunk header from user data pointer.
          * @param t_userData pointer to user data
          * @return Chunk* pointer to chunk header
          */

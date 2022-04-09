@@ -19,8 +19,8 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     
-    - name: checkout submodules
-      run: git clone --recurse-submodules=./libraries/Catch2
+    - name: checkout Catch2
+      run: git submodule update --init ./libraries/Catch2
 
     - name: configure_g++
       run: |

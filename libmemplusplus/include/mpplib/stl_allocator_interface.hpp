@@ -41,23 +41,23 @@ namespace mpp {
         }
 
         /**
-         * @brief Allocates memory using mpp::MemoryAllocator::Allocate().
+         * @brief Allocates memory using mpp::MemoryManager::Allocate().
          * @param n
          * @return pointer to object
          */
         pointer allocate(size_type n)
         {
-            return static_cast<pointer>(mpp::MemoryAllocator::Allocate(n * sizeof(T)));
+            return static_cast<pointer>(mpp::MemoryManager::Allocate(n * sizeof(T)));
         }
 
         /**
-         * @brief Deallocates memory using mpp::MemoryAllocator::Deallocate().
+         * @brief Deallocates memory using mpp::MemoryManager::Deallocate().
          * @param p - pointer to object
          * @param n
          */
         void deallocate(pointer p, size_type n)
         {
-            mpp::MemoryAllocator::Deallocate(static_cast<void*>(p));
+            mpp::MemoryManager::Deallocate(static_cast<void*>(p));
         }
 
         /**

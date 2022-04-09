@@ -75,13 +75,14 @@ if (MPP_BUILD_DOCS)
 endif()
 
 if (MPP_BUILD_BENCHMARKS)
-	list(APPEND CMAKE_ARGS "-DBENCHMARK_ENABLE_GTEST_TESTS=OFF")
 	include_directories("libraries")
 
 	message(STATUS "[+] Building with benchmark")
 	enable_testing()
 	
 	add_subdirectory(libraries/googletest)
+	set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Disable google benchmark tests" FORCE)
+	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable google benchmark tests" FORCE)
 	add_subdirectory(libraries/benchmark)
 
 	add_subdirectory(memplusplus-benchmarks)

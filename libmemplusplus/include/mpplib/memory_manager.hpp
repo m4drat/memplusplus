@@ -23,6 +23,8 @@ namespace mpp {
     class MemoryManager
     {
     private:
+        MemoryManager() = delete;
+
         /**
          * @brief Initializes random seed for chunk treap.
          */

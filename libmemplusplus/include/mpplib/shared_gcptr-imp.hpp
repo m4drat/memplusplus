@@ -14,13 +14,8 @@ namespace mpp {
     // Constructors
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr()
-    try : m_objectPtr {
-        nullptr
-    }
-    , m_references{ new uint32_t(1) }
-    {}
-    catch (...)
-    {
+    try : m_objectPtr{ nullptr }, m_references{ new uint32_t(1) } {
+    } catch (...) {
         // exception occurred (e.g. new throwed std::bad_alloc)
         throw;
     }
@@ -32,11 +27,7 @@ namespace mpp {
 
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(Type* obj)
-    try : m_objectPtr {
-        obj
-    }
-    , m_references{ new uint32_t(1) }
-    {
+    try : m_objectPtr{ obj }, m_references{ new uint32_t(1) } {
         PROFILE_FUNCTION();
 
         // In secure build add check for invalid Initialization.
@@ -48,12 +39,10 @@ namespace mpp {
 #endif
 
         AddToGcList();
-    }
-    catch (...)
-    {
+    } catch (...) {
         // exception occurred (e.g. new throwed std::bad_alloc)
         // Delete object, and call it's destructor
-        // MemoryAllocator::Deallocate<Type>(m_objectPtr);
+        // MemoryManager::Deallocate<Type>(m_objectPtr);
         throw;
     }
 
@@ -228,11 +217,12 @@ namespace mpp {
         if (m_objectPtr == nullptr)
             return false;
 
+        auto& gcPtrs = GC::GetInstance().GetGcPtrs();
+
         // Delete shared ptr from list of all active gc ptrs
-        auto toErase = std::find(
-            GC::GetInstance().GetGcPtrs().begin(), GC::GetInstance().GetGcPtrs().end(), this);
-        if (toErase != GC::GetInstance().GetGcPtrs().end()) {
-            GC::GetInstance().GetGcPtrs().erase(toErase);
+        auto toErase = std::find(gcPtrs.begin(), gcPtrs.end(), this);
+        if (toErase != gcPtrs.end()) {
+            gcPtrs.erase(toErase);
             return true;
         }
         return false;
@@ -357,8 +347,7 @@ namespace mpp {
         // Iterate through all GcPtrs, and check where they point.
         for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
             if (gcPtr->GetVoid() == t_obj)
-                utils::ErrorAbort(
-                    "SharedGcPtr<Type>: Invalid initialization!\n");
+                utils::ErrorAbort("SharedGcPtr<Type>: Invalid initialization!\n");
         }
     }
 

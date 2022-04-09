@@ -231,7 +231,7 @@ namespace mpp {
 
         // Null out memory that belongs to current chunk in secure build
         // #if MPP_SECURE == 1
-        //         std::memset(Chunk::GetUserDataPtr(t_chunk), MemoryAllocator::g_FILL_CHAR,
+        //         std::memset(Chunk::GetUserDataPtr(t_chunk), MemoryManager::g_FILL_CHAR,
         //         t_chunk->GetSize() - sizeof(Chunk::ChunkHeader));
         // #endif
 

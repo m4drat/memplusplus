@@ -42,8 +42,6 @@ namespace mpp {
 
         // In secure build try to randomize mmap base (to protect against attacks like
         // Offset-to-lib) If attemp failed, just call mmap(NULL, ...)
-        // @FIXME: Currently we are using default uniform_int_distribution, which is not
-        // cryptographically secure!
 #if MPP_SECURE == 1
         void* rawPtr = mmap(reinterpret_cast<void*>(MmapHint()),
                             t_size,
@@ -245,7 +243,7 @@ namespace mpp {
         // state, because, we've tried to free invalid/non-existing chunk
         // Always abort program, because we don't have any performance impact.
         utils::ErrorAbort(
-            "MemoryAllocator::Deallocate(): Invalid pointer deallocation detected!\n");
+            "MemoryManager::Deallocate(): Invalid pointer deallocation detected!\n");
 
         // The given pointer doesn't belong to any active arena
         return false;

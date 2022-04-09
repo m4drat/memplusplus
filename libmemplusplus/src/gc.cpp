@@ -37,7 +37,7 @@ namespace mpp {
         std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>();
 
         // Construct chunks graph
-        for (auto* gcPtr : s_activeGcPtrs) {
+        for (auto* gcPtr : m_activeGcPtrs) {
             objectsGraph->AddObjectInfo(gcPtr);
         }
 
@@ -57,11 +57,11 @@ namespace mpp {
         auto layoutedData = heuristics->Layout(objectsGraph);
 
         // Create arena with enough size to fit all objects
-        std::size_t godArenaSize = MemoryManager::Align(
-            (layoutedData.second < g_DEFAULT_ARENA_SIZE) ? g_DEFAULT_ARENA_SIZE
-                                                         : layoutedData.second,
-            g_PAGE_SIZE);
-        Arena* godArena = MemoryManager::CreateArena(godArenaSize);
+        std::size_t godArenaSize =
+            MM::Align((layoutedData.second < MM::g_DEFAULT_ARENA_SIZE) ? MM::g_DEFAULT_ARENA_SIZE
+                                                                       : layoutedData.second,
+                      MM::g_PAGE_SIZE);
+        Arena* godArena = MM::CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.second;
@@ -117,15 +117,15 @@ namespace mpp {
         }
 
         // Delete all arenas
-        auto it = s_arenaList.begin();
-        while (it != s_arenaList.end()) {
+        auto it = MM::s_arenaList.begin();
+        while (it != MM::s_arenaList.end()) {
             if (*it != godArena) {
 #if MPP_STATS == 1
                 m_gcStats->memoryCleaned += (*it)->FreeMemoryInsideChunkTreap();
 #endif
                 delete *it;
                 *it = nullptr;
-                it = s_arenaList.erase(it);
+                it = MM::s_arenaList.erase(it);
             } else {
                 ++it;
             }

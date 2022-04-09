@@ -28,24 +28,24 @@ namespace mpp {
      */
     class GC
     {
-    protected:
+    private:
         /**
          * @brief All active GcPtr's.
          *
          * All GcPtr's that are currently used in program adds to this list, to keep track
          * of them.
          */
-        std::vector<GcPtr*> s_activeGcPtrs;
+        std::vector<GcPtr*> m_activeGcPtrs;
 
         /**
          * @brief size of garbage, cleaned last time.
          */
-        std::size_t s_garbageSize{ 0 };
+        std::size_t m_garbageSize{ 0 };
 
         /**
          * @brief Required size of memory block, to save all user data in.
          */
-        std::size_t s_dataSize{ 0 };
+        std::size_t m_dataSize{ 0 };
 
 #if MPP_STATS == 1
         /**
@@ -82,7 +82,17 @@ namespace mpp {
          */
         std::vector<GcPtr*>& GetGcPtrs()
         {
-            return s_activeGcPtrs;
+            return m_activeGcPtrs;
+        }
+
+        /**
+         * @brief Get the Instance of GC object
+         * @return GC& Global Garbage Collector
+         */
+        static GC& GetInstance()
+        {
+            static GC gcInstance;
+            return gcInstance;
         }
     };
 }
