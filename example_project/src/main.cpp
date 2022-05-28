@@ -7,6 +7,7 @@
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/stl_allocator_interface.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 using namespace mpp;
@@ -30,20 +31,7 @@ void logic()
     using namespace mpp;
     using namespace std::literals::chrono_literals;
 
-    char* ptr = (char*)MM::Allocate(1024);
-    SharedGcPtr<char> a(ptr);
-    SharedGcPtr<UserData> b = MakeSharedGcPtr<UserData>(1337);
-    SharedGcPtr<UserData> c = MakeSharedGcPtr<UserData>(1337);
-    SharedGcPtr<UserData> d = MakeSharedGcPtr<UserData>(1337);
-    
-    a = nullptr;
-    // b = nullptr;
-    c = nullptr;
-    // d = nullptr;
-    
-    GC::GetInstance().Collect();
-    // Should trigger invalid initialization
-    // SharedGcPtr<char> b(ptr);
+    SharedGcPtr<int32_t> b = MakeSharedGcPtr<int32_t>(1337);
 }
 
 int main()

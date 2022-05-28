@@ -140,6 +140,16 @@ namespace mpp {
         Type& operator*() const noexcept;
 
         /**
+         * @brief Allows automatic conversions to bool.
+         */
+		explicit operator bool() const;
+
+        /**
+         * @brief Calculates distance between two pointers
+         */
+		ptrdiff_t operator-(const SharedGcPtr<Type>& t_other) const noexcept;
+
+        /**
          * @brief Tries to add SharedGcPtr to list of all active GcPtr's.
          * @return true if succeed, false otherwise
          */

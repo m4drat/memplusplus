@@ -24,7 +24,6 @@ option(MPP_USE_FUZZER_DEFINITIONS "Build mpp with fuzzing-friendly defines" OFF)
 option(MPP_BUILD_EXAMPLE "Build mpp example project" ON)
 option(MPP_BUILD_TESTS "Build mpp tests" ON)
 option(MPP_BUILD_DOCS "Build mpp documentation" OFF)
-option(MPP_BUILD_BENCHMARKS "Build mpp benchmark (tcmalloc, jemalloc, malloc, mpp)" ON)
 option(CMAKE_EXPORT_COMPILE_COMMANDS "Request generate of json file with all build commands" ON)
 
 message(STATUS "##################### GLOBAL OPTIONS #####################")
@@ -34,7 +33,6 @@ message(STATUS "MPP_USE_FUZZER_DEFINITIONS : ${MPP_USE_FUZZER_DEFINITIONS}")
 message(STATUS "MPP_BUILD_EXAMPLE          : ${MPP_BUILD_EXAMPLE}")
 message(STATUS "MPP_BUILD_TESTS            : ${MPP_BUILD_TESTS}")
 message(STATUS "MPP_BUILD_DOCS             : ${MPP_BUILD_DOCS}")
-message(STATUS "MPP_BUILD_BENCHMARKS       : ${MPP_BUILD_BENCHMARKS}")
 
 ################# ADD PROJECTS + DOCS + TESTS #################
 add_subdirectory(libmemplusplus)
@@ -72,20 +70,6 @@ endif()
 if (MPP_BUILD_DOCS)
 	message(STATUS "[+] Building with documentation")
 	add_subdirectory(docs)
-endif()
-
-if (MPP_BUILD_BENCHMARKS)
-	include_directories("libraries")
-
-	message(STATUS "[+] Building with benchmark")
-	enable_testing()
-	
-	add_subdirectory(libraries/googletest)
-	set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "Disable google benchmark tests" FORCE)
-	set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "Disable google benchmark tests" FORCE)
-	add_subdirectory(libraries/benchmark)
-
-	add_subdirectory(memplusplus-benchmarks)
 endif()
 
 ################# CLANG FORMAT / CLANG-TIDY #################

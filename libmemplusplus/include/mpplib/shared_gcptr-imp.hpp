@@ -202,6 +202,17 @@ namespace mpp {
     }
 
     template<class Type>
+    SharedGcPtr<Type>::operator bool() const
+    {
+        return Get() != nullptr;
+    }
+
+    template<class Type>
+    ptrdiff_t SharedGcPtr<Type>::operator-(const SharedGcPtr<Type>& t_other) const noexcept {
+        return Get() - t_other.Get();
+    }
+
+    template<class Type>
     bool SharedGcPtr<Type>::AddToGcList()
     {
         GC::GetInstance().GetGcPtrs().push_back(this);
