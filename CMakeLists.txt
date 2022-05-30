@@ -11,7 +11,7 @@ project(memplusplus LANGUAGES CXX)
 if (MSVC)
     add_compile_options(/W4)
 else()
-    add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable -Wno-exceptions)
+    add_compile_options(-Wall -Wextra -Wpedantic -Wno-unused-parameter -Wno-unused-variable -Wno-exceptions -Wno-c++20-attribute-extensions)
 endif()
 
 ################# GLOBAL OPTIONS #################

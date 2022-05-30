@@ -7,7 +7,6 @@
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
-#include "mpplib/stl_allocator_interface.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 using namespace mpp;
@@ -31,7 +30,7 @@ void logic()
     using namespace mpp;
     using namespace std::literals::chrono_literals;
 
-    SharedGcPtr<int32_t> b = MakeSharedGcPtr<int32_t>(1337);
+    SharedGcPtr<int32_t> b = MakeShared<int32_t>(1337);
 }
 
 int main()

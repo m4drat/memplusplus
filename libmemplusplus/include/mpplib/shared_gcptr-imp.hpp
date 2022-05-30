@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <string>
 #include <type_traits>
 
 namespace mpp {
@@ -26,7 +27,7 @@ namespace mpp {
     {}
 
     template<class Type>
-    SharedGcPtr<Type>::SharedGcPtr(Type* obj)
+    SharedGcPtr<Type>::SharedGcPtr(ElementType* obj)
     try : m_objectPtr{ obj }, m_references{ new uint32_t(1) } {
         PROFILE_FUNCTION();
 
@@ -72,6 +73,18 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         Swap(t_other);
+    }
+
+    template<class Type>
+    SharedGcPtr<Type>::SharedGcPtr(Type t_obj, uint32_t t_arraySize)
+        : SharedGcPtr<Type>(static_cast<ElementType*>(t_obj))
+    {
+        PROFILE_FUNCTION();
+        static_assert(std::is_array<Type>::value,
+                      "mpp::SharedGcPtr<T>::SharedGcPtr(Type* t_obj, uint32_t t_arraySize) is only "
+                      "valid when T is an array type.");
+
+        this->m_arraySize = t_arraySize;
     }
 
     // Destructors
@@ -190,13 +203,15 @@ namespace mpp {
     }
 
     template<class Type>
-    Type* SharedGcPtr<Type>::operator->() const noexcept
+    typename SharedGcPtr<Type>::ElementType* SharedGcPtr<Type>::operator->() const noexcept
     {
+        static_assert(!std::is_array<Type>::value,
+                      "mpp::SharedGcPtr<T>::operator-> is only valid when T is not an array type.");
         return m_objectPtr;
     }
 
     template<class Type>
-    Type& SharedGcPtr<Type>::operator*() const noexcept
+    typename SharedGcPtr<Type>::ElementType& SharedGcPtr<Type>::operator*() const noexcept
     {
         return *m_objectPtr;
     }
@@ -208,8 +223,23 @@ namespace mpp {
     }
 
     template<class Type>
-    ptrdiff_t SharedGcPtr<Type>::operator-(const SharedGcPtr<Type>& t_other) const noexcept {
+    std::ptrdiff_t SharedGcPtr<Type>::operator-(const SharedGcPtr<Type>& t_other) const noexcept
+    {
         return Get() - t_other.Get();
+    }
+
+    template<class Type>
+    typename SharedGcPtr<Type>::ElementType& SharedGcPtr<Type>::operator[](
+        std::ptrdiff_t t_index) const noexcept
+    {
+        static_assert(std::is_array<Type>::value,
+                      "mpp::SharedGcPtr<T>::operator[] is only valid when T is an array type.");
+
+        if (static_cast<uint32_t>(t_index) >= this->m_arraySize) [[unlikely]] {
+            utils::ErrorAbort(std::string(__func__) + " - index out of range!\n");
+        }
+
+        return Get()[t_index];
     }
 
     template<class Type>
@@ -259,6 +289,17 @@ namespace mpp {
     }
 
     template<class Type>
+    void SharedGcPtr<Type>::Destroy()
+    {
+        if constexpr (std::is_array<Type>::value) {
+            MM::DestroyArray(static_cast<ElementType*>(m_objectPtr), this->m_arraySize);
+        } else {
+            MM::DestroyObject(m_objectPtr);
+        }
+        MemoryManager::Deallocate(static_cast<void*>(m_objectPtr));
+    }
+
+    template<class Type>
     void SharedGcPtr<Type>::DeleteReference()
     {
         PROFILE_FUNCTION();
@@ -279,7 +320,7 @@ namespace mpp {
                 // TODO: should we really deallocate data, or we just need to delete it
                 // from chunksInUse + call object destructor
                 if (m_objectPtr) {
-                    MemoryManager::Deallocate<Type>(m_objectPtr);
+                    Destroy();
                 }
             }
         }
@@ -308,16 +349,20 @@ namespace mpp {
 
         std::swap(m_objectPtr, t_other.m_objectPtr);
         std::swap(m_references, t_other.m_references);
+
+        if constexpr (std::is_array<Type>::value) {
+            std::swap(this->m_arraySize, t_other.m_arraySize);
+        }
     }
 
     template<class Type>
-    Type* SharedGcPtr<Type>::Get() const
+    typename SharedGcPtr<Type>::ElementType* SharedGcPtr<Type>::Get() const noexcept
     {
         return m_objectPtr;
     }
 
     template<class Type>
-    void* SharedGcPtr<Type>::GetVoid() const
+    void* SharedGcPtr<Type>::GetVoid() const noexcept
     {
         return m_objectPtr;
     }
@@ -325,13 +370,22 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::UpdatePtr(void* t_newPtr)
     {
-        m_objectPtr = reinterpret_cast<Type*>(t_newPtr);
+        m_objectPtr = reinterpret_cast<ElementType*>(t_newPtr);
     }
 
     template<class Type>
     uint32_t SharedGcPtr<Type>::UseCount()
     {
         return *m_references;
+    }
+
+    template<class Type>
+    uint32_t SharedGcPtr<Type>::GetArraySize()
+    {
+        static_assert(std::is_array<Type>::value,
+                      "mpp::SharedGcPtr<T>::operator[] is only valid when T is an array type.");
+
+        return this->m_arraySize;
     }
 
     template<class Type>
@@ -353,7 +407,7 @@ namespace mpp {
     }
 
     template<class Type>
-    void SharedGcPtr<Type>::CheckInvalidInitialization(Type* t_obj)
+    void SharedGcPtr<Type>::CheckInvalidInitialization(ElementType* t_obj)
     {
         // Iterate through all GcPtrs, and check where they point.
         for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
@@ -363,9 +417,26 @@ namespace mpp {
     }
 
     template<class Type, class... Args>
-    SharedGcPtr<Type> MakeSharedGcPtr(Args&&... t_args)
+    SharedGcPtr<Type> MakeShared(Args&&... t_args)
     {
         PROFILE_FUNCTION();
-        return SharedGcPtr<Type>(MemoryManager::Allocate<Type>(std::forward<Args>(t_args)...));
+        Type* ptr = static_cast<Type*>(MM::Allocate(sizeof(Type)));
+        Type* obj = MM::Construct<Type>(ptr, std::forward<Args>(t_args)...);
+        return SharedGcPtr<Type>(obj);
+    }
+
+    template<class Type, class... Args>
+    SharedGcPtr<Type[]> MakeSharedN(uint32_t t_size, Args&&... t_args)
+    {
+        PROFILE_FUNCTION();
+
+        Type* ptr = static_cast<Type*>(MM::Allocate(sizeof(Type) * t_size));
+
+        for (uint32_t i = 0; i < t_size; i++) {
+            [[maybe_unused]] Type* obj =
+                MM::Construct<Type>(ptr + i, std::forward<Args>(t_args)...);
+        }
+
+        return SharedGcPtr<Type[]>(ptr, t_size);
     }
 }

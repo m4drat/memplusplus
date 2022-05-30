@@ -4,6 +4,7 @@
 #include "mpplib/memory_manager.hpp"
 #include <cstring>
 
+
 TEST_CASE("Test, that destructor/constructor gets called")
 {
     using namespace mpp;
@@ -22,11 +23,11 @@ TEST_CASE("Test, that destructor/constructor gets called")
             *ptr = 0;
         };
     };
-    int* ptr = new int(1488);
+    int* ptr = new int(1338);
     UserData* uData = MemoryManager::Allocate<UserData>(1337, ptr);
     REQUIRE(uData->data == 1337);
     REQUIRE(uData->ptr == ptr);
-    REQUIRE(*(uData->ptr) == 1488);
+    REQUIRE(*(uData->ptr) == 1338);
 
     MemoryManager::Deallocate<UserData>(uData);
     REQUIRE(*ptr == 0);
@@ -150,13 +151,13 @@ TEST_CASE("T - Merging into top")
     Arena* currentArena = MemoryManager::GetArenaList().at(0);
     REQUIRE(Chunk::GetPrevChunk(currentArena->topChunk)->GetSize() ==
             currentArena->topChunk->GetPrevSize());
-    std::size_t topChhunkSizeBeforeMerging = currentArena->topChunk->GetSize();
+    std::size_t topChunkSizeBeforeMerging = currentArena->topChunk->GetSize();
 
     MemoryManager::Deallocate(ch1);
     MemoryManager::Deallocate(ch2);
 
     REQUIRE(currentArena->chunksInUse.size() == 0);
-    REQUIRE(currentArena->topChunk->GetSize() == topChhunkSizeBeforeMerging + 160 * 2);
+    REQUIRE(currentArena->topChunk->GetSize() == topChunkSizeBeforeMerging + 160 * 2);
 }
 
 TEST_CASE("Allocating chunk exactly of size (g_DEFAULT_ARENA_SIZE - sizeof(metadata))")
@@ -326,13 +327,13 @@ TEST_CASE("Linked list checks")
             Chunk::GetHeaderPtr(p6));
 }
 
-TEST_CASE("Check that new arena alloacate chunks correctly")
+TEST_CASE("Check that new arena allocate chunks correctly")
 {
     using namespace mpp;
 
     const std::size_t allocaSize = 65520;
-    const std::size_t realChunkSize = MemoryManager::Align(
-        allocaSize + sizeof(Chunk::ChunkHeader), MemoryManager::g_MIN_CHUNK_SIZE);
+    const std::size_t realChunkSize = MemoryManager::Align(allocaSize + sizeof(Chunk::ChunkHeader),
+                                                           MemoryManager::g_MIN_CHUNK_SIZE);
     const std::size_t allocationsCount = MemoryManager::g_DEFAULT_ARENA_SIZE / realChunkSize;
 
     std::vector<void*> ptrs;

@@ -38,7 +38,7 @@ namespace mpp {
 
         /**
          * @brief Generate MMAP hint.
-         * @return std::intptr_t base address for new page. 
+         * @return std::intptr_t base address for new page.
          */
         static std::uintptr_t MmapHint();
 
@@ -84,7 +84,7 @@ namespace mpp {
         static Chunk* GetSuitableChunk(std::size_t t_realSize);
 
         /**
-         * @brief User specified hook to call before Allocate 
+         * @brief User specified hook to call before Allocate
          */
         static std::function<void*(std::size_t)> g_mppAllocateHook;
 
@@ -92,7 +92,7 @@ namespace mpp {
          * @brief User specified hook to call before Deallocate
          */
         static std::function<bool(void*)> g_mppDeallocateHook;
-        
+
         friend class GC;
         friend class Arena;
 
@@ -106,6 +106,7 @@ namespace mpp {
         static std::size_t Align(std::size_t t_size, int32_t t_alignment);
 
         /**
+         * @deprecated instead of using Allocate use @sa Make<T> / @sa MakeN<T>
          * @brief Default Allocate method. Allocates chunk with size at least
          * t_userDataSize.
          * @param t_userDataSize request size.
@@ -114,6 +115,8 @@ namespace mpp {
         static void* Allocate(std::size_t t_userDataSize);
 
         /**
+         * @deprecated this method is deprecated and will be private in a future version
+         * because we don't operate with raw pointers anymore.
          * @brief Deallocates chunk of memory.
          * @param t_chunkPtr pointer to start of user data.
          * @return true, if chunk was deallocated successfully, false if chunk
@@ -122,6 +125,7 @@ namespace mpp {
         static bool Deallocate(void* t_chunkPtr);
 
         /**
+         * @deprecated instead of using Allocate<T> use @sa Make<T> / @sa MakeN<T>
          * @brief Template version of Allocate to call object constructor.
          * @tparam T object to allocate type.
          * @tparam Args list of arguments to pass to object constructor.
@@ -133,10 +137,44 @@ namespace mpp {
         {
             PROFILE_FUNCTION();
 
-            return new (Allocate(sizeof(T))) T(std::forward<Args>(t_args)...);
+            return Construct(static_cast<T*>(Allocate(sizeof(T))), std::forward<Args>(t_args)...);
         }
 
         /**
+         * @brief Construct objects at t_objectPtr using params provided in t_args
+         * @param t_objectPtr pointer to memory location where to construct the object
+         * @param t_args arguments to T's constructor
+         * @return T* memory location where constructed object is stored
+         */
+        template<class T, class... Args>
+        static T* Construct(T* t_objectPtr, Args&&... t_args)
+        {
+            return ::new (t_objectPtr) T(std::forward<Args>(t_args)...);
+        }
+
+        template<class T>
+        static inline T* DestroyObject(T* t_objectPtr)
+        {
+            if (std::is_destructible<T>::value) {
+                t_objectPtr->~T();
+            }
+         
+            return t_objectPtr;
+        }
+
+        template<class T>
+        static T* DestroyArray(T* t_objectPtr, std::size_t t_arraySize)
+        {
+            for (uint32_t i = 0; i < t_arraySize; i++) {
+                DestroyObject(t_objectPtr + i);
+            }
+
+            return t_objectPtr;
+        }
+
+        /**
+         * @deprecated this method is deprecated and will be private in a future version
+         * because we don't operate with raw pointers anymore.
          * @brief Template version of Deallocate to call object destructor.
          * @tparam T actual type of the object.
          * @param t_objPtr pointer to object of type T.
@@ -147,11 +185,8 @@ namespace mpp {
         static bool Deallocate(T* t_objPtr)
         {
             PROFILE_FUNCTION();
-            
-            if (std::is_destructible<T>::value) {
-                t_objPtr->~T();
-            }
-            return Deallocate(reinterpret_cast<void*>(t_objPtr));
+
+            return Deallocate(reinterpret_cast<void*>(DestroyObject(t_objPtr)));
         }
 
         /**
@@ -165,7 +200,7 @@ namespace mpp {
          * @param t_deallocateHook std::function to set as hook
          */
         static void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook);
-   
+
 #if MPP_STATS == 1 || MPP_DEBUG == 1
         /**
          * @brief Visualizes heap layout.

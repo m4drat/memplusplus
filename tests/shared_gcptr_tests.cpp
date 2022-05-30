@@ -129,7 +129,7 @@ TEST_CASE("Multiple pointers to the same object")
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 0);
 }
 
-TEST_CASE("Create new pointer through assigment")
+TEST_CASE("Create new pointer through assignment")
 {
     using namespace mpp;
 
@@ -145,6 +145,120 @@ TEST_CASE("Create new pointer through assigment")
              ptr4.UseCount() == 3));
     REQUIRE((ptr2 == nullptr && ptr3 == nullptr && ptr4 == nullptr));
     REQUIRE(GC::GetInstance().GetGcPtrs().size() == 1);
+}
+
+TEST_CASE("Make shared array - elements access")
+{
+    using namespace mpp;
+
+    // SharedGcPtr<int32_t[]> a;
+}
+
+TEST_CASE("Test MakeSharedN works correctly (ctors/dtors)")
+{
+    using namespace mpp;
+
+    int32_t ctorCallsN = 0;
+    int32_t dtorCallsN = 0;
+
+    class Data
+    {
+    private:
+        int32_t* m_ctorCallsN;
+        int32_t* m_dtorCallsN;
+
+    public:
+        Data(int32_t* t_ctorCallsN, int32_t* t_dtorCallsN)
+            : m_ctorCallsN(t_ctorCallsN)
+            , m_dtorCallsN(t_dtorCallsN)
+        {
+            (*m_ctorCallsN)++;
+        }
+
+        ~Data() {
+            (*m_dtorCallsN)++;
+        }
+    };
+
+    SharedGcPtr<Data[]> dataPtrs = MakeSharedN<Data>(5, &ctorCallsN, &dtorCallsN);
+    dataPtrs = nullptr;
+
+    REQUIRE(ctorCallsN == 5);
+    REQUIRE(dtorCallsN == 5);
+
+    ctorCallsN = 0;
+    dtorCallsN = 0;
+
+    uint32_t length = 12;
+    SharedGcPtr<Data[]> dataPtrs2 = MakeSharedN<Data>(length, &ctorCallsN, &dtorCallsN);
+    dataPtrs2 = nullptr;
+
+    REQUIRE(ctorCallsN == 12);
+    REQUIRE(dtorCallsN == 12);
+}
+
+TEST_CASE("Test MakeShared works correctly (ctor/dtor)")
+{
+    using namespace mpp;
+
+    int32_t ctorCallsN = 0;
+    int32_t dtorCallsN = 0;
+
+    class Data
+    {
+    private:
+        int32_t* m_ctorCallsN;
+        int32_t* m_dtorCallsN;
+
+    public:
+        Data(int32_t* t_ctorCallsN, int32_t* t_dtorCallsN)
+            : m_ctorCallsN(t_ctorCallsN)
+            , m_dtorCallsN(t_dtorCallsN)
+        {
+            (*m_ctorCallsN)++;
+        }
+
+        ~Data() {
+            (*m_dtorCallsN)++;
+        }
+    };
+
+    SharedGcPtr<Data> dataPtr = MakeShared<Data>(&ctorCallsN, &dtorCallsN);
+    dataPtr = nullptr;
+
+    REQUIRE(ctorCallsN == 1);
+    REQUIRE(dtorCallsN == 1);
+}
+
+TEST_CASE("Test GetArraySize")
+{
+    using namespace mpp;
+
+    SharedGcPtr<int32_t[]> dataPtr1 = MakeSharedN<int32_t>(7);
+    REQUIRE(dataPtr1.GetArraySize() == 7);
+
+    SharedGcPtr<int32_t[]> dataPtr2;
+    REQUIRE(dataPtr2.GetArraySize() == 0);
+
+    dataPtr2 = MakeSharedN<int32_t>(10);
+    REQUIRE(dataPtr2.GetArraySize() == 10);
+
+    dataPtr1.Swap(dataPtr2);
+
+    REQUIRE(dataPtr1.GetArraySize() == 10);
+    REQUIRE(dataPtr2.GetArraySize() == 7);
+}
+
+TEST_CASE("Test access element by index")
+{
+    using namespace mpp;
+
+    SharedGcPtr<int32_t[]> dataPtr1 = MakeSharedN<int32_t>(3, 1337);
+    REQUIRE(dataPtr1.GetArraySize() == 3);
+
+    REQUIRE(dataPtr1[0] == 1337);
+    REQUIRE(dataPtr1[1] == 1337);
+    REQUIRE(dataPtr1[2] == 1337);
 }
 
 TEST_CASE("Integration test - 1")
