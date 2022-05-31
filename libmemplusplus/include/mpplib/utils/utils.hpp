@@ -24,6 +24,13 @@ namespace mpp { namespace utils {
     [[noreturn]] void ErrorAbort(const std::string& t_message);
 
     /**
+     * @brief Converts pointer to string (hexadecimal: 0x1337) representation
+     * @param t_ptr pointer to convert
+     * @return std::string string representation of the t_ptr
+     */
+    std::string AddrToString(void* t_ptr);
+
+    /**
      * @brief Finds first element, that is greater or equal to key.
      * @param first iterator to begin of the range
      * @param last iterator to end of the range

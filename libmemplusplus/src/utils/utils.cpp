@@ -66,4 +66,10 @@ namespace mpp { namespace utils {
         // terminate the program using default terminate handler
         std::terminate();
     }
+
+    std::string AddrToString(void* t_ptr) {
+        std::stringstream ss;
+        ss << static_cast<const void*>(t_ptr);
+        return ss.str();
+    }
 }}

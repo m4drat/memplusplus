@@ -1,4 +1,5 @@
 #include "mpplib/containers/gc_graph.hpp"
+#include "mpplib/utils/utils.hpp"
 
 namespace mpp {
     GcGraph::GcGraph()
@@ -7,8 +8,7 @@ namespace mpp {
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(GcGraph& t_other)
     {
-        for (auto v : t_other.GetAdjList())
-        {
+        for (auto v : t_other.GetAdjList()) {
             m_adjList.insert(v);
         }
     }
@@ -16,8 +16,7 @@ namespace mpp {
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(const std::vector<Vertex*>& t_other)
     {
-        for (auto v : t_other)
-        {
+        for (auto v : t_other) {
             m_adjList.insert(v);
         }
     }
@@ -82,28 +81,95 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        t_out << "digraph Objects {\n";
+        const std::string colorRed = "#fbb4ae";
+        const std::string colorOrange = "#fed9a6";
+        const std::string colorGreen = "#ccebc5";
+        const std::string colorGray = "#cccccc";
+        const std::string colorLightPurple = "#bcbddc";
 
-        // iterate for each vertex in adjacency list
+        t_out << "digraph Objects {\n";
+        t_out << "\tnode[ style=filled ];\n";
+
+        // Create all chunks
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
+                 pos < reinterpret_cast<std::size_t>(arena->end);
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
+                t_out << "\t\"" << chunkAddrStr << "\" [ fillcolor=\"";
+
+                if (arena->topChunk == currChunk) {
+                    t_out << colorOrange;
+                } else if (currChunk->IsUsed()) {
+                    t_out << colorGreen;
+                } else {
+                    t_out << colorRed;
+                }
+
+                t_out << "\" label=\"chunk\\n"
+                      << chunkAddrStr << "\\n"
+                      << "size = " << currChunk->GetSize() << "\"];\n";
+            }
+        }
+
+        // Draw connections between chunks
         for (auto v1 : m_adjList) {
             // if current vertex has neighbors draw all connections
             if (!v1->GetNeighbors().empty()) {
                 // for each neighbor draw connection between v1 and its neighbour
                 for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
-                    t_out << "\"" << v1->ToString() << "\" [label=\"chunk = " << v1->ToString()
-                          << "\n"
-                          << "chunk.size = " << v1->GetCorrespondingChunk()->GetSize() << "\"];"
-                          << std::endl;
-                    t_out << "\"" << (*it)->ToString()
-                          << "\" [label=\"chunk = " << (*it)->ToString() << "\n"
-                          << "chunk.size = " << (*it)->GetCorrespondingChunk()->GetSize() << "\"];"
-                          << std::endl;
                     t_out << "\t\"" + v1->ToString() + "\""
                           << " -> "
                           << "\"" + (*it)->ToString() + "\";\n";
                 }
-            } else {
-                t_out << "\t\"" + v1->ToString() + "\";\n";
+            }
+        }
+
+        // Generate flat heap view
+        t_out << "\tnode[ shape = none style = \"\" ];\n";
+        t_out << "\theap[ label=<\n";
+        t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
+        t_out << "\t\t<TR>\n";
+
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
+                 pos < reinterpret_cast<std::size_t>(arena->end);
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
+                t_out << "\t\t\t"
+                      << "<TD bgcolor=\"";
+
+                if (arena->topChunk == currChunk) {
+                    t_out << colorOrange;
+                } else if (currChunk->IsUsed()) {
+                    t_out << colorGreen;
+                } else {
+                    t_out << colorRed;
+                }
+
+                t_out << "\" PORT=\"" << chunkAddrStr << "\">"
+                      << chunkAddrStr.substr(chunkAddrStr.length() - 5) << "</TD>"
+                      << "\n";
+            }
+            t_out << "\t\t\t"
+                  << "<TD>.....</TD>"
+                  << "\n";
+        }
+
+        t_out << "\t\t</TR>\n";
+        t_out << "\t</table>>];\n";
+
+        // Draw connection to the flat heap view
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
+                 pos < reinterpret_cast<std::size_t>(arena->end);
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                // Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)pos);
+                t_out << "\t\"" << chunkAddrStr << "\" -> heap:\"" << chunkAddrStr
+                      << "\" [style=dashed, color=\"" << colorLightPurple << "\"];\n";
             }
         }
 
@@ -240,8 +306,7 @@ namespace mpp {
         PROFILE_FUNCTION();
         std::unique_ptr<Vertex> vertex = std::make_unique<Vertex>(t_chunk);
         auto foundVertexIt = m_adjList.find(vertex.get());
-        if (foundVertexIt != m_adjList.end())
-        {
+        if (foundVertexIt != m_adjList.end()) {
             return *foundVertexIt;
         }
 

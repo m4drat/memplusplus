@@ -73,10 +73,18 @@ void logic()
         }
     };
 
+    // SharedGcPtr<int32_t> garbagePtr1 = MakeShared<int32_t>(1);
+    // SharedGcPtr<int32_t> garbagePtr2 = MakeShared<int32_t>(2);
+
     // Create a random tree
     SharedGcPtr<TreeNode> root = MakeShared<TreeNode>(0, nullptr, nullptr, nullptr);
     SharedGcPtr<TreeNode> treeNode1 = MakeShared<TreeNode>(1, nullptr, nullptr, nullptr);
     SharedGcPtr<TreeNode> treeNode2 = MakeShared<TreeNode>(2, nullptr, nullptr, nullptr);
+
+    // SharedGcPtr<int32_t> garbagePtr3 = MakeShared<int32_t>(3);
+    // SharedGcPtr<int32_t> garbagePtr4 = MakeShared<int32_t>(4);
+    // SharedGcPtr<int32_t> garbagePtr5 = MakeShared<int32_t>(5);
+
     SharedGcPtr<TreeNode> treeNode3 = MakeShared<TreeNode>(3, nullptr, nullptr, nullptr);
     SharedGcPtr<TreeNode> treeNode4 = MakeShared<TreeNode>(4, nullptr, nullptr, nullptr);
     SharedGcPtr<TreeNode> treeNode5 = MakeShared<TreeNode>(5, nullptr, nullptr, nullptr);
@@ -104,6 +112,12 @@ void logic()
     treeNode5->up = treeNode4;
     treeNode5->left = nullptr;
     treeNode5->right = nullptr;
+
+    // garbagePtr1 = nullptr;
+    // garbagePtr2 = nullptr;
+    // garbagePtr3 = nullptr;
+    // garbagePtr4 = nullptr;
+    // garbagePtr5 = nullptr;
 
     GC::GetInstance().Collect();
     // GC::GetInstance().Collect();
