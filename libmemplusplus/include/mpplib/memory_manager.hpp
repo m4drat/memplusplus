@@ -18,7 +18,8 @@
 namespace mpp {
     class Arena;
     /**
-     * @brief Memory allocator class. Provides methods such as Allocate and Deallocate.
+     * @brief Memory allocator class. Performs raw memoty allocation/deallocation as well as objects
+     * construction/destruction.
      */
     class MemoryManager
     {
@@ -152,16 +153,29 @@ namespace mpp {
             return ::new (t_objectPtr) T(std::forward<Args>(t_args)...);
         }
 
+        /**
+         * @brief Destroys single object
+         * @tparam T user parameter type
+         * @param t_objectPtr pointer to object
+         * @return T* pointer to the destroyed object
+         */
         template<class T>
         static inline T* DestroyObject(T* t_objectPtr)
         {
             if (std::is_destructible<T>::value) {
                 t_objectPtr->~T();
             }
-         
+
             return t_objectPtr;
         }
 
+        /**
+         * @brief Destroys all objects inside array
+         * @tparam T user parameter type
+         * @param t_objectPtr pointer to the array start
+         * @param t_arraySize array size
+         * @return T* pointer to the array beginning
+         */
         template<class T>
         static T* DestroyArray(T* t_objectPtr, std::size_t t_arraySize)
         {

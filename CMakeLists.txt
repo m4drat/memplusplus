@@ -58,7 +58,7 @@ if (MPP_BUILD_TESTS)
 	message(STATUS "[+] Building with tests")
 	enable_testing()
 
-	add_subdirectory(libraries/Catch2)
+	add_subdirectory(libraries/googletest)
 	add_subdirectory(tests)
 
 	if (MPP_ENABLE_COVERAGE)

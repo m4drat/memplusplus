@@ -1,4 +1,4 @@
-#include <catch2/catch_all.hpp>
+#include "gtest/gtest.h"
 
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -7,7 +7,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 
-TEST_CASE("DoubleFree - detect 1")
+TEST(AllocatorLogicTest, DoubleFree_1)
 {
     using namespace mpp;
 
@@ -37,10 +37,12 @@ TEST_CASE("DoubleFree - detect 1")
     MemoryManager::Deallocate(ptrs[12]);
 
     // DoubleFree
-    CHECK(CHECK_ABORT(MemoryManager::Deallocate, (void*)ptrs[8]));
+    EXPECT_EXIT({ MemoryManager::Deallocate((void*)ptrs[8]); },
+                testing::KilledBySignal(SIGABRT),
+                "Double free or corruption detected!");
 }
 
-TEST_CASE("Invalid free test")
+TEST(AllocatorLogicTest, InvalidFree)
 {
     using namespace mpp;
 
@@ -69,5 +71,7 @@ TEST_CASE("Invalid free test")
     MemoryManager::Deallocate(ptrs[10]);
 
     // InvalidFree
-    CHECK(CHECK_ABORT(MemoryManager::Deallocate<void*>, (void*)0xdeadbeef));
+    EXPECT_EXIT({ MemoryManager::Deallocate((void*)0xdeadbeef); },
+                testing::KilledBySignal(SIGABRT),
+                "Invalid pointer deallocation detected!");
 }

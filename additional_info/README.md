@@ -7,7 +7,7 @@
 3. clang/g++ - compiler
 4. clang-format - formatting tool
 5. clang-tidy - linting tool
-6. catch2 - unit-testing
+6. googletest - unit-testing
 
 ### Version control
 

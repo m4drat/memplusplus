@@ -27,7 +27,7 @@ Current library version: 2.3.5
 
 1. Install latest build systems: `apt install cmake g++ clang`
 2. Clone just the library: `git clone https://github.com/m4drat/memplusplus/`
-3. Clone the library (with tests support): `git clone --recurse-submodules=./libraries/Catch2 https://github.com/m4drat/memplusplus/`
+3. Clone the library (with tests support): `git clone --recurse-submodules=./libraries/googletest https://github.com/m4drat/memplusplus/`
 4. Benchmarks (can be found in separate git repo): `git clone https://github.com/m4drat/memplusplus-benchmarks`
    1. Run them as follows: `cd memplusplus-benchmarks && ./run_all.sh`
 

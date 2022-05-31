@@ -1,9 +1,10 @@
+#include "gtest/gtest.h"
+
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
 #include "mpplib/memory_manager.hpp"
-#include <catch2/catch_all.hpp>
 
-TEST_CASE("Check that chunk to delete is in the middle of another chunks")
+TEST(ChunkTreapTest, ChunkToDeleteLocatedInBetween)
 {
     using namespace mpp;
 
@@ -13,7 +14,7 @@ TEST_CASE("Check that chunk to delete is in the middle of another chunks")
     Chunk* ch2 = (Chunk*)MemoryManager::Allocate(50);
     Chunk* ch3 = (Chunk*)MemoryManager::Allocate(50);
 
-    REQUIRE((((std::size_t)ch1 < (std::size_t)ch2) && ((std::size_t)ch2 < (std::size_t)ch3)));
+    ASSERT_TRUE((((std::size_t)ch1 < (std::size_t)ch2) && ((std::size_t)ch2 < (std::size_t)ch3)));
 
     ch1->SetSize(16);
     ch2->SetSize(16);
@@ -26,17 +27,19 @@ TEST_CASE("Check that chunk to delete is in the middle of another chunks")
     cTreap->RemoveChunk(ch2);
 
     if (cTreap->GetRootNode()->leftChild != nullptr) {
-        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
-        REQUIRE(((cTreap->GetRootNode()->leftChild->chunk == ch1) ||
-                 (cTreap->GetRootNode()->leftChild->chunk == ch3)));
+        ASSERT_TRUE(
+            ((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
+        ASSERT_TRUE(((cTreap->GetRootNode()->leftChild->chunk == ch1) ||
+                     (cTreap->GetRootNode()->leftChild->chunk == ch3)));
     } else {
-        REQUIRE(((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
-        REQUIRE(((cTreap->GetRootNode()->rightChild->chunk == ch1) ||
-                 (cTreap->GetRootNode()->rightChild->chunk == ch3)));
+        ASSERT_TRUE(
+            ((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
+        ASSERT_TRUE(((cTreap->GetRootNode()->rightChild->chunk == ch1) ||
+                     (cTreap->GetRootNode()->rightChild->chunk == ch3)));
     }
 }
 
-TEST_CASE("Check big tree")
+TEST(ChunkTreapTest, BigTree)
 {
     using namespace mpp;
 
@@ -75,11 +78,11 @@ TEST_CASE("Check big tree")
     cTreap->RemoveChunk(ch1);
     cTreap->RemoveChunk(ch9);
 
-    REQUIRE(cTreap->MaxSizeChunk()->GetSize() == 256);
-    REQUIRE(cTreap->MinSizeChunk()->GetSize() == 64);
+    ASSERT_TRUE(cTreap->MaxSizeChunk()->GetSize() == 256);
+    ASSERT_TRUE(cTreap->MinSizeChunk()->GetSize() == 64);
 }
 
-TEST_CASE("Check for correct chunk insertion")
+TEST(ChunkTreapTest, CorrectChunkInsertion)
 {
     using namespace mpp;
 
@@ -95,10 +98,10 @@ TEST_CASE("Check for correct chunk insertion")
 
     Chunk* result2 = cTreap->FirstGreaterOrEqualThan(insertedChunkSize);
 
-    REQUIRE((result1 == nullptr && result2 == insertedChunk));
+    ASSERT_TRUE((result1 == nullptr && result2 == insertedChunk));
 }
 
-TEST_CASE("Check for nonexistent large chunk")
+TEST(ChunkTreapTest, NonexistingBigChunk)
 {
     using namespace mpp;
 
@@ -120,10 +123,10 @@ TEST_CASE("Check for nonexistent large chunk")
 
     Chunk* result = cTreap->FirstGreaterOrEqualThan(nonexistentSize);
 
-    REQUIRE(result == nullptr);
+    ASSERT_TRUE(result == nullptr);
 }
 
-TEST_CASE("Check basic functions")
+TEST(ChunkTreapTest, BasicFunctions)
 {
     using namespace mpp;
 
@@ -144,10 +147,11 @@ TEST_CASE("Check basic functions")
     cTreap->InsertChunk(ch3);
     cTreap->InsertChunk(ch4);
 
-    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
+    ASSERT_TRUE(
+        (cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
 }
 
-TEST_CASE("Check delete many")
+TEST(ChunkTreapTest, DeleteMany)
 {
     using namespace mpp;
 
@@ -171,5 +175,6 @@ TEST_CASE("Check delete many")
     cTreap->RemoveChunk(ch2);
     cTreap->RemoveChunk(ch3);
 
-    REQUIRE((cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
+    ASSERT_TRUE(
+        (cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
 }
