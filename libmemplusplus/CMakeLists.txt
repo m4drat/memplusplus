@@ -105,6 +105,10 @@ else()
 	list(APPEND MPP_DEFINES MPP_STATS=0)
 endif()
 
+if (MPP_BUILD_TESTS MATCHES "ON")
+	list(APPEND MPP_DEFINES MPP_BUILD_TESTS=1)
+endif()
+
 message(STATUS "##################### LIBRARY OPTIONS #####################")
 message(STATUS "MPP_SANITIZERS        : ${MPP_SANITIZERS}")
 message(STATUS "MPP_BUILD_SHARED_LIBS : ${MPP_BUILD_SHARED_LIBS}")

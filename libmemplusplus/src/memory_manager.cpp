@@ -373,13 +373,13 @@ namespace mpp {
         return nullptr;
     }
 
-    Chunk* MemoryManager::GetInUseChunkByPtr(void* t_chunk)
+    Chunk* MemoryManager::GetInUseChunkByPtr(void* t_ptr)
     {
         PROFILE_FUNCTION();
 
-        Arena* arena = GetArenaByPtr(t_chunk);
+        Arena* arena = GetArenaByPtr(t_ptr);
         if (arena != nullptr) {
-            return arena->GetInUseChunkByPtr(t_chunk);
+            return arena->GetInUseChunkByPtr(t_ptr);
         }
 
         return nullptr;

@@ -3,6 +3,7 @@ project(unit_tests)
 # Add a testing executable
 add_executable(unit_tests 
     test_main.cpp
+    gc_tests.cpp
     gc_graph_tests.cpp
     shared_gcptr_tests.cpp
     chunk_treap_test.cpp

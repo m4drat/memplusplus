@@ -21,9 +21,23 @@ namespace mpp {
      * @brief Memory allocator class. Performs raw memoty allocation/deallocation as well as objects
      * construction/destruction.
      */
+
+    template<class T>
+    class SharedGcPtr;
+
     class MemoryManager
     {
     private:
+        template<class T>
+        friend class SharedGcPtr;
+        template<class Type, class... Args>
+        friend SharedGcPtr<Type> MakeShared(Args&&... t_args);
+        template<class Type, class... Args>
+        friend SharedGcPtr<Type[]> MakeSharedN(uint32_t t_size, Args&&... t_args);
+
+        friend class GC;
+        friend class Arena;
+
         MemoryManager() = delete;
 
         /**
@@ -94,53 +108,6 @@ namespace mpp {
          */
         static std::function<bool(void*)> g_mppDeallocateHook;
 
-        friend class GC;
-        friend class Arena;
-
-    public:
-        /**
-         * @brief Function that make number dividable by alignment.
-         * @param t_size is number to align
-         * @param t_alignment is alignment
-         * @return std::size_t Aligned number
-         */
-        static std::size_t Align(std::size_t t_size, int32_t t_alignment);
-
-        /**
-         * @deprecated instead of using Allocate use @sa Make<T> / @sa MakeN<T>
-         * @brief Default Allocate method. Allocates chunk with size at least
-         * t_userDataSize.
-         * @param t_userDataSize request size.
-         * @return void* pointer to user data in allocated chunk
-         */
-        static void* Allocate(std::size_t t_userDataSize);
-
-        /**
-         * @deprecated this method is deprecated and will be private in a future version
-         * because we don't operate with raw pointers anymore.
-         * @brief Deallocates chunk of memory.
-         * @param t_chunkPtr pointer to start of user data.
-         * @return true, if chunk was deallocated successfully, false if chunk
-         * doesn't belong to any arena
-         */
-        static bool Deallocate(void* t_chunkPtr);
-
-        /**
-         * @deprecated instead of using Allocate<T> use @sa Make<T> / @sa MakeN<T>
-         * @brief Template version of Allocate to call object constructor.
-         * @tparam T object to allocate type.
-         * @tparam Args list of arguments to pass to object constructor.
-         * @param t_args actual arguments to object constructor.
-         * @return T* constructed object
-         */
-        template<class T, class... Args>
-        static T* Allocate(Args&&... t_args)
-        {
-            PROFILE_FUNCTION();
-
-            return Construct(static_cast<T*>(Allocate(sizeof(T))), std::forward<Args>(t_args)...);
-        }
-
         /**
          * @brief Construct objects at t_objectPtr using params provided in t_args
          * @param t_objectPtr pointer to memory location where to construct the object
@@ -186,6 +153,42 @@ namespace mpp {
             return t_objectPtr;
         }
 
+    public:
+        /**
+         * @deprecated instead of using Allocate use @sa MakeShared<T> / @sa MakeSharedN<T>
+         * @brief Default Allocate method. Allocates chunk with size at least
+         * t_userDataSize.
+         * @param t_userDataSize request size.
+         * @return void* pointer to user data in allocated chunk
+         */
+        static void* Allocate(std::size_t t_userDataSize);
+
+        /**
+         * @deprecated this method is deprecated and will be private in a future version
+         * because we don't operate with raw pointers anymore.
+         * @brief Deallocates chunk of memory.
+         * @param t_chunkPtr pointer to start of user data.
+         * @return true, if chunk was deallocated successfully, false if chunk
+         * doesn't belong to any arena
+         */
+        static bool Deallocate(void* t_chunkPtr);
+
+        /**
+         * @deprecated instead of using Allocate<T> use @sa MakeShared<T> / @sa MakeSharedN<T>
+         * @brief Template version of Allocate to call object constructor.
+         * @tparam T object to allocate type.
+         * @tparam Args list of arguments to pass to object constructor.
+         * @param t_args actual arguments to object constructor.
+         * @return T* constructed object
+         */
+        template<class T, class... Args>
+        static T* Allocate(Args&&... t_args)
+        {
+            PROFILE_FUNCTION();
+
+            return Construct(static_cast<T*>(Allocate(sizeof(T))), std::forward<Args>(t_args)...);
+        }
+
         /**
          * @deprecated this method is deprecated and will be private in a future version
          * because we don't operate with raw pointers anymore.
@@ -202,6 +205,15 @@ namespace mpp {
 
             return Deallocate(reinterpret_cast<void*>(DestroyObject(t_objPtr)));
         }
+
+        /**
+         * @brief Ceils number (t_size) to the nearest number such that this number divided by
+         * t_alignment has no remainder.
+         * @param t_size is number to align
+         * @param t_alignment is alignment
+         * @return std::size_t Aligned number
+         */
+        static std::size_t Align(std::size_t t_size, int32_t t_alignment);
 
         /**
          * @brief Sets hook for Allocate method
@@ -234,18 +246,18 @@ namespace mpp {
         }
 
         /**
-         * @brief Check, that specified pointer points in any arena.
-         * @param t_ptr pointer to some location.
+         * @brief Finds inside which arena t_ptr points.
+         * @param t_ptr heap pointer.
          * @return Arena* if pointer points into arena, nullptr otherwise
          */
         static Arena* GetArenaByPtr(void* t_ptr);
 
         /**
-         * @brief Check, that specified pointer points in any active chunk.
-         * @param t_chunk pointer to some location.
+         * @brief Finds inside which chunk t_ptr points.
+         * @param t_ptr heap pointer.
          * @return Chunk* if pointer points into some chunk, nullptr otherwise
          */
-        static Chunk* GetInUseChunkByPtr(void* t_chunk);
+        static Chunk* GetInUseChunkByPtr(void* t_ptr);
 
         /**
          * @brief Resets allocator state by destroying all arenas.

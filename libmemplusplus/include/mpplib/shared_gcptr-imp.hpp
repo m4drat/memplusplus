@@ -1,8 +1,8 @@
 #pragma once
 
 #include "mpplib/gc.hpp"
-#include "mpplib/memory_manager.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include "mpplib/utils/utils.hpp"
 

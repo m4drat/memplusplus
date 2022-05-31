@@ -32,13 +32,13 @@ namespace mpp {
         /**
          * @brief All active GcPtr's.
          *
-         * All GcPtr's that are currently used in program adds to this list, to keep track
+         * All GcPtr's that are currently used in the program are added to this list, to keep track
          * of them.
          */
         std::vector<GcPtr*> m_activeGcPtrs;
 
         /**
-         * @brief size of garbage, cleaned last time.
+         * @brief last iteration garbage size.
          */
         std::size_t m_garbageSize{ 0 };
 
