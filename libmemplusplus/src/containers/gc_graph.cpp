@@ -48,7 +48,7 @@ namespace mpp {
         Chunk* gcPtrLocationChunk =
             MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(t_gcPtr));
 
-        // GcPtr is lying on heap
+        // GcPtr is on the heap
         if (gcPtrLocationChunk != nullptr) {
             // Check that "to" vertex is already exist
             Vertex* to = FindVertex(gcPtrObjectChunk);
@@ -64,7 +64,7 @@ namespace mpp {
                 from = new Vertex(gcPtrLocationChunk);
             }
             AddEdge(from, to);
-            // GcPtr isn't lying on heap
+        // GcPtr isn't on the heap
         } else {
             Vertex* vertex = FindVertex(gcPtrObjectChunk);
             if (vertex != nullptr) {
