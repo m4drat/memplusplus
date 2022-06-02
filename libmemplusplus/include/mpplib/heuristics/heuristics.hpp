@@ -26,6 +26,7 @@ namespace mpp {
             Graph,
             Undefined
         };
+
         /**
          * @brief Size required for new arena.
          */
@@ -37,6 +38,12 @@ namespace mpp {
         std::vector<Vertex*> m_layoutedHeap;
 
     public:
+        struct LayoutedHeap
+        {
+            std::vector<Vertex*>& vertices;
+            std::size_t layoutedSize;
+        };
+
         Heuristics() = default;
         ~Heuristics() = default;
 
@@ -58,7 +65,6 @@ namespace mpp {
          * @param t_objectsGraph reference to unique_ptr to GcGraph (will be divided into subgraphs)
          * @return pair of vector of vertices and size of all chunks
          */
-        std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>>
-        Layout(std::unique_ptr<GcGraph>& t_objectsGraph);
+        Heuristics::LayoutedHeap Layout(std::unique_ptr<GcGraph>& t_objectsGraph);
     };
 }

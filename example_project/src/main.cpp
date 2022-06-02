@@ -18,7 +18,8 @@ private:
 public:
     UserData(int val)
         : m_data{ val }
-    {}
+    {
+    }
 
     int GetData()
     {
@@ -33,15 +34,25 @@ void logic()
 
     struct Node
     {
-        SharedGcPtr<int32_t> ptr;
-        Node(SharedGcPtr<int32_t> t_ptr)
-            : ptr{ t_ptr }
-        {}
+        SharedGcPtr<int32_t> ptr1;
+        SharedGcPtr<int32_t> ptr2;
+        SharedGcPtr<int32_t> ptr3;
+        Node(SharedGcPtr<int32_t> t_ptr1, SharedGcPtr<int32_t> t_ptr2, SharedGcPtr<int32_t> t_ptr3)
+            : ptr1{ t_ptr1 }
+            , ptr2{ t_ptr2 }
+            , ptr3{ t_ptr3 }
+        {
+        }
     };
 
-    // Create Linked List
-    SharedGcPtr<Node> n1 = MakeShared<Node>(nullptr);
-    n1->ptr = MakeShared<int32_t>(1337);
+    SharedGcPtr<Node> n1 = MakeShared<Node>(nullptr, nullptr, nullptr);
+    SharedGcPtr<int32_t> ptr = MakeShared<int32_t>(1337);
+
+    n1->ptr1 = ptr;
+    n1->ptr2 = ptr;
+    n1->ptr3 = ptr;
+
+    ptr = nullptr;
 
     GC::GetInstance().Collect();
     GC::GetInstance().Collect();

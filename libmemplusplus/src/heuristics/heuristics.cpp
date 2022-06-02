@@ -1,8 +1,7 @@
 #include "mpplib/heuristics/heuristics.hpp"
 
 namespace mpp {
-    std::pair<std::reference_wrapper<std::vector<Vertex*>>, std::reference_wrapper<std::size_t>>
-    Heuristics::Layout(std::unique_ptr<GcGraph>& t_objectsGraph)
+    Heuristics::LayoutedHeap Heuristics::Layout(std::unique_ptr<GcGraph>& t_objectsGraph)
     {
         PROFILE_FUNCTION();
         auto m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
@@ -34,8 +33,7 @@ namespace mpp {
         //     }
         // }
 
-        return std::make_pair<std::reference_wrapper<std::vector<Vertex*>>,
-                              std::reference_wrapper<std::size_t>>(m_layoutedHeap, m_neededSpace);
+        return { m_layoutedHeap, m_neededSpace };
     }
 
     // std::vector<std::pair<GcGraph*, Heuristics::DataStructures>>

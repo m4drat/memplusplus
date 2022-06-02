@@ -26,11 +26,11 @@ namespace mpp {
          */
         std::set<Vertex*> m_neighbors;
         /**
-         * @brief The set of vertices, that points to current vertex.
+         * @brief Set of vertices, that are pointing the to current vertex.
          */
         std::set<Vertex*> m_pointingToVertices;
         /**
-         * @brief Set of GcPtr's that are pointing to current chunk.
+         * @brief Set of GcPtr's that are pointing to the current chunk.
          */
         std::set<GcPtr*> m_pointingToGcPtrs;
 
@@ -42,7 +42,8 @@ namespace mpp {
          */
         Vertex(Chunk* t_chunk)
             : m_correspondingChunk(t_chunk)
-        {}
+        {
+        }
 
         /**
          * @brief Set new value for m_correspondingChunk.

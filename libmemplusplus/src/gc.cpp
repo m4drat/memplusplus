@@ -56,25 +56,32 @@ namespace mpp {
         // Layout heap in the most efficient way
         auto layoutedData = heuristics->Layout(objectsGraph);
 
-        // Create arena with enough size to fit all objects
-        std::size_t godArenaSize =
-            MM::Align((layoutedData.second < MM::g_DEFAULT_ARENA_SIZE) ? MM::g_DEFAULT_ARENA_SIZE
-                                                                       : layoutedData.second,
-                      MM::g_PAGE_SIZE);
-        Arena* godArena = MM::CreateArena(godArenaSize);
+        // Create a new rena with enough memory to fit all objects
+        std::size_t godArenaSize = (layoutedData.layoutedSize < MM::g_DEFAULT_ARENA_SIZE)
+                                       ? MM::g_DEFAULT_ARENA_SIZE
+                                       : layoutedData.layoutedSize;
+
+        // If newly created arena is really small (we have less than 20% of free space)
+        // Enlarge it by specified expandFactor
+        if (static_cast<float>(godArenaSize - layoutedData.layoutedSize) / godArenaSize <
+            m_newAllocExtendThreshold) {
+            godArenaSize *= m_newAllocExpandFactor;
+        }
+
+        Arena* godArena = MM::CreateArena(MM::Align(godArenaSize, MM::g_PAGE_SIZE));
 
 #if MPP_STATS == 1
-        m_gcStats->activeObjectsTotalSize = layoutedData.second;
+        m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
         godArena->m_arenaStats->gcCreatedArena = true;
 #endif
 
-        void* currPtr{ godArena->begin };
-        Chunk* currChunk{ nullptr };
+        void* newChunkLocation{ godArena->begin };
+        Chunk* newChunk{ nullptr };
         std::size_t prevSize{ 0 };
         std::size_t currSize{ 0 };
 
         // Iterate through all vertices (aka chunks) in layouted vector
-        for (auto vertex : layoutedData.first.get()) {
+        for (auto vertex : layoutedData.vertices) {
             // Extract size of chunk
             currSize = vertex->GetCorrespondingChunk()->GetSize();
 
@@ -83,37 +90,39 @@ namespace mpp {
 #endif
 
             // Copy chunk data to new location
-            std::memcpy(
-                currPtr, reinterpret_cast<void*>(vertex->GetCorrespondingChunk()), currSize);
+            std::memcpy(newChunkLocation,
+                        reinterpret_cast<void*>(vertex->GetCorrespondingChunk()),
+                        currSize);
 
             // Update required fields
-            currChunk = reinterpret_cast<Chunk*>(currPtr);
-            currChunk->SetPrevSize(prevSize);
-            currChunk->SetIsUsed(1);
-            currChunk->SetIsPrevInUse(1);
-            godArena->chunksInUse.insert(currChunk);
+            newChunk = reinterpret_cast<Chunk*>(newChunkLocation);
+            newChunk->SetPrevSize(prevSize);
+            newChunk->SetIsUsed(1);
+            newChunk->SetIsPrevInUse(1);
+            godArena->chunksInUse.insert(newChunk);
 
             // Update GcPtr
             for (auto gcPtr : vertex->GetPointingToGcPtrs()) {
                 std::size_t updatedPtr =
-                    reinterpret_cast<std::size_t>(currPtr) +
+                    reinterpret_cast<std::size_t>(newChunkLocation) +
                     (reinterpret_cast<std::size_t>(gcPtr->GetVoid()) -
                      reinterpret_cast<std::size_t>(vertex->GetCorrespondingChunk()));
                 gcPtr->UpdatePtr(reinterpret_cast<void*>(updatedPtr));
             }
 
             prevSize = currSize;
-            currPtr = reinterpret_cast<void*>(reinterpret_cast<std::size_t>(currPtr) + currSize);
+            newChunkLocation =
+                reinterpret_cast<void*>(reinterpret_cast<std::size_t>(newChunkLocation) + currSize);
         }
 
         // If we have used all space in the arena
-        if (godArenaSize - layoutedData.second == 0) {
+        if (godArenaSize - layoutedData.layoutedSize == 0) {
             godArena->topChunk = nullptr;
             // We still have some space in top chunk
         } else {
-            Chunk* topChunk =
-                Chunk::ConstructChunk(currPtr, prevSize, godArenaSize - layoutedData.second, 1, 1);
-            godArena->SetUsedSpace(layoutedData.second);
+            Chunk* topChunk = Chunk::ConstructChunk(
+                newChunkLocation, prevSize, godArenaSize - layoutedData.layoutedSize, 1, 1);
+            godArena->SetUsedSpace(layoutedData.layoutedSize);
             godArena->topChunk = topChunk;
         }
 
