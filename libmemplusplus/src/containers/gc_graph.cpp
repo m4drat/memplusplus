@@ -46,7 +46,7 @@ namespace mpp {
 
         Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
         Chunk* gcPtrLocationChunk =
-            MemoryManager::GetInUseChunkByPtr(reinterpret_cast<void*>(t_gcPtr));
+            MemoryManager::GetInUseChunkByPtr(t_gcPtr);
 
         // GcPtr is on the heap
         if (gcPtrLocationChunk != nullptr) {

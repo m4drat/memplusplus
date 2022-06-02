@@ -17,14 +17,14 @@
 
 namespace mpp {
     class Arena;
-    /**
-     * @brief Memory allocator class. Performs raw memoty allocation/deallocation as well as objects
-     * construction/destruction.
-     */
 
     template<class T>
     class SharedGcPtr;
 
+    /**
+     * @brief Memory allocator class. Performs raw memoty allocation/deallocation as well as objects
+     * construction/destruction.
+     */
     class MemoryManager
     {
     private:

@@ -28,7 +28,7 @@ Current library version: 2.3.5
 1. Install latest build systems: `apt install cmake g++ clang`
 2. Clone just the library: `git clone https://github.com/m4drat/memplusplus/`
 3. Clone the library (with tests support): `git clone --recurse-submodules=./libraries/googletest https://github.com/m4drat/memplusplus/`
-4. Benchmarks (can be found in separate git [repo](https://github.com/m4drat/memplusplus-benchmarks)).
+4. If you want to run benchmarks, take a look at this: [link](#performance-comparisons)
 
 ### How to use the library as a dependency (external project)
 
@@ -116,7 +116,26 @@ Library options:
 
 ## Examples
 
-- Manual memory management
+- Automatic memory management
+
+    ```c++
+    #include <mpplib/mpp.hpp>
+
+    ...
+
+    // create smart pointer, that will automatically deallocate object, when needed
+    mpp::MakeShared<Object> object = mpp::MakeShared<Object>(<constructor params>);
+
+    // create array of Objects, that will automatically deallocate object, when needed
+    mpp::MakeShared<Object[]> objects = mpp::MakeSharedN<Object>(<array size>, <constructor params>);
+
+    ...
+
+    // collect all garbage + compact memory (can be called manually)
+    GC::GetInstance().Collect();
+    ```
+
+- ~~Manual memory management~~ - deprecated
 
     ```c++
     #include <mpplib/mpp.hpp>
@@ -134,22 +153,6 @@ Library options:
     mpp::MemoryAllocator::Deallocate(obj);
     // only deallocates raw pointer (behaves like free)
     mpp::MemoryAllocator::Deallocate(ptr);
-    ```
-
-- Automatic memory management
-
-    ```c++
-    #include <mpplib/mpp.hpp>
-
-    ...
-
-    // create smart pointer, that will automatically deallocate object, when needed
-    mpp::SharedGcPtr<Object> object = mpp::MakeSharedGcPtr<Object>(<constructor params>);
-
-    ...
-
-    // collect all garbage + compact memory (can be called manually)
-    GC::GetInstance().Collect();
     ```
 
 ## Debugging/profiling library
@@ -305,7 +308,6 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
     ```c++
     utils::Statistics::GetInstance().DumpStats(std::cout, true, false, false) << std::endl;
-
     ```
 
     Example output:
@@ -430,6 +432,8 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     ```
 
 ## Performance comparisons
+
+Benchmarks (can be found in separate git [repo](https://github.com/m4drat/memplusplus-benchmarks).
 
 ## Documentation
 

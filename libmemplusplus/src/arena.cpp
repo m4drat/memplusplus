@@ -93,12 +93,11 @@ namespace mpp {
         Chunk* chunk = Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
 
         // Update top chunk
-        topChunk = Chunk::ConstructChunk(
-            reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(topChunk) + t_chunkSize),
-            t_chunkSize,
-            newTopChunkSize,
-            1,
-            1);
+        topChunk = Chunk::ConstructChunk(reinterpret_cast<std::byte*>(topChunk) + t_chunkSize,
+                                         t_chunkSize,
+                                         newTopChunkSize,
+                                         1,
+                                         1);
 
         return chunk;
     }
@@ -151,12 +150,12 @@ namespace mpp {
                 Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
 
                 // Update the fields of the remaining chunk
-                Chunk* splittedChunk = Chunk::ConstructChunk(
-                    reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
-                    t_chunkSize,
-                    toSplitChunkSize - t_chunkSize,
-                    0,
-                    1);
+                Chunk* splittedChunk =
+                    Chunk::ConstructChunk(reinterpret_cast<std::byte*>(chunk) + t_chunkSize,
+                                          t_chunkSize,
+                                          toSplitChunkSize - t_chunkSize,
+                                          0,
+                                          1);
 
                 // Update previous size for the next chunk after splitted
                 // current memory layout: [user-returned][splitted part][next chunk after
@@ -193,12 +192,12 @@ namespace mpp {
                     t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
 
                 // Construct splitted chunk
-                Chunk* splittedChunk = Chunk::ConstructChunk(
-                    reinterpret_cast<void*>(reinterpret_cast<std::size_t>(chunk) + t_chunkSize),
-                    t_chunkSize,
-                    toSplitChunkSize - t_chunkSize,
-                    0,
-                    1);
+                Chunk* splittedChunk =
+                    Chunk::ConstructChunk(reinterpret_cast<std::byte*>(chunk) + t_chunkSize,
+                                          t_chunkSize,
+                                          toSplitChunkSize - t_chunkSize,
+                                          0,
+                                          1);
 
                 // Update previous size field for next chunk, after
                 // splitted chunk
@@ -271,8 +270,7 @@ namespace mpp {
             3. DT
         */
         if (((topChunk == nullptr) &&
-             (reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) +
-                                      t_chunk->GetSize()) == end)) ||
+             (reinterpret_cast<std::byte*>(t_chunk) + t_chunk->GetSize() == end)) ||
             (Chunk::GetNextChunk(t_chunk) == topChunk)) {
             return MergeWithTop(t_chunk);
         }
@@ -325,8 +323,7 @@ namespace mpp {
         Chunk* newChunk{ t_chunk };
 
         // Merge backwards
-        if ((static_cast<void*>(t_chunk) != begin) &&
-            Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+        if ((static_cast<void*>(t_chunk) != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
             freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             newChunk = MergeTwoSequenceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
         }
@@ -454,8 +451,10 @@ namespace mpp {
         }
         t_out << std::endl;
 
-        t_out << "MPP - Arena begin pointer        : " << static_cast<void*>(t_arena->begin) << std::endl;
-        t_out << "MPP - Arena end pointer          : " << static_cast<void*>(t_arena->end) << std::endl;
+        t_out << "MPP - Arena begin pointer        : " << static_cast<void*>(t_arena->begin)
+              << std::endl;
+        t_out << "MPP - Arena end pointer          : " << static_cast<void*>(t_arena->end)
+              << std::endl;
 
         t_out << "MPP - Freed chunks nodes (" << t_arena->freedChunks.GetFreedChunksSize() << ")"
               << std::endl;

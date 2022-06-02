@@ -92,8 +92,14 @@
 		],
 		"codechecker.backend.compilationDatabasePath": "/home/madrat/memplusplus/compile_commands.json",
 		"C_Cpp.files.exclude": {
-			"memplusplus-benchmarks/benchmarks/mempp/memplusplus": true,
+			"memplusplus-benchmarks/benchmarks/mempp/memplusplus/**": true,
 			"**/.vscode": true
+		},
+		"C_Cpp.codeAnalysis.exclude": {
+			"memplusplus-benchmarks/benchmarks/mempp/memplusplus/**": true,
+		},
+		"search.exclude": {
+			"**/memplusplus-benchmarks/benchmarks/mempp/memplusplus/": true
 		}
 	}
 }

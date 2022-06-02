@@ -105,6 +105,13 @@ namespace mpp {
         Chunk* GetCorrespondingChunk() const;
 
         /**
+         * @brief Get corresponding chunk object, but as a std::byte* ptr.
+         * @sa GetCorrespondingChunk
+         * @return std::byte* pointer that points to a chunk object
+         */
+        std::byte* GetCorrespondingChunkAsBytePtr() const;
+
+        /**
          * @brief Get string representation of the current vertex.
          * @return std::string string representation of the vertex
          */

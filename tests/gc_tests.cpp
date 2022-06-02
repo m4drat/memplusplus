@@ -34,11 +34,16 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
         {}
     };
 
-    // Create Linked List
     SharedGcPtr<Node> a1 = MakeShared<Node>(nullptr);
     a1->ptr = MakeShared<int32_t>(1337);
 
+    void* rawPtrBeforeGc1 = a1.GetVoid();
+    void* rawPtrBeforeGc2 = a1->ptr.GetVoid();
+
     GC::GetInstance().Collect();
+
+    EXPECT_TRUE(a1.GetVoid() != rawPtrBeforeGc1);
+    EXPECT_TRUE(a1->ptr.GetVoid() != rawPtrBeforeGc2);
 
     ASSERT_EXIT(
         {
@@ -51,9 +56,20 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
         ".*");
 }
 
-TEST(GcTest, CollectAndAllocate)
+TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
 {
     using namespace mpp;
+
+    SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
+    SharedGcPtr<int32_t> a2 = MakeShared<int32_t>(1338);
+    a1 = nullptr;
+
+    GC::GetInstance().Collect();
+    SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1339);
+
+    EXPECT_TRUE(*a1 == 1337);
+    EXPECT_TRUE(*a2 == 1338);
+    EXPECT_TRUE(*b1 == 1339);
 }
 
 TEST(GcTest, CollectX5)
@@ -64,6 +80,12 @@ TEST(GcTest, CollectX5)
 TEST(GcTest, GcPtrsUpdatedAfterCollect)
 {
     using namespace mpp;
+
+    SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
+    void* rawPtrBeforeGcCollect = a1.GetVoid();
+    GC::GetInstance().Collect();
+
+    EXPECT_TRUE(rawPtrBeforeGcCollect != a1.GetVoid());
 }
 
 /* For ctrl+c, ctrl+v

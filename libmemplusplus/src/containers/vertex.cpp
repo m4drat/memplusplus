@@ -58,6 +58,11 @@ namespace mpp {
         return m_correspondingChunk;
     }
 
+    std::byte* Vertex::GetCorrespondingChunkAsBytePtr() const
+    {
+        return reinterpret_cast<std::byte*>(m_correspondingChunk);
+    }
+
     std::string Vertex::ToString() const
     {
         std::stringstream ss;

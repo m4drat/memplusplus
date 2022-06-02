@@ -58,12 +58,7 @@ namespace mpp {
             mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
 #endif
         if (rawPtr == MAP_FAILED) {
-            // If we are using fuzzer just ignore out-of-memory errors and exit
-#if MPP_FUZZER_INSECURE == 1
-            exit(0);
-#else
             throw NoMemoryException();
-#endif
         }
 
         return rawPtr;

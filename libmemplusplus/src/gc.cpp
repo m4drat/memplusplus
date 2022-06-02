@@ -67,8 +67,9 @@ namespace mpp {
             m_newAllocExtendThreshold) {
             godArenaSize *= m_newAllocExpandFactor;
         }
+        godArenaSize = MM::Align(godArenaSize, MM::g_PAGE_SIZE);
 
-        Arena* godArena = MM::CreateArena(MM::Align(godArenaSize, MM::g_PAGE_SIZE));
+        Arena* godArena = MM::CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
@@ -101,42 +102,33 @@ namespace mpp {
 
             // Update GcPtr
             for (auto gcPtr : vertex->GetPointingToGcPtrs()) {
-                std::size_t updatedPtr =
-                    reinterpret_cast<std::size_t>(newChunkLocation) +
-                    (reinterpret_cast<std::size_t>(gcPtr->GetVoid()) -
-                     reinterpret_cast<std::size_t>(vertex->GetCorrespondingChunk()));
-                gcPtr->UpdatePtr(reinterpret_cast<void*>(updatedPtr));
+                std::byte* updatedPtr =
+                    newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) -
+                                        vertex->GetCorrespondingChunkAsBytePtr());
+                gcPtr->UpdatePtr(updatedPtr);
             }
 
             prevSize = currSize;
             newChunkLocation = newChunkLocation + currSize;
         }
 
-        // If we have used all space in the arena
-        if (godArenaSize - layoutedData.layoutedSize == 0) {
-            godArena->topChunk = nullptr;
-            // We still have some space in top chunk
-        } else {
-            Chunk* topChunk = Chunk::ConstructChunk(
-                newChunkLocation, prevSize, godArenaSize - layoutedData.layoutedSize, 1, 1);
-            godArena->SetUsedSpace(layoutedData.layoutedSize);
-            godArena->topChunk = topChunk;
-        }
+        // We always have some free space in the arena, so we have to construct a top chunk
+        Chunk* topChunk = Chunk::ConstructChunk(
+            newChunkLocation, prevSize, godArenaSize - layoutedData.layoutedSize, 1, 1);
+        godArena->SetUsedSpace(layoutedData.layoutedSize);
+        godArena->topChunk = topChunk;
 
-        // Delete all arenas except newly created one
-        auto it = MM::s_arenaList.begin();
-        while (it != MM::s_arenaList.end()) {
-            if (*it != godArena) {
+        MM::s_arenaList.erase(
+            std::remove_if(MM::s_arenaList.begin(), MM::s_arenaList.end(), [&](Arena* t_arena) {
+                if (t_arena == godArena)
+                    return false;
 #if MPP_STATS == 1
-                m_gcStats->memoryCleaned += (*it)->FreeMemoryInsideChunkTreap();
+                m_gcStats->memoryCleaned += t_arena->FreeMemoryInsideChunkTreap();
 #endif
-                delete *it;
-                *it = nullptr;
-                it = MM::s_arenaList.erase(it);
-            } else {
-                ++it;
-            }
-        }
+                delete t_arena;
+                t_arena = nullptr;
+                return true;
+            }));
 
 #if MPP_STATS == 1
         timer.TimerEnd();
