@@ -57,12 +57,14 @@ namespace mpp {
          * @brief Pointer to top chunk, a.k.a wilderness.
          */
         Chunk* topChunk{ nullptr };
+
         /**
-         * @brief Pointer to first usable address in allocated using mmap block.
+         * @brief Pointer to the first usable address in allocated using mmap block.
          */
         void* begin{ nullptr };
+
         /**
-         * @brief Pointer to first address right after arena.begin + arena.size.
+         * @brief Pointer to the first address right after arena.begin + arena.size.
          */
         void* end{ nullptr };
 

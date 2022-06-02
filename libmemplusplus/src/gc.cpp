@@ -95,10 +95,11 @@ namespace mpp {
 
             // Update GcPtr
             for (auto gcPtr : vertex->GetPointingToGcPtrs()) {
-                gcPtr->UpdatePtr(reinterpret_cast<void*>(
+                std::size_t updatedPtr =
                     reinterpret_cast<std::size_t>(currPtr) +
                     (reinterpret_cast<std::size_t>(gcPtr->GetVoid()) -
-                     reinterpret_cast<std::size_t>(vertex->GetCorrespondingChunk()))));
+                     reinterpret_cast<std::size_t>(vertex->GetCorrespondingChunk()));
+                gcPtr->UpdatePtr(reinterpret_cast<void*>(updatedPtr));
             }
 
             prevSize = currSize;
@@ -116,7 +117,7 @@ namespace mpp {
             godArena->topChunk = topChunk;
         }
 
-        // Delete all arenas
+        // Delete all arenas except newly created one
         auto it = MM::s_arenaList.begin();
         while (it != MM::s_arenaList.end()) {
             if (*it != godArena) {

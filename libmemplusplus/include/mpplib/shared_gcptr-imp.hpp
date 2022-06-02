@@ -245,7 +245,7 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::AddToGcList()
     {
-        GC::GetInstance().GetGcPtrs().push_back(this);
+        GC::GetInstance().GetGcPtrs().insert(this);
         return true;
     }
 

@@ -30,9 +30,9 @@ namespace mpp {
          */
         std::set<Vertex*> m_pointingToVertices;
         /**
-         * @brief Vector of GcPtr's that are pointing to current chunk.
+         * @brief Set of GcPtr's that are pointing to current chunk.
          */
-        std::vector<GcPtr*> m_pointingToGcPtrs;
+        std::set<GcPtr*> m_pointingToGcPtrs;
 
     public:
         Vertex() = delete;
@@ -93,9 +93,9 @@ namespace mpp {
         bool RemoveGcPtr(GcPtr* t_gcPtr);
         /**
          * @brief Get all GcPtr's, that points to current vertex (chunk).
-         * @return std::vector<GcPtr*>& pointing to current vertex GcPtr's
+         * @return std::set<GcPtr*>& pointing to current vertex GcPtr's
          */
-        std::vector<GcPtr*>& GetPointingToGcPtrs();
+        std::set<GcPtr*>& GetPointingToGcPtrs();
 
         /**
          * @brief Get corresponding chunk object.

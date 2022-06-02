@@ -33,14 +33,14 @@ namespace mpp {
 
     void Vertex::AddGcPtr(GcPtr* t_gcPtr)
     {
-        m_pointingToGcPtrs.push_back(t_gcPtr);
+        m_pointingToGcPtrs.insert(t_gcPtr);
     }
 
     bool Vertex::RemoveGcPtr(GcPtr* t_gcPtr)
     {
         PROFILE_FUNCTION();
         // Remove GcPtr pointer from current vertex
-        auto toErase = std::find(m_pointingToGcPtrs.begin(), m_pointingToGcPtrs.end(), t_gcPtr);
+        auto toErase = m_pointingToGcPtrs.find(t_gcPtr);
         if (toErase != m_pointingToGcPtrs.end()) {
             m_pointingToGcPtrs.erase(toErase);
             return true;
@@ -48,7 +48,7 @@ namespace mpp {
         return false;
     }
 
-    std::vector<GcPtr*>& Vertex::GetPointingToGcPtrs()
+    std::set<GcPtr*>& Vertex::GetPointingToGcPtrs()
     {
         return m_pointingToGcPtrs;
     }

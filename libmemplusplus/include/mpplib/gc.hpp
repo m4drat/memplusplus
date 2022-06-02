@@ -20,6 +20,7 @@
 
 #include <cstring>
 #include <memory>
+#include <set>
 #include <vector>
 
 namespace mpp {
@@ -35,7 +36,7 @@ namespace mpp {
          * All GcPtr's that are currently used in the program are added to this list, to keep track
          * of them.
          */
-        std::vector<GcPtr*> m_activeGcPtrs;
+        std::set<GcPtr*> m_activeGcPtrs;
 
         /**
          * @brief last iteration garbage size.
@@ -80,7 +81,7 @@ namespace mpp {
          * @brief Get reference to vector of currently active GcPtr's
          * @return std::vector<GcPtr*>& of currently used GcPtr's
          */
-        std::vector<GcPtr*>& GetGcPtrs()
+        std::set<GcPtr*>& GetGcPtrs()
         {
             return m_activeGcPtrs;
         }
