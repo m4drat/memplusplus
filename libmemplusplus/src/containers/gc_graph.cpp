@@ -64,7 +64,7 @@ namespace mpp {
                 from = new Vertex(gcPtrLocationChunk);
             }
             AddEdge(from, to);
-        // GcPtr isn't on the heap
+            // GcPtr isn't on the heap
         } else {
             Vertex* vertex = FindVertex(gcPtrObjectChunk);
             if (vertex != nullptr) {
@@ -92,8 +92,7 @@ namespace mpp {
 
         // Create all chunks
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
-                 pos < reinterpret_cast<std::size_t>(arena->end);
+            for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
@@ -133,8 +132,7 @@ namespace mpp {
         t_out << "\t\t<TR>\n";
 
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
-                 pos < reinterpret_cast<std::size_t>(arena->end);
+            for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
@@ -163,10 +161,8 @@ namespace mpp {
 
         // Draw connection to the flat heap view
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
-                 pos < reinterpret_cast<std::size_t>(arena->end);
+            for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                // Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)pos);
                 t_out << "\t\"" << chunkAddrStr << "\" -> heap:\"" << chunkAddrStr
                       << "\" [style=dashed, color=\"" << colorLightPurple << "\"];\n";

@@ -72,10 +72,10 @@ namespace mpp {
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
-        godArena->m_arenaStats->gcCreatedArena = true;
+        godArena->arenaStats->gcCreatedArena = true;
 #endif
 
-        void* newChunkLocation{ godArena->begin };
+        std::byte* newChunkLocation{ godArena->begin };
         Chunk* newChunk{ nullptr };
         std::size_t prevSize{ 0 };
         std::size_t currSize{ 0 };
@@ -86,13 +86,11 @@ namespace mpp {
             currSize = vertex->GetCorrespondingChunk()->GetSize();
 
 #if MPP_STATS == 1
-            godArena->m_arenaStats->totalAllocated += currSize;
+            godArena->arenaStats->totalAllocated += currSize;
 #endif
 
             // Copy chunk data to new location
-            std::memcpy(newChunkLocation,
-                        reinterpret_cast<void*>(vertex->GetCorrespondingChunk()),
-                        currSize);
+            std::memcpy(newChunkLocation, vertex->GetCorrespondingChunk(), currSize);
 
             // Update required fields
             newChunk = reinterpret_cast<Chunk*>(newChunkLocation);
@@ -111,8 +109,7 @@ namespace mpp {
             }
 
             prevSize = currSize;
-            newChunkLocation =
-                reinterpret_cast<void*>(reinterpret_cast<std::size_t>(newChunkLocation) + currSize);
+            newChunkLocation = newChunkLocation + currSize;
         }
 
         // If we have used all space in the arena

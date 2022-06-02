@@ -18,8 +18,7 @@ private:
 public:
     UserData(int val)
         : m_data{ val }
-    {
-    }
+    {}
 
     int GetData()
     {
@@ -38,11 +37,8 @@ void logic()
         SharedGcPtr<int32_t> ptr2;
         SharedGcPtr<int32_t> ptr3;
         Node(SharedGcPtr<int32_t> t_ptr1, SharedGcPtr<int32_t> t_ptr2, SharedGcPtr<int32_t> t_ptr3)
-            : ptr1{ t_ptr1 }
-            , ptr2{ t_ptr2 }
-            , ptr3{ t_ptr3 }
-        {
-        }
+            : ptr1{ t_ptr1 }, ptr2{ t_ptr2 }, ptr3{ t_ptr3 }
+        {}
     };
 
     SharedGcPtr<Node> n1 = MakeShared<Node>(nullptr, nullptr, nullptr);

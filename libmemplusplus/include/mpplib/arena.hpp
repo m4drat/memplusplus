@@ -33,7 +33,7 @@ namespace mpp {
         /**
          * @brief Unique ptr with arena metadata to use with Statistics.
          */
-        std::shared_ptr<utils::Statistics::ArenaStats> m_arenaStats;
+        std::shared_ptr<utils::Statistics::ArenaStats> arenaStats;
 #endif
 
         /**
@@ -61,19 +61,19 @@ namespace mpp {
         /**
          * @brief Pointer to the first usable address in allocated using mmap block.
          */
-        void* begin{ nullptr };
+        std::byte* begin{ nullptr };
 
         /**
          * @brief Pointer to the first address right after arena.begin + arena.size.
          */
-        void* end{ nullptr };
+        std::byte* end{ nullptr };
 
         /**
          * @brief Default arena constructor.
          * @param t_size arena size.
          * @param t_begin allocated arena begin.
          */
-        Arena(std::size_t t_size, void* t_begin);
+        Arena(std::size_t t_size, std::byte* t_begin);
 
         /**
          * @brief Arena destructor.

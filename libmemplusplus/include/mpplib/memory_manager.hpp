@@ -64,7 +64,7 @@ namespace mpp {
          * @param t_size Size of mapped memory
          * @return void* pointer to mapped memory.
          */
-        static void* SysAlloc(std::size_t t_size);
+        static std::byte* SysAlloc(std::size_t t_size);
 
         /**
          * @brief munmap(2) wrapper, that unmaps memory page of given size.

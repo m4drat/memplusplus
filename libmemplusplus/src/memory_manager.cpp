@@ -36,25 +36,26 @@ namespace mpp {
         return t_size + (t_alignment - (t_size % t_alignment));
     }
 
-    void* MemoryManager::SysAlloc(std::size_t t_size)
+    std::byte* MemoryManager::SysAlloc(std::size_t t_size)
     {
         PROFILE_FUNCTION();
 
         // In secure build try to randomize mmap base (to protect against attacks like
         // Offset-to-lib) If attemp failed, just call mmap(NULL, ...)
 #if MPP_SECURE == 1
-        void* rawPtr = mmap(reinterpret_cast<void*>(MmapHint()),
-                            t_size,
-                            PROT_READ | PROT_WRITE,
-                            MAP_PRIVATE | MAP_ANONYMOUS,
-                            -1,
-                            0);
+        std::byte* rawPtr = static_cast<std::byte*>(mmap(reinterpret_cast<void*>(MmapHint()),
+                                                         t_size,
+                                                         PROT_READ | PROT_WRITE,
+                                                         MAP_PRIVATE | MAP_ANONYMOUS,
+                                                         -1,
+                                                         0));
         if (rawPtr == MAP_FAILED) { // This time try to allocate without any hints
-            rawPtr = mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            rawPtr = static_cast<std::byte*>(
+                mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
         }
 #else
-        void* rawPtr =
-            mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        void* rawPtr = static_cast<std::byte*>(
+            mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
 #endif
         if (rawPtr == MAP_FAILED) {
             // If we are using fuzzer just ignore out-of-memory errors and exit
@@ -84,7 +85,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // Allocate memory for arena
-        void* arenaSpace = SysAlloc(t_arenaSize);
+        std::byte* arenaSpace = SysAlloc(t_arenaSize);
 
         // TODO - smart pointers memory management
         Arena* arena = new Arena(t_arenaSize, arenaSpace);
@@ -120,11 +121,11 @@ namespace mpp {
                 chunkToReturn = arena->AllocateFromFreeList(chunkToReturn, t_realSize);
             }
 #if MPP_STATS == 1
-            if (chunkToReturn->GetSize() > arena->m_arenaStats->biggestAllocation) {
-                arena->m_arenaStats->biggestAllocation = chunkToReturn->GetSize();
+            if (chunkToReturn->GetSize() > arena->arenaStats->biggestAllocation) {
+                arena->arenaStats->biggestAllocation = chunkToReturn->GetSize();
             }
-            if (chunkToReturn->GetSize() < arena->m_arenaStats->smallestAllocation) {
-                arena->m_arenaStats->smallestAllocation = chunkToReturn->GetSize();
+            if (chunkToReturn->GetSize() < arena->arenaStats->smallestAllocation) {
+                arena->arenaStats->smallestAllocation = chunkToReturn->GetSize();
             }
 #endif
 
@@ -143,7 +144,7 @@ namespace mpp {
         // Create new arena with requested size
         Arena* arena = CreateArena(t_userDataSize);
 #if MPP_STATS == 1
-        arena->m_arenaStats->bigArena = true;
+        arena->arenaStats->bigArena = true;
 #endif
 
         // Allocate chunk from right space of that arena
@@ -242,8 +243,7 @@ namespace mpp {
         // If we reached this point, we should be in some kind of error
         // state, because, we've tried to free invalid/non-existing chunk
         // Always abort program, because we don't have any performance impact.
-        utils::ErrorAbort(
-            "MemoryManager::Deallocate(): Invalid pointer deallocation detected!\n");
+        utils::ErrorAbort("MemoryManager::Deallocate(): Invalid pointer deallocation detected!\n");
 
         // The given pointer doesn't belong to any active arena
         return false;
@@ -277,14 +277,12 @@ namespace mpp {
         for (auto* arena : s_arenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
                   << std::endl;
-            for (std::size_t pos = reinterpret_cast<std::size_t>(arena->begin);
-                 pos < reinterpret_cast<std::size_t>(arena->end);
-                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+            Chunk* currChunk = reinterpret_cast<Chunk*>(arena->begin);
+            for (std::byte* pos = arena->begin; pos < arena->end; pos += currChunk->GetSize()) {
+                currChunk = reinterpret_cast<Chunk*>(pos);
 
                 bool currentChunkPtr =
-                    ((t_ptr >= currChunk) &&
-                     (t_ptr < (reinterpret_cast<char*>(currChunk) + currChunk->GetSize())));
+                    ((t_ptr >= currChunk) && (t_ptr < (currChunk + currChunk->GetSize())));
 
 #if MPP_COLOUR == 1
                 if (t_ptr != nullptr && currentChunkPtr) {

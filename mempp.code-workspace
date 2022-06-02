@@ -90,6 +90,10 @@
 			"mmap",
 			"nullptr"
 		],
-		"codechecker.backend.compilationDatabasePath": "/home/madrat/memplusplus/compile_commands.json"
+		"codechecker.backend.compilationDatabasePath": "/home/madrat/memplusplus/compile_commands.json",
+		"C_Cpp.files.exclude": {
+			"memplusplus-benchmarks/benchmarks/mempp/memplusplus": true,
+			"**/.vscode": true
+		}
 	}
 }
