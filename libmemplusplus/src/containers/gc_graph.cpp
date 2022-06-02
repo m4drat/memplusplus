@@ -1,6 +1,9 @@
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/utils/utils.hpp"
 
+#include <set>
+#include <unordered_set>
+
 namespace mpp {
     GcGraph::GcGraph()
     {}
@@ -64,7 +67,7 @@ namespace mpp {
                 from = new Vertex(gcPtrLocationChunk);
             }
             AddEdge(from, to);
-        // GcPtr isn't on the heap
+            // GcPtr isn't on the heap
         } else {
             Vertex* vertex = FindVertex(gcPtrObjectChunk);
             if (vertex != nullptr) {
@@ -87,8 +90,10 @@ namespace mpp {
         const std::string colorGray = "#cccccc";
         const std::string colorLightPurple = "#bcbddc";
 
+        std::unordered_map<void*, DotChunk> chunks;
+
         t_out << "digraph Objects {\n";
-        t_out << "\tnode[ style=filled ];\n";
+        t_out << "\tcompound=true;\n";
 
         // Create all chunks
         for (auto* arena : MemoryManager::GetArenaList()) {
@@ -97,21 +102,35 @@ namespace mpp {
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
-                t_out << "\t\"" << chunkAddrStr << "\" [ fillcolor=\"";
+                std::string fillColor = colorRed;
+                std::string chunkLabel = "chunk\\n" + chunkAddrStr + "\\n" +
+                                         "size = " + std::to_string(currChunk->GetSize());
 
                 if (arena->topChunk == currChunk) {
-                    t_out << colorOrange;
+                    fillColor = colorOrange;
                 } else if (currChunk->IsUsed()) {
-                    t_out << colorGreen;
-                } else {
-                    t_out << colorRed;
+                    fillColor = colorGreen;
                 }
 
-                t_out << "\" label=\"chunk\\n"
-                      << chunkAddrStr << "\\n"
-                      << "size = " << currChunk->GetSize() << "\"];\n";
+                DotChunk serializedChunk{
+                    currChunk, fillColor, chunkLabel, "cluster " + chunkAddrStr
+                };
+                chunks[currChunk] = serializedChunk;
             }
         }
+
+        // Add information about GcPtr's and their location
+        // for (auto vertex : m_adjList) {
+        //     // if current vertex has neighbors draw all connections
+        //     if (!vertex->GetNeighbors().empty()) {
+        //         // for each neighbor draw connection between v1 and its neighbour
+        //         for (auto neighbor = vertex->GetNeighbors().begin();
+        //              neighbor != vertex->GetNeighbors().end();
+        //              ++neighbor) {
+        //             DotChunk& ch = chunks.find((void*)(*neighbor)->GetCorrespondingChunk())->second;
+        //         }
+        //     }
+        // }
 
         // Draw connections between chunks
         for (auto v1 : m_adjList) {
@@ -171,6 +190,10 @@ namespace mpp {
                 t_out << "\t\"" << chunkAddrStr << "\" -> heap:\"" << chunkAddrStr
                       << "\" [style=dashed, color=\"" << colorLightPurple << "\"];\n";
             }
+        }
+
+        for (const auto& chunk : chunks) {
+            t_out << chunk.second.GetSerialized();
         }
 
         t_out << "}";

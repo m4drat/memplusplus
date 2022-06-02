@@ -12,6 +12,7 @@
 #include "mpplib/containers/vertex.hpp"
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
+#include "mpplib/utils/utils.hpp"
 
 namespace mpp {
     /**
@@ -35,6 +36,58 @@ namespace mpp {
          * @brief adjacency list to store graph.
          */
         std::set<Vertex*, VertexComparator> m_adjList;
+
+        /**
+         * @brief Helper class to construct chunk graphviz representation.
+         * This visualizer also adds
+         */
+        class DotChunk
+        {
+        private:
+            std::string m_serialized;
+            std::string m_subgraphId;
+            void* m_chunkPtr;
+
+        public:
+            DotChunk()
+                : m_chunkPtr{ nullptr }
+            {}
+
+            DotChunk(void* t_chunkPtr,
+                     const std::string& t_fillcolor,
+                     const std::string& t_label,
+                     const std::string& t_subgraphId)
+                : m_subgraphId{ t_subgraphId }
+                , m_chunkPtr{ t_chunkPtr }
+            {
+                // m_serialized += "\tgraph[ style=filled, fillcolor=\"" + t_fillcolor +
+                //                 "\" style=\"rounded\"];\n";
+                m_serialized += "\tsubgraph \"" + t_subgraphId + "\" { \n";
+                m_serialized += "\t\tlabel=\"" + t_label + "\";\n";
+                m_serialized += "\t\tstyle=\"rounded,filled\";\n";
+                m_serialized += "\t\tfillcolor=\"" + t_fillcolor +"\"\n";
+            }
+
+            void AddGcPtr(void* t_gcPtrLoc, const std::string& t_fillcolor, std::string t_label)
+            {
+                m_serialized += "\t\t\"" + mpp::utils::AddrToString(t_gcPtrLoc) +
+                                "\" [style=filled, fillcolor=\"" + t_fillcolor +
+                                "\", shape=box, label=\"" + t_label + "\"];\n";
+            }
+
+            std::string GetSerialized() const
+            {
+                return m_serialized + "\t}\n";
+            }
+
+            struct HashFunction
+            {
+                std::size_t operator()(const DotChunk& point) const
+                {
+                    return reinterpret_cast<std::size_t>(point.m_chunkPtr);
+                }
+            };
+        };
 
     public:
         /**
