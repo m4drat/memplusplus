@@ -23,12 +23,12 @@ namespace mpp { namespace utils {
         }
     }
 
-    bool EnvOptions::GetMppDumpObjectsGraph()
+    bool EnvOptions::GetMppDumpObjectsGraph() const
     {
         return m_dumpObjectsGraph;
     }
 
-    bool EnvOptions::GetMppShowStatistics()
+    bool EnvOptions::GetMppShowStatistics() const
     {
         return m_showStatistics;
     }

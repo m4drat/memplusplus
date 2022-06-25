@@ -16,7 +16,7 @@ namespace mpp { namespace utils { namespace profile {
          * @brief Construct a new Profiler Timer object
          * @param t_name name of the timer
          */
-        ProfilerTimer(const char* t_name);
+        explicit ProfilerTimer(const char* t_name);
 
         /**
          * @brief Destroy the Profiler Timer object

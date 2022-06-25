@@ -14,7 +14,7 @@ namespace mpp { namespace utils { namespace profile {
          * @brief Construct a new Timer object
          * @param t_name timer name
          */
-        Timer(const char* t_name);
+        explicit Timer(const char* t_name);
 
         /**
          * @brief Start timer

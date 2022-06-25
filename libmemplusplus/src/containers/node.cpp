@@ -34,7 +34,7 @@ namespace mpp {
         return *this;
     }
 
-    Node::Node(Node&& t_node)
+    Node::Node(Node&& t_node) noexcept
         : priority(t_node.priority)
         , chunk(t_node.chunk)
         , leftChild(t_node.leftChild)

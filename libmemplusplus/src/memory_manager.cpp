@@ -54,7 +54,7 @@ namespace mpp {
                 mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
         }
 #else
-        void* rawPtr = static_cast<std::byte*>(
+        std::byte* rawPtr = static_cast<std::byte*>(
             mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
 #endif
         if (rawPtr == MAP_FAILED) {

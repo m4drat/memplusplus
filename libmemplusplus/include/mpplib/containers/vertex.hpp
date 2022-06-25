@@ -40,7 +40,7 @@ namespace mpp {
          * @brief Default vertex constructor.
          * @param t_chunk chunk linked with current vertex.
          */
-        Vertex(Chunk* t_chunk)
+        explicit Vertex(Chunk* t_chunk)
             : m_correspondingChunk(t_chunk)
         {
         }

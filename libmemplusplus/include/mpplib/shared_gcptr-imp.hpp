@@ -410,7 +410,7 @@ namespace mpp {
     void SharedGcPtr<Type>::CheckInvalidInitialization(ElementType* t_obj)
     {
         // Iterate through all GcPtrs, and check where they point.
-        for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
+        for (auto* gcPtr : GC::GetInstance().GetGcPtrs()) {
             if (gcPtr->GetVoid() == t_obj)
                 utils::ErrorAbort("SharedGcPtr<Type>: Invalid initialization!\n");
         }

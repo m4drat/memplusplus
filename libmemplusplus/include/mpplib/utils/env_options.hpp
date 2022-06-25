@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mpplib/utils/profiler_definitions.hpp"
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace mpp { namespace utils {
     /**
@@ -36,13 +36,13 @@ namespace mpp { namespace utils {
          * @brief Get the MppDumpObjectsGraph variable.
          * @return true, if variable is set, false - otherwise.
          */
-        bool GetMppDumpObjectsGraph();
+        bool GetMppDumpObjectsGraph() const;
 
         /**
          * @brief Get the MppShowStatistics variable.
          * @return true, if variable is set, false - otherwise.
          */
-        bool GetMppShowStatistics();
+        bool GetMppShowStatistics() const;
 
         /**
          * @brief Get static instance

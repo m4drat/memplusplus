@@ -54,7 +54,7 @@ namespace mpp {
          * @param t_other vector of vertexes, to copy from.
          * @warning This copy constructor performs only shallow copy!
          */
-        GcGraph(const std::vector<Vertex*>& t_other);
+        explicit GcGraph(const std::vector<Vertex*>& t_other);
 
         /**
          * @brief Graph destructor. Iterates through each Vertex in adjList, deletes it,
@@ -170,7 +170,7 @@ namespace mpp {
          * @brief Get the number of vertices in current graph.
          * @return number of vertices in graph
          */
-        int32_t GetGraphVerticesCount();
+        uint32_t GetGraphVerticesCount();
 
         /**
          * @brief Get the adjacency list, that represent current graph.

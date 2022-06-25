@@ -5,7 +5,7 @@ file(GLOB_RECURSE
      *.[chi]pp *.[chi]xx *.cc *.hh *.ii *.[CHI] *.inl *.tpp
      )
 
-set(EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} "/CMakeFiles/" "cmake" "build" "3rd_party" ".git" "tests")
+set(EXCLUDE_PATTERNS ${EXCLUDE_PATTERNS} "/CMakeFiles/" "cmake" "build" "libraries" "3rd_party" ".git" "tests")
 
 # Delete exclude patterns
 foreach (SOURCE_FILE ${ALL_CXX_SOURCE_FILES}) 
@@ -53,16 +53,23 @@ if(CLANG_TIDY)
         clang-tidy
         COMMAND ${CLANG_TIDY}
         ${ALL_CXX_SOURCE_FILES}
-        -checks=clang-analyzer-*,cppcoreguidelines*,performance-*,portability-*,readability-*
+        -checks=clang-analyzer-*,cppcoreguidelines*,performance-*,portability-*,readability-*,hicpp-*,cert-*
         --
         -std=c++17
         -I${EXAMPLE_PROJECT_INCLUDES}
         -I${FUZZING_HARNESS_INCLUDES}
         -I${LIBMEMPLUSPLUS_INCLUDES}
+        -DMPP_STATS=1
+        -DMPP_COLOUR=1
+        -DMPP_PROFILE=1
+        -DMPP_SECURE=1
+        -DMPP_FULL_DEBUG=1
+        -DMPP_BUILD_EXAMPLE=1
+        -DMPP_FILL_CHAR="\\x99"
     )
 endif()
 
-# Adding clang-tidy target if executable is found
+# Adding scan-build target if executable is found
 find_program(CLANG_STATIC_ANALYZER "scan-build-15")
 if(CLANG_STATIC_ANALYZER)
     add_custom_target(

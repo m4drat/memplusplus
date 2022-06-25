@@ -164,7 +164,7 @@ namespace mpp {
          * @return true if current chunk is in use
          * @return false if current chunk isn't in use
          */
-        bool IsUsed()
+        bool IsUsed() const
         {
             return (this->ChunkHeader.chunkHeader & IS_USED_BIT_MASK) >> IS_USED_SHIFT;
         };
@@ -174,7 +174,7 @@ namespace mpp {
          * @return true if previous chunk is in use
          * @return false if previous chunk isn't in use
          */
-        bool IsPrevInUse()
+        bool IsPrevInUse() const
         {
             return (this->ChunkHeader.chunkHeader & IS_PREV_IN_USE_BIT_MASK) >>
                    IS_PREV_IN_USE_SHIFT;

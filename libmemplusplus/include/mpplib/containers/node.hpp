@@ -39,7 +39,7 @@ namespace mpp {
         /**
          * @brief Constructor, that construct node from chunk.
          */
-        Node(Chunk* t_chunk);
+        explicit Node(Chunk* t_chunk);
 
         /**
          * @brief Copy-Constructor, that constructs node from const node reference.
@@ -54,7 +54,7 @@ namespace mpp {
         /**
          * @brief Copy-Constructor, that constructs node from r-value node reference.
          */
-        Node(Node&& t_node);
+        Node(Node&& t_node) noexcept;
 
         /**
          * @brief Assignment operator, that constructs node from r-value node reference.

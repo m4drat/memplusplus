@@ -82,7 +82,7 @@ namespace mpp {
         std::size_t currSize{ 0 };
 
         // Iterate through all vertices (aka chunks) in layouted vector
-        for (auto vertex : layoutedData.vertices) {
+        for (auto* vertex : layoutedData.vertices) {
             // Extract size of chunk
             currSize = vertex->GetCorrespondingChunk()->GetSize();
 
@@ -101,7 +101,7 @@ namespace mpp {
             godArena->chunksInUse.insert(newChunk);
 
             // Update GcPtr
-            for (auto gcPtr : vertex->GetPointingToGcPtrs()) {
+            for (auto* gcPtr : vertex->GetPointingToGcPtrs()) {
                 std::byte* updatedPtr =
                     newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) -
                                         vertex->GetCorrespondingChunkAsBytePtr());

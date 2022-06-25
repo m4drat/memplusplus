@@ -5,6 +5,10 @@
 
 namespace mpp {
     Arena::Arena(std::size_t t_size, std::byte* t_begin)
+        : size{ t_size }
+        , topChunk{ Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1) }
+        , begin{ t_begin }
+        , end{ t_begin + t_size }
     {
         PROFILE_FUNCTION();
 #if MPP_STATS == 1
@@ -18,10 +22,6 @@ namespace mpp {
         arenaStats->bigArena = false;
         arenaStats->gcCreatedArena = false;
 #endif
-        size = t_size;
-        topChunk = Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1);
-        begin = t_begin;
-        end = t_begin + t_size;
     }
 
     Arena::~Arena()
@@ -37,7 +37,7 @@ namespace mpp {
         return freedChunks.GetAmountOfFreedMemory();
     }
 
-    Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize)
+    Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize) const
     {
         PROFILE_FUNCTION();
         // Find suitable chunk in treap of freed chunks
@@ -476,7 +476,7 @@ namespace mpp {
         t_out << "MPP - Chunks in use (" << t_arena->chunksInUse.size() << ")" << std::endl;
         int32_t idx2 = 0;
         if (t_dumpInUseChunks == true) {
-            for (auto ch : t_arena->chunksInUse) {
+            for (auto* ch : t_arena->chunksInUse) {
                 t_out << "\t" << idx2 << ". ";
                 Chunk::DumpChunk(t_out, ch) << std::endl;
                 idx2++;

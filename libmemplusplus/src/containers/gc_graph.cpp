@@ -8,7 +8,7 @@ namespace mpp {
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(GcGraph& t_other)
     {
-        for (auto v : t_other.GetAdjList()) {
+        for (auto* v : t_other.GetAdjList()) {
             m_adjList.insert(v);
         }
     }
@@ -16,7 +16,7 @@ namespace mpp {
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(const std::vector<Vertex*>& t_other)
     {
-        for (auto v : t_other) {
+        for (auto* v : t_other) {
             m_adjList.insert(v);
         }
     }
@@ -51,19 +51,19 @@ namespace mpp {
         // GcPtr is on the heap
         if (gcPtrLocationChunk != nullptr) {
             // Check that "to" vertex is already exist
-            Vertex* to = FindVertex(gcPtrObjectChunk);
-            if (to != nullptr) {
-                to->AddGcPtr(t_gcPtr);
+            Vertex* destination = FindVertex(gcPtrObjectChunk);
+            if (destination != nullptr) {
+                destination->AddGcPtr(t_gcPtr);
             } else {
-                to = new Vertex(gcPtrObjectChunk);
-                to->AddGcPtr(t_gcPtr);
+                destination = new Vertex(gcPtrObjectChunk);
+                destination->AddGcPtr(t_gcPtr);
             }
             // Check that "from" vertex is already exist
-            Vertex* from = FindVertex(gcPtrLocationChunk);
-            if (from == nullptr) {
-                from = new Vertex(gcPtrLocationChunk);
+            Vertex* origin = FindVertex(gcPtrLocationChunk);
+            if (origin == nullptr) {
+                origin = new Vertex(gcPtrLocationChunk);
             }
-            AddEdge(from, to);
+            AddEdge(origin, destination);
             // GcPtr isn't on the heap
         } else {
             Vertex* vertex = FindVertex(gcPtrObjectChunk);
@@ -222,7 +222,7 @@ namespace mpp {
         std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
 
         // iterate through all vertices
-        while (adjListCopy.empty() != true) {
+        while (!adjListCopy.empty()) {
             // Find connected component inside graph
             std::unique_ptr<GcGraph, std::function<void(GcGraph*)>> connectedComponent(
                 new GcGraph(UndirectedDFS(*(adjListCopy.begin()))), [](GcGraph* t_graph) {
@@ -231,7 +231,7 @@ namespace mpp {
                 });
 
             // delete each visited vertex from adjListCopy
-            for (auto v : connectedComponent->GetAdjList()) {
+            for (auto* v : connectedComponent->GetAdjList()) {
                 adjListCopy.erase(v);
             }
 
@@ -260,7 +260,7 @@ namespace mpp {
         std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
                                        t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
-        for (auto neighbor : neighbors) {
+        for (auto* neighbor : neighbors) {
             if ((std::find(t_visited.begin(), t_visited.end(), neighbor) != t_visited.end()) ==
                 false) {
                 GcGraph::DDFS(neighbor, t_visited);
@@ -289,7 +289,7 @@ namespace mpp {
                          t_vertex->GetPointingVertices().begin(),
                          t_vertex->GetPointingVertices().end());
         t_visited.push_back(t_vertex);
-        for (auto neighbor : neighbors) {
+        for (auto* neighbor : neighbors) {
             if ((std::find(t_visited.begin(), t_visited.end(), neighbor) != t_visited.end()) ==
                 false) {
                 GcGraph::UDFS(neighbor, t_visited);
@@ -309,7 +309,7 @@ namespace mpp {
         return nullptr;
     }
 
-    int32_t GcGraph::GetGraphVerticesCount()
+    uint32_t GcGraph::GetGraphVerticesCount()
     {
         return m_adjList.size();
     }

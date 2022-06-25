@@ -1,5 +1,6 @@
 #pragma once
 
+#include <limits>
 #include <random>
 
 namespace mpp {
@@ -35,7 +36,7 @@ namespace mpp {
          * @param t_max max value to generate (limited to (2 << 63) - 1)
          * @param t_randSeed Seed source (by default system random seed /dev/random)
          */
-        Random(std::size_t t_min = 0x0, std::size_t t_max = 18446744073709551615ull, std::size_t t_randSeed = std::random_device{}())
+        explicit Random(std::size_t t_min = 0x0, std::size_t t_max = std::numeric_limits<std::size_t>::max(), std::size_t t_randSeed = std::random_device{}())
             : m_gen{t_randSeed}, m_distribution{t_min, t_max}
         {}
 
