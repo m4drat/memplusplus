@@ -3,7 +3,8 @@
 
 namespace mpp {
     GcGraph::GcGraph()
-    {}
+    {
+    }
 
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(GcGraph& t_other)
@@ -45,8 +46,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
-        Chunk* gcPtrLocationChunk =
-            MemoryManager::GetInUseChunkByPtr(t_gcPtr);
+        Chunk* gcPtrLocationChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr);
 
         // GcPtr is on the heap
         if (gcPtrLocationChunk != nullptr) {
@@ -115,13 +115,11 @@ namespace mpp {
         // Draw connections between chunks
         for (auto v1 : m_adjList) {
             // if current vertex has neighbors draw all connections
-            if (!v1->GetNeighbors().empty()) {
-                // for each neighbor draw connection between v1 and its neighbour
-                for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
-                    t_out << "\t\"" + v1->ToString() + "\""
-                          << " -> "
-                          << "\"" + (*it)->ToString() + "\";\n";
-                }
+            // for each neighbor draw connection between v1 and its neighbour
+            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
+                t_out << "\t\"" + v1->ToString() + "\""
+                      << " -> "
+                      << "\"" + (*it)->ToString() + "\";\n";
             }
         }
 

@@ -101,6 +101,7 @@
 		"search.exclude": {
 			"**/memplusplus-benchmarks/benchmarks/mempp/memplusplus/": true
 		},
-		"clangd.path": "/usr/bin/clangd-15"
+		"clangd.path": "/usr/bin/clangd-15",
+		"editor.formatOnSave": true
 	}
 }
