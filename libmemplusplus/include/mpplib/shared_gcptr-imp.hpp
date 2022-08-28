@@ -1,8 +1,8 @@
 #pragma once
 
 #include "mpplib/gc.hpp"
-#include "mpplib/shared_gcptr.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include "mpplib/utils/utils.hpp"
 
@@ -24,7 +24,8 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(std::nullptr_t t_newData)
         : SharedGcPtr()
-    {}
+    {
+    }
 
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(ElementType* obj)
@@ -245,7 +246,7 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::AddToGcList()
     {
-        GC::GetInstance().GetGcPtrs().insert(this);
+        GC::GetInstance().AddGcPtr(this);
         return true;
     }
 

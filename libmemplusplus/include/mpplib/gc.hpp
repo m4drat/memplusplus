@@ -89,6 +89,15 @@ namespace mpp {
         }
 
         /**
+         * @brief Adds new gcptr to the list of active gcptr's
+         * @param t_ptr pointer to GcPtr to add
+         */
+        void AddGcPtr(GcPtr* t_ptr)
+        {
+            m_activeGcPtrs.insert(t_ptr);
+        }
+
+        /**
          * @brief Get the Instance of GC object
          * @return GC& Global Garbage Collector
          */

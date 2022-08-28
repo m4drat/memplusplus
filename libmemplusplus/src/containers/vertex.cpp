@@ -1,4 +1,5 @@
 #include "mpplib/containers/vertex.hpp"
+#include "mpplib/gc.hpp"
 
 namespace mpp {
     void Vertex::UpdateChunkPtr(Chunk* t_chunk)
@@ -46,6 +47,15 @@ namespace mpp {
             return true;
         }
         return false;
+    }
+
+    std::set<GcPtr*> Vertex::GetAllOutgoingGcPtrs(std::set<GcPtr*>& t_gcPtrs)
+    {
+        auto begin = t_gcPtrs.lower_bound((GcPtr*)m_correspondingChunk);
+        auto end =
+            t_gcPtrs.upper_bound((GcPtr*)(m_correspondingChunk + m_correspondingChunk->GetSize()));
+
+        return std::set<GcPtr*>(begin, end);
     }
 
     std::set<GcPtr*>& Vertex::GetPointingToGcPtrs()

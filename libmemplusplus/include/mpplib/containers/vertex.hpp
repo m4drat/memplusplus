@@ -86,12 +86,22 @@ namespace mpp {
          * @param t_gcPtr pointer to GcPtr to add to the current vertex.
          */
         void AddGcPtr(GcPtr* t_gcPtr);
+
         /**
          * @brief Removes GcPtr from list of pointing to the current vertex GcPtr's.
          * @param t_gcPtr pointer to GcPtr to delete from list
          * @return true if GcPtr was deleted successfully, false - otherwise
          */
         bool RemoveGcPtr(GcPtr* t_gcPtr);
+
+        /**
+         * @brief Get the All gcptrs located inside current vertex (chunk).
+         * @param t_gcPtrs set of pointers to GcPtrs, obtained by calling GetGcPtrs() on instance of
+         * GC class.
+         * @return std::set<GcPtr*>&
+         */
+        std::set<GcPtr*> GetAllOutgoingGcPtrs(std::set<GcPtr*>& t_gcPtrs);
+
         /**
          * @brief Get all GcPtr's, that points to current vertex (chunk).
          * @return std::set<GcPtr*>& pointing to current vertex GcPtr's
