@@ -31,46 +31,91 @@ void logic()
 {
     using namespace mpp;
     using namespace std::literals::chrono_literals;
-
-    // SharedGcPtr<SharedGcPtr<int32_t>> a =
-    //     MakeShared<SharedGcPtr<int32_t>>(MakeShared<int32_t>(1337));
-
-    // MM::VisHeapLayout(std::cout, nullptr);
-    // for (auto p : GC::GetInstance().GetGcPtrs()) {
-    //     std::cout << "(GcPtr*)" << p << " -> " << p->GetVoid() << std::endl;
-    // }
-
     struct Node
     {
-        SharedGcPtr<int32_t> ptr1;
-        SharedGcPtr<int32_t> ptr2;
-        SharedGcPtr<int32_t> ptr3;
-        SharedGcPtr<Node> node;
-        Node(SharedGcPtr<int32_t> t_ptr1, SharedGcPtr<int32_t> t_ptr2, SharedGcPtr<int32_t> t_ptr3)
-            : ptr1{ t_ptr1 }
-            , ptr2{ t_ptr2 }
-            , ptr3{ t_ptr3 }
-            , node{ nullptr }
+        uint32_t data;
+        SharedGcPtr<Node> prev;
+        SharedGcPtr<Node> next;
+
+        Node(uint32_t t_data, SharedGcPtr<Node> t_p, SharedGcPtr<Node> t_n)
+            : data{ t_data }
+            , prev{ t_p }
+            , next{ t_n }
         {
         }
     };
 
-    SharedGcPtr<Node> n1 = MakeShared<Node>(nullptr, nullptr, nullptr);
-    SharedGcPtr<int32_t> ptr = MakeShared<int32_t>(1337);
+    // Create Linked List
+    SharedGcPtr<Node> n1 = MakeShared<Node>(1, nullptr, nullptr);
+    SharedGcPtr<Node> n2 = MakeShared<Node>(2, nullptr, nullptr);
+    SharedGcPtr<Node> n3 = MakeShared<Node>(3, nullptr, nullptr);
+    SharedGcPtr<Node> n4 = MakeShared<Node>(4, nullptr, nullptr);
 
-    n1->ptr1 = ptr;
-    n1->ptr2 = ptr;
-    n1->ptr3 = ptr;
-    n1->node = MakeShared<Node>(nullptr, nullptr, nullptr);
+    n1->prev = nullptr;
+    n1->next = n2;
 
-    n1->node->ptr1 = MakeShared<int32_t>(1);
-    n1->node->node = n1;
+    n2->prev = n1;
+    n2->next = n3;
 
-    ptr = nullptr;
+    n3->prev = n2;
+    n3->next = n4;
+
+    n4->prev = n3;
+    n4->next = nullptr;
+
+    // Tree node
+    struct TreeNode
+    {
+        uint32_t data;
+        SharedGcPtr<TreeNode> left;
+        SharedGcPtr<TreeNode> right;
+        SharedGcPtr<TreeNode> up;
+
+        TreeNode(uint32_t t_data,
+                 SharedGcPtr<TreeNode> t_left,
+                 SharedGcPtr<TreeNode> t_right,
+                 SharedGcPtr<TreeNode> t_up)
+            : data{ t_data }
+            , left{ t_left }
+            , right{ t_right }
+            , up{ t_up }
+        {
+        }
+    };
+
+    // Create a random tree
+    SharedGcPtr<TreeNode> root = MakeShared<TreeNode>(0, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode1 = MakeShared<TreeNode>(1, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode2 = MakeShared<TreeNode>(2, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode3 = MakeShared<TreeNode>(3, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode4 = MakeShared<TreeNode>(4, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode5 = MakeShared<TreeNode>(5, nullptr, nullptr, nullptr);
+
+    root->up = nullptr;
+    root->left = treeNode1;
+    root->right = treeNode2;
+
+    treeNode1->up = root;
+    treeNode1->left = nullptr;
+    treeNode1->right = nullptr;
+
+    treeNode2->up = root;
+    treeNode2->left = treeNode3;
+    treeNode2->right = treeNode4;
+
+    treeNode3->up = treeNode2;
+    treeNode3->left = nullptr;
+    treeNode3->right = nullptr;
+
+    treeNode4->up = treeNode2;
+    treeNode4->left = treeNode5;
+    treeNode4->right = nullptr;
+
+    treeNode5->up = treeNode4;
+    treeNode5->left = nullptr;
+    treeNode5->right = nullptr;
 
     GC::GetInstance().Collect();
-    // GC::GetInstance().Collect();
-    // SharedGcPtr<int32_t> b = MakeShared<int32_t>(1337);
 }
 
 int main()

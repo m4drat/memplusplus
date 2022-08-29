@@ -177,7 +177,8 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
 
     // Generate graphviz layout just to check that nothing Segfaults
     std::stringstream ss;
-    objectsGraph->GenerateGraphvizLayout(ss);
+    objectsGraph->GenerateGraphvizLayoutSimple(ss);
+    objectsGraph->GenerateGraphvizLayoutAdvanced(ss);
 }
 
 TEST(GcGraphTest, DISABLED_GenerateGraphvizLayout)
@@ -259,7 +260,7 @@ TEST(GcGraphTest, DISABLED_GenerateGraphvizLayout)
         "color=\"#bcbddc\"];\n}";
 
     std::stringstream ss;
-    objectsGraph->GenerateGraphvizLayout(ss);
+    objectsGraph->GenerateGraphvizLayoutSimple(ss);
     ASSERT_EQ(ss.str(), correctOutput);
 }
 

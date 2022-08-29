@@ -4,6 +4,13 @@
 #include <cstdlib>
 
 namespace mpp { namespace utils {
+    enum class ObjectsGraphDumpType
+    {
+        SIMPLE,
+        ADVANCED,
+        DISABLED
+    };
+
     /**
      * @brief Class that wraps all environment options.
      */
@@ -11,9 +18,10 @@ namespace mpp { namespace utils {
     {
     private:
         /**
-         * @brief true, if environment variable MPP_DUMP_OBJECTS_GRAPH is set.
+         * @brief If environment variable MPP_DUMP_OBJECTS_GRAPH is set to 1 - dumps simple objects
+         * graph. If set to 2 - dumps advanced objects graph.
          */
-        bool m_dumpObjectsGraph;
+        ObjectsGraphDumpType m_dumpObjectsGraph;
 
         /**
          * @brief true, if environment variable MPP_SHOW_STATISTICS is set.
@@ -36,7 +44,7 @@ namespace mpp { namespace utils {
          * @brief Get the MppDumpObjectsGraph variable.
          * @return true, if variable is set, false - otherwise.
          */
-        bool GetMppDumpObjectsGraph() const;
+        ObjectsGraphDumpType GetMppDumpObjectsGraph() const;
 
         /**
          * @brief Get the MppShowStatistics variable.
@@ -46,7 +54,7 @@ namespace mpp { namespace utils {
 
         /**
          * @brief Get static instance
-         * @return EnvOptions& 
+         * @return EnvOptions&
          */
         static EnvOptions& Get();
     };

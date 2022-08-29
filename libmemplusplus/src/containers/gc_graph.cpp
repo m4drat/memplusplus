@@ -83,7 +83,106 @@ namespace mpp {
         }
     }
 
-    std::ostream& GcGraph::GenerateGraphvizLayout(std::ostream& t_out) const
+    std::ostream& GcGraph::GenerateGraphvizLayoutSimple(std::ostream& t_out) const
+    {
+        PROFILE_FUNCTION();
+
+        const std::string colorRed = "#fbb4ae";
+        const std::string colorOrange = "#fed9a6";
+        const std::string colorGreen = "#ccebc5";
+        const std::string colorGray = "#cccccc";
+        const std::string colorLightPurple = "#bcbddc";
+
+        t_out << "digraph Objects {\n";
+        t_out << "\tnode[ style=filled ];\n";
+
+        // Create all chunks
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::byte* pos = arena->begin; pos < arena->end;
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
+                t_out << "\t\"" << chunkAddrStr << "\" [ fillcolor=\"";
+
+                if (arena->topChunk == currChunk) {
+                    t_out << colorOrange;
+                } else if (currChunk->IsUsed()) {
+                    t_out << colorGreen;
+                } else {
+                    t_out << colorRed;
+                }
+
+                t_out << "\" label=\"chunk\\n"
+                      << chunkAddrStr << "\\n"
+                      << "size = " << currChunk->GetSize() << "\"];\n";
+            }
+        }
+
+        // Draw connections between chunks
+        for (auto v1 : m_adjList) {
+            // We don't want to draw GC pointers
+            if (!v1->IsChunk())
+                continue;
+
+            // if current vertex has neighbors draw all connections
+            // for each neighbor draw connection between v1 and its neighbour
+            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
+                t_out << "\t\"" + v1->ToString() + "\""
+                      << " -> "
+                      << "\"" + (*it)->ToString() + "\";\n";
+            }
+        }
+
+        // Generate flat heap view
+        t_out << "\tnode[ shape = none style = \"\" ];\n";
+        t_out << "\theap[ label=<\n";
+        t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
+        t_out << "\t\t<TR>\n";
+
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::byte* pos = arena->begin; pos < arena->end;
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
+                t_out << "\t\t\t"
+                      << "<TD bgcolor=\"";
+
+                if (arena->topChunk == currChunk) {
+                    t_out << colorOrange;
+                } else if (currChunk->IsUsed()) {
+                    t_out << colorGreen;
+                } else {
+                    t_out << colorRed;
+                }
+
+                t_out << "\" PORT=\"" << chunkAddrStr << "\">"
+                      << chunkAddrStr.substr(chunkAddrStr.length() - 5) << "</TD>"
+                      << "\n";
+            }
+            t_out << "\t\t\t"
+                  << "<TD>.....</TD>"
+                  << "\n";
+        }
+
+        t_out << "\t\t</TR>\n";
+        t_out << "\t</table>>];\n";
+
+        // Draw connection to the flat heap view
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::byte* pos = arena->begin; pos < arena->end;
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                std::string chunkAddrStr = utils::AddrToString((void*)pos);
+                t_out << "\t\"" << chunkAddrStr << "\" -> heap:\"" << chunkAddrStr
+                      << "\" [style=dashed, color=\"" << colorLightPurple << "\"];\n";
+            }
+        }
+
+        t_out << "}";
+
+        return t_out;
+    }
+
+    std::ostream& GcGraph::GenerateGraphvizLayoutAdvanced(std::ostream& t_out) const
     {
         PROFILE_FUNCTION();
 
@@ -208,7 +307,10 @@ namespace mpp {
 
                     t_out << "\t\"" << gcPtrAddrStr << "\":s -> \""
                           << ((pointsToCluster)
-                                  ? utils::AddrToString(Chunk::GetUserDataPtr(pointsToChunk))
+                                  ? utils::AddrToString(
+                                        *pointsToVertex
+                                             ->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs())
+                                             .begin())
                                   : utils::AddrToString(pointsToChunk))
                           << "\"";
 
@@ -240,8 +342,11 @@ namespace mpp {
 
             // Draw connections between non-heap GC-pointers and chunks
             t_out << "\t\"" << gcPtrAddrStr << "\":s -> \""
-                  << ((pointsToCluster) ? utils::AddrToString(Chunk::GetUserDataPtr(pointsToChunk))
-                                        : utils::AddrToString(pointsToChunk))
+                  << ((pointsToCluster)
+                          ? utils::AddrToString(
+                                *pointsToVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs())
+                                     .begin())
+                          : utils::AddrToString(pointsToChunk))
                   << "\"";
 
             if (pointsToCluster) {
@@ -266,7 +371,10 @@ namespace mpp {
                         : false;
 
                 t_out << "\t\""
-                      << ((isCluster) ? utils::AddrToString(Chunk::GetUserDataPtr(currChunk))
+                      << ((isCluster) ? utils::AddrToString(*chunkVertex
+                                                                 ->GetAllOutgoingGcPtrs(
+                                                                     GC::GetInstance().GetGcPtrs())
+                                                                 .begin())
                                       : utils::AddrToString(currChunk))
                       << "\" -> heap:\"" << chunkAddrStr << "\"";
 

@@ -195,7 +195,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     __GcGraph visualizer__
 
     To visualization the GcGraph you have to:
-    1. Build the library in debug mode, and set `MPP_DUMP_OBJECTS_GRAPH=1` before running the target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot".
+    1. Build the library in debug mode, and set `MPP_DUMP_OBJECTS_GRAPH=1` (basic visualization) or `MPP_DUMP_OBJECTS_GRAPH=2` (advanced visualization) before running the target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot".
     2. Then generate .svg file using dot as follows:
 
         ```bash
@@ -218,10 +218,10 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     };
 
     // Create Linked List
-    SharedGcPtr<Node> n1 = MakeSharedGcPtr<Node>(1, nullptr, nullptr);
-    SharedGcPtr<Node> n2 = MakeSharedGcPtr<Node>(2, nullptr, nullptr);
-    SharedGcPtr<Node> n3 = MakeSharedGcPtr<Node>(3, nullptr, nullptr);
-    SharedGcPtr<Node> n4 = MakeSharedGcPtr<Node>(4, nullptr, nullptr);
+    SharedGcPtr<Node> n1 = MakeShared<Node>(1, nullptr, nullptr);
+    SharedGcPtr<Node> n2 = MakeShared<Node>(2, nullptr, nullptr);
+    SharedGcPtr<Node> n3 = MakeShared<Node>(3, nullptr, nullptr);
+    SharedGcPtr<Node> n4 = MakeShared<Node>(4, nullptr, nullptr);
 
     n1->prev = nullptr;
     n1->next = n2;
@@ -249,12 +249,12 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     };
 
     // Create a random tree
-    SharedGcPtr<TreeNode> root = MakeSharedGcPtr<TreeNode>(0, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode1 = MakeSharedGcPtr<TreeNode>(1, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode2 = MakeSharedGcPtr<TreeNode>(2, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode3 = MakeSharedGcPtr<TreeNode>(3, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode4 = MakeSharedGcPtr<TreeNode>(4, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode5 = MakeSharedGcPtr<TreeNode>(5, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> root = MakeShared<TreeNode>(0, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode1 = MakeShared<TreeNode>(1, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode2 = MakeShared<TreeNode>(2, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode3 = MakeShared<TreeNode>(3, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode4 = MakeShared<TreeNode>(4, nullptr, nullptr, nullptr);
+    SharedGcPtr<TreeNode> treeNode5 = MakeShared<TreeNode>(5, nullptr, nullptr, nullptr);
 
     root->up = nullptr;
     root->left = treeNode1;

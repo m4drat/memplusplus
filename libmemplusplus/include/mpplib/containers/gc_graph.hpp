@@ -81,7 +81,15 @@ namespace mpp {
          *
          * @return std::ostream
          */
-        std::ostream& GenerateGraphvizLayout(std::ostream& t_out) const;
+        std::ostream& GenerateGraphvizLayoutSimple(std::ostream& t_out) const;
+
+        /**
+         * @brief Generates graph representation in form, that can be used in dot
+         * (graphviz), to visualize graph structure. This method takes into account all gcptrs.
+         *
+         * @return std::ostream
+         */
+        std::ostream& GenerateGraphvizLayoutAdvanced(std::ostream& t_out) const;
 
         /**
          * @brief Adds new edge to the graph.

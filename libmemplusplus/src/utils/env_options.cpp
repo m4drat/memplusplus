@@ -1,7 +1,8 @@
 #include "mpplib/utils/env_options.hpp"
 
 namespace mpp { namespace utils {
-    EnvOptions::EnvOptions() {
+    EnvOptions::EnvOptions()
+    {
         SetOptions();
     }
 
@@ -10,20 +11,22 @@ namespace mpp { namespace utils {
         char* dump_graph = std::getenv("MPP_DUMP_OBJECTS_GRAPH");
         char* show_stats = std::getenv("MPP_SHOW_STATISTICS");
 
-        if (dump_graph != nullptr && dump_graph[0] == '1') {
-            m_dumpObjectsGraph = true;
+        if (dump_graph && dump_graph[0] == '1') {
+            m_dumpObjectsGraph = ObjectsGraphDumpType::SIMPLE;
+        } else if (dump_graph && dump_graph[0] == '2') {
+            m_dumpObjectsGraph = ObjectsGraphDumpType::ADVANCED;
         } else {
-            m_dumpObjectsGraph = false;
+            m_dumpObjectsGraph = ObjectsGraphDumpType::DISABLED;
         }
 
-        if (show_stats != nullptr && show_stats[0] == '1') {
+        if (show_stats && show_stats[0] == '1') {
             m_showStatistics = true;
         } else {
             m_showStatistics = false;
         }
     }
 
-    bool EnvOptions::GetMppDumpObjectsGraph() const
+    ObjectsGraphDumpType EnvOptions::GetMppDumpObjectsGraph() const
     {
         return m_dumpObjectsGraph;
     }

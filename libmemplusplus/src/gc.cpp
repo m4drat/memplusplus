@@ -42,9 +42,21 @@ namespace mpp {
         }
 
 #if MPP_DEBUG == 1
-        if (utils::EnvOptions::Get().GetMppDumpObjectsGraph()) {
+        if (utils::EnvOptions::Get().GetMppDumpObjectsGraph() !=
+            utils::ObjectsGraphDumpType::DISABLED) {
             std::ofstream objectsDot("objects_cycle" + std::to_string(m_currentCycle) + ".dot");
-            objectsGraph->GenerateGraphvizLayout(objectsDot) << std::endl;
+
+            switch (utils::EnvOptions::Get().GetMppDumpObjectsGraph()) {
+                case utils::ObjectsGraphDumpType::SIMPLE:
+                    objectsGraph->GenerateGraphvizLayoutSimple(objectsDot) << std::endl;
+                    break;
+                case utils::ObjectsGraphDumpType::ADVANCED:
+                    objectsGraph->GenerateGraphvizLayoutAdvanced(objectsDot) << std::endl;
+                    break;
+                default:
+                    break;
+            }
+
             objectsDot.close();
             m_currentCycle++;
         }
