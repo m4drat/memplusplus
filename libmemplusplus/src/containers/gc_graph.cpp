@@ -1,4 +1,8 @@
 #include "mpplib/containers/gc_graph.hpp"
+#include "mpplib/containers/vertex.hpp"
+#include "mpplib/gc.hpp"
+#include "mpplib/gcptr.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/utils.hpp"
 
 namespace mpp {
@@ -45,35 +49,37 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        Chunk* gcPtrObjectChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr->GetVoid());
-        Chunk* gcPtrLocationChunk = MemoryManager::GetInUseChunkByPtr(t_gcPtr);
+        Chunk* gcPtrObjectChunk = MM::GetInUseChunkByPtr(t_gcPtr->GetVoid());
+        Chunk* gcPtrLocationChunk = MM::GetInUseChunkByPtr(t_gcPtr);
+
+        // Check that "to" vertex already exists in graph
+        Vertex* destination = FindVertex(gcPtrObjectChunk);
+        if (destination != nullptr) {
+            destination->AddGcPtr(t_gcPtr);
+        } else {
+            destination = new Vertex(gcPtrObjectChunk);
+            destination->AddGcPtr(t_gcPtr);
+        }
 
         // GcPtr is on the heap
         if (gcPtrLocationChunk != nullptr) {
-            // Check that "to" vertex is already exist
-            Vertex* destination = FindVertex(gcPtrObjectChunk);
-            if (destination != nullptr) {
-                destination->AddGcPtr(t_gcPtr);
-            } else {
-                destination = new Vertex(gcPtrObjectChunk);
-                destination->AddGcPtr(t_gcPtr);
-            }
-            // Check that "from" vertex is already exist
+            // Check that "from" vertex already exist in graph
             Vertex* origin = FindVertex(gcPtrLocationChunk);
             if (origin == nullptr) {
                 origin = new Vertex(gcPtrLocationChunk);
             }
             AddEdge(origin, destination);
-            // GcPtr isn't on the heap
         } else {
-            Vertex* vertex = FindVertex(gcPtrObjectChunk);
-            if (vertex != nullptr) {
-                vertex->AddGcPtr(t_gcPtr);
-            } else {
-                vertex = new Vertex(gcPtrObjectChunk);
-                vertex->AddGcPtr(t_gcPtr);
-                AddVertex(vertex);
+            // GcPtr isn't on the heap
+            // Check that "from" vertex already exist in graph
+
+            // We don't really care about the location of the GcPtr,
+            // thus it is okay to cast t_gcPtr to Chunk*
+            Vertex* origin = FindVertex((Chunk*)t_gcPtr);
+            if (origin == nullptr) {
+                origin = new Vertex((std::byte*)t_gcPtr);
             }
+            AddEdge(origin, destination);
         }
     }
 
@@ -88,43 +94,13 @@ namespace mpp {
         const std::string colorLightPurple = "#bcbddc";
 
         t_out << "digraph Objects {\n";
-        t_out << "\tnode[ style=filled ];\n";
-
-        // Create all chunks
-        for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
-                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
-                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
-                t_out << "\t\"" << chunkAddrStr << "\" [ fillcolor=\"";
-
-                if (arena->topChunk == currChunk) {
-                    t_out << colorOrange;
-                } else if (currChunk->IsUsed()) {
-                    t_out << colorGreen;
-                } else {
-                    t_out << colorRed;
-                }
-
-                t_out << "\" label=\"chunk\\n"
-                      << chunkAddrStr << "\\n"
-                      << "size = " << currChunk->GetSize() << "\"];\n";
-            }
-        }
-
-        // Draw connections between chunks
-        for (auto v1 : m_adjList) {
-            // if current vertex has neighbors draw all connections
-            // for each neighbor draw connection between v1 and its neighbour
-            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
-                t_out << "\t\"" + v1->ToString() + "\""
-                      << " -> "
-                      << "\"" + (*it)->ToString() + "\";\n";
-            }
-        }
+        t_out << "\tcompound=true;\n";
+        t_out << "\tratio=expand;\n";
+        t_out << "\tgraph [ranksep=1.5]\n\n";
 
         // Generate flat heap view
-        t_out << "\tnode[ shape = none style = \"\" ];\n";
+        t_out << "\t// Draw flat heap layout\n";
+        t_out << "\theap[ shape = none style = \"\" ];\n";
         t_out << "\theap[ label=<\n";
         t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
         t_out << "\t\t<TR>\n";
@@ -155,15 +131,153 @@ namespace mpp {
         }
 
         t_out << "\t\t</TR>\n";
-        t_out << "\t</table>>];\n";
+        t_out << "\t</table>>];\n\n";
 
-        // Draw connection to the flat heap view
+        t_out << "\t// Draw all chunks (begin)\n";
+        t_out << "\tnode[ style=\"filled\" ];\n";
+
+        std::set<GcPtr*> nonHeapGcPtrs = GC::GetInstance().GetGcPtrs();
+        uint32_t gcptrIndex = 1;
+
         for (auto* arena : MemoryManager::GetArenaList()) {
             for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                std::string chunkAddrStr = utils::AddrToString((void*)pos);
-                t_out << "\t\"" << chunkAddrStr << "\" -> heap:\"" << chunkAddrStr
-                      << "\" [style=dashed, color=\"" << colorLightPurple << "\"];\n";
+                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
+                std::string chunkLabel = "label=\"chunk\\n" + chunkAddrStr + "\\n" +
+                                         "size = " + std::to_string(currChunk->GetSize()) + "\"";
+                std::string chunkColor;
+
+                if (arena->topChunk == currChunk) {
+                    chunkColor = colorOrange;
+                } else if (currChunk->IsUsed()) {
+                    chunkColor = colorGreen;
+                } else {
+                    chunkColor = colorRed;
+                }
+
+                auto chunkAsVertex = FindVertex(currChunk);
+                if (!chunkAsVertex ||
+                    chunkAsVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).empty()) {
+                    // Current chunk doesn't have GC-pointers inside
+                    t_out << "\t\"" << chunkAddrStr << "\" [fillcolor=\"" << chunkColor << "\", "
+                          << chunkLabel << "];\n";
+                } else {
+                    // Current chunk does have GC-pointers inside
+                    t_out << "\tsubgraph \"cluster-" << chunkAddrStr << "\" {\n";
+                    t_out << "\t\t" << chunkLabel << ";\n";
+                    t_out << "\t\tstyle=\"rounded,filled\";\n";
+                    t_out << "\t\tfillcolor=\"" << chunkColor << "\";\n";
+                    t_out << "\t\tsubgraph \"cluster\" {\n";
+                    t_out << "\t\t\tstyle=\"dashed\";\n";
+                    t_out << "\t\t\tlabel=\"\";\n";
+
+                    for (auto gcPtr :
+                         chunkAsVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs())) {
+                        nonHeapGcPtrs.erase(gcPtr);
+                        // std::cout << "Vertex: [" << chunkAsVertex << "] -> Chunk: [" <<
+                        // chunkAddrStr
+                        //           << "] -> GcPtr: " << utils::AddrToString(gcPtr->GetVoid())
+                        //           << std::endl;
+                        std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
+                        t_out << "\t\t\t\"" << gcPtrAddrStr
+                              << "\" [style=\"filled,dashed\", fillcolor=\"" << chunkColor
+                              << "\", shape=box, label=\"gcptr-" << gcptrIndex++ << "\"];\n";
+                    }
+
+                    t_out << "\t\t}\n";
+                    t_out << "\t}\n";
+                }
+
+                if (!chunkAsVertex)
+                    continue;
+
+                // Draw connections between GC-pointers and chunks
+                t_out << "\n\t// Draw connections between GC-pointers from current chunk "
+                      << chunkAddrStr << " and chunks\n";
+                for (auto gcPtr :
+                     chunkAsVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs())) {
+                    std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
+                    Chunk* pointsToChunk = MM::GetInUseChunkByPtr(gcPtr->GetVoid());
+                    Vertex* pointsToVertex = FindVertex(pointsToChunk);
+                    bool pointsToCluster =
+                        (pointsToVertex)
+                            ? !pointsToVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs())
+                                   .empty()
+                            : false;
+
+                    t_out << "\t\"" << gcPtrAddrStr << "\":s -> \""
+                          << ((pointsToCluster)
+                                  ? utils::AddrToString(Chunk::GetUserDataPtr(pointsToChunk))
+                                  : utils::AddrToString(pointsToChunk))
+                          << "\"";
+
+                    if (pointsToCluster) {
+                        t_out << " [lhead=\"cluster-" << utils::AddrToString(pointsToChunk)
+                              << "\"]";
+                    }
+
+                    t_out << ";\n";
+                }
+            }
+        }
+
+        t_out << "\t// Draw all chunks (end)\n";
+
+        // Draw GC-pointers that are not on the heap
+        t_out << "\n\t// Draw connections between non-heap GC-pointers and chunks\n";
+        for (auto gcPtr : nonHeapGcPtrs) {
+            std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
+            Chunk* pointsToChunk = MM::GetInUseChunkByPtr(gcPtr->GetVoid());
+            Vertex* pointsToVertex = FindVertex(pointsToChunk);
+            bool pointsToCluster =
+                (pointsToVertex)
+                    ? !pointsToVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).empty()
+                    : false;
+
+            t_out << "\t\"" << gcPtrAddrStr << "\" [style=filled, fillcolor=\"" << colorGray
+                  << "\", shape=rect, label=\"gcptr-" << gcptrIndex++ << "\"];\n";
+
+            // Draw connections between non-heap GC-pointers and chunks
+            t_out << "\t\"" << gcPtrAddrStr << "\":s -> \""
+                  << ((pointsToCluster) ? utils::AddrToString(Chunk::GetUserDataPtr(pointsToChunk))
+                                        : utils::AddrToString(pointsToChunk))
+                  << "\"";
+
+            if (pointsToCluster) {
+                t_out << " [lhead=\"cluster-" << utils::AddrToString(pointsToChunk) << "\"]";
+            }
+
+            t_out << ";\n";
+        }
+
+        // Draw connection to the flat heap view
+        t_out << "\n\t// Draw connections from all chunks to the flat heap view\n";
+        for (auto* arena : MemoryManager::GetArenaList()) {
+            for (std::byte* pos = arena->begin; pos < arena->end;
+                 pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
+                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
+
+                Vertex* chunkVertex = FindVertex(currChunk);
+                bool isCluster =
+                    (chunkVertex)
+                        ? !chunkVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).empty()
+                        : false;
+
+                t_out << "\t\""
+                      << ((isCluster) ? utils::AddrToString(Chunk::GetUserDataPtr(currChunk))
+                                      : utils::AddrToString(currChunk))
+                      << "\" -> heap:\"" << chunkAddrStr << "\"";
+
+                if (isCluster) {
+                    t_out << " [ltail=\"cluster-" << chunkAddrStr << "\", style=dashed, color=\""
+                          << colorLightPurple << "\"]";
+                } else {
+                    t_out << " [style=dashed, color=\"" << colorLightPurple << "\"]";
+                }
+
+                t_out << ";\n";
             }
         }
 
@@ -190,6 +304,17 @@ namespace mpp {
 
         // Create connection between two vertices
         t_from->AddNeighbor(t_to);
+    }
+
+    bool GcGraph::HasEdge(Vertex* t_from, Vertex* t_to) const
+    {
+        if (m_adjList.find(t_from) == m_adjList.end() || m_adjList.find(t_to) == m_adjList.end())
+            return false;
+
+        if (t_from->GetNeighbors().find(t_to) == t_from->GetNeighbors().end())
+            return false;
+
+        return true;
     }
 
     void GcGraph::RemoveEdge(Vertex* t_from, Vertex* t_to)
@@ -295,7 +420,7 @@ namespace mpp {
         }
     }
 
-    Vertex* GcGraph::FindVertex(Chunk* t_chunk)
+    Vertex* GcGraph::FindVertex(Chunk* t_chunk) const
     {
         PROFILE_FUNCTION();
         std::unique_ptr<Vertex> vertex = std::make_unique<Vertex>(t_chunk);

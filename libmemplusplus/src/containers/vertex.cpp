@@ -1,10 +1,16 @@
 #include "mpplib/containers/vertex.hpp"
 #include "mpplib/gc.hpp"
+#include "mpplib/utils/utils.hpp"
 
 namespace mpp {
-    void Vertex::UpdateChunkPtr(Chunk* t_chunk)
+    bool Vertex::IsChunk() const
     {
-        m_correspondingChunk = t_chunk;
+        return m_currLocationIsAChunk;
+    }
+
+    void Vertex::UpdateLocationPtr(std::byte* t_location)
+    {
+        m_correspondingLocation = t_location;
     }
 
     void Vertex::AddNeighbor(Vertex* t_neighbor)
@@ -51,9 +57,16 @@ namespace mpp {
 
     std::set<GcPtr*> Vertex::GetAllOutgoingGcPtrs(std::set<GcPtr*>& t_gcPtrs)
     {
-        auto begin = t_gcPtrs.lower_bound((GcPtr*)m_correspondingChunk);
-        auto end =
-            t_gcPtrs.upper_bound((GcPtr*)(m_correspondingChunk + m_correspondingChunk->GetSize()));
+        std::set<GcPtr*>::iterator begin;
+        std::set<GcPtr*>::iterator end;
+
+        begin = t_gcPtrs.lower_bound((GcPtr*)m_correspondingLocation);
+        if (m_currLocationIsAChunk) {
+            end = t_gcPtrs.upper_bound(
+                (GcPtr*)(m_correspondingLocation + GetLocationAsChunk()->GetSize()));
+        } else {
+            end = t_gcPtrs.upper_bound((GcPtr*)(m_correspondingLocation));
+        }
 
         return std::set<GcPtr*>(begin, end);
     }
@@ -63,20 +76,23 @@ namespace mpp {
         return m_pointingToGcPtrs;
     }
 
-    Chunk* Vertex::GetCorrespondingChunk() const
+    std::byte* Vertex::GetLoc() const
     {
-        return m_correspondingChunk;
+        return m_correspondingLocation;
     }
 
-    std::byte* Vertex::GetCorrespondingChunkAsBytePtr() const
+    Chunk* Vertex::GetLocationAsChunk() const
     {
-        return reinterpret_cast<std::byte*>(m_correspondingChunk);
+#if MPP_DEBUG == 1
+        utils::ConditionalAbort(!m_currLocationIsAChunk, "Current location is not a chunk");
+#endif
+        return reinterpret_cast<Chunk*>(m_correspondingLocation);
     }
 
     std::string Vertex::ToString() const
     {
         std::stringstream ss;
-        ss << static_cast<const void*>(m_correspondingChunk);
+        ss << static_cast<const void*>(m_correspondingLocation);
         return ss.str();
     }
 }

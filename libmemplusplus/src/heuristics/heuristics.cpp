@@ -8,8 +8,10 @@ namespace mpp {
 
         for (auto& graph : m_subgraphs) {
             for (const auto& v : graph->GetAdjList()) {
+                if (!v->IsChunk())
+                    continue;
                 m_layoutedHeap.push_back(v);
-                m_neededSpace += v->GetCorrespondingChunk()->GetSize();
+                m_neededSpace += v->GetLocationAsChunk()->GetSize();
             }
         }
         // for (auto& gcGraph : m_subgraphs)

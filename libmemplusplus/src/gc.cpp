@@ -83,15 +83,20 @@ namespace mpp {
 
         // Iterate through all vertices (aka chunks) in layouted vector
         for (auto* vertex : layoutedData.vertices) {
-            // Extract size of chunk
-            currSize = vertex->GetCorrespondingChunk()->GetSize();
+            // We don't care about non-heap gcptrs (it may be a local GcPtr, etc)
+            if (!vertex->IsChunk()) {
+                continue;
+            }
+
+            // Extract size of a chunk
+            currSize = vertex->GetLocationAsChunk()->GetSize();
 
 #if MPP_STATS == 1
             godArena->arenaStats->totalAllocated += currSize;
 #endif
 
             // Copy chunk data to new location
-            std::memcpy(newChunkLocation, vertex->GetCorrespondingChunk(), currSize);
+            std::memcpy(newChunkLocation, vertex->GetLoc(), currSize);
 
             // Update required fields
             newChunk = reinterpret_cast<Chunk*>(newChunkLocation);
@@ -103,8 +108,8 @@ namespace mpp {
             // Update GcPtr
             for (auto* gcPtr : vertex->GetPointingToGcPtrs()) {
                 std::byte* updatedPtr =
-                    newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) -
-                                        vertex->GetCorrespondingChunkAsBytePtr());
+                    newChunkLocation +
+                    (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) - vertex->GetLoc());
                 gcPtr->UpdatePtr(updatedPtr);
             }
 

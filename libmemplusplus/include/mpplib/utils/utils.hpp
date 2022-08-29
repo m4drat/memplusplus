@@ -24,6 +24,18 @@ namespace mpp { namespace utils {
     [[noreturn]] void ErrorAbort(const std::string& t_message);
 
     /**
+     * @brief Behaves like an assert.
+     * @param t_shouldAbort if true, calls utils::ErrorAbort.
+     * @param t_message message to print.
+     */
+    inline void ConditionalAbort(bool t_shouldAbort, const std::string& t_message)
+    {
+        if (t_shouldAbort) {
+            ErrorAbort(t_message);
+        }
+    }
+
+    /**
      * @brief Converts pointer to string (hexadecimal: 0x1337) representation
      * @param t_ptr pointer to convert
      * @return std::string string representation of the t_ptr

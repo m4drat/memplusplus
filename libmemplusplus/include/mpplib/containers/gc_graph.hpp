@@ -27,7 +27,7 @@ namespace mpp {
         {
             bool operator()(const Vertex* lhs, const Vertex* rhs) const
             {
-                return (lhs->GetCorrespondingChunk() < rhs->GetCorrespondingChunk());
+                return (lhs->GetLoc() < rhs->GetLoc());
             }
         };
 
@@ -94,6 +94,16 @@ namespace mpp {
          * @param t_to vertex, to create edge to
          */
         void AddEdge(Vertex* t_from, Vertex* t_to);
+
+        /**
+         * @brief Checks whether the edge exists between two vertices.
+         * @warning: this methods takes direction into account!
+         *
+         * @param t_from vertex, to check edge from.
+         * @param t_to vertex, to check edge to.
+         * @return true if edge exists, false otherwise.
+         */
+        bool HasEdge(Vertex* t_from, Vertex* t_to) const;
 
         /**
          * @brief Removes edge between two vertices.
@@ -164,7 +174,7 @@ namespace mpp {
          * @param t_chunk chunk, that associated with some vertex, that we want to find.
          * @return Vertex linked with specified chunk
          */
-        Vertex* FindVertex(Chunk* t_chunk);
+        Vertex* FindVertex(Chunk* t_chunk) const;
 
         /**
          * @brief Get the number of vertices in current graph.

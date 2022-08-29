@@ -491,6 +491,12 @@ Benchmarks (can be found in separate git [repo](https://github.com/m4drat/memplu
     cd build && ctest
     ```
 
+    Some tests are disabled because they require you to turn off aslr (for example `GcGraphTest.GenerateGraphvizLayout`). This is considered unreliable, but if you still want to run them, you can do it like this:
+
+    ```bash
+    cd build && setarch `uname -m` -R ./build/tests/unit_tests --gtest_also_run_disabled_tests
+    ```
+
 ## clang-format and clang-tidy
 
 - install clang-tidy and clang-format
