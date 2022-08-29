@@ -40,16 +40,6 @@ namespace mpp {
          */
         std::set<GcPtr*> m_activeGcPtrs;
 
-        /**
-         * @brief last iteration garbage size.
-         */
-        std::size_t m_garbageSize{ 0 };
-
-        /**
-         * @brief Required size of memory block, to save all user data in.
-         */
-        std::size_t m_dataSize{ 0 };
-
 #if MPP_STATS == 1
         /**
          * @brief Used to keep track of garbage collector stats

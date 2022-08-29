@@ -12,15 +12,16 @@
 
 namespace mpp {
     /**
-     * @brief Represent Vertex in the graph. Each vertex represents unique chunk in graph.
+     * @brief Represent Vertex in the graph. Each vertex represents unique memory location
+     * (potentially a chunk) in the graph.
      */
     class Vertex
     {
     private:
         /**
-         * @brief Chunk linked with the current vertex.
+         * @brief Location linked with the current vertex.
          */
-        Chunk* m_correspondingChunk;
+        std::byte* m_correspondingLocation;
         /**
          * @brief Set of vertices that the current vertex points to.
          */
@@ -33,23 +34,47 @@ namespace mpp {
          * @brief Set of GcPtr's that are pointing to the current chunk.
          */
         std::set<GcPtr*> m_pointingToGcPtrs;
+        /**
+         * @brief Says whether the m_correspondingLocation is a pointer to a valid chunk or not.
+         */
+        bool m_currLocationIsAChunk;
 
     public:
         Vertex() = delete;
         /**
          * @brief Default vertex constructor.
-         * @param t_chunk chunk linked with current vertex.
+         * @param t_loc location (possibly chunk) linked with current vertex.
          */
-        explicit Vertex(Chunk* t_chunk)
-            : m_correspondingChunk(t_chunk)
+        explicit Vertex(std::byte* t_location)
+            : m_correspondingLocation(t_location)
+            , m_currLocationIsAChunk(false)
+        {
+        }
+
+        explicit Vertex(Chunk* t_location)
+            : m_correspondingLocation((std::byte*)t_location)
+            , m_currLocationIsAChunk(true)
+        {
+        }
+
+        explicit Vertex(std::byte* t_location, bool t_currLocationIsAChunk)
+            : m_correspondingLocation(t_location)
+            , m_currLocationIsAChunk(t_currLocationIsAChunk)
         {
         }
 
         /**
-         * @brief Set new value for m_correspondingChunk.
-         * @param t_chunk new value for chunk pointer.
+         * @brief Checks whether location is a chunk or not.
+         *
+         * @return true if location is a chunk, false otherwise.
          */
-        void UpdateChunkPtr(Chunk* t_chunk);
+        bool IsChunk() const;
+
+        /**
+         * @brief Set new value for m_correspondingLocation.
+         * @param t_location new value for location pointer.
+         */
+        void UpdateLocationPtr(std::byte* t_location);
 
         /**
          * @brief Add new vertex, that points to the current vertex.
@@ -109,17 +134,18 @@ namespace mpp {
         std::set<GcPtr*>& GetPointingToGcPtrs();
 
         /**
-         * @brief Get corresponding chunk object.
-         * @return Chunk* chunk, that current vertex represents
+         * @brief Get corresponding location.
+         * @return std::byte* location (potentially chunk), that current vertex represents
          */
-        Chunk* GetCorrespondingChunk() const;
+        std::byte* GetLoc() const;
 
         /**
-         * @brief Get corresponding chunk object, but as a std::byte* ptr.
-         * @sa GetCorrespondingChunk
-         * @return std::byte* pointer that points to a chunk object
+         * @brief Get corresponding location as a chunk object. The caller must check whether the
+         * location is an actual chunk or not.
+         * @sa GetCorrespondingLocation
+         * @return Chunk* pointer that points to a chunk object
          */
-        std::byte* GetCorrespondingChunkAsBytePtr() const;
+        Chunk* GetLocationAsChunk() const;
 
         /**
          * @brief Get string representation of the current vertex.

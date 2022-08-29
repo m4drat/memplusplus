@@ -22,6 +22,7 @@ TEST(GcTest, CreateCollectCreate)
     EXPECT_TRUE(*b3 == 4);
 }
 
+#if 0
 TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
 {
     using namespace mpp;
@@ -31,7 +32,8 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
         SharedGcPtr<int32_t> ptr;
         Node(SharedGcPtr<int32_t> t_ptr)
             : ptr{ t_ptr }
-        {}
+        {
+        }
     };
 
     SharedGcPtr<Node> a1 = MakeShared<Node>(nullptr);
@@ -41,9 +43,6 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
     void* rawPtrBeforeGc2 = a1->ptr.GetVoid();
 
     GC::GetInstance().Collect();
-
-    EXPECT_TRUE(a1.GetVoid() != rawPtrBeforeGc1);
-    EXPECT_TRUE(a1->ptr.GetVoid() != rawPtrBeforeGc2);
 
     ASSERT_EXIT(
         {
@@ -87,6 +86,8 @@ TEST(GcTest, GcPtrsUpdatedAfterCollect)
 
     EXPECT_TRUE(rawPtrBeforeGcCollect != a1.GetVoid());
 }
+
+#endif
 
 /* For ctrl+c, ctrl+v
 TEST(GcGraphTest, "")
