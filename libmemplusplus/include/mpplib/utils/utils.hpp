@@ -2,6 +2,7 @@
 
 #include "mpplib/utils/profiler_definitions.hpp"
 #include <algorithm>
+#include <assert.h>
 
 namespace mpp { namespace utils {
 

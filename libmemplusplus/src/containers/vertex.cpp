@@ -1,5 +1,6 @@
 #include "mpplib/containers/vertex.hpp"
 #include "mpplib/gc.hpp"
+#include "mpplib/utils/assert.hpp"
 #include "mpplib/utils/utils.hpp"
 
 namespace mpp {
@@ -83,9 +84,7 @@ namespace mpp {
 
     Chunk* Vertex::GetLocationAsChunk() const
     {
-#if MPP_DEBUG == 1
-        utils::ConditionalAbort(!m_currLocationIsAChunk, "Current location is not a chunk");
-#endif
+        MPP_ASSERT(m_currLocationIsAChunk, "Current location is not a chunk!");
         return reinterpret_cast<Chunk*>(m_correspondingLocation);
     }
 
