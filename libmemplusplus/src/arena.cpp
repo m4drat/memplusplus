@@ -456,7 +456,7 @@ namespace mpp {
         t_out << "MPP - Arena end pointer          : " << static_cast<void*>(t_arena->end)
               << std::endl;
 
-        t_out << "MPP - Freed chunks nodes (" << t_arena->freedChunks.GetFreedChunksSize() << ")"
+        t_out << "MPP - Freed chunks nodes (" << t_arena->freedChunks.TotalFreeChunks() << ")"
               << std::endl;
         int32_t idx1 = 0;
         std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node) {

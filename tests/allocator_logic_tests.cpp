@@ -346,6 +346,30 @@ TEST(AllocatorLogicTest, NewArenaAllocatesChunksCorrectly)
     MemoryManager::Deallocate(newArenaChunk);
 }
 
+TEST(AllocatorLogicTest, FreeListAllocation)
+{
+    using namespace mpp;
+
+    MM::ResetAllocatorState();
+    void* p1 = MM::Allocate(512);
+    void* p2 = MM::Allocate(512);
+    void* p3 = MM::Allocate(512);
+    void* p4 = MM::Allocate(MM::g_DEFAULT_ARENA_SIZE - 2048);
+
+    MM::Deallocate(p1);
+    MM::Deallocate(p2);
+
+    ASSERT_EQ(MM::GetArenaList().size(), 1);
+    ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+    Chunk* chunkToReturn = nullptr;
+    chunkToReturn = (*MM::GetArenaList().begin())->freedChunks.FirstGreaterOrEqualTo(964);
+
+    void* p5 = MemoryManager::Allocate(964);
+    ASSERT_EQ(Chunk::GetHeaderPtr(p5), chunkToReturn);
+    ASSERT_EQ(MM::GetArenaList().size(), 1);
+    ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+}
+
 /* For ctrl+c, ctrl-V
 TEST(AllocatorLogicTest, "")
 {

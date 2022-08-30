@@ -101,7 +101,7 @@ namespace mpp {
          * @brief Get number of nodes (aka freed chunks).
          * @return uint32_t number of freed chunks.
          */
-        uint32_t GetFreedChunksSize();
+        uint32_t TotalFreeChunks();
 
         /**
          * @brief Get the amount of total memory held by chunks

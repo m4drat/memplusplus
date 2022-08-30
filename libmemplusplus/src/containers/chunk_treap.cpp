@@ -90,7 +90,7 @@ namespace mpp {
         t_root = nullptr;
     }
 
-    uint32_t ChunkTreap::GetFreedChunksSize()
+    uint32_t ChunkTreap::TotalFreeChunks()
     {
         return m_freedChunks;
     }
