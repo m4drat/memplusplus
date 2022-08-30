@@ -157,7 +157,7 @@ Library options:
 
 ## Debugging/profiling library
 
-To enable backtrace functionality add this flags to your project's CMakeLists.txt:
+To enable backtrace functionality add these flags to your project's CMakeLists.txt:
 
 ```cmake
 # For GCC
@@ -292,7 +292,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     ![objects-simple](./additional_info/images/objects_simple.svg)
 
     Executing this code with `MPP_DUMP_OBJECTS_GRAPH=2` will generate this graph:
-    ![objects-simple](./additional_info/images/objects_advanced.svg)
+    ![objects-advanced](./additional_info/images/objects_advanced.svg)
 
 - Profiler
 

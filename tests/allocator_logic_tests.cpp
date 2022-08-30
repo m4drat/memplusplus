@@ -373,6 +373,7 @@ TEST(AllocatorLogicTest, FreeListAllocation)
 TEST(AllocatorLogicTest, FreeListAllocationWithSplit)
 {
     using namespace mpp;
+    std::stringstream ss;
 
     MM::ResetAllocatorState();
     void* p1 = MM::Allocate(512);
@@ -383,6 +384,9 @@ TEST(AllocatorLogicTest, FreeListAllocationWithSplit)
 
     MM::Deallocate(p2);
     MM::Deallocate(p3);
+
+    // Visualize heap layout just to check that at least it doesn't segfault 🤷
+    MM::VisHeapLayout(ss, nullptr);
 
     ASSERT_EQ(MM::GetArenaList().size(), 1);
     ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
@@ -400,6 +404,9 @@ TEST(AllocatorLogicTest, FreeListAllocationWithSplit)
     chunkToReturn = (*MM::GetArenaList().begin())->freedChunks.FirstGreaterOrEqualTo(520);
     void* p7 = MemoryManager::Allocate(520);
     ASSERT_EQ(Chunk::GetHeaderPtr(p7), chunkToReturn);
+
+    // Dump arena just to check that at least it doesn't segfault 🤷
+    Arena::DumpArena(ss, *MM::GetArenaList().begin(), true, true);
 }
 
 /* For ctrl+c, ctrl-V

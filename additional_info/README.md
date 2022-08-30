@@ -107,9 +107,8 @@ GcPtr<UserData> smartPtr = GcPtr<UserData>(rawPtr);
         m_ptrToObj{ rawPtr }
     {
         std::vector<GcPtr*>gcPtrs.push_back(this) // sorted list
-        // мы всегда будем знать к какому чанку относится указатель, даже если он сдвинут, т.к. g_ChunkList
-        rawPtr->T() // Вызвать конструкто юзер объекта
-        Вернуть умный указатель на объект юзеру
+        rawPtr->T()
+        // Return smart pointer to an object to the user
     }
 // } ========================================================
 
@@ -118,8 +117,8 @@ smartPtr->~GcPtr(); // Destructor gets called
     template <class T>
     ~GcPtr()
     {
-        std::vector<GcPtr*>gcPtrs.pop(this); // Удаляем себя из вектора GcPtrs 
-        m_ptrToObj->~T() // Вызываем деструктор объекта
+        std::vector<GcPtr*>gcPtrs.pop(this); // We're deleting this from vector of GcPtr's 
+        m_ptrToObj->~T() // Call destructor of user object
     }
 // } ========================================================
 
@@ -134,10 +133,6 @@ GC::collect();
             correspondingChunk = MemoryManager::FindChunk(gcPtr.ptrToData)
             markObject(correspondingChunk)
             graph.AddInfoAboutGraph(correspondingChunk)
-            /** Как проверять, что указатель в чанке указывает 
-             * 1. Ptr in Heap Range 
-             * 2. Ptr in GcPtrs
-             */ 
 
         // sweep
         for(chunk : MemoryManager::g_ChunkList)
@@ -161,7 +156,7 @@ OR
 
 // ======================================================== {
     // Smart compact
-    // Группы объектов, например LinkedList
+    // Object groups. For example: LinkedList
         std::vector<Group> groups = Heuristics::FindStructures(graph)
         for(group : groups) 
         {
