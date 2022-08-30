@@ -126,7 +126,7 @@ Library options:
     // create smart pointer, that will automatically deallocate object, when needed
     mpp::MakeShared<Object> object = mpp::MakeShared<Object>(<constructor params>);
 
-    // create array of Objects, that will automatically deallocate object, when needed
+    // create array of Objects, that will be automatically deallocated, when goes out of scope
     mpp::MakeShared<Object[]> objects = mpp::MakeSharedN<Object>(<array size>, <constructor params>);
 
     ...
@@ -160,8 +160,13 @@ Library options:
 To enable backtrace functionality add this flags to your project's CMakeLists.txt:
 
 ```cmake
+# For GCC
 target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
 target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -export-dynamic)
+
+# For Clang
+target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -Wl,--export-dynamic)
 ```
 
 Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.

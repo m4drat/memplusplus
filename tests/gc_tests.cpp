@@ -22,8 +22,7 @@ TEST(GcTest, CreateCollectCreate)
     EXPECT_TRUE(*b3 == 4);
 }
 
-#if 0
-TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
+TEST(GcTest, DISABLED_CreatePointerOnHeapCollectGarbageAllocate)
 {
     using namespace mpp;
 
@@ -55,7 +54,7 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
         ".*");
 }
 
-TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
+TEST(GcTest, DISABLED_CreateTwoObjectsDestroyCollectAndCreate)
 {
     using namespace mpp;
 
@@ -71,12 +70,12 @@ TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
     EXPECT_TRUE(*b1 == 1339);
 }
 
-TEST(GcTest, CollectX5)
+TEST(GcTest, DISABLED_CollectX5)
 {
     using namespace mpp;
 }
 
-TEST(GcTest, GcPtrsUpdatedAfterCollect)
+TEST(GcTest, DISABLED_GcPtrsUpdatedAfterCollect)
 {
     using namespace mpp;
 
@@ -86,8 +85,6 @@ TEST(GcTest, GcPtrsUpdatedAfterCollect)
 
     EXPECT_TRUE(rawPtrBeforeGcCollect != a1.GetVoid());
 }
-
-#endif
 
 /* For ctrl+c, ctrl+v
 TEST(GcGraphTest, "")
