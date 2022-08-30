@@ -64,16 +64,18 @@ namespace mpp {
 
         /**
          * @brief Remove chunk from chunk treap in logN.
+         * @warning Chunk must be in chunk treap! Otherwise this function segfaults.
          * @param t_chunk the chunk to remove
+         * @return true if chunk was removed, false otherwise
          */
-        void RemoveChunk(Chunk* t_chunk);
+        bool RemoveChunk(Chunk* t_chunk);
 
         /**
          * @brief Finds first chunk that size is greater or equal, to desiredSize.
          * @param t_desiredChunkSize desired chunk size
          * @return Found chunk of suitable size or nullptr
          */
-        Chunk* FirstGreaterOrEqualThan(std::size_t t_desiredChunkSize) const;
+        Chunk* FirstGreaterOrEqualTo(std::size_t t_desiredChunkSize) const;
 
         /**
          * @brief Get root node.
@@ -96,8 +98,8 @@ namespace mpp {
         void Delete(Node* t_root);
 
         /**
-         * @brief Get the amount of freed chunks.
-         * @return uint32_t amount of freed chunks.
+         * @brief Get number of nodes (aka freed chunks).
+         * @return uint32_t number of freed chunks.
          */
         uint32_t GetFreedChunksSize();
 
@@ -106,7 +108,7 @@ namespace mpp {
          * inside chunk treap
          * @return std::size_t total amount of freed memory
          */
-        std::size_t GetAmountOfFreedMemory();
+        std::size_t TotalFreeMemory();
 
         /**
          * @brief Generates tree representation in form, that can be used in dot

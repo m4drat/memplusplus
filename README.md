@@ -110,7 +110,7 @@ Library options:
 
 ## Environment options
 
-- `MPP_DUMP_OBJECTS_GRAPH=1` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only exists in debug mode)
+- `MPP_DUMP_OBJECTS_GRAPH=1` / `MPP_DUMP_OBJECTS_GRAPH=2` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only possible in debug mode)
 
 - `MPP_SHOW_STATISTICS=1` - display statistics after program termination (should be built with `MPP_STATS` set to ON)
 
@@ -436,7 +436,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
 ## Performance comparisons
 
-Benchmarks (can be found in separate git [repo](https://github.com/m4drat/memplusplus-benchmarks).
+Benchmarks: [memplusplus-benchmarks](https://github.com/m4drat/memplusplus-benchmarks).
 
 ## Documentation
 

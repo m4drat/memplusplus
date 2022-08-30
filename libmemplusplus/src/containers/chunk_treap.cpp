@@ -6,12 +6,16 @@ namespace mpp {
         : m_root{ nullptr }
         , m_freedChunks{ 0 }
         , m_freedMemory{ 0 }
-    {}
+    {
+    }
 
     // TODO - smart pointers memory management
     ChunkTreap::ChunkTreap(const ChunkTreap& t_treap)
-        : m_root(new Node(*t_treap.m_root)), m_freedChunks{ 0 }, m_freedMemory{ 0 }
-    {}
+        : m_root(new Node(*t_treap.m_root))
+        , m_freedChunks{ t_treap.m_freedChunks }
+        , m_freedMemory{ t_treap.m_freedMemory }
+    {
+    }
 
     ChunkTreap& ChunkTreap::operator=(const ChunkTreap& t_treap)
     {
@@ -22,27 +26,37 @@ namespace mpp {
 
         // TODO - smart pointers memory management
         m_root = new Node(*t_treap.m_root);
+        m_freedChunks = t_treap.m_freedChunks;
+        m_freedMemory = t_treap.m_freedMemory;
 
         return *this;
     }
 
     ChunkTreap::ChunkTreap(ChunkTreap&& t_treap)
         : m_root(t_treap.m_root)
+        , m_freedChunks{ t_treap.m_freedChunks }
+        , m_freedMemory{ t_treap.m_freedMemory }
     {
         t_treap.m_root = nullptr;
+        t_treap.m_freedChunks = 0;
+        t_treap.m_freedMemory = 0;
     }
 
     ChunkTreap& ChunkTreap::operator=(ChunkTreap&& t_treap)
     {
-        if (&t_treap == this)
-        {
+        if (&t_treap == this) {
             return *this;
         }
 
         Delete();
 
         m_root = t_treap.m_root;
+        m_freedChunks = t_treap.m_freedChunks;
+        m_freedMemory = t_treap.m_freedMemory;
+
         t_treap.m_root = nullptr;
+        t_treap.m_freedChunks = 0;
+        t_treap.m_freedMemory = 0;
 
         return *this;
     }
@@ -60,8 +74,7 @@ namespace mpp {
 
     void ChunkTreap::Delete(Node* t_root)
     {
-        if (t_root == nullptr)
-        {
+        if (t_root == nullptr) {
             return;
         }
 
@@ -82,7 +95,7 @@ namespace mpp {
         return m_freedChunks;
     }
 
-    std::size_t ChunkTreap::GetAmountOfFreedMemory()
+    std::size_t ChunkTreap::TotalFreeMemory()
     {
         return m_freedMemory;
     }
@@ -224,13 +237,12 @@ namespace mpp {
         MergeNodes(leftSubtree, rightSubtree, m_root);
     }
 
-    void ChunkTreap::RemoveChunk(Chunk* t_chunk)
+    bool ChunkTreap::RemoveChunk(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
 
-        if (m_root == nullptr)
-        {
-            return;
+        if (m_root == nullptr) {
+            return false;
         }
 
         m_freedChunks--;
@@ -258,9 +270,11 @@ namespace mpp {
         nodeToRemove = nullptr;
 
         MergeNodes(leftSubtree, rightSubtree, m_root);
+
+        return true;
     }
 
-    Chunk* ChunkTreap::FirstGreaterOrEqualThan(std::size_t t_desiredChunkSize) const
+    Chunk* ChunkTreap::FirstGreaterOrEqualTo(std::size_t t_desiredChunkSize) const
     {
         PROFILE_FUNCTION();
 

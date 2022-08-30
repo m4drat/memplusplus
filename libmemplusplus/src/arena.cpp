@@ -34,14 +34,14 @@ namespace mpp {
 
     std::size_t Arena::FreeMemoryInsideChunkTreap()
     {
-        return freedChunks.GetAmountOfFreedMemory();
+        return freedChunks.TotalFreeMemory();
     }
 
     Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize) const
     {
         PROFILE_FUNCTION();
         // Find suitable chunk in treap of freed chunks
-        return freedChunks.FirstGreaterOrEqualThan(t_desiredChunkSize);
+        return freedChunks.FirstGreaterOrEqualTo(t_desiredChunkSize);
     }
 
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)

@@ -64,6 +64,15 @@ void logic()
     n4->prev = n3;
     n4->next = nullptr;
 
+    SharedGcPtr<int8_t> a = MakeShared<int8_t>(1);
+    SharedGcPtr<int8_t> b = MakeShared<int8_t>(1);
+    SharedGcPtr<SharedGcPtr<int8_t>> c = MakeShared<SharedGcPtr<int8_t>>(MakeShared<int8_t>(1));
+    SharedGcPtr<int8_t> d = MakeShared<int8_t>(1);
+    SharedGcPtr<int8_t> e = MakeShared<int8_t>(1);
+
+    b = nullptr;
+    d = nullptr;
+
     // Tree node
     struct TreeNode
     {
