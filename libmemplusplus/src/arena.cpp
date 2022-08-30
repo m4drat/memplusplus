@@ -125,89 +125,52 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        // Delete chunk, that we are currently working with from
-        // free list
+        // Chunk to return
+        Chunk* chunk = nullptr;
+        // Size of chunk extracted from free list
+        std::size_t toSplitChunkSize = t_chunk->GetSize();
+
+        // Delete current chunk from free list
         freedChunks.RemoveChunk(t_chunk);
 
-        // First case, chunk to split is the first chunk inside arena
-        // memory layout: [t_chunk][....]
-        if (static_cast<void*>(t_chunk) == begin) {
-            // First chunk size is equal to requested size
-            if (t_chunk->GetSize() == t_chunkSize) {
+        // Free-list chunk size is equal to requested size (we don't need to split)
+        if (t_chunk->GetSize() == t_chunkSize) {
+            // Chunk to split is the first chunk inside arena. Memory layout: [t_chunk][....]
+            if (static_cast<void*>(t_chunk) == begin) {
                 // Set prevInUse to 1, because we don't want to merge it to the
                 // left (cause we dont have anything on the left)
-                Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
-                Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
-                Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
-                return chunk;
-                // First chunks size doesn't equal to requested size
+                chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
             } else {
-                // First chunk (is going to be splitted)
-                std::size_t toSplitChunkSize = t_chunk->GetSize();
-
-                // Splitting first chunk, this is going to be returned
-                // to the user
-                Chunk* chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
-
-                // Update the fields of the remaining chunk
-                Chunk* splittedChunk =
-                    Chunk::ConstructChunk(reinterpret_cast<std::byte*>(chunk) + t_chunkSize,
-                                          t_chunkSize,
-                                          toSplitChunkSize - t_chunkSize,
-                                          0,
-                                          1);
-
-                // Update previous size for the next chunk after splitted
-                // current memory layout: [user-returned][splitted part][next chunk after
-                // splitted]
-                Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
-
-                // Keep track of splitted part, by placing it into
-                // free list
-                freedChunks.InsertChunk(splittedChunk);
-                return chunk;
+                chunk = Chunk::ConstructChunk(
+                    t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
             }
-            // Second case: we are anywhere in arena, excluding first chunk
-            // memory layout: [...][t_chunk][....]
+            Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
+            Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
         } else {
-            // t_chunk size is equal to requesteed size, so we don't need
-            // to split it in smaller parts
-            if (t_chunk->GetSize() == t_chunkSize) {
-                // Construct new chunk
-                Chunk* chunk = Chunk::ConstructChunk(
-                    t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
-
-                // Update inuse bit
-                Chunk::GetNextChunk(chunk)->SetIsPrevInUse(1);
-
-                // Update previous size
-                Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
-                return chunk;
+            // Free-list chunk size is NOT equal to requested size (we have need to split it)
+            if (static_cast<void*>(t_chunk) == begin) {
+                // Chunk to split is the first chunk inside arena. Memory layout: [t_chunk][....]
+                // Split chunk from the beginning of the arena
+                chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
             } else {
-                // Chunk size, that is going to be splitted
-                std::size_t toSplitChunkSize = t_chunk->GetSize();
-
-                // Construct chunk, that is going to be returned
-                Chunk* chunk = Chunk::ConstructChunk(
+                chunk = Chunk::ConstructChunk(
                     t_chunk, Chunk::GetPrevChunk(t_chunk)->GetSize(), t_chunkSize, 1, 1);
-
-                // Construct splitted chunk
-                Chunk* splittedChunk =
-                    Chunk::ConstructChunk(reinterpret_cast<std::byte*>(chunk) + t_chunkSize,
-                                          t_chunkSize,
-                                          toSplitChunkSize - t_chunkSize,
-                                          0,
-                                          1);
-
-                // Update previous size field for next chunk, after
-                // splitted chunk
-                Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
-
-                // Insert splitted part into free list
-                freedChunks.InsertChunk(splittedChunk);
-                return chunk;
             }
+            // Update fields of the remaining chunk
+            Chunk* splittedChunk =
+                Chunk::ConstructChunk(reinterpret_cast<std::byte*>(chunk) + t_chunkSize,
+                                      t_chunkSize,
+                                      toSplitChunkSize - t_chunkSize,
+                                      0,
+                                      1);
+            // Update previous size for the next chunk after the splitted one.
+            // Memory layout: [user-returned][splitted part][next chunk after splitted]
+            Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
+
+            // Keep track of remaining chunk by placing it into free list
+            freedChunks.InsertChunk(splittedChunk);
         }
+        return chunk;
     }
 
     void Arena::DeallocateChunk(Chunk* t_chunk)
