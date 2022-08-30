@@ -175,7 +175,7 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 0);
     ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 0);
 
-    // Generate graphviz layout just to check that nothing Segfaults
+    // Generate graphviz layout just to check that at least it doesn't segfault 🤷
     std::stringstream ss;
     objectsGraph->GenerateGraphvizLayoutSimple(ss);
     objectsGraph->GenerateGraphvizLayoutAdvanced(ss);
@@ -183,9 +183,9 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
 
 TEST(GcGraphTest, DISABLED_GenerateGraphvizLayout)
 {
-    // This test is disabled because it requires you to temporarily disable aslr.
+    // This test is disabled because it is unreliable and requires you to temporarily disable aslr.
     // If you still want to execute it do as follows:
-    // setarch `uname -m` -R ./build/tests/unit_tests
+    // setarch `uname -m` -R ./build/tests/unit_tests --gtest_also_run_disabled_tests
     using namespace mpp;
 
     struct Node

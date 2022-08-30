@@ -79,6 +79,10 @@ TEST(ChunkTreapTest, CheckAllConstructorsAndAssignOperators)
     ASSERT_TRUE(cTreap.MaxSizeChunk()->GetSize() == 288);
     ASSERT_EQ(cTreap.TotalFreeChunks(), 9);
 
+    // Generate graphviz layout just to check that at least it doesn't segfault 🤷
+    std::stringstream ss;
+    cTreap.GenerateGraphvizLayout(ss);
+
     ASSERT_TRUE(cTreap.RemoveChunk(ch1));
     ASSERT_TRUE(cTreap.RemoveChunk(ch6));
     ASSERT_TRUE(cTreap.RemoveChunk(ch9));
