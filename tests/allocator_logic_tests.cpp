@@ -393,6 +393,13 @@ TEST(AllocatorLogicTest, FreeListAllocationWithSplit)
     ASSERT_EQ(Chunk::GetHeaderPtr(p6), chunkToReturn);
     ASSERT_EQ(MM::GetArenaList().size(), 1);
     ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+
+    // Trigger code at arena.cpp:142
+    MM::Deallocate(p1);
+
+    chunkToReturn = (*MM::GetArenaList().begin())->freedChunks.FirstGreaterOrEqualTo(520);
+    void* p7 = MemoryManager::Allocate(520);
+    ASSERT_EQ(Chunk::GetHeaderPtr(p7), chunkToReturn);
 }
 
 /* For ctrl+c, ctrl-V
