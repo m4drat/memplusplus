@@ -4,5 +4,12 @@ valgrind --leak-check=full \
          --show-leak-kinds=all \
          --track-origins=yes \
          --verbose \
-         --log-file=valgrind-out.txt \
+         --log-file=valgrind-out-example.txt \
          ./build/example_project/example_project-d
+
+valgrind --leak-check=full \
+         --show-leak-kinds=all \
+         --track-origins=yes \
+         --verbose \
+         --log-file=valgrind-out-tests.txt \
+         ./build/tests/unit_tests

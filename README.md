@@ -283,8 +283,11 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     GC::GetInstance().Collect();
     ```
 
-    You will get this objects graph.
-    ![objects](./additional_info/images/objects.svg)
+    Executing this code with `MPP_DUMP_OBJECTS_GRAPH=1` will generate this graph:
+    ![objects-simple](./additional_info/images/objects_simple.svg)
+
+    Executing this code with `MPP_DUMP_OBJECTS_GRAPH=2` will generate this graph:
+    ![objects-simple](./additional_info/images/objects_advanced.svg)
 
 - Profiler
 

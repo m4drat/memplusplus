@@ -195,7 +195,8 @@ namespace mpp {
         t_out << "digraph Objects {\n";
         t_out << "\tcompound=true;\n";
         t_out << "\tratio=expand;\n";
-        t_out << "\tgraph [ranksep=1.5]\n\n";
+        t_out << "\tgraph [ranksep=1.5]\n";
+        t_out << "\tnewrank=true;\n\n";
 
         // Generate flat heap view
         t_out << "\t// Draw flat heap layout\n";
@@ -264,6 +265,7 @@ namespace mpp {
                 } else {
                     // Current chunk does have GC-pointers inside
                     t_out << "\tsubgraph \"cluster-" << chunkAddrStr << "\" {\n";
+                    t_out << "\t\trank=same;\n";
                     t_out << "\t\t" << chunkLabel << ";\n";
                     t_out << "\t\tstyle=\"rounded,filled\";\n";
                     t_out << "\t\tfillcolor=\"" << chunkColor << "\";\n";
@@ -487,7 +489,6 @@ namespace mpp {
 
     void GcGraph::DDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
     {
-        PROFILE_FUNCTION();
         std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
                                        t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
@@ -513,7 +514,6 @@ namespace mpp {
 
     void GcGraph::UDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
     {
-        PROFILE_FUNCTION();
         std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
                                        t_vertex->GetNeighbors().end());
         neighbors.insert(neighbors.end(),
