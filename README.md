@@ -171,6 +171,33 @@ target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -Wl,--export-dynamic)
 
 Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.
 
+- Address Sanitizer support (ASAN):
+    Enable `MPP_SANITIZERS` before building library. Then compile your project with `-fsanitize=address` flag. As a result wou will get asan-compatible build which will help you to debug memory management issues.
+
+    Example buggy code:
+
+    ```c++
+    void* p1 = MM::Allocate(128);
+    MM::Deallocate(p1);
+    *(uint32_t*)p1 = 0x13371337; // Use-after-free write
+    ```
+
+    Example asan report for this code:
+
+    ```c++
+    =================================================================
+    ==26738==ERROR: AddressSanitizer: use-after-poison on address 0x19b297400010 at pc 0x557f3c1aaea3 bp 0x7ffcb838c440 sp 0x7ffcb838c438
+    WRITE of size 4 at 0x19b297400010 thread T0
+        #0 0x557f3c1aaea2 in main /home/madrat/memplusplus/build/../example_project/src/main.cpp:137:20
+        #1 0x7f16c401a0b2 in __libc_start_main /build/glibc-eX1tMB/glibc-2.31/csu/../csu/libc-start.c:308:16
+        #2 0x557f3c0e7d2d in _start (/home/madrat/memplusplus/build/example_project/example_project-d+0x45d2d) (BuildId: cca1c1f77a22aeae021502831561465b63cc9f19)
+
+    Address 0x19b297400010 is a wild pointer inside of access range of size 0x000000000004.
+    SUMMARY: AddressSanitizer: use-after-poison /home/madrat/memplusplus/build/../example_project/src/main.cpp:137:20 in main
+    
+    ......
+    ```
+
 - Data visualizers:
   
     In Debug builds, you can dump .dot representation of the ChunkTreap and GcGraph (only using specific environment variable). Later you can "render" this .dot files using dot from graphviz.  
