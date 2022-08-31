@@ -1,5 +1,6 @@
 #include "mpplib/arena.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/utils/macros.hpp"
 
 #include <functional>
 
@@ -37,7 +38,7 @@ namespace mpp {
         return freedChunks.TotalFreeMemory();
     }
 
-    Chunk* Arena::GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize) const
+    Chunk* Arena::GetFirstGreaterOrEqualToChunk(std::size_t t_desiredChunkSize) const
     {
         PROFILE_FUNCTION();
         // Find suitable chunk in treap of freed chunks
@@ -98,6 +99,7 @@ namespace mpp {
                                          newTopChunkSize,
                                          1,
                                          1);
+        MPP_POISON_USER_DATA_INSIDE_CHUNK(topChunk);
 
         return chunk;
     }
@@ -169,6 +171,7 @@ namespace mpp {
 
             // Keep track of remaining chunk by placing it into free list
             freedChunks.InsertChunk(splittedChunk);
+            MPP_POISON_USER_DATA_INSIDE_CHUNK(splittedChunk);
         }
         return chunk;
     }

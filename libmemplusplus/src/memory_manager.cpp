@@ -107,7 +107,7 @@ namespace mpp {
             if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
                 chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
             } else { // Check if current arena has enough free space
-                chunkToReturn = arena->GetFirstGreaterOrEqualThanChunk(t_realSize);
+                chunkToReturn = arena->GetFirstGreaterOrEqualToChunk(t_realSize);
 
                 // If we are here, current arena doesn't have any free space,
                 // proceed to the next one
@@ -215,7 +215,7 @@ namespace mpp {
                 // In this case, we still can free invalid pointer, so
                 // add additional checks inside DeallocateChunk
                 arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
-                MPP_POISON_CHUNK(Chunk::GetHeaderPtr(t_chunkPtr));
+                MPP_POISON_USER_DATA_INSIDE_CHUNK(Chunk::GetHeaderPtr(t_chunkPtr));
                 return true;
             }
         }

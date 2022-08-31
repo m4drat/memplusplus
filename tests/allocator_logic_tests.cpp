@@ -80,8 +80,8 @@ TEST(AllocatorLogicTest, FDT_merge_into_top)
     }
 
     MemoryManager::Deallocate(ch1);
-    ASSERT_TRUE(Chunk::GetUserDataPtr(
-                    currentArena->GetFirstGreaterOrEqualThanChunk(allocationSize)) == ch1);
+    ASSERT_TRUE(
+        Chunk::GetUserDataPtr(currentArena->GetFirstGreaterOrEqualToChunk(allocationSize)) == ch1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 0);
 
     std::size_t beforeMergeTopSize = currentArena->topChunk->GetSize();

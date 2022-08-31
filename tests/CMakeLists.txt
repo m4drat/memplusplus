@@ -14,4 +14,10 @@ add_executable(unit_tests
 
 target_link_libraries(${PROJECT_NAME} PUBLIC lib::mpp gtest)
 
+if(MPP_SANITIZERS MATCHES "ON")
+    target_compile_options(${PROJECT_NAME} PRIVATE -g -O2 -fsanitize=address)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -g -O2)
+endif()
+
 add_test(unit_tester ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME})

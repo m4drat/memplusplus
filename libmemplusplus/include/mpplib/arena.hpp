@@ -116,7 +116,7 @@ namespace mpp {
          * Complexity (average): O(logN).
          * @return Chunk of max size.
          */
-        Chunk* GetFirstGreaterOrEqualThanChunk(std::size_t t_desiredChunkSize) const;
+        Chunk* GetFirstGreaterOrEqualToChunk(std::size_t t_desiredChunkSize) const;
 
         /**
          * @brief Constructs chunk from freed chunk, earlier found in chunk treap

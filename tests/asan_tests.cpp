@@ -7,7 +7,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 
-TEST(AsanIntegrationTests, DISABLED_UseAfterFreeRead)
+TEST(AsanIntegrationTests, UseAfterFreeRead)
 {
     using namespace mpp;
 
@@ -18,11 +18,11 @@ TEST(AsanIntegrationTests, DISABLED_UseAfterFreeRead)
     MM::Deallocate(p1);
 
     EXPECT_EXIT({ volatile bool res = *(uint64_t*)p1 == 0x1337133791237482; },
-                testing::KilledBySignal(SIGABRT),
-                "UseAfterFreeRead detected!");
+                testing::ExitedWithCode(SIGHUP),
+                "READ of size 8");
 }
 
-TEST(AsanIntegrationTests, DISABLED_UseAfterFreeWrite)
+TEST(AsanIntegrationTests, UseAfterFreeWrite)
 {
     using namespace mpp;
 
@@ -32,7 +32,5 @@ TEST(AsanIntegrationTests, DISABLED_UseAfterFreeWrite)
 
     MM::Deallocate(p1);
 
-    EXPECT_EXIT({ *p1 = 0x1234567812345678; },
-                testing::KilledBySignal(SIGABRT),
-                "UseAfterFreeWrite detected!");
+    EXPECT_EXIT({ *p1 = 0x1234567812345678; }, testing::ExitedWithCode(SIGHUP), "WRITE of size 8");
 }

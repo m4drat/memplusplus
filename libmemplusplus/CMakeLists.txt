@@ -216,6 +216,11 @@ if(MPP_SANITIZERS MATCHES "ON")
 	list(APPEND MPP_DEFINES MPP_SANITIZERS=1)
 endif()
 
+if(MPP_BUILD_FUZZER MATCHES "ON")
+	target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address,fuzzer-no-link)
+	target_link_options(${PROJECT_NAME} PRIVATE -fsanitize=address,fuzzer-no-link)
+endif()
+
 target_compile_definitions(${PROJECT_NAME}
 	PUBLIC ${MPP_DEFINES}
 )

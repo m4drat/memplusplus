@@ -61,7 +61,7 @@ namespace mpp {
         {
             Chunk* newChunk = static_cast<Chunk*>(t_newChunkPtr);
 
-            MPP_UNPOISON_MEM(newChunk, t_chunkSize - sizeof(Chunk::ChunkHeader));
+            MPP_UNPOISON_MEM(newChunk, t_chunkSize);
 
             newChunk->SetPrevSize(t_prevSize);
             newChunk->SetSize(t_chunkSize);

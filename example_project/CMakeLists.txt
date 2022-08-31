@@ -7,12 +7,17 @@ target_include_directories(${PROJECT_NAME}
 )
 
 set_target_properties(${PROJECT_NAME}
-    PROPERTIES
+	PROPERTIES
 	DEBUG_POSTFIX "-${STATIC_POSTFIX}d"
 	RELEASE_POSTFIX "-${STATIC_POSTFIX}r"
 	MINSIZEREL_POSTFIX "-${STATIC_POSTFIX}mr"
-    RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
+	RELWITHDEBINFO_POSTFIX "-${STATIC_POSTFIX}rd"
 )
 
-target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+if(MPP_SANITIZERS MATCHES "ON")
+	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0 -fsanitize=address)
+else()
+	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+endif()
+
 target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -Wl,--export-dynamic)
