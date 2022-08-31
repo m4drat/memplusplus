@@ -191,11 +191,7 @@ namespace mpp {
         // Update currently used space variable
         m_currentlyAllocatedSpace -= t_chunk->GetSize();
 
-        // Null out memory that belongs to current chunk in secure build
-        // #if MPP_SECURE == 1
-        //         std::memset(Chunk::GetUserDataPtr(t_chunk), MemoryManager::g_FILL_CHAR,
-        //         t_chunk->GetSize() - sizeof(Chunk::ChunkHeader));
-        // #endif
+        MPP_SECURE_WIPE_CHUNK(t_chunk);
 
         // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
@@ -433,7 +429,7 @@ namespace mpp {
             Iterate(out, node->leftChild);
         };
         if (t_dumpFreedChunks == true) {
-            Iterate(std::cout, t_arena->freedChunks.GetRootNode());
+            Iterate(t_out, t_arena->freedChunks.GetRootNode());
         }
 
         t_out << "MPP - Chunks in use (" << t_arena->chunksInUse.size() << ")" << std::endl;

@@ -26,6 +26,7 @@ TEST(SharedGcPtrTests, NullptrConstructor)
 TEST(SharedGcPtrTests, ExplicitConstructor)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr((char*)MemoryManager::Allocate(40));
 
@@ -36,6 +37,7 @@ TEST(SharedGcPtrTests, ExplicitConstructor)
 TEST(SharedGcPtrTests, AssignToRValueRef)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     char* data1 = (char*)MemoryManager::Allocate(40);
     SharedGcPtr<char> ptr = SharedGcPtr<char>(data1);
@@ -48,6 +50,7 @@ TEST(SharedGcPtrTests, AssignToRValueRef)
 TEST(SharedGcPtrTests, AssignToConstReference)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     char* data1 = (char*)MemoryManager::Allocate(40);
     char* data2 = (char*)MemoryManager::Allocate(40);
@@ -73,6 +76,7 @@ TEST(SharedGcPtrTests, AssignToConstReference)
 TEST(SharedGcPtrTests, AssignToTypePtr)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     char* data1 = (char*)MemoryManager::Allocate(40);
     SharedGcPtr<char> ptr1 = nullptr;
@@ -90,6 +94,7 @@ TEST(SharedGcPtrTests, AssignToTypePtr)
 TEST(SharedGcPtrTests, AssignToNullptr)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1 = nullptr;
 
@@ -101,6 +106,7 @@ TEST(SharedGcPtrTests, AssignToNullptr)
 TEST(SharedGcPtrTests, FunctionCallWithSharedPtr)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     char* data1 = (char*)MemoryManager::Allocate(40);
     SharedGcPtr<char> ptr1(data1);
@@ -120,6 +126,7 @@ TEST(SharedGcPtrTests, FunctionCallWithSharedPtr)
 TEST(SharedGcPtrTests, MultiplePointersToTheSameObject)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1(nullptr);
     SharedGcPtr<char> ptr2(ptr1);
@@ -133,6 +140,7 @@ TEST(SharedGcPtrTests, MultiplePointersToTheSameObject)
 TEST(SharedGcPtrTests, CreateNewPtrAssignment)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1(nullptr);
     SharedGcPtr<char> ptr2(ptr1);
@@ -151,6 +159,7 @@ TEST(SharedGcPtrTests, CreateNewPtrAssignment)
 TEST(SharedGcArrayTests, MakeSharedNCallsCtorsDtors)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     int32_t ctorCallsN = 0;
     int32_t dtorCallsN = 0;
@@ -195,6 +204,7 @@ TEST(SharedGcArrayTests, MakeSharedNCallsCtorsDtors)
 TEST(SharedGcArrayTests, MakeSharedCallsCtorDtor)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     int32_t ctorCallsN = 0;
     int32_t dtorCallsN = 0;
@@ -229,6 +239,7 @@ TEST(SharedGcArrayTests, MakeSharedCallsCtorDtor)
 TEST(SharedGcArrayTests, GetArraySize)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<int32_t[]> dataPtr1 = MakeSharedN<int32_t>(7);
     ASSERT_TRUE(dataPtr1.GetArraySize() == 7);
@@ -248,6 +259,7 @@ TEST(SharedGcArrayTests, GetArraySize)
 TEST(SharedGcArrayTests, AccessElemetsByIndex)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<int32_t[]> dataPtr1 = MakeSharedN<int32_t>(3, 1337);
     ASSERT_TRUE(dataPtr1.GetArraySize() == 3);
@@ -260,6 +272,7 @@ TEST(SharedGcArrayTests, AccessElemetsByIndex)
 TEST(SharedGcArrayTests, SharedPtrPointingToAnArrayOfSharedPtrs)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<SharedGcPtr<int32_t>[]> dataPtr1 = MakeSharedN<SharedGcPtr<int32_t>>(3);
     ASSERT_TRUE(dataPtr1.GetArraySize() == 3);
@@ -276,6 +289,7 @@ TEST(SharedGcArrayTests, SharedPtrPointingToAnArrayOfSharedPtrs)
 TEST(SharedGcPtrTests, IntegrationTest_1)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1((char*)MemoryManager::Allocate(64));
     SharedGcPtr<char> ptr2((char*)MemoryManager::Allocate(64));
@@ -316,6 +330,7 @@ TEST(SharedGcPtrTests, IntegrationTest_1)
 TEST(SharedGcPtrTests, IntegrationTest_2)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1((char*)MemoryManager::Allocate(64));
     SharedGcPtr<char> ptr2 = ptr1;
@@ -349,6 +364,7 @@ TEST(SharedGcPtrTests, IntegrationTest_2)
 TEST(SharedGcPtrTests, IntegrationTest_3)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1 = nullptr;
     ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 0);
@@ -373,6 +389,7 @@ TEST(SharedGcPtrTests, IntegrationTest_3)
 TEST(SharedGcPtrTests, IntegrationTest_4)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     SharedGcPtr<char> ptr1 = nullptr;
     ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 0);

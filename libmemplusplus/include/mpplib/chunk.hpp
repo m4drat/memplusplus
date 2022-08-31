@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mpplib/utils/macros.hpp"
 #include <cstdint>
 #include <iostream>
 
@@ -59,6 +60,9 @@ namespace mpp {
                                      uint8_t t_isPrevInUse)
         {
             Chunk* newChunk = static_cast<Chunk*>(t_newChunkPtr);
+
+            MPP_UNPOISON_MEM(newChunk, t_chunkSize - sizeof(Chunk::ChunkHeader));
+
             newChunk->SetPrevSize(t_prevSize);
             newChunk->SetSize(t_chunkSize);
             newChunk->SetIsUsed(t_isInUse);

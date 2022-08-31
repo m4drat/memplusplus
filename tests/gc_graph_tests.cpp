@@ -74,6 +74,7 @@ TEST(GcGraphTest, FindVertex)
 TEST(GcGraphTest, GetAllOutgoingGcPtrs)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     // <Second GcPtr
     //         <First GcPtr.........>>
@@ -103,6 +104,7 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs)
 TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
 {
     using namespace mpp;
+    MM::ResetAllocatorState();
 
     struct Node
     {

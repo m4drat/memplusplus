@@ -33,7 +33,7 @@ jobs:
           -DMPP_BUILD_TESTS=ON \
           -DMPP_BUILD_DOCS=OFF \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
-          -DMPP_SANITIZERS=OFF \
+          -DMPP_SANITIZERS=ON \
           -DMPP_BUILD_SHARED_LIBS=OFF \
           -DMPP_FULL_DEBUG=ON \
           -DMPP_SECURE=OFF \

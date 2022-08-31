@@ -85,9 +85,9 @@ namespace mpp {
          *
          * It creates new arena and allocate chunk in it.
          * @param t_userDataSize is the size of user data, that will be allocated.
-         * @return void* pointer to newly allocated chunk.
+         * @return Chunk* pointer to newly allocated chunk.
          */
-        static void* AllocateBigChunk(std::size_t t_userDataSize);
+        static Chunk* AllocateBigChunk(std::size_t t_userDataSize);
 
         /**
          * @brief Finds suitable chunk of requested size from somwhere (top/freelist).

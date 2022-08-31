@@ -1,6 +1,6 @@
 #include "mpplib/containers/vertex.hpp"
 #include "mpplib/gc.hpp"
-#include "mpplib/utils/assert.hpp"
+#include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/utils.hpp"
 
 namespace mpp {

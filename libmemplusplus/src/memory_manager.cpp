@@ -1,5 +1,6 @@
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/exception.hpp"
+#include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/random.hpp"
 #include "mpplib/utils/utils.hpp"
 
@@ -132,7 +133,7 @@ namespace mpp {
         return nullptr;
     }
 
-    void* MemoryManager::AllocateBigChunk(std::size_t t_userDataSize)
+    Chunk* MemoryManager::AllocateBigChunk(std::size_t t_userDataSize)
     {
         PROFILE_FUNCTION();
 
@@ -144,7 +145,7 @@ namespace mpp {
 
         // Allocate chunk from right space of that arena
         Chunk* bigChungus = arena->AllocateFromTopChunk(t_userDataSize);
-        return Chunk::GetUserDataPtr(bigChungus);
+        return bigChungus;
     }
 
     void* MemoryManager::Allocate(std::size_t t_userDataSize)
@@ -164,15 +165,9 @@ namespace mpp {
         // we will allocate new arena with chunk, which size is
         // equal to requested size, aligned to g_PAGE_SIZE
         if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
-#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-            void* bigChunk = AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
-            std::memset(bigChunk,
-                        g_FILL_CHAR,
-                        Align(realChunkSize, g_PAGE_SIZE) - sizeof(Chunk::ChunkHeader));
-            return bigChunk;
-#else
-            return AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
-#endif
+            Chunk* bigChunk = AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
+            MPP_SECURE_WIPE_CHUNK(bigChunk);
+            return Chunk::GetUserDataPtr(bigChunk);
         }
 
         // If we dont have active arenas yet
@@ -185,26 +180,16 @@ namespace mpp {
         // or by splitting top chunk)
         Chunk* chunk = GetSuitableChunk(realChunkSize);
         if (chunk != nullptr) {
-#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-            std::memset(Chunk::GetUserDataPtr(chunk),
-                        g_FILL_CHAR,
-                        realChunkSize - sizeof(Chunk::ChunkHeader));
+            MPP_SECURE_WIPE_CHUNK(chunk);
             return Chunk::GetUserDataPtr(chunk);
-#else
-            return Chunk::GetUserDataPtr(chunk);
-#endif
         }
 
         // finally, if there is no available space for chunk
         // create new arena and allocate from it
         Arena* arena = CreateArena(g_DEFAULT_ARENA_SIZE);
-#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-        void* userChunk = Chunk::GetUserDataPtr(arena->AllocateFromTopChunk(realChunkSize));
-        std::memset(userChunk, g_FILL_CHAR, realChunkSize - sizeof(Chunk::ChunkHeader));
-        return userChunk;
-#else
-        return Chunk::GetUserDataPtr(arena->AllocateFromTopChunk(realChunkSize));
-#endif
+        Chunk* userChunk = arena->AllocateFromTopChunk(realChunkSize);
+        MPP_SECURE_WIPE_CHUNK(userChunk);
+        return Chunk::GetUserDataPtr(userChunk);
     }
 
     bool MemoryManager::Deallocate(void* t_chunkPtr)
@@ -230,8 +215,8 @@ namespace mpp {
                 // In this case, we still can free invalid pointer, so
                 // add additional checks inside DeallocateChunk
                 arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
+                MPP_POISON_CHUNK(Chunk::GetHeaderPtr(t_chunkPtr));
                 return true;
-                break;
             }
         }
 

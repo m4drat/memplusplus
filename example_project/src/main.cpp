@@ -7,7 +7,6 @@
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
-#include "mpplib/utils/assert.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 using namespace mpp;
