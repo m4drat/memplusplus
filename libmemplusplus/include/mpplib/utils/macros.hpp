@@ -46,14 +46,14 @@ namespace mpp {
 #if defined MPP_SANITIZERS
 #define MPP_UNPOISON_MEM(ptr, size) ASAN_UNPOISON_MEMORY_REGION(ptr, size);
 #define MPP_POISON_MEM(ptr, size) ASAN_POISON_MEMORY_REGION(ptr, size);
-#define MPP_UNPOISON_CHUNK(chunk)                                                                  \
+#define MPP_UNPOISON_USER_DATA_INSIDE_CHUNK(chunk)                                                 \
     MPP_UNPOISON_MEM(Chunk::GetUserDataPtr(chunk), chunk->GetSize() - sizeof(Chunk::ChunkHeader));
 #define MPP_POISON_USER_DATA_INSIDE_CHUNK(chunk)                                                   \
     MPP_POISON_MEM(Chunk::GetUserDataPtr(chunk), chunk->GetSize() - sizeof(Chunk::ChunkHeader));
 #else
 #define MPP_UNPOISON_MEM(ptr, size)
 #define MPP_POISON_MEM(ptr, size)
-#define MPP_UNPOISON_CHUNK(chunk)
-#define MPP_POISON_CHUNK(chunk)
+#define MPP_UNPOISON_USER_DATA_INSIDE_CHUNK(chunk)
+#define MPP_POISON_USER_DATA_INSIDE_CHUNK(chunk)
 #endif
 }

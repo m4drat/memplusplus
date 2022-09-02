@@ -2,6 +2,30 @@
 #include "mpplib/memory_manager.hpp"
 
 namespace mpp { namespace utils {
+    void Statistics::ArenaStats::UpdateBiggestAllocation(std::size_t t_size)
+    {
+        if (t_size > biggestAllocation) {
+            biggestAllocation = t_size;
+        }
+    }
+
+    void Statistics::ArenaStats::UpdateSmallestAllocation(std::size_t t_size)
+    {
+        if (t_size < smallestAllocation) {
+            smallestAllocation = t_size;
+        }
+    }
+
+    void Statistics::ArenaStats::IncreaseTotalFreed(std::size_t t_size)
+    {
+        totalFreed += t_size;
+    }
+
+    void Statistics::ArenaStats::IncreaseTotalAllocated(std::size_t t_size)
+    {
+        totalAllocated += t_size;
+    }
+
     Statistics::~Statistics()
     {
 #if MPP_STATS == 1

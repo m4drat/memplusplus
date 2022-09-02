@@ -104,7 +104,7 @@ namespace mpp {
             currSize = vertex->GetLocationAsChunk()->GetSize();
 
 #if MPP_STATS == 1
-            godArena->arenaStats->totalAllocated += currSize;
+            godArena->arenaStats->IncreaseTotalAllocated(currSize);
 #endif
 
             // Copy chunk data to new location

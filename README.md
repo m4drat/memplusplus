@@ -172,7 +172,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -Wl,--export-dynamic)
 Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.
 
 - Address Sanitizer support (ASAN):
-    Enable `MPP_SANITIZERS` before building library. Then compile your project with `-fsanitize=address` flag. As a result wou will get asan-compatible build which will help you to debug memory management issues.
+
+    Enable `MPP_SANITIZERS` before building the library. Then compile your project with `-fsanitize=address` flag. As a result wou will get asan-compatible build which will help you to debug any memory management issues.
 
     Example buggy code:
 

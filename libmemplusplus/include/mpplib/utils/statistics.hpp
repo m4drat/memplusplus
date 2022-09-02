@@ -58,6 +58,30 @@ namespace mpp { namespace utils {
              * @brief Arena was created by GC
              */
             bool gcCreatedArena;
+
+            /**
+             * @brief Update smallest allocation size
+             * @param t_size New potentially smallest allocation size
+             */
+            void UpdateSmallestAllocation(std::size_t t_size);
+
+            /**
+             * @brief Update biggest allocation size
+             * @param t_size New potentially biggest allocation size
+             */
+            void UpdateBiggestAllocation(std::size_t t_size);
+
+            /**
+             * @brief Update total freed memory
+             * @param t_size delta of freed memory
+             */
+            void IncreaseTotalFreed(std::size_t t_size);
+
+            /**
+             * @brief Update total allocated memory
+             * @param t_size delta of allocated memory
+             */
+            void IncreaseTotalAllocated(std::size_t t_size);
         };
 
         /**

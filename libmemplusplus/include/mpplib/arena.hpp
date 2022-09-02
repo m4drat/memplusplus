@@ -31,7 +31,7 @@ namespace mpp {
     public:
 #if MPP_STATS == 1
         /**
-         * @brief Unique ptr with arena metadata to use with Statistics.
+         * @brief Arena statistics.
          */
         std::shared_ptr<utils::Statistics::ArenaStats> arenaStats;
 #endif

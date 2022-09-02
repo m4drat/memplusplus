@@ -53,13 +53,9 @@ namespace mpp {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
 
 #if MPP_STATS == 1
-        arenaStats->totalAllocated += t_chunkSize;
-        if (chunk->GetSize() > arenaStats->biggestAllocation) {
-            arenaStats->biggestAllocation = chunk->GetSize();
-        }
-        if (chunk->GetSize() < arenaStats->smallestAllocation) {
-            arenaStats->smallestAllocation = chunk->GetSize();
-        }
+        arenaStats->IncreaseTotalAllocated(t_chunkSize);
+        arenaStats->UpdateBiggestAllocation(chunk->GetSize());
+        arenaStats->UpdateSmallestAllocation(chunk->GetSize());
 #endif
 
         // Keep track of in use chunks
@@ -114,7 +110,7 @@ namespace mpp {
         chunksInUse.insert(chunk);
 
 #if MPP_STATS == 1
-        arenaStats->totalAllocated += t_chunkSize;
+        arenaStats->IncreaseTotalAllocated(t_chunkSize);
 #endif
 
         // Update used space variable
@@ -204,7 +200,7 @@ namespace mpp {
         }
 
 #if MPP_STATS == 1
-        arenaStats->totalFreed += t_chunk->GetSize();
+        arenaStats->IncreaseTotalFreed(t_chunk->GetSize());
 #endif
         return;
     }

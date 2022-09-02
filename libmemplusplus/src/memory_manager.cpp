@@ -117,12 +117,8 @@ namespace mpp {
                 chunkToReturn = arena->AllocateFromFreeList(chunkToReturn, t_realSize);
             }
 #if MPP_STATS == 1
-            if (chunkToReturn->GetSize() > arena->arenaStats->biggestAllocation) {
-                arena->arenaStats->biggestAllocation = chunkToReturn->GetSize();
-            }
-            if (chunkToReturn->GetSize() < arena->arenaStats->smallestAllocation) {
-                arena->arenaStats->smallestAllocation = chunkToReturn->GetSize();
-            }
+            arena->arenaStats->UpdateBiggestAllocation(chunkToReturn->GetSize());
+            arena->arenaStats->UpdateSmallestAllocation(chunkToReturn->GetSize());
 #endif
 
             return chunkToReturn;
@@ -170,8 +166,7 @@ namespace mpp {
             return Chunk::GetUserDataPtr(bigChunk);
         }
 
-        // If we dont have active arenas yet
-        // we will create new one
+        // If we dont have any active arena yet. Create a new one.
         if (s_arenaList.empty()) {
             CreateArena(g_DEFAULT_ARENA_SIZE);
         }
@@ -201,15 +196,13 @@ namespace mpp {
             return g_mppDeallocateHook(t_chunkPtr);
         }
 
-        // If given pointer is nullptr just return false
-        // because we dont want to waste time, trying to search
-        // for arena
+        // If a given pointer is a nullptr - return false
+        // We dont want to waste time, searching for the arena
         if (t_chunkPtr == nullptr) {
             return false;
         }
 
-        // iterating through all the areas in an attempt
-        // to find the one that the chunk belongs to
+        // Find arena that chunk belongs to
         for (auto* arena : s_arenaList) {
             if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
                 // In this case, we still can free invalid pointer, so
