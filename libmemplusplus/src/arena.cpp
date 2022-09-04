@@ -326,8 +326,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        // Try to find InUse chunk by ptr in some location
-        // inside this chunk
+        // Find chunk by pointer
         auto foundChunkIt = utils::LowerBound(
             chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
                 return (t_ptr >= reinterpret_cast<void*>(t_ch));
@@ -335,7 +334,7 @@ namespace mpp {
         if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
             return *foundChunkIt;
         }
-        return *(--foundChunkIt);
+        return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
     }
 
     std::size_t Arena::GetUsedSpace()

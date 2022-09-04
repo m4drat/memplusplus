@@ -21,7 +21,7 @@ namespace mpp {
 
 #define MPP_RELEASE_ASSERT(expr, msg) PRIVATE__MPP_ASSERT((expr), (msg))
 
-#if defined MPP_FULL_DEBUG || defined MPP_SECURE
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
 #define MPP_SECURE_MEMSET(ptr, value, size)                                                        \
     do {                                                                                           \
         MPP_ASSERT(ptr != nullptr, "Null pointer");                                                \
@@ -32,7 +32,7 @@ namespace mpp {
 #define MPP_SECURE_MEMSET(ptr, value, size)
 #endif
 
-#if defined MPP_FULL_DEBUG || defined MPP_SECURE
+#if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
 #define MPP_SECURE_WIPE_CHUNK(chunk)                                                               \
     do {                                                                                           \
         MPP_SECURE_MEMSET(Chunk::GetUserDataPtr(chunk),                                            \
