@@ -85,3 +85,7 @@ jobs:
           cd build
           mkdir corpus && echo -ne "a1024a1024a128a0a10ddda1024a1024ddd" > ./corpus/testcase_1
           ASAN_OPTIONS=detect_leaks=0 ctest --build-config Debug
+
+      - name: trigger_benchmarking
+        run: |
+          curl -XPOST -u "${{secrets.PAT_USERNAME}}:${{secrets.PAT_TOKEN}}" -H "Accept: application/vnd.github.everest-preview+json" -H "Content-Type: application/json" https://api.github.com/repos/m4drat/memplusplus-benchmarks/dispatches --data '{"event_type": "build_application"}'

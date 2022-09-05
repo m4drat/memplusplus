@@ -123,7 +123,7 @@ namespace mpp {
          * using GetFirstGreaterOrEqualThanChunk.
          *
          * If size of found chunk is bigger, than requested, split it into
-         * two chunks. Add allocated chunk to chunksInUse.
+         * two chunks. Adds allocated chunk to chunksInUse.
          * Complexity (average): O(logN).
          * @sa SplitChunkFromFreeList.
          * @param t_chunk found in chunk treap earlier using
