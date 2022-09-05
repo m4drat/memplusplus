@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1662409523984,
+  "lastUpdate": 1662411367747,
   "repoUrl": "https://github.com/m4drat/memplusplus",
   "entries": {
     "Mem++ benchmarks": [
@@ -42,6 +42,48 @@ window.BENCHMARK_DATA = {
             "value": 800.9242915002363,
             "unit": "ns/iter",
             "extra": "iterations: 869360\ncpu: 804.9362749611913 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ftri2001@gmail.com",
+            "name": "Theodor",
+            "username": "m4drat"
+          },
+          "committer": {
+            "email": "ftri2001@gmail.com",
+            "name": "Theodor",
+            "username": "m4drat"
+          },
+          "distinct": true,
+          "id": "b1db518aa04f321a6e3d0f7654093bab3b51d6c9",
+          "message": "Updated unit-tests building",
+          "timestamp": "2022-09-05T23:54:37+03:00",
+          "tree_id": "7ccf230c41d84b4af50f2d6fb64ae5c231fa571d",
+          "url": "https://github.com/m4drat/memplusplus/commit/b1db518aa04f321a6e3d0f7654093bab3b51d6c9"
+        },
+        "date": 1662411367165,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_AllocateDeallocate",
+            "value": 56.92085268476107,
+            "unit": "ns/iter",
+            "extra": "iterations: 12300771\ncpu: 56.910652185948344 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AllocateSingle",
+            "value": 857.5343929763703,
+            "unit": "ns/iter",
+            "extra": "iterations: 814004\ncpu: 859.7987233478993 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_DeallocateSingle",
+            "value": 860.00121428902,
+            "unit": "ns/iter",
+            "extra": "iterations: 811172\ncpu: 862.7084021637086 ns\nthreads: 1"
           }
         ]
       }
