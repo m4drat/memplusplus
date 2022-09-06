@@ -1,5 +1,6 @@
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/exception.hpp"
+#include "mpplib/gc.hpp"
 #include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/random.hpp"
 #include "mpplib/utils/utils.hpp"
@@ -327,6 +328,8 @@ namespace mpp {
             *it = nullptr;
             it = s_arenaList.erase(it);
         }
+
+        GC::GetInstance().GetGcPtrs().clear();
 
         return true;
     }

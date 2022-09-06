@@ -211,7 +211,7 @@ endif()
 # ################ ENABLE SUPPORT OF SANITIZERS #################
 if(MPP_SANITIZERS MATCHES "ON")
 	message(WARNING "Sanitizers are enabled. This is not recommended for production builds!")
-	target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address -g -O2 -fno-omit-frame-pointer)
+	target_compile_options(${PROJECT_NAME} PRIVATE -fsanitize=address -g -O0 -fno-omit-frame-pointer)
 	target_link_libraries(${PROJECT_NAME} PRIVATE -fsanitize=address)
 	list(APPEND MPP_DEFINES MPP_SANITIZERS=1)
 endif()

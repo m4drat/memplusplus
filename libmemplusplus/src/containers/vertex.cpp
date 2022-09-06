@@ -64,7 +64,7 @@ namespace mpp {
         begin = t_gcPtrs.lower_bound((GcPtr*)m_correspondingLocation);
         if (m_currLocationIsAChunk) {
             end = t_gcPtrs.upper_bound(
-                (GcPtr*)(m_correspondingLocation + GetLocationAsChunk()->GetSize()));
+                (GcPtr*)(m_correspondingLocation + GetLocationAsAChunk()->GetSize()));
         } else {
             end = t_gcPtrs.upper_bound((GcPtr*)(m_correspondingLocation));
         }
@@ -82,7 +82,7 @@ namespace mpp {
         return m_correspondingLocation;
     }
 
-    Chunk* Vertex::GetLocationAsChunk() const
+    Chunk* Vertex::GetLocationAsAChunk() const
     {
         MPP_ASSERT(m_currLocationIsAChunk, "Current location is not a chunk!");
         return reinterpret_cast<Chunk*>(m_correspondingLocation);

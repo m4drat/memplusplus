@@ -2,6 +2,7 @@
 
 [![codecov](https://codecov.io/gh/m4drat/memplusplus/branch/master/graph/badge.svg)](https://codecov.io/gh/m4drat/memplusplus)
 ![build](https://github.com/m4drat/memplusplus/workflows/C/C++%20CI/badge.svg?branch=master)
+![benchmarking](https://github.com/m4drat/memplusplus/workflows/Benchmarking/badge.svg?branch=master)
 
 C++ memory allocator with smart features, such as garbage collection, and heap compacting.
 
@@ -469,7 +470,9 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
 ## Performance comparisons
 
-Benchmarks: [memplusplus-benchmarks](https://github.com/m4drat/memplusplus-benchmarks).
+1. Standalone benchmarks: [memplusplus-benchmarks](https://github.com/m4drat/memplusplus-benchmarks).
+
+2. Continuous benchmarking results: [continuous-benchmarking](https://m4drat.github.io/memplusplus/dev/bench/)
 
 ## Documentation
 

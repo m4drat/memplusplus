@@ -30,8 +30,8 @@ namespace mpp {
     class GC
     {
     private:
-        static constexpr float m_newAllocExtendThreshold = 0.2f;
-        static constexpr float m_newAllocExpandFactor = 1.2f;
+        static constexpr float m_newAllocExtendThreshold = 0.25f;
+        static constexpr float m_newAllocExpandFactor = 1.25f;
         /**
          * @brief All active GcPtr's.
          *

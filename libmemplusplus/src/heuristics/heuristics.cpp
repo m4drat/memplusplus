@@ -11,7 +11,7 @@ namespace mpp {
                 if (!v->IsChunk())
                     continue;
                 m_layoutedHeap.push_back(v);
-                m_neededSpace += v->GetLocationAsChunk()->GetSize();
+                m_neededSpace += v->GetLocationAsAChunk()->GetSize();
             }
         }
         // for (auto& gcGraph : m_subgraphs)

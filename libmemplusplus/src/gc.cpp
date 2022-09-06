@@ -1,4 +1,7 @@
 #include "mpplib/gc.hpp"
+#include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/macros.hpp"
+#include <cstddef>
 
 namespace mpp {
 #if MPP_DEBUG == 1
@@ -66,14 +69,14 @@ namespace mpp {
         std::unique_ptr<Heuristics> heuristics = std::make_unique<Heuristics>();
 
         // Layout heap in the most efficient way
-        auto layoutedData = heuristics->Layout(objectsGraph);
+        Heuristics::LayoutedHeap layoutedData = heuristics->Layout(objectsGraph);
 
         // Create a new rena with enough memory to fit all objects
         std::size_t godArenaSize = (layoutedData.layoutedSize < MM::g_DEFAULT_ARENA_SIZE)
                                        ? MM::g_DEFAULT_ARENA_SIZE
                                        : layoutedData.layoutedSize;
 
-        // If newly created arena is really small (we have less than 20% of free space)
+        // If newly created arena is really small (we have less than 25% of free space)
         // Enlarge it by specified expandFactor
         if (static_cast<float>(godArenaSize - layoutedData.layoutedSize) / godArenaSize <
             m_newAllocExtendThreshold) {
@@ -101,13 +104,48 @@ namespace mpp {
             }
 
             // Extract size of a chunk
-            currSize = vertex->GetLocationAsChunk()->GetSize();
+            currSize = vertex->GetLocationAsAChunk()->GetSize();
 
 #if MPP_STATS == 1
             godArena->arenaStats->IncreaseTotalAllocated(currSize);
 #endif
+            // Update GcPtr
+            for (auto* gcPtr : vertex->GetPointingToGcPtrs()) {
+                std::byte* updatedPtr =
+                    newChunkLocation +
+                    (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) - vertex->GetLoc());
 
-            // Copy chunk data to new location
+                // Either the GcPtr is going to be copied to another chunk later
+                gcPtr->UpdatePtr(updatedPtr);
+
+                // Or we already copied it to another chunk and we need to update it again
+                if (Arena* gcPtrsArena = MM::GetArenaByPtr(gcPtr)) {
+                    auto gcPtrOffset = reinterpret_cast<std::byte*>(gcPtr) - gcPtrsArena->begin;
+                    auto gcPtrNewLoc = godArena->begin + gcPtrOffset;
+                    // Update GcPtr's internal pointer
+                    // FIXME: this is awful way to do it, but it works for now (might break if
+                    // shared_gcptr's layout is changed / or another GcPtr inherited pointer with
+                    // different layout is added).
+                    auto gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
+                        gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
+
+                    MPP_ASSERT((std::byte*)(gcPtrInternalPointer + sizeof(std::size_t)) >
+                                   gcPtrsArena->end,
+                               "GcPtr's internal pointer is out of newly created arena's bounds");
+
+                    *gcPtrInternalPointer = reinterpret_cast<std::size_t>(updatedPtr);
+                }
+            }
+
+            // Update m_activeGcPtrs
+            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(m_activeGcPtrs)) {
+                m_activeGcPtrs.erase(gcPtr);
+                auto updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
+                    newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
+                m_activeGcPtrs.insert(m_activeGcPtrs.end(), updatedGcPtrLocation);
+            }
+
+            // Copy chunk data to the new location
             std::memcpy(newChunkLocation, vertex->GetLoc(), currSize);
 
             // Update required fields
@@ -116,14 +154,6 @@ namespace mpp {
             newChunk->SetIsUsed(1);
             newChunk->SetIsPrevInUse(1);
             godArena->chunksInUse.insert(newChunk);
-
-            // Update GcPtr
-            for (auto* gcPtr : vertex->GetPointingToGcPtrs()) {
-                std::byte* updatedPtr =
-                    newChunkLocation +
-                    (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) - vertex->GetLoc());
-                gcPtr->UpdatePtr(updatedPtr);
-            }
 
             prevSize = currSize;
             newChunkLocation = newChunkLocation + currSize;

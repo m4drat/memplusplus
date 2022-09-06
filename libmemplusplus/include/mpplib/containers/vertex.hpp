@@ -145,7 +145,7 @@ namespace mpp {
          * @sa GetCorrespondingLocation
          * @return Chunk* pointer that points to a chunk object
          */
-        Chunk* GetLocationAsChunk() const;
+        Chunk* GetLocationAsAChunk() const;
 
         /**
          * @brief Get string representation of the current vertex.
