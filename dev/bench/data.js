@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1662411367747,
+  "lastUpdate": 1662469824664,
   "repoUrl": "https://github.com/m4drat/memplusplus",
   "entries": {
     "Mem++ benchmarks": [
@@ -84,6 +84,48 @@ window.BENCHMARK_DATA = {
             "value": 860.00121428902,
             "unit": "ns/iter",
             "extra": "iterations: 811172\ncpu: 862.7084021637086 ns\nthreads: 1"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ftri2001@gmail.com",
+            "name": "Theodor",
+            "username": "m4drat"
+          },
+          "committer": {
+            "email": "ftri2001@gmail.com",
+            "name": "Theodor",
+            "username": "m4drat"
+          },
+          "distinct": true,
+          "id": "c6225ecd733ccad43becb12aa46b99f28f598a24",
+          "message": "Fixed GC::Collect bugs. Closes #64, #62",
+          "timestamp": "2022-09-06T16:09:05+03:00",
+          "tree_id": "80c394cc8c7fb6107c7ff131b9bdef28a2e69ac9",
+          "url": "https://github.com/m4drat/memplusplus/commit/c6225ecd733ccad43becb12aa46b99f28f598a24"
+        },
+        "date": 1662469824385,
+        "tool": "googlecpp",
+        "benches": [
+          {
+            "name": "BM_AllocateDeallocate",
+            "value": 45.55999897326083,
+            "unit": "ns/iter",
+            "extra": "iterations: 15388505\ncpu: 45.557661384260534 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_AllocateSingle",
+            "value": 715.1218903696416,
+            "unit": "ns/iter",
+            "extra": "iterations: 974933\ncpu: 718.108731574173 ns\nthreads: 1"
+          },
+          {
+            "name": "BM_DeallocateSingle",
+            "value": 718.5603752222368,
+            "unit": "ns/iter",
+            "extra": "iterations: 970730\ncpu: 720.8841799471691 ns\nthreads: 1"
           }
         ]
       }
