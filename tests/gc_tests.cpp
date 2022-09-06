@@ -30,18 +30,8 @@ TEST(GcTest, PointerToPointer)
     SharedGcPtr<SharedGcPtr<int32_t>> p =
         MakeShared<SharedGcPtr<int32_t>>(MakeShared<int32_t>(0x95782));
     EXPECT_TRUE(*p->Get() == 0x95782);
-    for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
-        std::cout << "    gcPtr* = " << gcPtr << std::endl;
-        std::cout << "gcPtr->ptr = " << gcPtr->GetVoid() << std::endl;
-    }
-
     GC::GetInstance().Collect();
 
-    std::cout << std::endl;
-    for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
-        std::cout << "    gcPtr* = " << gcPtr << std::endl;
-        std::cout << "gcPtr->ptr = " << gcPtr->GetVoid() << std::endl;
-    }
     EXPECT_TRUE(*p->Get() == 0x95782);
 }
 
@@ -65,18 +55,7 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
     void* rawPtrBeforeGc1 = a1.GetVoid();
     void* rawPtrBeforeGc2 = a1->ptr.GetVoid();
 
-    for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
-        std::cout << "    gcPtr* = " << gcPtr << std::endl;
-        std::cout << "gcPtr->ptr = " << gcPtr->GetVoid() << std::endl;
-    }
-
     GC::GetInstance().Collect();
-
-    std::cout << std::endl;
-    for (auto gcPtr : GC::GetInstance().GetGcPtrs()) {
-        std::cout << "    gcPtr* = " << gcPtr << std::endl;
-        std::cout << "gcPtr->ptr = " << gcPtr->GetVoid() << std::endl;
-    }
 
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1338);
     EXPECT_TRUE(*a1->ptr == 1337);
@@ -168,7 +147,7 @@ TEST(GcTest, DISABLED_CollectX5)
     using namespace mpp;
 }
 
-TEST(GcTest, DISABLED_GcPtrsUpdatedAfterCollect)
+TEST(GcTest, GcPtrsAreUpdatedAfterCollect)
 {
     using namespace mpp;
     MM::ResetAllocatorState();

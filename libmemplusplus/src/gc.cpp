@@ -129,8 +129,8 @@ namespace mpp {
                     auto gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
                         gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
 
-                    MPP_ASSERT((std::byte*)(gcPtrInternalPointer + sizeof(std::size_t)) >
-                                   gcPtrsArena->end,
+                    MPP_ASSERT((std::byte*)(gcPtrInternalPointer + sizeof(std::size_t)) <=
+                                   godArena->end,
                                "GcPtr's internal pointer is out of newly created arena's bounds");
 
                     *gcPtrInternalPointer = reinterpret_cast<std::size_t>(updatedPtr);
