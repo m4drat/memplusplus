@@ -15,7 +15,7 @@ namespace mpp {
         /**
          * @brief Destructor of GcPtr object.
          */
-        virtual ~GcPtr(){};
+        virtual ~GcPtr() = default;
 
         /**
          * @brief Get pointer to controlled object as void.

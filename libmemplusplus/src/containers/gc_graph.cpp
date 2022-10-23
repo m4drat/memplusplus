@@ -6,23 +6,19 @@
 #include "mpplib/utils/utils.hpp"
 
 namespace mpp {
-    GcGraph::GcGraph()
-    {
-    }
-
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(GcGraph& t_other)
     {
-        for (auto* v : t_other.GetAdjList()) {
-            m_adjList.insert(v);
+        for (auto* vertex : t_other.GetAdjList()) {
+            m_adjList.insert(vertex);
         }
     }
 
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(const std::vector<Vertex*>& t_other)
     {
-        for (auto* v : t_other) {
-            m_adjList.insert(v);
+        for (auto* vertex : t_other) {
+            m_adjList.insert(vertex);
         }
     }
 
@@ -100,7 +96,7 @@ namespace mpp {
         for (auto* arena : MemoryManager::GetArenaList()) {
             for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 t_out << "\t\"" << chunkAddrStr << "\" [ fillcolor=\"";
 
@@ -119,15 +115,15 @@ namespace mpp {
         }
 
         // Draw connections between chunks
-        for (auto v1 : m_adjList) {
+        for (auto* vtx1 : m_adjList) {
             // We don't want to draw GC pointers
-            if (!v1->IsChunk())
+            if (!vtx1->IsChunk())
                 continue;
 
             // if current vertex has neighbors draw all connections
-            // for each neighbor draw connection between v1 and its neighbour
-            for (auto it = v1->GetNeighbors().begin(); it != v1->GetNeighbors().end(); ++it) {
-                t_out << "\t\"" + v1->ToString() + "\""
+            // for each neighbor draw connection between vtx1 and its neighbour
+            for (auto it = vtx1->GetNeighbors().begin(); it != vtx1->GetNeighbors().end(); ++it) {
+                t_out << "\t\"" + vtx1->ToString() + "\""
                       << " -> "
                       << "\"" + (*it)->ToString() + "\";\n";
             }
@@ -142,7 +138,7 @@ namespace mpp {
         for (auto* arena : MemoryManager::GetArenaList()) {
             for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 t_out << "\t\t\t"
                       << "<TD bgcolor=\"";
@@ -363,7 +359,7 @@ namespace mpp {
         for (auto* arena : MemoryManager::GetArenaList()) {
             for (std::byte* pos = arena->begin; pos < arena->end;
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
 
                 Vertex* chunkVertex = FindVertex(currChunk);
@@ -464,8 +460,8 @@ namespace mpp {
                 });
 
             // delete each visited vertex from adjListCopy
-            for (auto* v : connectedComponent->GetAdjList()) {
-                adjListCopy.erase(v);
+            for (auto* vtx : connectedComponent->GetAdjList()) {
+                adjListCopy.erase(vtx);
             }
 
             // Add found component to vector
@@ -493,8 +489,7 @@ namespace mpp {
                                        t_vertex->GetNeighbors().end());
         t_visited.push_back(t_vertex);
         for (auto* neighbor : neighbors) {
-            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) != t_visited.end()) ==
-                false) {
+            if (std::find(t_visited.begin(), t_visited.end(), neighbor) == t_visited.end()) {
                 GcGraph::DDFS(neighbor, t_visited);
             }
         }
@@ -521,8 +516,7 @@ namespace mpp {
                          t_vertex->GetPointingVertices().end());
         t_visited.push_back(t_vertex);
         for (auto* neighbor : neighbors) {
-            if ((std::find(t_visited.begin(), t_visited.end(), neighbor) != t_visited.end()) ==
-                false) {
+            if (std::find(t_visited.begin(), t_visited.end(), neighbor) == t_visited.end()) {
                 GcGraph::UDFS(neighbor, t_visited);
             }
         }

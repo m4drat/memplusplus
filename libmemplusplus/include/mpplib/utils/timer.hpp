@@ -1,7 +1,6 @@
 #pragma once
 
 #include <chrono>
-#include <string>
 
 namespace mpp { namespace utils { namespace profile {
     /**

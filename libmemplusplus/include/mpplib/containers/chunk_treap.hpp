@@ -36,8 +36,8 @@ namespace mpp {
         // copy/assign
         ChunkTreap(const ChunkTreap& t_treap);
         ChunkTreap& operator=(const ChunkTreap& t_treap);
-        ChunkTreap(ChunkTreap&& t_treap);
-        ChunkTreap& operator=(ChunkTreap&& t_treap);
+        ChunkTreap(ChunkTreap&& t_treap) noexcept;
+        ChunkTreap& operator=(ChunkTreap&& t_treap) noexcept;
 
         /**
          * @brief Destructs chunk treap.
@@ -101,14 +101,14 @@ namespace mpp {
          * @brief Get number of nodes (aka freed chunks).
          * @return uint32_t number of freed chunks.
          */
-        uint32_t TotalFreeChunks();
+        uint32_t TotalFreeChunks() const;
 
         /**
          * @brief Get the amount of total memory held by chunks
          * inside chunk treap
          * @return std::size_t total amount of freed memory
          */
-        std::size_t TotalFreeMemory();
+        std::size_t TotalFreeMemory() const;
 
         /**
          * @brief Generates tree representation in form, that can be used in dot
@@ -122,7 +122,7 @@ namespace mpp {
          * @return std::ostream that was passed as parameter
          */
         std::ostream& GenerateGraphvizLayout(std::ostream& t_out,
-                                             std::string t_treapName = "Treap",
+                                             const std::string& t_treapName = "Treap",
                                              Node* t_root = nullptr) const;
 
     private:

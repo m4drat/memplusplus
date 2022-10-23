@@ -121,16 +121,18 @@ namespace mpp {
                 // Or we already copied it to another chunk and we need to update it again
                 if (Arena* gcPtrsArena = MM::GetArenaByPtr(gcPtr)) {
                     auto gcPtrOffset = reinterpret_cast<std::byte*>(gcPtr) - gcPtrsArena->begin;
-                    auto gcPtrNewLoc = godArena->begin + gcPtrOffset;
+                    auto* gcPtrNewLoc = godArena->begin + gcPtrOffset;
                     // Update GcPtr's internal pointer
-                    // FIXME: this is awful way to do it, but it works for now (might break if
+                    // FIXME: this is an awful way to do it, but it works for now (might break if
                     // shared_gcptr's layout is changed / or another GcPtr inherited pointer with
                     // different layout is added).
-                    auto gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
+                    // It even might break because compiler decides to reorder members of
+                    // SharedGcPtr between different instantiations
+                    auto* gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
                         gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
 
-                    MPP_ASSERT((std::byte*)(gcPtrInternalPointer + sizeof(std::size_t)) <=
-                                   godArena->end,
+                    MPP_ASSERT(reinterpret_cast<std::byte*>(gcPtrInternalPointer +
+                                                            sizeof(std::size_t)) <= godArena->end,
                                "GcPtr's internal pointer is out of newly created arena's bounds");
 
                     *gcPtrInternalPointer = reinterpret_cast<std::size_t>(updatedPtr);
@@ -140,7 +142,7 @@ namespace mpp {
             // Update m_activeGcPtrs
             for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(m_activeGcPtrs)) {
                 m_activeGcPtrs.erase(gcPtr);
-                auto updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
+                auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
                     newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
                 m_activeGcPtrs.insert(m_activeGcPtrs.end(), updatedGcPtrLocation);
             }

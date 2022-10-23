@@ -40,7 +40,7 @@ namespace mpp {
         /**
          * @brief Default constructor for graph object.
          */
-        GcGraph();
+        GcGraph() = default;
 
         /**
          * @brief Constructor to initialize from reference to another graph.

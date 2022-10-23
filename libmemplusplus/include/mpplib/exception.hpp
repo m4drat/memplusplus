@@ -21,7 +21,8 @@ namespace mpp {
          */
         explicit Exception(const char* message)
             : m_errorMsg(message)
-        {}
+        {
+        }
 
         /**
          * @brief Constructor (C++ STL strings).
@@ -29,15 +30,15 @@ namespace mpp {
          */
         explicit Exception(const std::string& message)
             : m_errorMsg(message)
-        {}
+        {
+        }
 
         /**
          * @brief Destructor.
          *
          * Virtual to allow for subclassing.
          */
-        virtual ~Exception() throw()
-        {}
+        ~Exception() override = default;
 
         /**
          * @brief Returns a pointer to the (constant) error description.
@@ -45,7 +46,7 @@ namespace mpp {
          *         is in posession of the Exception object. Callers must
          *         not attempt to free the memory.
          */
-        virtual const char* what() const throw()
+        const char* what() const noexcept override
         {
             return m_errorMsg.c_str();
         }
@@ -68,7 +69,8 @@ namespace mpp {
          */
         NoMemoryException()
             : Exception("No memory avaliable!\n")
-        {}
+        {
+        }
     };
 
     /**
@@ -82,6 +84,7 @@ namespace mpp {
          */
         UnmapMemoryException()
             : Exception("Cannot unmap memory!\n")
-        {}
+        {
+        }
     };
 }

@@ -5,6 +5,7 @@
 #include "mpplib/utils/random.hpp"
 #include "mpplib/utils/utils.hpp"
 
+#include <cstdint>
 #include <sys/mman.h>
 
 namespace mpp {
@@ -14,8 +15,8 @@ namespace mpp {
 
     std::uintptr_t MemoryManager::MmapHint()
     {
-        std::uintptr_t randOffset = static_cast<std::uintptr_t>(
-            Random::GetInstance()()); // generates random value [0, (2 << 63) - 1]
+        // generates random value [0, (2 << 63) - 1]
+        auto randOffset = static_cast<std::uintptr_t>(Random::GetInstance()());
 
         // Min value: 0x10000000000
         // Max value: 0x40ffffc00000
@@ -24,8 +25,11 @@ namespace mpp {
         // 32mb, and we use only 6mb as an offset between maps. But that still should be sufficient,
         // cause probability of this event is negligible. Using 0xFFFFFF as a random mask we should
         // have 24 random bits, which will give us enough entropy.
+        const uint64_t megabyte = 1024 * 1024;
+        const uint64_t randomMask = 0xFFFFFF;
+        const uint64_t mapOffsetMb = 6 * megabyte;
         std::uintptr_t mmapHint =
-            MemoryManager::g_MMAP_START + (6 * 1024 * 1024) * (randOffset & 0xFFFFFF);
+            MemoryManager::g_MMAP_START + mapOffsetMb * (randOffset & randomMask);
         return mmapHint;
     }
 
@@ -45,12 +49,12 @@ namespace mpp {
         // In secure build try to randomize mmap base (to protect against attacks like
         // Offset-to-lib) If attemp failed, just call mmap(NULL, ...)
 #if MPP_SECURE == 1
-        std::byte* rawPtr = static_cast<std::byte*>(mmap(reinterpret_cast<void*>(MmapHint()),
-                                                         t_size,
-                                                         PROT_READ | PROT_WRITE,
-                                                         MAP_PRIVATE | MAP_ANONYMOUS,
-                                                         -1,
-                                                         0));
+        auto* rawPtr = static_cast<std::byte*>(mmap(reinterpret_cast<void*>(MmapHint()),
+                                                    t_size,
+                                                    PROT_READ | PROT_WRITE,
+                                                    MAP_PRIVATE | MAP_ANONYMOUS,
+                                                    -1,
+                                                    0));
         if (rawPtr == MAP_FAILED) { // This time try to allocate without any hints
             rawPtr = static_cast<std::byte*>(
                 mmap(NULL, t_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0));
@@ -85,7 +89,7 @@ namespace mpp {
         std::byte* arenaSpace = SysAlloc(t_arenaSize);
 
         // TODO - smart pointers memory management
-        Arena* arena = new Arena(t_arenaSize, arenaSpace);
+        auto* arena = new Arena(t_arenaSize, arenaSpace);
 
         // Add newly created arena to vector of active arenas
         s_arenaList.push_back(arena);
@@ -251,7 +255,7 @@ namespace mpp {
         for (auto* arena : s_arenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
                   << std::endl;
-            Chunk* currChunk = reinterpret_cast<Chunk*>(arena->begin);
+            auto* currChunk = reinterpret_cast<Chunk*>(arena->begin);
             for (std::byte* pos = arena->begin; pos < arena->end; pos += currChunk->GetSize()) {
                 currChunk = reinterpret_cast<Chunk*>(pos);
 
@@ -322,11 +326,11 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        auto it = s_arenaList.begin();
-        while (it != s_arenaList.end()) {
-            delete *it;
-            *it = nullptr;
-            it = s_arenaList.erase(it);
+        auto currArena = s_arenaList.begin();
+        while (currArena != s_arenaList.end()) {
+            delete *currArena;
+            *currArena = nullptr;
+            currArena = s_arenaList.erase(currArena);
         }
 
         GC::GetInstance().GetGcPtrs().clear();

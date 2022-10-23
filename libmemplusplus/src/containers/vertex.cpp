@@ -61,12 +61,12 @@ namespace mpp {
         std::set<GcPtr*>::iterator begin;
         std::set<GcPtr*>::iterator end;
 
-        begin = t_gcPtrs.lower_bound((GcPtr*)m_correspondingLocation);
+        begin = t_gcPtrs.lower_bound(reinterpret_cast<GcPtr*>(m_correspondingLocation));
         if (m_currLocationIsAChunk) {
-            end = t_gcPtrs.upper_bound(
-                (GcPtr*)(m_correspondingLocation + GetLocationAsAChunk()->GetSize()));
+            end = t_gcPtrs.upper_bound(reinterpret_cast<GcPtr*>(m_correspondingLocation +
+                                                                GetLocationAsAChunk()->GetSize()));
         } else {
-            end = t_gcPtrs.upper_bound((GcPtr*)(m_correspondingLocation));
+            end = t_gcPtrs.upper_bound(reinterpret_cast<GcPtr*>(m_correspondingLocation));
         }
 
         return std::set<GcPtr*>(begin, end);
@@ -90,8 +90,8 @@ namespace mpp {
 
     std::string Vertex::ToString() const
     {
-        std::stringstream ss;
-        ss << static_cast<const void*>(m_correspondingLocation);
-        return ss.str();
+        std::stringstream stringStream;
+        stringStream << static_cast<const void*>(m_correspondingLocation);
+        return stringStream.str();
     }
 }

@@ -12,7 +12,29 @@
 #include <string>
 #include <unistd.h>
 
+#define __STDC_WANT_LIB_EXT1__ 1
+#include <stdlib.h>
+#include <string.h> // for memset_s
+
 namespace mpp { namespace utils {
+
+    void* SecureMemset(void* t_pointer,
+                       size_t t_targetBufferSize,
+                       unsigned char t_fillChar,
+                       size_t t_sizeToRemove)
+    {
+#ifdef __STDC_LIB_EXT1__
+        memset_s(pointer, size_data, t_fillChar, size_to_remove);
+#else
+        if (t_sizeToRemove > t_targetBufferSize)
+            t_sizeToRemove = t_targetBufferSize;
+        volatile unsigned char* dataPtr = static_cast<unsigned char*>(t_pointer);
+        while ((t_sizeToRemove--) != 0u) {
+            *dataPtr++ = t_fillChar;
+        }
+#endif
+        return t_pointer;
+    }
 
 #if MPP_DEBUG == 1
     void DumpStackTrace(std::ostream& t_out, int32_t t_skip)
@@ -69,8 +91,8 @@ namespace mpp { namespace utils {
 
     std::string AddrToString(void* t_ptr)
     {
-        std::stringstream ss;
-        ss << static_cast<const void*>(t_ptr);
-        return ss.str();
+        std::stringstream addrToStrSS;
+        addrToStrSS << static_cast<const void*>(t_ptr);
+        return addrToStrSS.str();
     }
 }}

@@ -7,11 +7,11 @@ namespace mpp {
         auto m_subgraphs = t_objectsGraph->WeaklyConnectedComponents();
 
         for (auto& graph : m_subgraphs) {
-            for (const auto& v : graph->GetAdjList()) {
-                if (!v->IsChunk())
+            for (const auto& vertex : graph->GetAdjList()) {
+                if (!vertex->IsChunk())
                     continue;
-                m_layoutedHeap.push_back(v);
-                m_neededSpace += v->GetLocationAsAChunk()->GetSize();
+                m_layoutedHeap.push_back(vertex);
+                m_neededSpace += vertex->GetLocationAsAChunk()->GetSize();
             }
         }
         // for (auto& gcGraph : m_subgraphs)

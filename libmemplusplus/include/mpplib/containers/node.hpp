@@ -22,7 +22,7 @@ namespace mpp {
         int32_t priority{ 0 };
 
         /**
-         * @brief Сhunk related to the current node.
+         * @brief Chunk related to the current node.
          */
         Chunk* chunk{ nullptr };
 
@@ -59,7 +59,7 @@ namespace mpp {
         /**
          * @brief Assignment operator, that constructs node from r-value node reference.
          */
-        Node& operator=(Node&& t_node);
+        Node& operator=(Node&& t_node) noexcept;
 
         /**
          * @brief Default destructor.

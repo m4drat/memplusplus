@@ -278,7 +278,7 @@ namespace mpp {
         /**
          * @brief Default arena size.
          */
-        static const std::size_t g_DEFAULT_ARENA_SIZE = 32ULL * (1 << 20);
+        static const std::size_t g_DEFAULT_ARENA_SIZE = 32ULL * (1ULL << 20ULL);
 
         /**
          * @brief Page size for mmap request.
@@ -291,7 +291,7 @@ namespace mpp {
          * If it isn't possible to allocate memory at desired address, just
          * call mmap(NULL, ...).
          */
-        static const std::uintptr_t g_MMAP_START = 1ULL << 40;
+        static const std::uintptr_t g_MMAP_START = 1ULL << 40ULL;
 
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
         /**

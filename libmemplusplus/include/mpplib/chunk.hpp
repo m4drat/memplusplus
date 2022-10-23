@@ -59,7 +59,7 @@ namespace mpp {
                                      uint8_t t_isInUse,
                                      uint8_t t_isPrevInUse)
         {
-            Chunk* newChunk = static_cast<Chunk*>(t_newChunkPtr);
+            auto* newChunk = static_cast<Chunk*>(t_newChunkPtr);
 
             MPP_UNPOISON_MEM(newChunk, t_chunkSize);
 
@@ -78,7 +78,7 @@ namespace mpp {
          */
         static void* GetUserDataPtr(Chunk* t_chunk)
         {
-            return reinterpret_cast<void*>(reinterpret_cast<std::size_t>(t_chunk) +
+            return reinterpret_cast<void*>(reinterpret_cast<std::byte*>(t_chunk) +
                                            sizeof(Chunk::ChunkHeader));
         }
 
@@ -89,7 +89,7 @@ namespace mpp {
          */
         static Chunk* GetHeaderPtr(void* t_userData)
         {
-            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_userData) -
+            return reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(t_userData) -
                                             sizeof(Chunk::ChunkHeader));
         }
 
@@ -100,7 +100,7 @@ namespace mpp {
          */
         static Chunk* GetPrevChunk(Chunk* t_chunk)
         {
-            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_chunk) -
+            return reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(t_chunk) -
                                             t_chunk->GetPrevSize());
         }
 
@@ -111,7 +111,7 @@ namespace mpp {
          */
         static Chunk* GetNextChunk(Chunk* t_chunk)
         {
-            return reinterpret_cast<Chunk*>(reinterpret_cast<std::size_t>(t_chunk) +
+            return reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(t_chunk) +
                                             t_chunk->GetSize());
         }
 
@@ -119,7 +119,7 @@ namespace mpp {
          * @brief Get previous size from chunk header.
          * @return std::size_t extracted from header previous size value
          */
-        std::size_t GetPrevSize()
+        std::size_t GetPrevSize() const
         {
             return (this->ChunkHeader.prevChunkSize >> EXTRACT_SIZE_SHIFT) << EXTRACT_SIZE_SHIFT;
         };
@@ -137,7 +137,7 @@ namespace mpp {
          * @brief Get size of current chunk from its chunk header.
          * @return std::size_t current chunk size
          */
-        std::size_t GetSize()
+        std::size_t GetSize() const
         {
             return (this->ChunkHeader.chunkHeader >> EXTRACT_SIZE_SHIFT) << EXTRACT_SIZE_SHIFT;
         };

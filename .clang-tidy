@@ -1,0 +1,395 @@
+Checks: "clang-diagnostic-*,clang-analyzer-*,clang-analyzer-*,cppcoreguidelines*,-cppcoreguidelines-non-private-member-variables-in-classes,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-cppcoreguidelines-pro-type-reinterpret-cast,-cppcoreguidelines-macro-usage,performance-*,portability-*,readability-*,-readability-implicit-bool-conversion,-readability-braces-around-statements,-readability-uppercase-literal-suffix,hicpp-*,-hicpp-braces-around-statements,-hicpp-uppercase-literal-suffix,-hicpp-no-array-decay,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,cert-*"
+WarningsAsErrors: ""
+HeaderFilterRegex: ""
+AnalyzeTemporaryDtors: false
+FormatStyle: none
+User: madrat
+CheckOptions:
+  - key: cppcoreguidelines-pro-type-reinterpret-cast
+    value: "false"
+  - key: readability-suspicious-call-argument.PrefixSimilarAbove
+    value: "30"
+  - key: cppcoreguidelines-no-malloc.Reallocations
+    value: "::realloc"
+  - key: cppcoreguidelines-owning-memory.LegacyResourceConsumers
+    value: "::free;::realloc;::freopen;::fclose"
+  - key: cert-dcl51-cpp.AggressiveDependentMemberLookup
+    value: "false"
+  - key: hicpp-use-auto.MinTypeNameLength
+    value: "5"
+  - key: cppcoreguidelines-macro-usage.CheckCapsOnly
+    value: "false"
+  - key: hicpp-use-override.IgnoreDestructors
+    value: "false"
+  - key: readability-inconsistent-declaration-parameter-name.Strict
+    value: "false"
+  - key: readability-suspicious-call-argument.DiceDissimilarBelow
+    value: "60"
+  - key: cert-dcl37-c.AllowedIdentifiers
+    value: ""
+  - key: hicpp-use-emplace.SmartPointers
+    value: "::std::shared_ptr;::std::unique_ptr;::std::auto_ptr;::std::weak_ptr"
+  - key: hicpp-member-init.IgnoreArrays
+    value: "false"
+  - key: readability-suspicious-call-argument.Equality
+    value: "true"
+  - key: hicpp-use-override.AllowOverrideAndFinal
+    value: "false"
+  - key: hicpp-signed-bitwise.IgnorePositiveIntegerLiterals
+    value: "false"
+  - key: cert-err09-cpp.WarnOnLargeObjects
+    value: "false"
+  - key: hicpp-use-equals-delete.IgnoreMacros
+    value: "true"
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnFloatingPointNarrowingConversion
+    value: "true"
+  - key: cppcoreguidelines-init-variables.IncludeStyle
+    value: llvm
+  - key: readability-suspicious-call-argument.SuffixSimilarAbove
+    value: "30"
+  - key: hicpp-uppercase-literal-suffix.NewSuffixes
+    value: ""
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnIntegerNarrowingConversion
+    value: "true"
+  - key: cppcoreguidelines-prefer-member-initializer.UseAssignment
+    value: "false"
+  - key: hicpp-function-size.VariableThreshold
+    value: "4294967295"
+  - key: cert-oop57-cpp.MemSetNames
+    value: ""
+  - key: hicpp-no-malloc.Deallocations
+    value: "::free"
+  - key: performance-type-promotion-in-math-fn.IncludeStyle
+    value: llvm
+  - key: readability-function-cognitive-complexity.DescribeBasicIncrements
+    value: "true"
+  - key: readability-inconsistent-declaration-parameter-name.IgnoreMacros
+    value: "true"
+  - key: readability-identifier-naming.IgnoreFailedSplit
+    value: "false"
+  - key: hicpp-multiway-paths-covered.WarnOnMissingElse
+    value: "false"
+  - key: readability-qualified-auto.AddConstToQualified
+    value: "true"
+  - key: hicpp-no-malloc.Allocations
+    value: "::malloc;::calloc"
+  - key: cppcoreguidelines-explicit-virtual-functions.OverrideSpelling
+    value: override
+  - key: hicpp-use-noexcept.UseNoexceptFalse
+    value: "true"
+  - key: readability-uppercase-literal-suffix.IgnoreMacros
+    value: "true"
+  - key: cert-dcl59-cpp.HeaderFileExtensions
+    value: ";h;hh;hpp;hxx"
+  - key: performance-unnecessary-copy-initialization.AllowedTypes
+    value: ""
+  - key: readability-suspicious-call-argument.Levenshtein
+    value: "true"
+  - key: readability-simplify-boolean-expr.ChainedConditionalAssignment
+    value: "false"
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoreAllFloatingPointValues
+    value: "false"
+  - key: cert-oop54-cpp.WarnOnlyIfThisHasSuspiciousField
+    value: "false"
+  - key: cert-err09-cpp.CheckThrowTemporaries
+    value: "true"
+  - key: performance-inefficient-vector-operation.EnableProto
+    value: "false"
+  - key: readability-function-size.LineThreshold
+    value: "4294967295"
+  - key: modernize-loop-convert.MaxCopySize
+    value: "16"
+  - key: readability-suspicious-call-argument.PrefixDissimilarBelow
+    value: "25"
+  - key: portability-simd-intrinsics.Suggest
+    value: "false"
+  - key: cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
+    value: ""
+  - key: readability-redundant-string-init.StringNames
+    value: "::std::basic_string_view;::std::basic_string"
+  - key: readability-magic-numbers.IgnoreBitFieldsWidths
+    value: "true"
+  - key: readability-suspicious-call-argument.LevenshteinDissimilarBelow
+    value: "50"
+  - key: readability-identifier-length.IgnoredExceptionVariableNames
+    value: "^[e]$"
+  - key: google-readability-braces-around-statements.ShortStatementLines
+    value: "1"
+  - key: cppcoreguidelines-pro-type-member-init.IgnoreArrays
+    value: "false"
+  - key: readability-else-after-return.WarnOnUnfixable
+    value: "true"
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues
+    value: "1.0;100.0;"
+  - key: cppcoreguidelines-macro-usage.IgnoreCommandLineMacros
+    value: "true"
+  - key: readability-suspicious-call-argument.Substring
+    value: "true"
+  - key: cppcoreguidelines-pro-bounds-constant-array-index.IncludeStyle
+    value: llvm
+  - key: readability-identifier-length.IgnoredVariableNames
+    value: ""
+  - key: readability-magic-numbers.IgnoreAllFloatingPointValues
+    value: "false"
+  - key: hicpp-use-auto.RemoveStars
+    value: "false"
+  - key: readability-suspicious-call-argument.Abbreviations
+    value: "arr=array;cnt=count;idx=index;src=source;stmt=statement;cpy=copy;dest=destination;dist=distancedst=distance;ptr=pointer;wdth=width;str=string;ln=line;srv=server;attr=attribute;ref=reference;buf=buffer;col=column;nr=number;vec=vector;len=length;elem=element;val=value;i=index;var=variable;hght=height;cl=client;num=number;pos=position;lst=list;addr=address"
+  - key: readability-uppercase-literal-suffix.NewSuffixes
+    value: ""
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues
+    value: "1;2;3;4;"
+  - key: modernize-loop-convert.MinConfidence
+    value: reasonable
+  - key: performance-unnecessary-value-param.AllowedTypes
+    value: ""
+  - key: readability-uniqueptr-delete-release.PreferResetCall
+    value: "false"
+  - key: readability-identifier-length.MinimumExceptionNameLength
+    value: "2"
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnorePowersOf2IntegerValues
+    value: "false"
+  - key: google-readability-namespace-comments.SpacesBeforeComments
+    value: "2"
+  - key: cppcoreguidelines-avoid-magic-numbers.IgnoreBitFieldsWidths
+    value: "true"
+  - key: cert-err61-cpp.CheckThrowTemporaries
+    value: "true"
+  - key: cppcoreguidelines-no-malloc.Allocations
+    value: "::malloc;::calloc"
+  - key: readability-function-size.BranchThreshold
+    value: "4294967295"
+  - key: hicpp-use-emplace.TupleMakeFunctions
+    value: "::std::make_pair;::std::make_tuple"
+  - key: hicpp-function-size.LineThreshold
+    value: "4294967295"
+  - key: readability-implicit-bool-conversion.AllowIntegerConditions
+    value: "false"
+  - key: readability-identifier-length.IgnoredParameterNames
+    value: "^[n]$"
+  - key: readability-function-size.StatementThreshold
+    value: "800"
+  - key: hicpp-use-noexcept.ReplacementString
+    value: ""
+  - key: readability-identifier-naming.IgnoreMainLikeFunctions
+    value: "false"
+  - key: cppcoreguidelines-init-variables.MathHeader
+    value: "<math.h>"
+  - key: google-readability-function-size.StatementThreshold
+    value: "800"
+  - key: cert-msc51-cpp.DisallowedSeedTypes
+    value: "time_t,std::time_t"
+  - key: readability-suspicious-call-argument.DiceSimilarAbove
+    value: "70"
+  - key: readability-suspicious-call-argument.Abbreviation
+    value: "true"
+  - key: cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value: "false"
+  - key: cert-dcl37-c.AggressiveDependentMemberLookup
+    value: "false"
+  - key: readability-identifier-length.MinimumLoopCounterNameLength
+    value: "2"
+  - key: cppcoreguidelines-no-malloc.Deallocations
+    value: "::free"
+  - key: readability-magic-numbers.IgnorePowersOf2IntegerValues
+    value: "false"
+  - key: readability-suspicious-call-argument.JaroWinklerSimilarAbove
+    value: "85"
+  - key: readability-simplify-subscript-expr.Types
+    value: "::std::basic_string;::std::basic_string_view;::std::vector;::std::array"
+  - key: performance-unnecessary-copy-initialization.ExcludedContainerTypes
+    value: ""
+  - key: modernize-replace-auto-ptr.IncludeStyle
+    value: llvm
+  - key: performance-move-const-arg.CheckTriviallyCopyableMove
+    value: "true"
+  - key: hicpp-move-const-arg.CheckTriviallyCopyableMove
+    value: "true"
+  - key: readability-static-accessed-through-instance.NameSpecifierNestingThreshold
+    value: "3"
+  - key: readability-function-size.VariableThreshold
+    value: "4294967295"
+  - key: cert-dcl16-c.NewSuffixes
+    value: "L;LL;LU;LLU"
+  - key: cert-err61-cpp.MaxSize
+    value: "-1"
+  - key: readability-identifier-naming.GetConfigPerFile
+    value: "true"
+  - key: cert-sig30-c.AsyncSafeFunctionSet
+    value: POSIX
+  - key: hicpp-member-init.UseAssignment
+    value: "false"
+  - key: readability-function-size.NestingThreshold
+    value: "4294967295"
+  - key: cppcoreguidelines-narrowing-conversions.IgnoreConversionFromTypes
+    value: ""
+  - key: readability-function-size.ParameterThreshold
+    value: "4294967295"
+  - key: hicpp-function-size.NestingThreshold
+    value: "4294967295"
+  - key: readability-function-cognitive-complexity.IgnoreMacros
+    value: "false"
+  - key: cert-str34-c.DiagnoseSignedUnsignedCharComparisons
+    value: "false"
+  - key: cert-err33-c.CheckedFunctions
+    value: "::aligned_alloc;::asctime_s;::at_quick_exit;::atexit;::bsearch;::bsearch_s;::btowc;::c16rtomb;::c32rtomb;::calloc;::clock;::cnd_broadcast;::cnd_init;::cnd_signal;::cnd_timedwait;::cnd_wait;::ctime_s;::fclose;::fflush;::fgetc;::fgetpos;::fgets;::fgetwc;::fopen;::fopen_s;::fprintf;::fprintf_s;::fputc;::fputs;::fputwc;::fputws;::fread;::freopen;::freopen_s;::fscanf;::fscanf_s;::fseek;::fsetpos;::ftell;::fwprintf;::fwprintf_s;::fwrite;::fwscanf;::fwscanf_s;::getc;::getchar;::getenv;::getenv_s;::gets_s;::getwc;::getwchar;::gmtime;::gmtime_s;::localtime;::localtime_s;::malloc;::mbrtoc16;::mbrtoc32;::mbsrtowcs;::mbsrtowcs_s;::mbstowcs;::mbstowcs_s;::memchr;::mktime;::mtx_init;::mtx_lock;::mtx_timedlock;::mtx_trylock;::mtx_unlock;::printf_s;::putc;::putwc;::raise;::realloc;::remove;::rename;::scanf;::scanf_s;::setlocale;::setvbuf;::signal;::snprintf;::snprintf_s;::sprintf;::sprintf_s;::sscanf;::sscanf_s;::strchr;::strerror_s;::strftime;::strpbrk;::strrchr;::strstr;::strtod;::strtof;::strtoimax;::strtok;::strtok_s;::strtol;::strtold;::strtoll;::strtoul;::strtoull;::strtoumax;::strxfrm;::swprintf;::swprintf_s;::swscanf;::swscanf_s;::thrd_create;::thrd_detach;::thrd_join;::thrd_sleep;::time;::timespec_get;::tmpfile;::tmpfile_s;::tmpnam;::tmpnam_s;::tss_create;::tss_get;::tss_set;::ungetc;::ungetwc;::vfprintf;::vfprintf_s;::vfscanf;::vfscanf_s;::vfwprintf;::vfwprintf_s;::vfwscanf;::vfwscanf_s;::vprintf_s;::vscanf;::vscanf_s;::vsnprintf;::vsnprintf_s;::vsprintf;::vsprintf_s;::vsscanf;::vsscanf_s;::vswprintf;::vswprintf_s;::vswscanf;::vswscanf_s;::vwprintf_s;::vwscanf;::vwscanf_s;::wcrtomb;::wcschr;::wcsftime;::wcspbrk;::wcsrchr;::wcsrtombs;::wcsrtombs_s;::wcsstr;::wcstod;::wcstof;::wcstoimax;::wcstok;::wcstok_s;::wcstol;::wcstold;::wcstoll;::wcstombs;::wcstombs_s;::wcstoul;::wcstoull;::wcstoumax;::wcsxfrm;::wctob;::wctrans;::wctype;::wmemchr;::wprintf_s;::wscanf;::wscanf_s;"
+  - key: cppcoreguidelines-explicit-virtual-functions.AllowOverrideAndFinal
+    value: "false"
+  - key: hicpp-braces-around-statements.ShortStatementLines
+    value: "0"
+  - key: readability-redundant-smartptr-get.IgnoreMacros
+    value: "true"
+  - key: readability-identifier-naming.AggressiveDependentMemberLookup
+    value: "false"
+  - key: cert-err61-cpp.WarnOnLargeObjects
+    value: "false"
+  - key: readability-identifier-length.MinimumParameterNameLength
+    value: "3"
+  - key: hicpp-use-emplace.IgnoreImplicitConstructors
+    value: "false"
+  - key: cppcoreguidelines-owning-memory.LegacyResourceProducers
+    value: "::malloc;::aligned_alloc;::realloc;::calloc;::fopen;::freopen;::tmpfile"
+  - key: hicpp-uppercase-literal-suffix.IgnoreMacros
+    value: "true"
+  - key: google-readability-namespace-comments.ShortNamespaceLines
+    value: "10"
+  - key: readability-suspicious-call-argument.JaroWinklerDissimilarBelow
+    value: "75"
+  - key: readability-suspicious-call-argument.Suffix
+    value: "true"
+  - key: cert-err09-cpp.MaxSize
+    value: "-1"
+  - key: hicpp-use-override.OverrideSpelling
+    value: override
+  - key: hicpp-use-equals-default.IgnoreMacros
+    value: "true"
+  - key: hicpp-use-override.FinalSpelling
+    value: final
+  - key: cppcoreguidelines-explicit-virtual-functions.FinalSpelling
+    value: final
+  - key: readability-suspicious-call-argument.MinimumIdentifierNameLength
+    value: "3"
+  - key: modernize-loop-convert.NamingStyle
+    value: CamelCase
+  - key: cppcoreguidelines-pro-type-member-init.UseAssignment
+    value: "false"
+  - key: hicpp-function-size.StatementThreshold
+    value: "800"
+  - key: readability-suspicious-call-argument.SubstringDissimilarBelow
+    value: "40"
+  - key: performance-for-range-copy.WarnOnAllAutoCopies
+    value: "false"
+  - key: hicpp-no-malloc.Reallocations
+    value: "::realloc"
+  - key: performance-no-automatic-move.AllowedTypes
+    value: ""
+  - key: modernize-pass-by-value.IncludeStyle
+    value: llvm
+  - key: readability-simplify-boolean-expr.ChainedConditionalReturn
+    value: "false"
+  - key: readability-else-after-return.WarnOnConditionVariables
+    value: "true"
+  - key: modernize-use-nullptr.NullMacros
+    value: "NULL"
+  - key: readability-suspicious-call-argument.SuffixDissimilarBelow
+    value: "25"
+  - key: cppcoreguidelines-macro-usage.AllowedRegexp
+    value: "^DEBUG_*"
+  - key: readability-suspicious-call-argument.LevenshteinSimilarAbove
+    value: "66"
+  - key: cppcoreguidelines-narrowing-conversions.PedanticMode
+    value: "false"
+  - key: readability-suspicious-call-argument.JaroWinkler
+    value: "true"
+  - key: readability-suspicious-call-argument.Prefix
+    value: "true"
+  - key: hicpp-special-member-functions.AllowMissingMoveFunctions
+    value: "false"
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value: "false"
+  - key: cert-dcl51-cpp.Invert
+    value: "false"
+  - key: hicpp-special-member-functions.AllowSoleDefaultDtor
+    value: "false"
+  - key: cppcoreguidelines-explicit-virtual-functions.IgnoreDestructors
+    value: "false"
+  - key: performance-for-range-copy.AllowedTypes
+    value: ""
+  - key: hicpp-function-size.BranchThreshold
+    value: "4294967295"
+  - key: readability-braces-around-statements.ShortStatementLines
+    value: "0"
+  - key: hicpp-use-emplace.ContainersWithPushBack
+    value: "::std::vector;::std::list;::std::deque"
+  - key: hicpp-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value: "false"
+  - key: readability-magic-numbers.IgnoredFloatingPointValues
+    value: "1.0;100.0;"
+  - key: readability-redundant-declaration.IgnoreMacros
+    value: "true"
+  - key: performance-inefficient-string-concatenation.StrictMode
+    value: "false"
+  - key: readability-implicit-bool-conversion.AllowPointerConditions
+    value: "false"
+  - key: hicpp-function-size.ParameterThreshold
+    value: "4294967295"
+  - key: portability-restrict-system-includes.Includes
+    value: "*"
+  - key: cert-dcl51-cpp.AllowedIdentifiers
+    value: ""
+  - key: cert-oop57-cpp.MemCpyNames
+    value: ""
+  - key: readability-suspicious-call-argument.SubstringSimilarAbove
+    value: "50"
+  - key: cppcoreguidelines-narrowing-conversions.WarnWithinTemplateInstantiation
+    value: "false"
+  - key: readability-identifier-length.MinimumVariableNameLength
+    value: "3"
+  - key: hicpp-use-emplace.TupleTypes
+    value: "::std::pair;::std::tuple"
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnEquivalentBitWidth
+    value: "true"
+  - key: cppcoreguidelines-non-private-member-variables-in-classes.IgnorePublicMemberVariables
+    value: "false"
+  - key: cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted
+    value: "false"
+  - key: cert-oop57-cpp.MemCmpNames
+    value: ""
+  - key: readability-function-cognitive-complexity.Threshold
+    value: "25"
+  - key: cppcoreguidelines-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: "true"
+  - key: performance-faster-string-find.StringLikeClasses
+    value: "::std::basic_string;::std::basic_string_view"
+  - key: cppcoreguidelines-narrowing-conversions.WarnOnIntegerToFloatingPointNarrowingConversion
+    value: "true"
+  - key: llvm-qualified-auto.AddConstToQualified
+    value: "false"
+  - key: cert-str34-c.CharTypdefsToIgnore
+    value: ""
+  - key: llvm-else-after-return.WarnOnConditionVariables
+    value: "false"
+  - key: readability-suspicious-call-argument.Dice
+    value: "true"
+  - key: readability-identifier-length.IgnoredLoopCounterNames
+    value: "^[ijk_]$"
+  - key: cert-dcl37-c.Invert
+    value: "false"
+  - key: performance-inefficient-vector-operation.VectorLikeClasses
+    value: "::std::vector"
+  - key: readability-magic-numbers.IgnoredIntegerValues
+    value: "1;2;3;4;"
+  - key: portability-simd-intrinsics.Std
+    value: ""
+  - key: hicpp-use-nullptr.NullMacros
+    value: ""
+  - key: readability-redundant-member-init.IgnoreBaseInCopyConstructors
+    value: "false"
+  - key: cert-dcl16-c.IgnoreMacros
+    value: "true"
+  - key: performance-unnecessary-value-param.IncludeStyle
+    value: llvm
+  - key: llvm-else-after-return.WarnOnUnfixable
+    value: "false"
+  - key: cert-msc32-c.DisallowedSeedTypes
+    value: "time_t,std::time_t"

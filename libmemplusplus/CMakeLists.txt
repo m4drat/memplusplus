@@ -72,6 +72,7 @@ endif()
 if(MPP_SECURE MATCHES "ON")
 	message(STATUS "Building in secure mode: MPP_SECURE=1")
 	list(APPEND MPP_DEFINES MPP_SECURE=1)
+	list(APPEND MPP_DEFINES __STDC_WANT_LIB_EXT1__=1)
 
 	# In secure mode we want to fill memory with zeroes
 	# (prevents memleaks through string printing functions)

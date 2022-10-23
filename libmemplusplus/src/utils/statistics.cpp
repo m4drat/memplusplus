@@ -41,15 +41,16 @@ namespace mpp { namespace utils {
             return "0 bytes";
         }
 
-        std::stringstream ss;
+        std::stringstream formattedSizeSS;
 
-        uint32_t k = 1024;
+        const uint32_t kilobyte = 1024;
         std::vector<std::string> sizes{ "Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
-        int32_t i = std::floor(std::log(t_bytes) / std::log(k));
-        ss << std::setprecision(t_decimals) << std::fixed << (t_bytes / std::pow(k, i)) << " "
-           << sizes.at(i);
+        int32_t sizesIdx = std::floor(std::log(t_bytes) / std::log(kilobyte));
+        formattedSizeSS << std::setprecision((int32_t)t_decimals) << std::fixed
+                        << ((double)t_bytes / std::pow(kilobyte, sizesIdx)) << " "
+                        << sizes.at(sizesIdx);
 
-        return ss.str();
+        return formattedSizeSS.str();
     }
 
     std::ostream& Statistics::DumpArenasGeneralStats(std::ostream& t_out)
@@ -139,7 +140,7 @@ namespace mpp { namespace utils {
         t_out << "MPP: PAGE_SIZE          : " << FormattedSize(MemoryManager::g_PAGE_SIZE)
               << std::endl;
 
-        if (t_dumpActiveArenas == true) {
+        if (t_dumpActiveArenas) {
             t_out << "~~~~~~~~~~~~~~~~ All active arenas ~~~~~~~~~~~~~~~~" << std::endl;
             for (auto* arena : MemoryManager::GetArenaList()) {
                 Arena::DumpArena(t_out, arena, t_dumpFreedChunks, t_dumpInUseChunks) << std::endl;
@@ -161,7 +162,7 @@ namespace mpp { namespace utils {
         m_gcCyclesStats.push_back(std::move(t_gcCycleStats));
     }
 
-    void Statistics::AddArenaStats(std::shared_ptr<ArenaStats> t_arenaStats)
+    void Statistics::AddArenaStats(const std::shared_ptr<ArenaStats>& t_arenaStats)
     {
         m_arenasStats.push_back(t_arenaStats);
     }

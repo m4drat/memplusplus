@@ -81,7 +81,7 @@ namespace mpp {
          * @brief Copy-Constructor to construct from const SharedGcPtr rvalue reference.
          * @param t_other const reference to another SharedGcPtr
          */
-        SharedGcPtr(SharedGcPtr<Type>&& t_other);
+        SharedGcPtr(SharedGcPtr<Type>&& t_other) noexcept;
 
         /**
          * @brief Construct SharedGcPtr which holds an array of objects of type ElementType
@@ -206,7 +206,7 @@ namespace mpp {
         /**
          * @brief Resets smart pointer. Decrements references counter.
          */
-        void Reset(std::nullptr_t const);
+        void Reset(std::nullptr_t);
 
         /**
          * @brief Calls object destructor and deallocates memory

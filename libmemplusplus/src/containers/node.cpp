@@ -6,7 +6,8 @@ namespace mpp {
         , chunk(t_chunk)
         , leftChild(nullptr)
         , rightChild(nullptr)
-    {}
+    {
+    }
 
     Node::Node(const Node& t_node)
         : priority(t_node.priority)
@@ -45,7 +46,7 @@ namespace mpp {
         t_node.rightChild = nullptr;
     }
 
-    Node& Node::operator=(Node&& t_node)
+    Node& Node::operator=(Node&& t_node) noexcept
     {
         if (&t_node == this)
             return *this;

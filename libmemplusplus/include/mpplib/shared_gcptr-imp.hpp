@@ -69,7 +69,7 @@ namespace mpp {
     }
 
     template<class Type>
-    SharedGcPtr<Type>::SharedGcPtr(SharedGcPtr<Type>&& t_other)
+    SharedGcPtr<Type>::SharedGcPtr(SharedGcPtr<Type>&& t_other) noexcept
     {
         PROFILE_FUNCTION();
 
@@ -279,7 +279,7 @@ namespace mpp {
     }
 
     template<class Type>
-    void SharedGcPtr<Type>::Reset(std::nullptr_t const)
+    void SharedGcPtr<Type>::Reset(std::nullptr_t)
     {
         PROFILE_FUNCTION();
 

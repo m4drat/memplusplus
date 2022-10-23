@@ -52,7 +52,7 @@ namespace mpp {
         }
 
         explicit Vertex(Chunk* t_location)
-            : m_correspondingLocation((std::byte*)t_location)
+            : m_correspondingLocation(reinterpret_cast<std::byte*>(t_location))
             , m_currLocationIsAChunk(true)
         {
         }

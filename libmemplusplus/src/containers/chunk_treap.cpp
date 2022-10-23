@@ -32,7 +32,7 @@ namespace mpp {
         return *this;
     }
 
-    ChunkTreap::ChunkTreap(ChunkTreap&& t_treap)
+    ChunkTreap::ChunkTreap(ChunkTreap&& t_treap) noexcept
         : m_root(t_treap.m_root)
         , m_freedChunks{ t_treap.m_freedChunks }
         , m_freedMemory{ t_treap.m_freedMemory }
@@ -42,7 +42,7 @@ namespace mpp {
         t_treap.m_freedMemory = 0;
     }
 
-    ChunkTreap& ChunkTreap::operator=(ChunkTreap&& t_treap)
+    ChunkTreap& ChunkTreap::operator=(ChunkTreap&& t_treap) noexcept
     {
         if (&t_treap == this) {
             return *this;
@@ -90,18 +90,18 @@ namespace mpp {
         t_root = nullptr;
     }
 
-    uint32_t ChunkTreap::TotalFreeChunks()
+    uint32_t ChunkTreap::TotalFreeChunks() const
     {
         return m_freedChunks;
     }
 
-    std::size_t ChunkTreap::TotalFreeMemory()
+    std::size_t ChunkTreap::TotalFreeMemory() const
     {
         return m_freedMemory;
     }
 
     std::ostream& ChunkTreap::GenerateGraphvizLayout(std::ostream& t_out,
-                                                     std::string t_treapName,
+                                                     const std::string& t_treapName,
                                                      Node* t_root) const
     {
         PROFILE_FUNCTION();

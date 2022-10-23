@@ -2,7 +2,7 @@
 
 #include "mpplib/utils/profiler_definitions.hpp"
 #include <algorithm>
-#include <assert.h>
+#include <cassert>
 
 namespace mpp { namespace utils {
 
@@ -10,6 +10,19 @@ namespace mpp { namespace utils {
      * @brief Default backtrace size.
      */
     static const uint32_t s_MAX_STACK_LEVELS = 50;
+
+    /**
+     * @brief Secure implementation of memset.
+     * @param t_pointer Pointer to memory to be set.
+     * @param t_targetBufferSize Destination buffer size.
+     * @param t_fillChar Character to fill memory with.
+     * @param t_sizeToRemove Size of memory to be removed.
+     * @return void* Pointer to cleared memory.
+     */
+    void* SecureMemset(void* t_pointer,
+                       size_t t_targetBufferSize,
+                       unsigned char t_fillChar,
+                       size_t t_sizeToRemove);
 
     /**
      * @brief Helper function to dump stacktrace.
@@ -54,18 +67,21 @@ namespace mpp { namespace utils {
     template<class ForwardIt, class T, class Compare>
     ForwardIt LowerBound(ForwardIt first, ForwardIt last, const T& value, Compare comp)
     {
+        using difference_type = typename std::iterator_traits<ForwardIt>::difference_type;
+
         PROFILE_FUNCTION();
 
-        ForwardIt it;
-        typename std::iterator_traits<ForwardIt>::difference_type count, step;
+        ForwardIt iter;
+        difference_type count;
+        difference_type step;
         count = std::distance(first, last);
 
         while (count > 0) {
-            it = first;
+            iter = first;
             step = count / 2;
-            std::advance(it, step);
-            if (comp(*it, value)) {
-                first = ++it;
+            std::advance(iter, step);
+            if (comp(*iter, value)) {
+                first = ++iter;
                 count -= step + 1;
             } else {
                 count = step;

@@ -157,7 +157,7 @@ namespace mpp { namespace utils {
          * @brief Add arena stats to vector of all arena statistics
          * @param t_arenaStats std::unique_ptr<ArenaStats>
          */
-        void AddArenaStats(std::shared_ptr<ArenaStats> t_arenaStats);
+        void AddArenaStats(const std::shared_ptr<ArenaStats>& t_arenaStats);
 
         /**
          * @brief Get Gc stats

@@ -86,13 +86,13 @@ namespace mpp {
          * @brief Returns amount of freed memory inside chunk treap
          * @return std::size_t amount of memory
          */
-        std::size_t FreeMemoryInsideChunkTreap();
+        std::size_t FreeMemoryInsideChunkTreap() const;
 
         /**
          * @brief Get currently used space.
          * @return used by current arena space.
          */
-        std::size_t GetUsedSpace();
+        std::size_t GetUsedSpace() const;
 
         /**
          * @brief Updates arena used space.
@@ -213,7 +213,7 @@ namespace mpp {
          * active chunk).
          * @return found chunk or nullptr
          */
-        Chunk* GetInUseChunkByPtr(void* t_ptr);
+        Chunk* GetInUseChunkByPtr(void* t_ptr) const;
 
 #if MPP_STATS == 1
         /**
