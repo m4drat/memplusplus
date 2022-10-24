@@ -71,6 +71,12 @@ namespace mpp {
         bool Collect();
 
         /**
+         * @brief 
+         * 
+         */
+        Chunk* GetChunkInUseByPtr(Arena* t_arena, void* t_ptr);
+
+        /**
          * @brief Get reference to unordered set of currently active GcPtr's
          * @return std::unordered_set<GcPtr*>& of currently used GcPtr's
          */

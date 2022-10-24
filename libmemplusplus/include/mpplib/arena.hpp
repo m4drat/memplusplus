@@ -44,11 +44,6 @@ namespace mpp {
         ChunkTreap freedChunks;
 
         /**
-         * @brief All currently used chunks inside arena.
-         */
-        std::set<Chunk*> chunksInUse;
-
-        /**
          * @brief Full arena size.
          */
         std::size_t size{ 0 };
@@ -81,6 +76,11 @@ namespace mpp {
          * Deletes chunksInUse, freedChunks, and munmaps allocated memory page.
          */
         ~Arena();
+
+        /**
+         * @brief All currently used chunks inside arena.
+         */
+        std::set<Chunk*> GetChunksInUse;
 
         /**
          * @brief Returns amount of freed memory inside chunk treap
@@ -203,17 +203,7 @@ namespace mpp {
          */
         Chunk* MergeWithTop(Chunk* t_chunk);
 
-        /**
-         * @brief Find a chunk by the pointer pointing to this chunk.
-         *
-         * Complexity: O(logN).
-         * @warning t_ptr should be in chunksInUse! Using this function you can find only
-         * inUse chunk.
-         * @param t_ptr pointer, that points into some active chunk (everywhere inside
-         * active chunk).
-         * @return found chunk or nullptr
-         */
-        Chunk* GetInUseChunkByPtr(void* t_ptr) const;
+        
 
 #if MPP_STATS == 1
         /**

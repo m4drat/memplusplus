@@ -29,8 +29,14 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        chunksInUse.clear();
         MemoryManager::SysDealloc(this->begin, size);
+    }
+
+    std::set<Chunk*> Arena::GetChunksInUse()
+    {
+        void* ptr = this->begin;
+        
+        
     }
 
     std::size_t Arena::FreeMemoryInsideChunkTreap() const
@@ -57,9 +63,6 @@ namespace mpp {
         arenaStats->UpdateBiggestAllocation(chunk->GetSize());
         arenaStats->UpdateSmallestAllocation(chunk->GetSize());
 #endif
-
-        // Keep track of in use chunks
-        chunksInUse.insert(chunk);
 
         // update current allocated space
         m_currentlyAllocatedSpace += t_chunkSize;
@@ -105,9 +108,6 @@ namespace mpp {
         PROFILE_FUNCTION();
         // Extract chunk from free list, and split it if needed
         Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
-
-        // Keep track of inuse chunks
-        chunksInUse.insert(chunk);
 
 #if MPP_STATS == 1
         arenaStats->IncreaseTotalAllocated(t_chunkSize);
@@ -175,17 +175,6 @@ namespace mpp {
     void Arena::DeallocateChunk(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
-
-        // Delete chunk from active chunks
-        // If erase returns 0, it means, that we haven't deleted
-        // any chunks from chunks in use. This can mean, that chunk
-        // already was deleted (aka DoubleFree occurred), or some other
-        // kind of memory corruption occurred (for example we tried to
-        // free invalid chunk). Always abort program, because
-        // we don't have any performance impact.
-        if (!chunksInUse.erase(t_chunk)) {
-            utils::ErrorAbort("Arena::DeallocateChunk(): Double free or corruption detected!\n");
-        }
 
         // Update currently used space variable
         m_currentlyAllocatedSpace -= t_chunk->GetSize();
@@ -318,21 +307,6 @@ namespace mpp {
         Chunk* chunk = Chunk::ConstructChunk(
             t_chunk1, t_chunk1->GetPrevSize(), t_chunk1->GetSize() + t_chunk2->GetSize(), 0, 0);
         return chunk;
-    }
-
-    Chunk* Arena::GetInUseChunkByPtr(void* t_ptr) const
-    {
-        PROFILE_FUNCTION();
-
-        // Find chunk by pointer
-        auto foundChunkIt = utils::LowerBound(
-            chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
-                return (t_ptr >= reinterpret_cast<void*>(t_ch));
-            });
-        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
-            return *foundChunkIt;
-        }
-        return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
     }
 
     std::size_t Arena::GetUsedSpace() const

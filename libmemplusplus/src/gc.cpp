@@ -18,6 +18,21 @@ namespace mpp {
 #endif
     }
 
+    Chunk* GC::GetChunkInUseByPtr(Arena* t_arena, void* t_ptr)
+    {
+        //PROFILE_FUNCTION();
+
+        // Find chunk by pointer
+        auto foundChunkIt = utils::LowerBound(
+            t_arena->GetChunksInUse.begin(), t_arena->GetChunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
+                return (t_ptr >= reinterpret_cast<void*>(t_ch));
+            });
+        if (foundChunkIt != t_arena->GetChunksInUse.end() && *foundChunkIt == t_ptr) {
+            return *foundChunkIt;
+        }
+        return (foundChunkIt != t_arena->GetChunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
+    }
+
     bool GC::Collect()
     {
 #if MPP_STATS == 1
@@ -160,7 +175,6 @@ namespace mpp {
             newChunk->SetPrevSize(prevSize);
             newChunk->SetIsUsed(1);
             newChunk->SetIsPrevInUse(1);
-            godArena->chunksInUse.insert(newChunk);
 
             prevSize = currSize;
             newChunkLocation = newChunkLocation + currSize;
