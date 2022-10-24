@@ -56,7 +56,7 @@ namespace mpp {
         return false;
     }
 
-    std::set<GcPtr*> Vertex::GetAllOutgoingGcPtrs(std::set<GcPtr*>& t_gcPtrs)
+    std::set<GcPtr*> Vertex::GetAllOutgoingGcPtrs(const std::set<GcPtr*>& t_gcPtrs)
     {
         std::set<GcPtr*>::iterator begin;
         std::set<GcPtr*>::iterator end;

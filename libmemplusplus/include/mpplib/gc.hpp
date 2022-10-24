@@ -21,6 +21,7 @@
 #include <cstring>
 #include <memory>
 #include <set>
+#include <unordered_set>
 #include <vector>
 
 namespace mpp {
@@ -38,7 +39,7 @@ namespace mpp {
          * All GcPtr's that are currently used in the program are added to this list, to keep track
          * of them.
          */
-        std::set<GcPtr*> m_activeGcPtrs;
+        std::unordered_set<GcPtr*> m_activeGcPtrs;
 
 #if MPP_STATS == 1
         /**
@@ -70,12 +71,22 @@ namespace mpp {
         bool Collect();
 
         /**
-         * @brief Get reference to vector of currently active GcPtr's
-         * @return std::vector<GcPtr*>& of currently used GcPtr's
+         * @brief Get reference to unordered set of currently active GcPtr's
+         * @return std::unordered_set<GcPtr*>& of currently used GcPtr's
          */
-        std::set<GcPtr*>& GetGcPtrs()
+        std::unordered_set<GcPtr*>& GetGcPtrs()
         {
             return m_activeGcPtrs;
+        }
+
+        /**
+         * @brief Transforms an unordered set of GcPtr's to a set of GcPtr's
+         * and returns it as a copy.
+         * @return std::set<GcPtr*> of currently used GcPtr's
+         */
+        std::set<GcPtr*> GetOrderedGcPtrs()
+        {
+            return std::set(m_activeGcPtrs.begin(), m_activeGcPtrs.end());
         }
 
         /**

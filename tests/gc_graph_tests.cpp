@@ -97,8 +97,8 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs)
     ASSERT_NE(firstVertex, nullptr);
     ASSERT_NE(secondVertex, nullptr);
     ASSERT_NE(firstVertex, secondVertex);
-    ASSERT_EQ(firstVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 0);
-    ASSERT_EQ(secondVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 1);
+    ASSERT_EQ(firstVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(secondVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 1);
 }
 
 TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
@@ -129,43 +129,46 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(objectsGraph->GetGraphVerticesCount(), 6);
     ASSERT_EQ(GC::GetInstance().GetGcPtrs().size(), 5);
 
-    auto nodePtrVtx = objectsGraph->FindVertex((Chunk*)&nodePtr);
+    auto* nodePtrVtx = objectsGraph->FindVertex((Chunk*)&nodePtr);
     ASSERT_EQ(nodePtrVtx, nullptr);
 
-    auto ptrToNodePtrVtx = objectsGraph->FindVertex((Chunk*)&ptrToNodePtr);
+    auto* ptrToNodePtrVtx = objectsGraph->FindVertex((Chunk*)&ptrToNodePtr);
     ASSERT_NE(ptrToNodePtrVtx, nullptr);
 
-    auto nodePtrVtxValid = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.GetVoid()));
+    auto* nodePtrVtxValid =
+        objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.GetVoid()));
     ASSERT_NE(nodePtrVtxValid, nullptr);
 
     ASSERT_EQ(objectsGraph->HasEdge(ptrToNodePtrVtx, nodePtrVtxValid), true);
     ASSERT_EQ(objectsGraph->HasEdge(nodePtrVtxValid, ptrToNodePtrVtx), false);
 
-    ASSERT_EQ(ptrToNodePtrVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 1);
-    ASSERT_EQ(nodePtrVtxValid->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 1);
+    ASSERT_EQ(ptrToNodePtrVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(),
+              1);
+    ASSERT_EQ(nodePtrVtxValid->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(),
+              1);
 
-    auto nodeVtx = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->GetVoid()));
+    auto* nodeVtx = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->GetVoid()));
     ASSERT_NE(nodeVtx, nullptr);
-    ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 3);
+    ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 3);
 
-    auto aVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->a));
+    auto* aVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->a));
     ASSERT_EQ(aVtxTmp, nodeVtx);
-    auto bVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->b));
+    auto* bVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->b));
     ASSERT_EQ(bVtxTmp, nodeVtx);
-    auto cVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->c));
+    auto* cVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->c));
     ASSERT_EQ(cVtxTmp, nodeVtx);
 
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, aVtxTmp), false);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, bVtxTmp), false);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, cVtxTmp), false);
 
-    auto aVtx =
+    auto* aVtx =
         objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->Get()->a.GetVoid()));
     ASSERT_NE(aVtx, nullptr);
-    auto bVtx =
+    auto* bVtx =
         objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->Get()->b.GetVoid()));
     ASSERT_NE(bVtx, nullptr);
-    auto cVtx =
+    auto* cVtx =
         objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->Get()->c.GetVoid()));
     ASSERT_NE(cVtx, nullptr);
 
@@ -173,9 +176,9 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, bVtx), true);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, cVtx), true);
 
-    ASSERT_EQ(aVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 0);
-    ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 0);
-    ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetGcPtrs()).size(), 0);
+    ASSERT_EQ(aVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
 
     // Generate graphviz layout just to check that at least it doesn't segfault 🤷
     std::stringstream ss;

@@ -140,12 +140,17 @@ namespace mpp {
             }
 
             // Update m_activeGcPtrs
-            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(m_activeGcPtrs)) {
-                m_activeGcPtrs.erase(gcPtr);
+            std::set<GcPtr*> orderedActiveGcPtrs = GetOrderedGcPtrs();
+            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(orderedActiveGcPtrs)) {
+                orderedActiveGcPtrs.erase(gcPtr);
                 auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
                     newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
-                m_activeGcPtrs.insert(m_activeGcPtrs.end(), updatedGcPtrLocation);
+                orderedActiveGcPtrs.insert(orderedActiveGcPtrs.end(), updatedGcPtrLocation);
             }
+
+            // Update activeGcPtrs after all GcPtrs are updated
+            m_activeGcPtrs =
+                std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());
 
             // Copy chunk data to the new location
             std::memcpy(newChunkLocation, vertex->GetLoc(), currSize);

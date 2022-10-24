@@ -125,7 +125,7 @@ namespace mpp {
          * GC class.
          * @return std::set<GcPtr*>&
          */
-        std::set<GcPtr*> GetAllOutgoingGcPtrs(std::set<GcPtr*>& t_gcPtrs);
+        std::set<GcPtr*> GetAllOutgoingGcPtrs(const std::set<GcPtr*>& t_gcPtrs);
 
         /**
          * @brief Get all GcPtr's, that points to current vertex (chunk).
