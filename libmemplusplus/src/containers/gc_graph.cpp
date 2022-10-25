@@ -94,13 +94,13 @@ namespace mpp {
 
         // Create all chunks
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
+            for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 t_out << "\t\"" << chunkAddrStr << "\" [ fillcolor=\"";
 
-                if (arena->topChunk == currChunk) {
+                if (arena->TopChunk() == currChunk) {
                     t_out << colorOrange;
                 } else if (currChunk->IsUsed()) {
                     t_out << colorGreen;
@@ -136,14 +136,14 @@ namespace mpp {
         t_out << "\t\t<TR>\n";
 
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
+            for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 t_out << "\t\t\t"
                       << "<TD bgcolor=\"";
 
-                if (arena->topChunk == currChunk) {
+                if (arena->TopChunk() == currChunk) {
                     t_out << colorOrange;
                 } else if (currChunk->IsUsed()) {
                     t_out << colorGreen;
@@ -165,7 +165,7 @@ namespace mpp {
 
         // Draw connection to the flat heap view
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
+            for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 std::string chunkAddrStr = utils::AddrToString((void*)pos);
                 t_out << "\t\"" << chunkAddrStr << "\" -> heap:\"" << chunkAddrStr
@@ -202,14 +202,14 @@ namespace mpp {
         t_out << "\t\t<TR>\n";
 
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
+            for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 t_out << "\t\t\t"
                       << "<TD bgcolor=\"";
 
-                if (arena->topChunk == currChunk) {
+                if (arena->TopChunk() == currChunk) {
                     t_out << colorOrange;
                 } else if (currChunk->IsUsed()) {
                     t_out << colorGreen;
@@ -238,7 +238,7 @@ namespace mpp {
         uint32_t gcptrIndex = 1;
 
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
+            for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
@@ -246,7 +246,7 @@ namespace mpp {
                                          "size = " + std::to_string(currChunk->GetSize()) + "\"";
                 std::string chunkColor;
 
-                if (arena->topChunk == currChunk) {
+                if (arena->TopChunk() == currChunk) {
                     chunkColor = colorOrange;
                 } else if (currChunk->IsUsed()) {
                     chunkColor = colorGreen;
@@ -352,7 +352,7 @@ namespace mpp {
         // Draw connection to the flat heap view
         t_out << "\n\t// Draw connections from all chunks to the flat heap view\n";
         for (auto* arena : MemoryManager::GetArenaList()) {
-            for (std::byte* pos = arena->begin; pos < arena->end;
+            for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);

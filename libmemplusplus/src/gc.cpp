@@ -111,10 +111,10 @@ namespace mpp {
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
-        godArena->arenaStats->gcCreatedArena = true;
+        godArena->GetArenaStats()->gcCreatedArena = true;
 #endif
 
-        std::byte* newChunkLocation{ godArena->begin };
+        std::byte* newChunkLocation{ godArena->BeginPtr() };
         Chunk* newChunk{ nullptr };
         std::size_t prevSize{ 0 };
         std::size_t currSize{ 0 };
@@ -130,7 +130,7 @@ namespace mpp {
             currSize = vertex->GetLocationAsAChunk()->GetSize();
 
 #if MPP_STATS == 1
-            godArena->arenaStats->IncreaseTotalAllocated(currSize);
+            godArena->GetArenaStats()->IncreaseTotalAllocated(currSize);
 #endif
             // Update GcPtr
             for (auto* gcPtr : vertex->GetPointingToGcPtrs()) {
@@ -143,8 +143,9 @@ namespace mpp {
 
                 // Or we already copied it to another chunk and we need to update it again
                 if (Arena* gcPtrsArena = MM::GetArenaByPtr(gcPtr)) {
-                    auto gcPtrOffset = reinterpret_cast<std::byte*>(gcPtr) - gcPtrsArena->begin;
-                    auto* gcPtrNewLoc = godArena->begin + gcPtrOffset;
+                    auto gcPtrOffset =
+                        reinterpret_cast<std::byte*>(gcPtr) - gcPtrsArena->BeginPtr();
+                    auto* gcPtrNewLoc = godArena->BeginPtr() + gcPtrOffset;
                     // Update GcPtr's internal pointer
                     // FIXME: this is an awful way to do it, but it works for now (might break
                     // if shared_gcptr's layout is changed / or another GcPtr inherited pointer
@@ -154,9 +155,10 @@ namespace mpp {
                     auto* gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
                         gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
 
-                    MPP_ASSERT(reinterpret_cast<std::byte*>(gcPtrInternalPointer +
-                                                            sizeof(std::size_t)) <= godArena->end,
-                               "GcPtr's internal pointer is out of newly created arena's bounds");
+                    MPP_ASSERT(
+                        reinterpret_cast<std::byte*>(gcPtrInternalPointer + sizeof(std::size_t)) <=
+                            godArena->EndPtr(),
+                        "GcPtr's internal pointer is out of newly created arena's bounds");
 
                     *gcPtrInternalPointer = reinterpret_cast<std::size_t>(updatedPtr);
                 }
@@ -192,7 +194,7 @@ namespace mpp {
         Chunk* topChunk = Chunk::ConstructChunk(
             newChunkLocation, prevSize, godArenaSize - layoutedData.layoutedSize, 1, 1);
         godArena->SetUsedSpace(layoutedData.layoutedSize);
-        godArena->topChunk = topChunk;
+        godArena->TopChunk() = topChunk;
 
         MM::s_arenaList.erase(
             std::remove_if(MM::s_arenaList.begin(), MM::s_arenaList.end(), [&](Arena* t_arena) {

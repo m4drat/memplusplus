@@ -124,7 +124,13 @@ void logic()
     treeNode5->left = nullptr;
     treeNode5->right = nullptr;
 
+    std::cout << "Before GC" << std::endl;
+    MM::VisHeapLayout(std::cout, nullptr);
+
     GC::GetInstance().Collect();
+
+    std::cout << "After GC" << std::endl;
+    MM::VisHeapLayout(std::cout, nullptr);
 }
 
 int main()

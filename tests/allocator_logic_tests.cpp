@@ -75,9 +75,9 @@ TEST(AllocatorLogicTest, FDT_merge_into_top)
     // "Test double-linked list"
     {
         ASSERT_TRUE(Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch1)) == Chunk::GetHeaderPtr(ch2));
-        ASSERT_TRUE(Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch2)) == currentArena->topChunk);
+        ASSERT_TRUE(Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch2)) == currentArena->TopChunk());
 
-        ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->topChunk) == Chunk::GetHeaderPtr(ch2));
+        ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->TopChunk()) == Chunk::GetHeaderPtr(ch2));
         ASSERT_TRUE(Chunk::GetPrevChunk(Chunk::GetHeaderPtr(ch2)) == Chunk::GetHeaderPtr(ch1));
     }
 
@@ -86,11 +86,11 @@ TEST(AllocatorLogicTest, FDT_merge_into_top)
         Chunk::GetUserDataPtr(currentArena->GetFirstGreaterOrEqualToChunk(allocationSize)) == ch1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 0);
 
-    std::size_t beforeMergeTopSize = currentArena->topChunk->GetSize();
+    std::size_t beforeMergeTopSize = currentArena->TopChunk()->GetSize();
 
     MemoryManager::Deallocate(ch2);
     ASSERT_TRUE(beforeMergeTopSize + alignedAllocationSize * 2 ==
-                currentArena->topChunk->GetSize());
+                currentArena->TopChunk()->GetSize());
 
     EXPECT_TRUE(currentArena->ConstructChunksInUse(true).empty());
 }
@@ -110,10 +110,10 @@ TEST(AllocatorLogicTest, ADT_merge_into_top)
     ASSERT_TRUE(ch1 < ch2);
 
     MemoryManager::Deallocate(ch2);
-    ASSERT_TRUE(currentArena->topChunk->IsPrevInUse() == 1);
+    ASSERT_TRUE(currentArena->TopChunk()->IsPrevInUse() == 1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsPrevInUse() == 1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsUsed() == 1);
-    ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->topChunk) == Chunk::GetHeaderPtr(ch1));
+    ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->TopChunk()) == Chunk::GetHeaderPtr(ch1));
 
     ASSERT_TRUE(currentArena->ConstructChunksInUse().size() == 1);
 }
@@ -128,14 +128,14 @@ TEST(AllocatorLogicTest, DT_merge_into_top)
     ASSERT_TRUE(ch1 != nullptr);
 
     Arena* currentArena = MemoryManager::GetArenaList().at(0);
-    ASSERT_TRUE(Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch1)) == currentArena->topChunk);
+    ASSERT_TRUE(Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch1)) == currentArena->TopChunk());
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsUsed() == 1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsPrevInUse() == 1);
 
     MemoryManager::Deallocate(ch1);
 
-    ASSERT_TRUE(currentArena->topChunk->IsUsed() == 1);
-    ASSERT_TRUE(currentArena->topChunk->IsPrevInUse() == 1);
+    ASSERT_TRUE(currentArena->TopChunk()->IsUsed() == 1);
+    ASSERT_TRUE(currentArena->TopChunk()->IsPrevInUse() == 1);
 
     ASSERT_TRUE(currentArena->ConstructChunksInUse().empty());
 }
@@ -152,15 +152,15 @@ TEST(AllocatorLogicTest, T_merge_into_top)
     ASSERT_TRUE((ch1 != nullptr && ch2 != nullptr));
 
     Arena* currentArena = MemoryManager::GetArenaList().at(0);
-    ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->topChunk)->GetSize() ==
-                currentArena->topChunk->GetPrevSize());
-    std::size_t topChunkSizeBeforeMerging = currentArena->topChunk->GetSize();
+    ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->TopChunk())->GetSize() ==
+                currentArena->TopChunk()->GetPrevSize());
+    std::size_t topChunkSizeBeforeMerging = currentArena->TopChunk()->GetSize();
 
     MemoryManager::Deallocate(ch1);
     MemoryManager::Deallocate(ch2);
 
     ASSERT_TRUE(currentArena->ConstructChunksInUse().empty());
-    ASSERT_TRUE(currentArena->topChunk->GetSize() == topChunkSizeBeforeMerging + 160 * 2);
+    ASSERT_TRUE(currentArena->TopChunk()->GetSize() == topChunkSizeBeforeMerging + 160 * 2);
 }
 
 TEST(AllocatorLogicTest, ChunkOfArenaSizeMinusMetadata)
@@ -175,13 +175,13 @@ TEST(AllocatorLogicTest, ChunkOfArenaSizeMinusMetadata)
     Arena* currentArena = MemoryManager::GetArenaList().at(0);
 
     ASSERT_TRUE(ch1 != nullptr);
-    ASSERT_TRUE(currentArena->topChunk == nullptr);
+    ASSERT_TRUE(currentArena->TopChunk() == nullptr);
 
     MemoryManager::Deallocate(ch1);
-    ASSERT_TRUE(currentArena->topChunk != nullptr);
+    ASSERT_TRUE(currentArena->TopChunk() != nullptr);
 
     constexpr std::size_t ARENA_SIZE{ MemoryManager::g_DEFAULT_ARENA_SIZE };
-    ASSERT_TRUE(currentArena->topChunk->GetSize() == ARENA_SIZE);
+    ASSERT_TRUE(currentArena->TopChunk()->GetSize() == ARENA_SIZE);
 }
 
 TEST(AllocatorLogicTest, ChunkWithDoubleTheArenaSize)
@@ -195,11 +195,11 @@ TEST(AllocatorLogicTest, ChunkWithDoubleTheArenaSize)
     Arena* currentArena = MemoryManager::GetArenaList().at(0);
 
     ASSERT_TRUE(ch1 != nullptr);
-    ASSERT_TRUE(currentArena->topChunk == nullptr);
+    ASSERT_TRUE(currentArena->TopChunk() == nullptr);
 
     MemoryManager::Deallocate(ch1);
-    ASSERT_TRUE(currentArena->topChunk != nullptr);
-    ASSERT_TRUE(currentArena->topChunk->GetSize() ==
+    ASSERT_TRUE(currentArena->TopChunk() != nullptr);
+    ASSERT_TRUE(currentArena->TopChunk()->GetSize() ==
                 MemoryManager::g_DEFAULT_ARENA_SIZE * 2 + 0x1000);
 }
 
@@ -363,14 +363,14 @@ TEST(AllocatorLogicTest, FreeListAllocation)
     MM::Deallocate(p2);
 
     ASSERT_EQ(MM::GetArenaList().size(), 1);
-    ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+    ASSERT_EQ((*MM::GetArenaList().begin())->GetFreedChunks().TotalFreeChunks(), 1);
     Chunk* chunkToReturn = nullptr;
-    chunkToReturn = (*MM::GetArenaList().begin())->freedChunks.FirstGreaterOrEqualTo(964);
+    chunkToReturn = (*MM::GetArenaList().begin())->GetFreedChunks().FirstGreaterOrEqualTo(964);
 
     void* p5 = MemoryManager::Allocate(964);
     ASSERT_EQ(Chunk::GetHeaderPtr(p5), chunkToReturn);
     ASSERT_EQ(MM::GetArenaList().size(), 1);
-    ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+    ASSERT_EQ((*MM::GetArenaList().begin())->GetFreedChunks().TotalFreeChunks(), 1);
 }
 
 TEST(AllocatorLogicTest, FreeListAllocationWithSplit)
@@ -392,19 +392,19 @@ TEST(AllocatorLogicTest, FreeListAllocationWithSplit)
     MM::VisHeapLayout(ss, nullptr);
 
     ASSERT_EQ(MM::GetArenaList().size(), 1);
-    ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+    ASSERT_EQ((*MM::GetArenaList().begin())->GetFreedChunks().TotalFreeChunks(), 1);
     Chunk* chunkToReturn = nullptr;
-    chunkToReturn = (*MM::GetArenaList().begin())->freedChunks.FirstGreaterOrEqualTo(964);
+    chunkToReturn = (*MM::GetArenaList().begin())->GetFreedChunks().FirstGreaterOrEqualTo(964);
 
     void* p6 = MemoryManager::Allocate(750);
     ASSERT_EQ(Chunk::GetHeaderPtr(p6), chunkToReturn);
     ASSERT_EQ(MM::GetArenaList().size(), 1);
-    ASSERT_EQ((*MM::GetArenaList().begin())->freedChunks.TotalFreeChunks(), 1);
+    ASSERT_EQ((*MM::GetArenaList().begin())->GetFreedChunks().TotalFreeChunks(), 1);
 
     // Trigger code at arena.cpp:142
     MM::Deallocate(p1);
 
-    chunkToReturn = (*MM::GetArenaList().begin())->freedChunks.FirstGreaterOrEqualTo(520);
+    chunkToReturn = (*MM::GetArenaList().begin())->GetFreedChunks().FirstGreaterOrEqualTo(520);
     void* p7 = MemoryManager::Allocate(520);
     ASSERT_EQ(Chunk::GetHeaderPtr(p7), chunkToReturn);
 

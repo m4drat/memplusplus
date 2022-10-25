@@ -6,22 +6,22 @@
 
 namespace mpp {
     Arena::Arena(std::size_t t_size, std::byte* t_begin)
-        : size{ t_size }
-        , topChunk{ Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1) }
-        , begin{ t_begin }
-        , end{ t_begin + t_size }
+        : m_size{ t_size }
+        , m_topChunk{ Chunk::ConstructChunk(t_begin, 0, t_size, 1, 1) }
+        , m_Begin{ t_begin }
+        , m_End{ t_begin + t_size }
     {
         PROFILE_FUNCTION();
 #if MPP_STATS == 1
-        arenaStats = std::make_shared<utils::Statistics::ArenaStats>();
-        utils::Statistics::GetInstance().AddArenaStats(arenaStats);
-        arenaStats->totalAllocated = 0;
-        arenaStats->totalFreed = 0;
-        arenaStats->biggestAllocation = 0;
-        arenaStats->smallestAllocation = std::numeric_limits<std::size_t>::max();
-        arenaStats->fullArenaSize = t_size;
-        arenaStats->bigArena = false;
-        arenaStats->gcCreatedArena = false;
+        m_arenaStats = std::make_shared<utils::Statistics::ArenaStats>();
+        utils::Statistics::GetInstance().AddArenaStats(m_arenaStats);
+        m_arenaStats->totalAllocated = 0;
+        m_arenaStats->totalFreed = 0;
+        m_arenaStats->biggestAllocation = 0;
+        m_arenaStats->smallestAllocation = std::numeric_limits<std::size_t>::max();
+        m_arenaStats->fullArenaSize = t_size;
+        m_arenaStats->bigArena = false;
+        m_arenaStats->gcCreatedArena = false;
 #endif
     }
 
@@ -29,18 +29,17 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        MemoryManager::SysDealloc(this->begin, size);
+        MemoryManager::SysDealloc(this->m_Begin, m_size);
     }
 
     const std::set<Chunk*>& Arena::ConstructChunksInUse(bool t_rebuild)
     {
         if (t_rebuild || m_chunksInUse.empty()) {
             m_chunksInUse.clear();
-            auto* currChunk = reinterpret_cast<Chunk*>(begin);
-            for (std::byte* pos = begin; pos < end; pos += currChunk->GetSize()) {
-                currChunk = reinterpret_cast<Chunk*>(pos);
-                if (currChunk->IsUsed() && (currChunk != topChunk)) {
-                    m_chunksInUse.insert(currChunk);
+
+            for (Chunk& chunk : *this) {
+                if (chunk.IsUsed() && (&chunk != m_topChunk)) {
+                    m_chunksInUse.insert(&chunk);
                 }
             }
         }
@@ -55,14 +54,14 @@ namespace mpp {
 
     std::size_t Arena::FreeMemoryInsideChunkTreap() const
     {
-        return freedChunks.TotalFreeMemory();
+        return m_freedChunks.TotalFreeMemory();
     }
 
     Chunk* Arena::GetFirstGreaterOrEqualToChunk(std::size_t t_desiredChunkSize) const
     {
         PROFILE_FUNCTION();
         // Find suitable chunk in treap of freed chunks
-        return freedChunks.FirstGreaterOrEqualTo(t_desiredChunkSize);
+        return m_freedChunks.FirstGreaterOrEqualTo(t_desiredChunkSize);
     }
 
     Chunk* Arena::AllocateFromTopChunk(std::size_t t_chunkSize)
@@ -73,9 +72,9 @@ namespace mpp {
         Chunk* chunk = SplitTopChunk(t_chunkSize);
 
 #if MPP_STATS == 1
-        arenaStats->IncreaseTotalAllocated(t_chunkSize);
-        arenaStats->UpdateBiggestAllocation(chunk->GetSize());
-        arenaStats->UpdateSmallestAllocation(chunk->GetSize());
+        m_arenaStats->IncreaseTotalAllocated(t_chunkSize);
+        m_arenaStats->UpdateBiggestAllocation(chunk->GetSize());
+        m_arenaStats->UpdateSmallestAllocation(chunk->GetSize());
 #endif
 
         // update current allocated space
@@ -87,32 +86,33 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
         // Size of requested chunk is equal to size of top chunk
-        if (t_chunkSize == topChunk->GetSize()) {
+        if (t_chunkSize == m_topChunk->GetSize()) {
             // Construct new chunk from all memory, that belongs to top chunk
             Chunk* chunk =
-                Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
+                Chunk::ConstructChunk(m_topChunk, m_topChunk->GetPrevSize(), t_chunkSize, 1, 1);
 
             // make topChunk nullptr, to let allocator know, that we dont
             // have any more top-space in current arena. This field can be
             // updated later in deallocate, if we managed to merge everything
             // on the right side
-            topChunk = nullptr;
+            m_topChunk = nullptr;
             return chunk;
         }
 
         // Splitting top chunk in smaller chunks
-        std::size_t newTopChunkSize = topChunk->GetSize() - t_chunkSize;
+        std::size_t newTopChunkSize = m_topChunk->GetSize() - t_chunkSize;
 
         // Constructing new chunk from splitted memory
-        Chunk* chunk = Chunk::ConstructChunk(topChunk, topChunk->GetPrevSize(), t_chunkSize, 1, 1);
+        Chunk* chunk =
+            Chunk::ConstructChunk(m_topChunk, m_topChunk->GetPrevSize(), t_chunkSize, 1, 1);
 
         // Update top chunk
-        topChunk = Chunk::ConstructChunk(reinterpret_cast<std::byte*>(topChunk) + t_chunkSize,
-                                         t_chunkSize,
-                                         newTopChunkSize,
-                                         1,
-                                         1);
-        MPP_POISON_USER_DATA_INSIDE_CHUNK(topChunk);
+        m_topChunk = Chunk::ConstructChunk(reinterpret_cast<std::byte*>(m_topChunk) + t_chunkSize,
+                                           t_chunkSize,
+                                           newTopChunkSize,
+                                           1,
+                                           1);
+        MPP_POISON_USER_DATA_INSIDE_CHUNK(m_topChunk);
 
         return chunk;
     }
@@ -124,7 +124,7 @@ namespace mpp {
         Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
 
 #if MPP_STATS == 1
-        arenaStats->IncreaseTotalAllocated(t_chunkSize);
+        m_arenaStats->IncreaseTotalAllocated(t_chunkSize);
 #endif
 
         // Update used space variable
@@ -143,12 +143,12 @@ namespace mpp {
         std::size_t toSplitChunkSize = t_chunk->GetSize();
 
         // Delete current chunk from free list
-        freedChunks.RemoveChunk(t_chunk);
+        m_freedChunks.RemoveChunk(t_chunk);
 
         // Free-list chunk size is equal to requested size (we don't need to split)
         if (t_chunk->GetSize() == t_chunkSize) {
             // Chunk to split is the first chunk inside arena. Memory layout: [t_chunk][....]
-            if (static_cast<void*>(t_chunk) == begin) {
+            if (static_cast<void*>(t_chunk) == m_Begin) {
                 // Set prevInUse to 1, because we don't want to merge it to the
                 // left (cause we dont have anything on the left)
                 chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
@@ -160,7 +160,7 @@ namespace mpp {
             Chunk::GetNextChunk(chunk)->SetPrevSize(t_chunkSize);
         } else {
             // Free-list chunk size is NOT equal to requested size (we have need to split it)
-            if (static_cast<void*>(t_chunk) == begin) {
+            if (static_cast<void*>(t_chunk) == m_Begin) {
                 // Chunk to split is the first chunk inside arena. Memory layout: [t_chunk][....]
                 // Split chunk from the beginning of the arena
                 chunk = Chunk::ConstructChunk(t_chunk, 0, t_chunkSize, 1, 1);
@@ -180,7 +180,7 @@ namespace mpp {
             Chunk::GetNextChunk(splittedChunk)->SetPrevSize(toSplitChunkSize - t_chunkSize);
 
             // Keep track of remaining chunk by placing it into free list
-            freedChunks.InsertChunk(splittedChunk);
+            m_freedChunks.InsertChunk(splittedChunk);
             MPP_POISON_USER_DATA_INSIDE_CHUNK(splittedChunk);
         }
         return chunk;
@@ -197,13 +197,13 @@ namespace mpp {
 
         // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);
-        if (newChunk != topChunk) {
+        if (newChunk != m_topChunk) {
             // Update free list
-            freedChunks.InsertChunk(newChunk);
+            m_freedChunks.InsertChunk(newChunk);
         }
 
 #if MPP_STATS == 1
-        arenaStats->IncreaseTotalFreed(t_chunk->GetSize());
+        m_arenaStats->IncreaseTotalFreed(t_chunk->GetSize());
 #endif
     }
 
@@ -229,9 +229,9 @@ namespace mpp {
             2. ADT
             3. DT
         */
-        if (((topChunk == nullptr) &&
-             (reinterpret_cast<std::byte*>(t_chunk) + t_chunk->GetSize() == end)) ||
-            (Chunk::GetNextChunk(t_chunk) == topChunk)) {
+        if (((m_topChunk == nullptr) &&
+             (reinterpret_cast<std::byte*>(t_chunk) + t_chunk->GetSize() == m_End)) ||
+            (Chunk::GetNextChunk(t_chunk) == m_topChunk)) {
             return MergeWithTop(t_chunk);
         }
 
@@ -248,20 +248,20 @@ namespace mpp {
 
         // Merge forward
         if (Chunk::GetNextChunk(t_chunk)->IsUsed() == 0) {
-            freedChunks.RemoveChunk(Chunk::GetNextChunk(t_chunk));
+            m_freedChunks.RemoveChunk(Chunk::GetNextChunk(t_chunk));
             newChunk = MergeTwoSequenceChunks(newChunk, Chunk::GetNextChunk(t_chunk));
         }
 
         // Merge backwards
-        if ((reinterpret_cast<void*>(t_chunk) != begin) &&
+        if ((reinterpret_cast<void*>(t_chunk) != m_Begin) &&
             Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
-            freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
+            m_freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             newChunk = MergeTwoSequenceChunks(Chunk::GetPrevChunk(newChunk), newChunk);
         }
 
         // Magic rule, well to know: chunk->GetPrevSize() == 0 <=> chunk == this->begin
         // Set size of previous chunk
-        if (static_cast<void*>(newChunk) != begin) {
+        if (static_cast<void*>(newChunk) != m_Begin) {
             newChunk->SetPrevSize(Chunk::GetPrevChunk(newChunk)->GetSize());
         } else {
             newChunk->SetPrevSize(0);
@@ -283,32 +283,33 @@ namespace mpp {
         Chunk* newChunk{ t_chunk };
 
         // Merge backwards
-        if ((static_cast<void*>(t_chunk) != begin) && Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
-            freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
+        if ((static_cast<void*>(t_chunk) != m_Begin) &&
+            Chunk::GetPrevChunk(t_chunk)->IsUsed() == 0) {
+            m_freedChunks.RemoveChunk(Chunk::GetPrevChunk(t_chunk));
             newChunk = MergeTwoSequenceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
         }
 
         // If top chunk is null, we need to create new one
-        if (topChunk == nullptr) {
-            topChunk = newChunk;
+        if (m_topChunk == nullptr) {
+            m_topChunk = newChunk;
             // Check, if top chunk isn't the first chunk in arena:
-            if (static_cast<void*>(topChunk) != begin) {
-                topChunk->SetPrevSize(Chunk::GetPrevChunk(topChunk)->GetSize());
+            if (static_cast<void*>(m_topChunk) != m_Begin) {
+                m_topChunk->SetPrevSize(Chunk::GetPrevChunk(m_topChunk)->GetSize());
                 // Check, if top chunk is the first chunk in arena:
             } else {
                 // ChunkSize is already set by MergeTwoSequenceChunks function
-                topChunk->SetPrevSize(0);
+                m_topChunk->SetPrevSize(0);
             }
-            topChunk->SetIsPrevInUse(1);
-            topChunk->SetIsUsed(1);
-            return topChunk;
+            m_topChunk->SetIsPrevInUse(1);
+            m_topChunk->SetIsUsed(1);
+            return m_topChunk;
             // Merging with topChunk if it isn't nullptr
             // Merge forward
         }
-        topChunk = MergeTwoSequenceChunks(newChunk, topChunk);
-        topChunk->SetIsPrevInUse(1);
-        topChunk->SetIsUsed(1);
-        return topChunk;
+        m_topChunk = MergeTwoSequenceChunks(newChunk, m_topChunk);
+        m_topChunk->SetIsPrevInUse(1);
+        m_topChunk->SetIsUsed(1);
+        return m_topChunk;
     }
 
     // Note that MergeTwoSequenceChunks doesn't check order of the
@@ -347,20 +348,20 @@ namespace mpp {
               << std::endl;
 
         t_out << "MPP - Total arena size           : "
-              << utils::Statistics::FormattedSize(t_arena->size) << std::endl;
+              << utils::Statistics::FormattedSize(t_arena->m_size) << std::endl;
         t_out << "MPP - Currently Allocated Space  : "
               << utils::Statistics::FormattedSize(t_arena->m_currentlyAllocatedSpace) << std::endl;
         t_out << "MPP - Amount of free memory      : "
-              << utils::Statistics::FormattedSize(t_arena->size -
+              << utils::Statistics::FormattedSize(t_arena->m_size -
                                                   t_arena->m_currentlyAllocatedSpace)
               << " (" << std::fixed << std::setprecision(4)
-              << (float)(t_arena->size - t_arena->m_currentlyAllocatedSpace) /
-                     float(t_arena->size) * 100.0f
+              << (float)(t_arena->m_size - t_arena->m_currentlyAllocatedSpace) /
+                     float(t_arena->m_size) * 100.0f
               << "% of total arena size)" << std::endl;
         t_out << "MPP - Amount of allocated memory : "
               << utils::Statistics::FormattedSize(t_arena->m_currentlyAllocatedSpace) << " ("
               << std::fixed << std::setprecision(4)
-              << (float)t_arena->m_currentlyAllocatedSpace / float(t_arena->size) * 100.0f
+              << (float)t_arena->m_currentlyAllocatedSpace / float(t_arena->m_size) * 100.0f
               << "% of total arena size)" << std::endl;
         t_out << "MPP - Allocated memory == 0      : ";
         if (t_arena->m_currentlyAllocatedSpace == 0) {
@@ -389,19 +390,19 @@ namespace mpp {
         }
 
         t_out << "MPP - TopChunk                   : ";
-        if (t_arena->topChunk) {
-            Chunk::DumpChunk(t_out, t_arena->topChunk);
+        if (t_arena->m_topChunk) {
+            Chunk::DumpChunk(t_out, t_arena->m_topChunk);
         } else {
             t_out << "nullptr";
         }
         t_out << std::endl;
 
-        t_out << "MPP - Arena begin pointer        : " << static_cast<void*>(t_arena->begin)
+        t_out << "MPP - Arena begin pointer        : " << static_cast<void*>(t_arena->m_Begin)
               << std::endl;
-        t_out << "MPP - Arena end pointer          : " << static_cast<void*>(t_arena->end)
+        t_out << "MPP - Arena end pointer          : " << static_cast<void*>(t_arena->m_End)
               << std::endl;
 
-        t_out << "MPP - Freed chunks nodes (" << t_arena->freedChunks.TotalFreeChunks() << ")"
+        t_out << "MPP - Freed chunks nodes (" << t_arena->m_freedChunks.TotalFreeChunks() << ")"
               << std::endl;
         int32_t idx1 = 0;
         std::function<void(std::ostream&, Node*)> Iterate = [&](std::ostream& out, Node* node) {
@@ -415,7 +416,7 @@ namespace mpp {
             Iterate(out, node->leftChild);
         };
         if (t_dumpFreedChunks) {
-            Iterate(t_out, t_arena->freedChunks.GetRootNode());
+            Iterate(t_out, t_arena->m_freedChunks.GetRootNode());
         }
 
         t_out << "MPP - Chunks in use (" << chunksInUse.size() << ")" << std::endl;

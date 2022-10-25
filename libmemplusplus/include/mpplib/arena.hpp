@@ -33,12 +33,11 @@ namespace mpp {
          */
         std::set<Chunk*> m_chunksInUse;
 
-    public:
 #if MPP_STATS == 1
         /**
          * @brief Arena statistics.
          */
-        std::shared_ptr<utils::Statistics::ArenaStats> arenaStats;
+        std::shared_ptr<utils::Statistics::ArenaStats> m_arenaStats;
 #endif
 
         /**
@@ -46,27 +45,128 @@ namespace mpp {
          *
          * Treap is used, because we need fast search (logN), fast insert/remove (logN).
          */
-        ChunkTreap freedChunks;
+        ChunkTreap m_freedChunks;
 
         /**
          * @brief Full arena size.
          */
-        std::size_t size{ 0 };
+        std::size_t m_size{ 0 };
 
         /**
          * @brief Pointer to top chunk, a.k.a wilderness.
          */
-        Chunk* topChunk{ nullptr };
+        Chunk* m_topChunk{ nullptr };
 
         /**
          * @brief Pointer to the first usable address in allocated using mmap block.
          */
-        std::byte* begin{ nullptr };
+        std::byte* m_Begin{ nullptr };
 
         /**
          * @brief Pointer to the first address right after arena.begin + arena.size.
          */
-        std::byte* end{ nullptr };
+        std::byte* m_End{ nullptr };
+
+    public:
+        //! @brief Iterator for chunks inside arena.
+        class Iterator
+        {
+        public:
+            using iterator_category = std::forward_iterator_tag;
+            using difference_type = std::ptrdiff_t;
+            using value_type = Chunk;
+            using pointer = Chunk*;
+            using reference = Chunk&;
+
+            explicit Iterator(pointer ptr)
+                : m_ptr(ptr)
+            {
+            }
+
+            reference operator*() const
+            {
+                return *m_ptr;
+            }
+
+            pointer operator->()
+            {
+                return m_ptr;
+            }
+
+            Iterator& operator++()
+            {
+                m_ptr = reinterpret_cast<Chunk*>((std::byte*)m_ptr + m_ptr->GetSize());
+                return *this;
+            }
+
+            Iterator operator++(int)
+            {
+                Iterator tmp = *this;
+                ++(*this);
+                return tmp;
+            }
+
+            friend bool operator==(const Iterator& t_first, const Iterator& t_second)
+            {
+                return t_first.m_ptr == t_second.m_ptr;
+            };
+
+            friend bool operator!=(const Iterator& t_first, const Iterator& t_second)
+            {
+                return t_first.m_ptr != t_second.m_ptr;
+            };
+
+        private:
+            pointer m_ptr;
+        };
+
+        //! @brief Stats for arena.
+        std::shared_ptr<utils::Statistics::ArenaStats> GetArenaStats()
+        {
+            return m_arenaStats;
+        }
+
+        //! @brief Returns const reference to treap with all freed chunks.
+        const ChunkTreap& GetFreedChunks() const
+        {
+            return m_freedChunks;
+        }
+
+        //! @brief Returns arena size
+        std::size_t GetSize() const
+        {
+            return m_size;
+        }
+
+        //! @brief Returns reference to a pointer to top chunk.
+        Chunk*& TopChunk()
+        {
+            return m_topChunk;
+        }
+
+        //! @brief Returns pointer to a beginning of the arena.
+        std::byte* BeginPtr() const
+        {
+            return m_Begin;
+        }
+
+        //! @brief Returns pointer to an end of the arena.
+        std::byte* EndPtr() const
+        {
+            return m_End;
+        }
+
+        //! @brief Returns iterator to the first chunk in arena.
+        Iterator begin() const
+        {
+            return Iterator(reinterpret_cast<Chunk*>(m_Begin));
+        }
+
+        //! @brief Returns iterator to the memory address right after the last chunk in arena.
+        Iterator end() const
+        {
+            return Iterator(reinterpret_cast<Chunk*>(m_End));
+        }
 
         /**
          * @brief Default arena constructor.

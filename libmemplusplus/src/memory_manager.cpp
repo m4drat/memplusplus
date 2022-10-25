@@ -109,7 +109,7 @@ namespace mpp {
         for (auto* arena : s_arenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the right side
-            if (arena->topChunk && (t_realSize <= arena->topChunk->GetSize())) {
+            if (arena->TopChunk() && (t_realSize <= arena->TopChunk()->GetSize())) {
                 chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
             } else { // Check if current arena has enough free space
                 chunkToReturn = arena->GetFirstGreaterOrEqualToChunk(t_realSize);
@@ -122,8 +122,8 @@ namespace mpp {
                 chunkToReturn = arena->AllocateFromFreeList(chunkToReturn, t_realSize);
             }
 #if MPP_STATS == 1
-            arena->arenaStats->UpdateBiggestAllocation(chunkToReturn->GetSize());
-            arena->arenaStats->UpdateSmallestAllocation(chunkToReturn->GetSize());
+            arena->GetArenaStats()->UpdateBiggestAllocation(chunkToReturn->GetSize());
+            arena->GetArenaStats()->UpdateSmallestAllocation(chunkToReturn->GetSize());
 #endif
 
             return chunkToReturn;
@@ -141,7 +141,7 @@ namespace mpp {
         // Create new arena with requested size
         Arena* arena = CreateArena(t_userDataSize);
 #if MPP_STATS == 1
-        arena->arenaStats->bigArena = true;
+        arena->GetArenaStats()->bigArena = true;
 #endif
 
         // Allocate chunk from right space of that arena
@@ -209,7 +209,7 @@ namespace mpp {
 
         // Find arena that chunk belongs to
         for (auto* arena : s_arenaList) {
-            if (t_chunkPtr >= arena->begin && t_chunkPtr <= arena->end) {
+            if (t_chunkPtr >= arena->BeginPtr() && t_chunkPtr <= arena->EndPtr()) {
                 // In this case, we still can free invalid pointer, so
                 // add additional checks inside DeallocateChunk
                 arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
@@ -255,43 +255,42 @@ namespace mpp {
         for (auto* arena : s_arenaList) {
             t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
                   << std::endl;
-            auto* currChunk = reinterpret_cast<Chunk*>(arena->begin);
-            for (std::byte* pos = arena->begin; pos < arena->end; pos += currChunk->GetSize()) {
-                currChunk = reinterpret_cast<Chunk*>(pos);
+            for (Chunk& chunk : *arena) {
+                Chunk* currChunkPtr = &chunk;
 
-                bool currentChunkPtr =
-                    ((t_ptr >= currChunk) && (t_ptr < (currChunk + currChunk->GetSize())));
+                bool isPtrInsideCurrChunk =
+                    ((t_ptr >= currChunkPtr) && (t_ptr < (currChunkPtr + currChunkPtr->GetSize())));
 
 #if MPP_COLOUR == 1
-                if (t_ptr != nullptr && currentChunkPtr) {
+                if (t_ptr != nullptr && isPtrInsideCurrChunk) {
                     t_out << col::MAGENTA << "<(";
                 } else {
                     t_out << col::BLUE << "[";
                 }
 
-                if (currChunk->IsUsed()) {
-                    t_out << col::GREEN << "PTR:" << static_cast<void*>(currChunk) << col::RESET
-                          << "/" << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET
-                          << "/" << col::GREEN << "CS:" << currChunk->GetSize() << col::RESET
+                if (currChunkPtr->IsUsed()) {
+                    t_out << col::GREEN << "PTR:" << static_cast<void*>(currChunkPtr) << col::RESET
+                          << "/" << col::GREEN << "PS:" << currChunkPtr->GetPrevSize() << col::RESET
+                          << "/" << col::GREEN << "CS:" << currChunkPtr->GetSize() << col::RESET
                           << "/";
                 } else {
-                    t_out << col::RED << "PTR:" << static_cast<void*>(currChunk) << col::RESET
-                          << "/" << col::GREEN << "PS:" << currChunk->GetPrevSize() << col::RESET
-                          << "/" << col::GREEN << "CS:" << currChunk->GetSize() << col::RESET
+                    t_out << col::RED << "PTR:" << static_cast<void*>(currChunkPtr) << col::RESET
+                          << "/" << col::GREEN << "PS:" << currChunkPtr->GetPrevSize() << col::RESET
+                          << "/" << col::GREEN << "CS:" << currChunkPtr->GetSize() << col::RESET
                           << "/";
                 }
-                if (currChunk->IsPrevInUse()) {
-                    t_out << col::GREEN << "P:" << currChunk->IsPrevInUse() << col::RESET << "/";
+                if (currChunkPtr->IsPrevInUse()) {
+                    t_out << col::GREEN << "P:" << currChunkPtr->IsPrevInUse() << col::RESET << "/";
                 } else {
-                    t_out << col::RED << "P:" << currChunk->IsPrevInUse() << col::RESET << "/";
+                    t_out << col::RED << "P:" << currChunkPtr->IsPrevInUse() << col::RESET << "/";
                 }
-                if (currChunk->IsUsed()) {
-                    t_out << col::GREEN << "U:" << currChunk->IsUsed();
+                if (currChunkPtr->IsUsed()) {
+                    t_out << col::GREEN << "U:" << currChunkPtr->IsUsed();
                 } else {
-                    t_out << col::RED << "U:" << currChunk->IsUsed();
+                    t_out << col::RED << "U:" << currChunkPtr->IsUsed();
                 }
 
-                if (t_ptr != nullptr && currentChunkPtr) {
+                if (t_ptr != nullptr && isPtrInsideCurrChunk) {
                     t_out << col::MAGENTA << ")>" << col::RESET;
                 } else {
                     t_out << col::BLUE << "]" << col::RESET;
@@ -343,7 +342,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         for (auto* arena : s_arenaList) {
-            if (t_ptr >= arena->begin && t_ptr <= arena->end) {
+            if (t_ptr >= arena->BeginPtr() && t_ptr <= arena->EndPtr()) {
                 return arena;
             }
         }
