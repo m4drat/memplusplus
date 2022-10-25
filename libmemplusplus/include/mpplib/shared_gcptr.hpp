@@ -9,6 +9,17 @@
 #include "mpplib/utils/profiler_definitions.hpp"
 
 namespace mpp {
+    template<class Type>
+    class SharedGcPtrBase
+    {
+    protected:
+        using ElementType = typename std::remove_extent<Type>::type;
+        /**
+         * @brief pointer to object.
+         */
+        ElementType* m_objectPtr{ nullptr };
+    };
+
     template<bool Type>
     class SharedGcPtrArray
     {
@@ -30,21 +41,14 @@ namespace mpp {
      */
     template<class Type>
     class SharedGcPtr
-        : public SharedGcPtrArray<std::is_array<Type>::value>
+        : public SharedGcPtrBase<Type>
+        , public SharedGcPtrArray<std::is_array<Type>::value>
         , public GcPtr
     {
-        // static_assert(offsetof(SharedGcPtr<Type>, m_objectPtr) == 10,
-        //               "m_objectPtr must be at offset 10");
-
         friend class GC;
 
     protected:
         using ElementType = typename std::remove_extent<Type>::type;
-
-        /**
-         * @brief pointer to object.
-         */
-        ElementType* m_objectPtr{ nullptr };
 
         /**
          * @brief Number of references to the object.

@@ -31,8 +31,14 @@ namespace mpp {
     class GC
     {
     private:
+        /**
+         * @brief Newly created arena available space expansion threshold. If arena has less space
+         * than required, new arena is created with size of old_size * @sa m_newAllocExpandFactor.
+         */
         static constexpr float m_newAllocExtendThreshold = 0.25f;
+        //! @brief Newly created arena expansion factor.
         static constexpr float m_newAllocExpandFactor = 1.25f;
+
         /**
          * @brief All active GcPtr's.
          *
@@ -42,28 +48,22 @@ namespace mpp {
         std::unordered_set<GcPtr*> m_activeGcPtrs;
 
 #if MPP_STATS == 1
-        /**
-         * @brief Used to keep track of garbage collector stats
-         */
+        //! @brief Used to keep track of garbage collector stats
         std::unique_ptr<utils::Statistics::GcStats> m_gcStats;
 #endif
 
-        /**
-         * @brief Current cycle to dump objects graph
-         */
+        //! @brief Current cycle to dump objects graph
         static uint32_t m_currentCycle;
 
     public:
-        /**
-         * @brief Construct a new GC object
-         */
+        //! @brief Construct a new GC object
         GC();
 
         /**
          * @brief Collect garbage.
          *
          * This method will construct graph of all in use chunks.
-         * Then it will create Heuristics object to relayout data in most efficient way.
+         * Then it will create Heuristics object to relayout data in the most efficient way.
          * After that, it will move all data to newly created arena, updating
          * corresponding gcptr's. And in the end it will destroy unused arenas.
          * @return true if everything is good, false - otherwise
