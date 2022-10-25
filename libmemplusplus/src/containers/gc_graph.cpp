@@ -45,8 +45,8 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        Chunk* gcPtrObjectChunk = MM::GetInUseChunkByPtr(t_gcPtr->GetVoid());
-        Chunk* gcPtrLocationChunk = MM::GetInUseChunkByPtr(t_gcPtr);
+        Chunk* gcPtrObjectChunk = GC::FindChunkInUse(t_gcPtr->GetVoid());
+        Chunk* gcPtrLocationChunk = GC::FindChunkInUse(t_gcPtr);
 
         // Check that "to" vertex already exists in graph
         Vertex* destination = FindVertex(gcPtrObjectChunk);
@@ -294,7 +294,7 @@ namespace mpp {
                       << chunkAddrStr << " and chunks\n";
                 for (auto* gcPtr : chunkAsVertex->GetAllOutgoingGcPtrs(orderedGcPtrs)) {
                     std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
-                    Chunk* pointsToChunk = MM::GetInUseChunkByPtr(gcPtr->GetVoid());
+                    Chunk* pointsToChunk = GC::FindChunkInUse(gcPtr->GetVoid());
                     Vertex* pointsToVertex = FindVertex(pointsToChunk);
                     bool pointsToCluster =
                         (pointsToVertex)
@@ -325,7 +325,7 @@ namespace mpp {
         t_out << "\n\t// Draw connections between non-heap GC-pointers and chunks\n";
         for (auto* gcPtr : nonHeapGcPtrs) {
             std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
-            Chunk* pointsToChunk = MM::GetInUseChunkByPtr(gcPtr->GetVoid());
+            Chunk* pointsToChunk = GC::FindChunkInUse(gcPtr->GetVoid());
             Vertex* pointsToVertex = FindVertex(pointsToChunk);
             bool pointsToCluster =
                 (pointsToVertex) ? !pointsToVertex->GetAllOutgoingGcPtrs(orderedGcPtrs).empty()

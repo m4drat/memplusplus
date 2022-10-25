@@ -71,6 +71,13 @@ namespace mpp {
         bool Collect();
 
         /**
+         * @brief Returns in-use chunk if t_ptr points inside it, nullptr otherwise.
+         * @param t_ptr Pointer to find chunk for
+         * @return Chunk* Pointer to chunk if t_ptr points inside it, nullptr otherwise
+         */
+        static Chunk* FindChunkInUse(void* t_ptr);
+
+        /**
          * @brief Get reference to unordered set of currently active GcPtr's
          * @return std::unordered_set<GcPtr*>& of currently used GcPtr's
          */

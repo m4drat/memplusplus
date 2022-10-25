@@ -29,8 +29,28 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        chunksInUse.clear();
         MemoryManager::SysDealloc(this->begin, size);
+    }
+
+    const std::set<Chunk*>& Arena::ConstructChunksInUse(bool t_rebuild)
+    {
+        if (t_rebuild || m_chunksInUse.empty()) {
+            m_chunksInUse.clear();
+            auto* currChunk = reinterpret_cast<Chunk*>(begin);
+            for (std::byte* pos = begin; pos < end; pos += currChunk->GetSize()) {
+                currChunk = reinterpret_cast<Chunk*>(pos);
+                if (currChunk->IsUsed() && (currChunk != topChunk)) {
+                    m_chunksInUse.insert(currChunk);
+                }
+            }
+        }
+
+        return m_chunksInUse;
+    }
+
+    void Arena::ClearChunksInUse()
+    {
+        m_chunksInUse.clear();
     }
 
     std::size_t Arena::FreeMemoryInsideChunkTreap() const
@@ -57,9 +77,6 @@ namespace mpp {
         arenaStats->UpdateBiggestAllocation(chunk->GetSize());
         arenaStats->UpdateSmallestAllocation(chunk->GetSize());
 #endif
-
-        // Keep track of in use chunks
-        chunksInUse.insert(chunk);
 
         // update current allocated space
         m_currentlyAllocatedSpace += t_chunkSize;
@@ -105,9 +122,6 @@ namespace mpp {
         PROFILE_FUNCTION();
         // Extract chunk from free list, and split it if needed
         Chunk* chunk = SplitChunkFromFreeList(t_chunk, t_chunkSize);
-
-        // Keep track of inuse chunks
-        chunksInUse.insert(chunk);
 
 #if MPP_STATS == 1
         arenaStats->IncreaseTotalAllocated(t_chunkSize);
@@ -175,17 +189,6 @@ namespace mpp {
     void Arena::DeallocateChunk(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
-
-        // Delete chunk from active chunks
-        // If erase returns 0, it means, that we haven't deleted
-        // any chunks from chunks in use. This can mean, that chunk
-        // already was deleted (aka DoubleFree occurred), or some other
-        // kind of memory corruption occurred (for example we tried to
-        // free invalid chunk). Always abort program, because
-        // we don't have any performance impact.
-        if (!chunksInUse.erase(t_chunk)) {
-            utils::ErrorAbort("Arena::DeallocateChunk(): Double free or corruption detected!\n");
-        }
 
         // Update currently used space variable
         m_currentlyAllocatedSpace -= t_chunk->GetSize();
@@ -320,21 +323,6 @@ namespace mpp {
         return chunk;
     }
 
-    Chunk* Arena::GetInUseChunkByPtr(void* t_ptr) const
-    {
-        PROFILE_FUNCTION();
-
-        // Find chunk by pointer
-        auto foundChunkIt = utils::LowerBound(
-            chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
-                return (t_ptr >= reinterpret_cast<void*>(t_ch));
-            });
-        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
-            return *foundChunkIt;
-        }
-        return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
-    }
-
     std::size_t Arena::GetUsedSpace() const
     {
         return m_currentlyAllocatedSpace;
@@ -352,6 +340,8 @@ namespace mpp {
                                    bool t_dumpInUseChunks)
     {
         PROFILE_FUNCTION();
+
+        const std::set<Chunk*>& chunksInUse = t_arena->ConstructChunksInUse();
 
         t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena) << " --------------"
               << std::endl;
@@ -387,14 +377,13 @@ namespace mpp {
 #endif
         }
         t_out << "MPP - Memory used for metadata   : "
-              << utils::Statistics::FormattedSize(t_arena->chunksInUse.size() *
-                                                  sizeof(Chunk::ChunkHeader_t))
+              << utils::Statistics::FormattedSize(chunksInUse.size() * sizeof(Chunk::ChunkHeader_t))
               << " (";
         if (t_arena->m_currentlyAllocatedSpace == 0) {
             t_out << "0% of currently allocated space)" << std::endl;
         } else {
             t_out << std::fixed << std::setprecision(4)
-                  << (float)(t_arena->chunksInUse.size() * sizeof(Chunk::ChunkHeader_t)) /
+                  << (float)(chunksInUse.size() * sizeof(Chunk::ChunkHeader_t)) /
                          float(t_arena->m_currentlyAllocatedSpace) * 100.0f
                   << "% of currently allocated space)" << std::endl;
         }
@@ -429,10 +418,10 @@ namespace mpp {
             Iterate(t_out, t_arena->freedChunks.GetRootNode());
         }
 
-        t_out << "MPP - Chunks in use (" << t_arena->chunksInUse.size() << ")" << std::endl;
+        t_out << "MPP - Chunks in use (" << chunksInUse.size() << ")" << std::endl;
         int32_t idx2 = 0;
         if (t_dumpInUseChunks) {
-            for (auto* chunk : t_arena->chunksInUse) {
+            for (auto* chunk : chunksInUse) {
                 t_out << "\t" << idx2 << ". ";
                 Chunk::DumpChunk(t_out, chunk) << std::endl;
                 idx2++;

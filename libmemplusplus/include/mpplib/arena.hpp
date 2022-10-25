@@ -23,10 +23,15 @@ namespace mpp {
     class Arena final
     {
     private:
-        /**
-         * @brief Currently used space in arena.
-         */
+        //! @brief Currently used space in arena.
         std::size_t m_currentlyAllocatedSpace{ 0 };
+
+        /**
+         * @brief All chunks in use. Invalid before call to @sa ConstructChunksInUse.
+         * @warning call to ConstructChunksInUse by default doesn't rebuild this set if it's already
+         * built. So it might be outdated.
+         */
+        std::set<Chunk*> m_chunksInUse;
 
     public:
 #if MPP_STATS == 1
@@ -42,11 +47,6 @@ namespace mpp {
          * Treap is used, because we need fast search (logN), fast insert/remove (logN).
          */
         ChunkTreap freedChunks;
-
-        /**
-         * @brief All currently used chunks inside arena.
-         */
-        std::set<Chunk*> chunksInUse;
 
         /**
          * @brief Full arena size.
@@ -81,6 +81,20 @@ namespace mpp {
          * Deletes chunksInUse, freedChunks, and munmaps allocated memory page.
          */
         ~Arena();
+
+        /**
+         * @brief Constructs set of chunks, that are in use.
+         * @warning This function traverses all chunks in arena, and is very slow O(n).
+         * @warning By default this method doesn't rebuild chunksInUse if it was built earlier.
+         * So it might be outdated.
+         * @return std::set<Chunk*>& set of chunks
+         */
+        const std::set<Chunk*>& ConstructChunksInUse(bool t_rebuild = false);
+
+        /**
+         * @brief Clears m_chunksInUse set.
+         */
+        void ClearChunksInUse();
 
         /**
          * @brief Returns amount of freed memory inside chunk treap
@@ -202,18 +216,6 @@ namespace mpp {
          * @return new top chunk ptr
          */
         Chunk* MergeWithTop(Chunk* t_chunk);
-
-        /**
-         * @brief Find a chunk by the pointer pointing to this chunk.
-         *
-         * Complexity: O(logN).
-         * @warning t_ptr should be in chunksInUse! Using this function you can find only
-         * inUse chunk.
-         * @param t_ptr pointer, that points into some active chunk (everywhere inside
-         * active chunk).
-         * @return found chunk or nullptr
-         */
-        Chunk* GetInUseChunkByPtr(void* t_ptr) const;
 
 #if MPP_STATS == 1
         /**

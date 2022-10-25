@@ -7,7 +7,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 
-TEST(AllocatorLogicTest, DoubleFree_1)
+TEST(AllocatorLogicTest, DISABLED_DoubleFree_1)
 {
     using namespace mpp;
 

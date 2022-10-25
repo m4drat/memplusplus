@@ -1,7 +1,9 @@
 #include "mpplib/gc.hpp"
+#include "mpplib/chunk.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/macros.hpp"
 #include <cstddef>
+#include <unordered_map>
 
 namespace mpp {
 #if MPP_DEBUG == 1
@@ -16,6 +18,27 @@ namespace mpp {
 #if MPP_STATS == 1
         m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
+    }
+
+    Chunk* GC::FindChunkInUse(void* t_ptr)
+    {
+        PROFILE_FUNCTION();
+
+        Arena* arenaPtr = MM::GetArenaByPtr(t_ptr);
+        if (arenaPtr == nullptr)
+            return nullptr;
+
+        const std::set<Chunk*>& chunksInUse = arenaPtr->ConstructChunksInUse();
+
+        // Find chunk by pointer
+        auto foundChunkIt = utils::LowerBound(
+            chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
+                return (t_ptr >= reinterpret_cast<void*>(t_ch));
+            });
+        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
+            return *foundChunkIt;
+        }
+        return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
     }
 
     bool GC::Collect()
@@ -78,9 +101,9 @@ namespace mpp {
 
         // If newly created arena is really small (we have less than 25% of free space)
         // Enlarge it by specified expandFactor
-        if (static_cast<float>(godArenaSize - layoutedData.layoutedSize) / godArenaSize <
+        if (static_cast<double>(godArenaSize - layoutedData.layoutedSize) / (double)godArenaSize <
             m_newAllocExtendThreshold) {
-            godArenaSize *= m_newAllocExpandFactor;
+            godArenaSize = (std::size_t)((double)godArenaSize * m_newAllocExpandFactor);
         }
         godArenaSize = MM::Align(godArenaSize, MM::g_PAGE_SIZE);
 
@@ -123,11 +146,11 @@ namespace mpp {
                     auto gcPtrOffset = reinterpret_cast<std::byte*>(gcPtr) - gcPtrsArena->begin;
                     auto* gcPtrNewLoc = godArena->begin + gcPtrOffset;
                     // Update GcPtr's internal pointer
-                    // FIXME: this is an awful way to do it, but it works for now (might break if
-                    // shared_gcptr's layout is changed / or another GcPtr inherited pointer with
-                    // different layout is added).
-                    // It even might break because compiler decides to reorder members of
-                    // SharedGcPtr between different instantiations
+                    // FIXME: this is an awful way to do it, but it works for now (might break
+                    // if shared_gcptr's layout is changed / or another GcPtr inherited pointer
+                    // with different layout is added). It even might break because compiler
+                    // decides to reorder members of SharedGcPtr between different
+                    // instantiations
                     auto* gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
                         gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
 
@@ -160,7 +183,6 @@ namespace mpp {
             newChunk->SetPrevSize(prevSize);
             newChunk->SetIsUsed(1);
             newChunk->SetIsPrevInUse(1);
-            godArena->chunksInUse.insert(newChunk);
 
             prevSize = currSize;
             newChunkLocation = newChunkLocation + currSize;

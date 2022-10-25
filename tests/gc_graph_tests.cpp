@@ -135,8 +135,7 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     auto* ptrToNodePtrVtx = objectsGraph->FindVertex((Chunk*)&ptrToNodePtr);
     ASSERT_NE(ptrToNodePtrVtx, nullptr);
 
-    auto* nodePtrVtxValid =
-        objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.GetVoid()));
+    auto* nodePtrVtxValid = objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.GetVoid()));
     ASSERT_NE(nodePtrVtxValid, nullptr);
 
     ASSERT_EQ(objectsGraph->HasEdge(ptrToNodePtrVtx, nodePtrVtxValid), true);
@@ -147,15 +146,15 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(nodePtrVtxValid->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(),
               1);
 
-    auto* nodeVtx = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->GetVoid()));
+    auto* nodeVtx = objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->GetVoid()));
     ASSERT_NE(nodeVtx, nullptr);
     ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 3);
 
-    auto* aVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->a));
+    auto* aVtxTmp = objectsGraph->FindVertex(GC::FindChunkInUse(&ptrToNodePtr.Get()->Get()->a));
     ASSERT_EQ(aVtxTmp, nodeVtx);
-    auto* bVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->b));
+    auto* bVtxTmp = objectsGraph->FindVertex(GC::FindChunkInUse(&ptrToNodePtr.Get()->Get()->b));
     ASSERT_EQ(bVtxTmp, nodeVtx);
-    auto* cVtxTmp = objectsGraph->FindVertex(MM::GetInUseChunkByPtr(&ptrToNodePtr.Get()->Get()->c));
+    auto* cVtxTmp = objectsGraph->FindVertex(GC::FindChunkInUse(&ptrToNodePtr.Get()->Get()->c));
     ASSERT_EQ(cVtxTmp, nodeVtx);
 
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, aVtxTmp), false);
@@ -163,13 +162,13 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, cVtxTmp), false);
 
     auto* aVtx =
-        objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->Get()->a.GetVoid()));
+        objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->Get()->a.GetVoid()));
     ASSERT_NE(aVtx, nullptr);
     auto* bVtx =
-        objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->Get()->b.GetVoid()));
+        objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->Get()->b.GetVoid()));
     ASSERT_NE(bVtx, nullptr);
     auto* cVtx =
-        objectsGraph->FindVertex(MM::GetInUseChunkByPtr(ptrToNodePtr.Get()->Get()->c.GetVoid()));
+        objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->Get()->c.GetVoid()));
     ASSERT_NE(cVtx, nullptr);
 
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, aVtx), true);
