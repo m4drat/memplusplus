@@ -168,66 +168,6 @@ window.BENCHMARK_DATA = {
             "value": 490.0313795864041,
             "unit": "us/iter",
             "extra": "iterations: 1499\ncpu: 489.97184789859733 us\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"200'000\" \"Transition matrix: ver-1\"",
-            "value": 361.55101050849225,
-            "unit": "ms/iter",
-            "extra": "iterations: 2\ncpu: 363.24819999908084 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"400'000\" \"Transition matrix: ver-1\"",
-            "value": 764.6575479896853,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 767.3025000002199 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"600'000\" \"Transition matrix: ver-1\"",
-            "value": 1146.5327990059109,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 1150.9793000005716 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"800'000\" \"Transition matrix: ver-1\"",
-            "value": 1519.1137060052995,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 1524.8798000028073 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"1'000'000\" \"Transition matrix: ver-1\"",
-            "value": 1883.4364990019594,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 1891.5118000006785 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"1'200'000\" \"Transition matrix: ver-1\"",
-            "value": 2321.6618360090706,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 2330.932299999766 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"1'400'000\" \"Transition matrix: ver-1\"",
-            "value": 2741.2887780104143,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 2752.1250999967747 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"1'600'000\" \"Transition matrix: ver-1\"",
-            "value": 3149.7587579746096,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 3162.7792999949734 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"1'800'000\" \"Transition matrix: ver-1\"",
-            "value": 3501.39495000559,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 3515.799399996702 ms\nthreads: 1"
-          },
-          {
-            "name": "BM_Complex/\"Total ops: \" \"2'000'000\" \"Transition matrix: ver-1\"",
-            "value": 3828.8984000128607,
-            "unit": "ms/iter",
-            "extra": "iterations: 1\ncpu: 3843.9992999902015 ms\nthreads: 1"
           }
         ]
       },
