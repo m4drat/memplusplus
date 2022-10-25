@@ -33,6 +33,9 @@ namespace mpp {
         : public SharedGcPtrArray<std::is_array<Type>::value>
         , public GcPtr
     {
+        // static_assert(offsetof(SharedGcPtr<Type>, m_objectPtr) == 10,
+        //               "m_objectPtr must be at offset 10");
+
         friend class GC;
 
     protected:

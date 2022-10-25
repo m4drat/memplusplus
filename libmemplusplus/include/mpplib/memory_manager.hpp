@@ -253,13 +253,6 @@ namespace mpp {
         static Arena* GetArenaByPtr(void* t_ptr);
 
         /**
-         * @brief Finds inside which chunk t_ptr points.
-         * @param t_ptr heap pointer.
-         * @return Chunk* if pointer points into some chunk, nullptr otherwise
-         */
-        static Chunk* GetInUseChunkByPtr(void* t_ptr);
-
-        /**
          * @brief Resets allocator state by destroying all arenas.
          * @return true if everything is fine, false otherwise
          */

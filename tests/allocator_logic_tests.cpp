@@ -1,7 +1,9 @@
 #include "gtest/gtest.h"
 
 #include "mpplib/exception.hpp"
+#include "mpplib/gc.hpp"
 #include "mpplib/memory_manager.hpp"
+
 #include <cstring>
 
 TEST(AllocatorLogicTest, CtorDtorCalled)
@@ -66,8 +68,8 @@ TEST(AllocatorLogicTest, FDT_merge_into_top)
     ASSERT_TRUE((ch1 != nullptr && ch2 != nullptr));
     ASSERT_TRUE(ch1 < ch2);
 
-    ASSERT_TRUE(currentArena->chunksInUse.size() == 2);
-    for (Chunk* chunk : currentArena->chunksInUse)
+    EXPECT_TRUE(currentArena->ConstructChunksInUse().size() == 2);
+    for (Chunk* chunk : currentArena->ConstructChunksInUse())
         ASSERT_TRUE(chunk->GetSize() == alignedAllocationSize);
 
     // "Test double-linked list"
@@ -89,7 +91,8 @@ TEST(AllocatorLogicTest, FDT_merge_into_top)
     MemoryManager::Deallocate(ch2);
     ASSERT_TRUE(beforeMergeTopSize + alignedAllocationSize * 2 ==
                 currentArena->topChunk->GetSize());
-    ASSERT_TRUE(currentArena->chunksInUse.size() == 0);
+
+    EXPECT_TRUE(currentArena->ConstructChunksInUse(true).empty());
 }
 
 TEST(AllocatorLogicTest, ADT_merge_into_top)
@@ -112,7 +115,7 @@ TEST(AllocatorLogicTest, ADT_merge_into_top)
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsUsed() == 1);
     ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->topChunk) == Chunk::GetHeaderPtr(ch1));
 
-    ASSERT_TRUE(currentArena->chunksInUse.size() == 1);
+    ASSERT_TRUE(currentArena->ConstructChunksInUse().size() == 1);
 }
 
 TEST(AllocatorLogicTest, DT_merge_into_top)
@@ -134,7 +137,7 @@ TEST(AllocatorLogicTest, DT_merge_into_top)
     ASSERT_TRUE(currentArena->topChunk->IsUsed() == 1);
     ASSERT_TRUE(currentArena->topChunk->IsPrevInUse() == 1);
 
-    ASSERT_TRUE(currentArena->chunksInUse.size() == 0);
+    ASSERT_TRUE(currentArena->ConstructChunksInUse().empty());
 }
 
 TEST(AllocatorLogicTest, T_merge_into_top)
@@ -156,7 +159,7 @@ TEST(AllocatorLogicTest, T_merge_into_top)
     MemoryManager::Deallocate(ch1);
     MemoryManager::Deallocate(ch2);
 
-    ASSERT_TRUE(currentArena->chunksInUse.size() == 0);
+    ASSERT_TRUE(currentArena->ConstructChunksInUse().empty());
     ASSERT_TRUE(currentArena->topChunk->GetSize() == topChunkSizeBeforeMerging + 160 * 2);
 }
 
@@ -299,32 +302,32 @@ TEST(AllocatorLogicTest, LinkedListChecks)
 
     Arena* arena = MemoryManager::GetArenaByPtr(p1);
 
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 160)) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
+                                                           sizeof(Chunk::ChunkHeader) + 160)) ==
                 Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader))) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
+                                                           sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p5));
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 159)) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
+                                                           sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p5));
 
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader))) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p1) -
+                                                           sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p1));
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader) + 159)) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p1) -
+                                                           sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p1));
 
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(p6) == Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader))) ==
+    ASSERT_TRUE(GC::FindChunkInUse(p6) == Chunk::GetHeaderPtr(p6));
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) -
+                                                           sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) - 1)) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) -
+                                                           sizeof(Chunk::ChunkHeader) - 1)) ==
                 Chunk::GetHeaderPtr(p5));
-    ASSERT_TRUE(arena->GetInUseChunkByPtr(reinterpret_cast<void*>(
-                    reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) + 159)) ==
+    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) -
+                                                           sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p6));
 }
 
