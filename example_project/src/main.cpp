@@ -85,9 +85,9 @@ void logic()
                  SharedGcPtr<TreeNode> t_right,
                  SharedGcPtr<TreeNode> t_up)
             : data{ t_data }
-            , left{ t_left }
-            , right{ t_right }
-            , up{ t_up }
+            , left{ std::move(t_left) }
+            , right{ std::move(t_right) }
+            , up{ std::move(t_up) }
         {
         }
     };

@@ -120,11 +120,13 @@ namespace mpp {
             pointer m_ptr;
         };
 
+#if MPP_STATS == 1
         //! @brief Stats for arena.
         std::shared_ptr<utils::Statistics::ArenaStats> GetArenaStats()
         {
             return m_arenaStats;
         }
+#endif
 
         //! @brief Returns const reference to treap with all freed chunks.
         const ChunkTreap& GetFreedChunks() const
