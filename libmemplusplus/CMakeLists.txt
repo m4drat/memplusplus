@@ -200,7 +200,7 @@ endif()
 # target_compile_options(${PROJECT_NAME} PRIVATE -flto)
 
 # ################ ALIAS TO USE AS AN INTERNAL PROJECT #################
-add_library(lib::mpp ALIAS ${PROJECT_NAME})
+add_library(mpp::mpp ALIAS ${PROJECT_NAME})
 
 # ################ SET DEBUG COMPILER OPTIONS #################
 if(CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")

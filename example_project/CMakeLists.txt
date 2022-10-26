@@ -20,4 +20,4 @@ else()
 	target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -Wl,--export-dynamic)
+target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -Wl,--export-dynamic)

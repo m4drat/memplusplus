@@ -25,6 +25,6 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -g -O2)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC lib::mpp gtest)
+target_link_libraries(${PROJECT_NAME} PUBLIC mpp::mpp gtest)
 
 add_test(unit_tester ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME})

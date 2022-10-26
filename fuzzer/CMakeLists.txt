@@ -12,7 +12,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 target_compile_options(${PROJECT_NAME} PRIVATE -g -O1 -fsanitize=fuzzer,address)
-target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -fsanitize=fuzzer,address)
+target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -fsanitize=fuzzer,address)
 
 # target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
 # target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp)

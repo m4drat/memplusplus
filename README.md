@@ -74,7 +74,7 @@ Current library version: 2.3.5
 
     ```cmake
     add_subdirectory(libmemplusplus)
-    target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE lib::mpp)
+    target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE mpp::mpp)
     ```
 
 3. After that you will be able to include library headers in your sources like that: `#include "mpplib/mpp.hpp"`
@@ -163,11 +163,11 @@ To enable backtrace functionality add these flags to your project's CMakeLists.t
 ```cmake
 # For GCC
 target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
-target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -export-dynamic)
+target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -export-dynamic)
 
 # For Clang
 target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
-target_link_libraries(${PROJECT_NAME} PRIVATE lib::mpp -Wl,--export-dynamic)
+target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -Wl,--export-dynamic)
 ```
 
 Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.
