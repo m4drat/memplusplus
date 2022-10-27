@@ -44,7 +44,7 @@ namespace mpp {
     public:
         struct LayoutedHeap
         {
-            std::vector<Vertex*>& vertices;
+            std::vector<Vertex*> vertices;
             std::size_t layoutedSize;
 
             LayoutedHeap(std::vector<Vertex*>& vertices, std::size_t layoutedSize)
