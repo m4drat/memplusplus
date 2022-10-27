@@ -103,12 +103,11 @@ namespace mpp {
 
         Chunk* chunkToReturn = nullptr;
 
-        // Try iterating through all available arenas
-        // to try to find enough space for user-requested chunk
-        // in top chunk
+        // Try iterating through all available arenas to try to
+        // find enough space for user-requested chunk in top chunk
         for (auto* arena : s_arenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
-            // some space in the right side
+            // some space in the "right side" of the arena
             if (arena->TopChunk() && (t_realSize <= arena->TopChunk()->GetSize())) {
                 chunkToReturn = arena->AllocateFromTopChunk(t_realSize);
             } else { // Check if current arena has enough free space
@@ -129,8 +128,8 @@ namespace mpp {
             return chunkToReturn;
         }
 
-        // If we still cant find chunk, we will return nullptr
-        // to show that we dont have arena, to allocate from
+        // If we still cant find a chunk, we will return a nullptr
+        // to show that we dont have an arena, to allocate from
         return nullptr;
     }
 
@@ -218,9 +217,7 @@ namespace mpp {
             }
         }
 
-        // If we reached this point, we should be in some kind of error
-        // state, because, we've tried to free invalid/non-existing chunk
-        // Always abort program, because we don't have any performance impact.
+        // We've tried to free invalid/non-existing chunk. Always abort the program in this case.
         utils::ErrorAbort("MemoryManager::Deallocate(): Invalid pointer deallocation detected!\n");
 
         // The given pointer doesn't belong to any active arena

@@ -188,7 +188,7 @@ namespace mpp {
          * @brief Get the number of vertices in current graph.
          * @return number of vertices in graph
          */
-        uint32_t GetGraphVerticesCount();
+        uint32_t GetVerticesCount();
 
         /**
          * @brief Get the adjacency list, that represent current graph.

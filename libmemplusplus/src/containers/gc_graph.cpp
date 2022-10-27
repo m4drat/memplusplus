@@ -428,6 +428,14 @@ namespace mpp {
 
     bool GcGraph::RemoveVertex(Vertex* t_vertex)
     {
+        // Remove all edges that are pointing to this vertex
+        for (auto* pointingVertex : t_vertex->GetPointingVertices()) {
+            RemoveEdge(pointingVertex, t_vertex);
+            // if (t_vertex->IsChunk()) {
+            //     pointingVertex->RemoveGcPtr(t_vertex->GetLoc());
+            // }
+        }
+
         return m_adjList.erase(t_vertex);
     }
 
@@ -527,7 +535,7 @@ namespace mpp {
         return nullptr;
     }
 
-    uint32_t GcGraph::GetGraphVerticesCount()
+    uint32_t GcGraph::GetVerticesCount()
     {
         return m_adjList.size();
     }

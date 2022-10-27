@@ -48,6 +48,10 @@ namespace mpp {
         timer.TimerStart();
 #endif
         PROFILE_FUNCTION();
+
+        // Ordered copy of m_activeGcPtrs
+        std::set<GcPtr*> orderedActiveGcPtrs = GetOrderedGcPtrs();
+
         /*
         1.
             1.1 Divide graph into subgraphs (by connected components)
@@ -89,10 +93,11 @@ namespace mpp {
 #endif
 
         // Create heuristics object
-        std::unique_ptr<Heuristics> heuristics = std::make_unique<Heuristics>();
+        std::unique_ptr<Heuristics> heuristics =
+            std::make_unique<Heuristics>(objectsGraph, orderedActiveGcPtrs);
 
         // Layout heap in the most efficient way
-        Heuristics::LayoutedHeap layoutedData = heuristics->Layout(objectsGraph);
+        Heuristics::LayoutedHeap layoutedData = heuristics->LayoutHeap();
 
         // Create a new rena with enough memory to fit all objects
         std::size_t godArenaSize = (layoutedData.layoutedSize < MM::g_DEFAULT_ARENA_SIZE)
@@ -165,17 +170,13 @@ namespace mpp {
             }
 
             // Update m_activeGcPtrs
-            std::set<GcPtr*> orderedActiveGcPtrs = GetOrderedGcPtrs();
+            // @TODO: GetAllOutgoingGcPtrs can be replace with call to GetNeighbors()?
             for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(orderedActiveGcPtrs)) {
                 orderedActiveGcPtrs.erase(gcPtr);
                 auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
                     newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
                 orderedActiveGcPtrs.insert(orderedActiveGcPtrs.end(), updatedGcPtrLocation);
             }
-
-            // Update activeGcPtrs after all GcPtrs are updated
-            m_activeGcPtrs =
-                std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());
 
             // Copy chunk data to the new location
             std::memcpy(newChunkLocation, vertex->GetLoc(), currSize);
@@ -189,6 +190,10 @@ namespace mpp {
             prevSize = currSize;
             newChunkLocation = newChunkLocation + currSize;
         }
+
+        // Update activeGcPtrs after all GcPtrs are updated
+        m_activeGcPtrs =
+            std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());
 
         // We always have some free space in the arena, so we have to construct a top chunk
         Chunk* topChunk = Chunk::ConstructChunk(
