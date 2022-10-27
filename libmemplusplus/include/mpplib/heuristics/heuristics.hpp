@@ -39,7 +39,7 @@ namespace mpp {
 
         std::unique_ptr<GcGraph>& m_objectsGraph;
 
-        std::set<GcPtr*>& m_gcPtrs;
+        const std::set<GcPtr*>& m_gcPtrs;
 
     public:
         struct LayoutedHeap
@@ -54,7 +54,7 @@ namespace mpp {
             }
         };
 
-        Heuristics(std::unique_ptr<GcGraph>& t_objectsGraph, std::set<GcPtr*>& t_gcPtrs)
+        Heuristics(std::unique_ptr<GcGraph>& t_objectsGraph, const std::set<GcPtr*>& t_gcPtrs)
             : m_objectsGraph(t_objectsGraph)
             , m_gcPtrs(t_gcPtrs)
         {

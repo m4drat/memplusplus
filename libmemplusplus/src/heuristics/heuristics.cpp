@@ -39,18 +39,18 @@ namespace mpp {
             t_llGraph->GetAdjList().begin(), t_llGraph->GetAdjList().end(), isListHead);
 
         if (headIt != t_llGraph->GetAdjList().end())
-            Vertex* head = *headIt;
+            head = *headIt;
 
         // Layout linked list starting from head
         while (head != nullptr) {
-            t_llGraph->RemoveVertex(head);
-
+            Vertex* oldHead = head;
             if (head->IsChunk()) {
                 layoutedLL.push_back(head);
                 neededSpace += head->GetLocationAsAChunk()->GetSize();
             }
 
             head = (!head->GetNeighbors().empty()) ? *head->GetNeighbors().begin() : nullptr;
+            t_llGraph->RemoveVertex(oldHead);
         }
 
         return LayoutedHeap{ layoutedLL, neededSpace };
@@ -77,6 +77,6 @@ namespace mpp {
             }
         }
 
-        return { m_layoutedHeap, m_neededSpace };
+        return LayoutedHeap{ m_layoutedHeap, m_neededSpace };
     }
 }

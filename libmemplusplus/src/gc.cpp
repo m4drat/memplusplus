@@ -124,6 +124,11 @@ namespace mpp {
         std::size_t prevSize{ 0 };
         std::size_t currSize{ 0 };
 
+        // Map that stores old gcptr location -> new gcptr location
+        // Used to be able to update all data pointers inside gcptrs
+        std::unordered_map<GcPtr*, std::byte*> gcPtrsToNewLocations;
+        gcPtrsToNewLocations.reserve(orderedActiveGcPtrs.size());
+
         // Iterate through all vertices (aka chunks) in layouted vector
         for (auto* vertex : layoutedData.vertices) {
             // We don't care about non-heap gcptrs (it may be a local GcPtr, etc)
@@ -137,20 +142,26 @@ namespace mpp {
 #if MPP_STATS == 1
             godArena->GetArenaStats()->IncreaseTotalAllocated(currSize);
 #endif
-            // Update GcPtr
+            // Update m_activeGcPtrs
+            // @TODO: GetAllOutgoingGcPtrs can be replace with call to GetNeighbors()?
+            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(orderedActiveGcPtrs)) {
+                orderedActiveGcPtrs.erase(gcPtr);
+                auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
+                    newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
+                orderedActiveGcPtrs.insert(orderedActiveGcPtrs.end(), updatedGcPtrLocation);
+                gcPtrsToNewLocations[gcPtr] = reinterpret_cast<std::byte*>(updatedGcPtrLocation);
+            }
+
+            // Update GcPtrs
             for (auto* gcPtr : vertex->GetPointingToGcPtrs()) {
-                std::byte* updatedPtr =
-                    newChunkLocation +
-                    (reinterpret_cast<std::byte*>(gcPtr->GetVoid()) - vertex->GetLoc());
+                std::byte* newUserDataPtr = newChunkLocation + sizeof(Chunk);
 
                 // Either the GcPtr is going to be copied to another chunk later
-                gcPtr->UpdatePtr(updatedPtr);
+                gcPtr->UpdatePtr(newUserDataPtr);
 
                 // Or we already copied it to another chunk and we need to update it again
-                if (Arena* gcPtrsArena = MM::GetArenaByPtr(gcPtr)) {
-                    auto gcPtrOffset =
-                        reinterpret_cast<std::byte*>(gcPtr) - gcPtrsArena->BeginPtr();
-                    auto* gcPtrNewLoc = godArena->BeginPtr() + gcPtrOffset;
+                if (gcPtrsToNewLocations.find(gcPtr) != gcPtrsToNewLocations.end()) {
+                    auto* gcPtrNewLoc = gcPtrsToNewLocations[gcPtr];
                     // Update GcPtr's internal pointer
                     // FIXME: this is an awful way to do it, but it works for now (might break
                     // if shared_gcptr's layout is changed / or another GcPtr inherited pointer
@@ -165,17 +176,8 @@ namespace mpp {
                             godArena->EndPtr(),
                         "GcPtr's internal pointer is out of newly created arena's bounds");
 
-                    *gcPtrInternalPointer = reinterpret_cast<std::size_t>(updatedPtr);
+                    *gcPtrInternalPointer = reinterpret_cast<std::size_t>(newUserDataPtr);
                 }
-            }
-
-            // Update m_activeGcPtrs
-            // @TODO: GetAllOutgoingGcPtrs can be replace with call to GetNeighbors()?
-            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(orderedActiveGcPtrs)) {
-                orderedActiveGcPtrs.erase(gcPtr);
-                auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
-                    newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
-                orderedActiveGcPtrs.insert(orderedActiveGcPtrs.end(), updatedGcPtrLocation);
             }
 
             // Copy chunk data to the new location
