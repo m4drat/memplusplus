@@ -431,9 +431,6 @@ namespace mpp {
         // Remove all edges that are pointing to this vertex
         for (auto* pointingVertex : t_vertex->GetPointingVertices()) {
             RemoveEdge(pointingVertex, t_vertex);
-            // if (t_vertex->IsChunk()) {
-            //     pointingVertex->RemoveGcPtr(t_vertex->GetLoc());
-            // }
         }
 
         return m_adjList.erase(t_vertex);

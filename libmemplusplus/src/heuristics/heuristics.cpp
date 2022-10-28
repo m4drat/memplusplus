@@ -7,6 +7,8 @@ namespace mpp {
     Heuristics::LayoutedHeap Heuristics::LayoutGeneralGraph(
         std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_graph)
     {
+        PROFILE_FUNCTION();
+
         std::vector<Vertex*> layoutedHeap;
         std::size_t neededSpace = 0;
 
@@ -23,6 +25,8 @@ namespace mpp {
     Heuristics::LayoutedHeap Heuristics::LayoutLinkedList(
         std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_llGraph)
     {
+        PROFILE_FUNCTION();
+
         std::vector<Vertex*> layoutedLL;
         std::size_t neededSpace = 0;
 

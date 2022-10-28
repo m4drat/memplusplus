@@ -128,6 +128,21 @@ void logic()
         std::cout << head << head->index << " " << head->data << std::endl;
         head = head->next;
     }
+
+    std::cout << std::endl;
+
+    SharedGcPtr<Worker<true, false>::ListNode>* newHead = &worker.m_LinkedListHead;
+    while (newHead->Get() != nullptr) {
+        std::cout << *newHead << newHead->Get()->index << " " << newHead->Get()->data << std::endl;
+        newHead = &newHead->Get()->next;
+    }
+
+    head = nullptr;
+    worker.m_LinkedListHead = nullptr;
+
+    // MM::VisHeapLayout(std::cout, nullptr);
+    // GC::GetInstance().Collect();
+    // MM::VisHeapLayout(std::cout, nullptr);
 }
 
 int main()
