@@ -18,7 +18,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'mem++'
-copyright = '2020, madrat, l1th1um, akoul02'
+copyright = '2022, madrat, l1th1um, akoul02'
 author = 'madrat, l1th1um, akoul02'
 
 
@@ -48,7 +48,12 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+# html_theme = 'press'
+
+import maisie_sphinx_theme
+extensions.append("maisie_sphinx_theme")
+html_theme = 'maisie_sphinx_theme'
+html_theme_path = maisie_sphinx_theme.html_theme_path()
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
