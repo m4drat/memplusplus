@@ -4,32 +4,52 @@
 ![build](https://github.com/m4drat/memplusplus/workflows/C/C++%20CI/badge.svg?branch=master)
 ![benchmarking](https://github.com/m4drat/memplusplus/workflows/Benchmarking/badge.svg?branch=master)
 
+- [mem++](#mem)
+  - [🔢 Current version](#-current-version)
+  - [🔬 Features](#-features)
+  - [⚠ Supported systems / limitations](#-supported-systems--limitations)
+  - [❓ Usage](#-usage)
+    - [How to use the library as a dependency (external project)](#how-to-use-the-library-as-a-dependency-external-project)
+    - [How to use the library internally](#how-to-use-the-library-internally)
+  - [📀 Build options](#-build-options)
+  - [🔳 Environment options](#-environment-options)
+  - [📚 Examples](#-examples)
+  - [💻 Debugging/profiling library](#-debuggingprofiling-library)
+  - [🔥 Heuristic layouting](#-heuristic-layouting)
+    - [1. Find connected components](#1-find-connected-components)
+    - [2. Layout each component heuristically](#2-layout-each-component-heuristically)
+  - [🚀 Performance comparisons](#-performance-comparisons)
+  - [🧾 Documentation](#-documentation)
+  - [🧪 Tests](#-tests)
+  - [🚁 clang-format and clang-tidy](#-clang-format-and-clang-tidy)
+
 C++ memory allocator with smart features, such as garbage collection, and heap compacting.
 
-## Current version
+## 🔢 Current version
 
 Current library version: 2.3.5
 
-## Features
+## 🔬 Features
 
 - Garbage Collecting
 - Fast memory allocations (using bump allocators techniques)
 - Fast free algorithms
-- Advanced compacting algorithms
+- Advanced compacting algorithms, which are used to reduce memory fragmentation and improve cache locality: [heuristic-layouting](#🔥-heuristic-layouting)
 
-## Supported systems / limitations
+## ⚠ Supported systems / limitations
 
+- The library is still in development, so it is not recommended to use it in production.
 - All Unix-like systems (where it is possible to use mmap)
 - g++ or clang++ compilers
-- currently supports only single-threaded applications
+- __currently supports only single-threaded applications__
 - currently you cant use manual memory management and GarbageCollection simultaneously (e.g. you should only use smart pointers, or manually control memory using Allocate and Deallocate)
 
-## Usage
+## ❓ Usage
 
 1. Install latest build systems: `apt install cmake g++ clang`
 2. Clone just the library: `git clone https://github.com/m4drat/memplusplus/`
 3. Clone the library (with tests support): `git clone --recurse-submodules=./libraries/googletest https://github.com/m4drat/memplusplus/`
-4. If you want to run benchmarks, take a look at this: [link](#performance-comparisons)
+4. If you want to run benchmarks, take a look at this: [link](#🚀-performance-comparisons)
 
 ### How to use the library as a dependency (external project)
 
@@ -79,7 +99,7 @@ Current library version: 2.3.5
 
 3. After that you will be able to include library headers in your sources like that: `#include "mpplib/mpp.hpp"`
 
-## Build options
+## 📀 Build options
 
 Global options:
 
@@ -109,13 +129,13 @@ Library options:
 
 - `MPP_STATS` - Add statistics instrumentation.
 
-## Environment options
+## 🔳 Environment options
 
 - `MPP_DUMP_OBJECTS_GRAPH=1` / `MPP_DUMP_OBJECTS_GRAPH=2` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only possible in debug mode)
 
 - `MPP_SHOW_STATISTICS=1` - display statistics after program termination (should be built with `MPP_STATS` set to ON)
 
-## Examples
+## 📚 Examples
 
 - Automatic memory management
 
@@ -132,7 +152,7 @@ Library options:
 
     ...
 
-    // collect all garbage + compact memory (can be called manually)
+    // collect all garbage + compact memory (should be called manually)
     GC::GetInstance().Collect();
     ```
 
@@ -156,7 +176,7 @@ Library options:
     mpp::MemoryAllocator::Deallocate(ptr);
     ```
 
-## Debugging/profiling library
+## 💻 Debugging/profiling library
 
 To enable backtrace functionality add these flags to your project's CMakeLists.txt:
 
@@ -468,13 +488,34 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     mpp::MemoryManager::SetDeallocateHook(deallocHook);
     ```
 
-## Performance comparisons
+## 🔥 Heuristic layouting
+
+Right now algorithm consists of 2 parts:
+
+### 1. Find connected components
+
+Divide graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing graph into components we can solve layouting problem for each component separately, and what is more important, we can do it in parallel. Also this step can be called optimal layouting in some sense, because it is guaranteed that all objects in component will be located in the same arena (contiguous memory block).
+
+### 2. Layout each component heuristically
+
+The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layouting algorithm. Currently it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly liked list). The algorithm is based on the following assumptions:
+
+- If we have a singly linked list, then most likely the next element should be located right after the current one. If it is not (take a look at the image below), then it's a good idea to move it there. By doing so we can reduce cache misses and improve performance.
+
+<img src="./additional_info/images/linked_list_types.png" width=70%>
+
+Benchmark results for the algorithm are presented here: [Benchmark results](#🚀-performance-comparisons).
+
+We can see that the algorithm is able to improve memory access time by 4-8 times (depending on the size of the list). Of course, it should be noted that the benchmark shows the corner case, when the list is fully randomized in memory. In real life, the list might be layouted in a way that is already cache-friendly, so the algorithm will not be able to improve the performance.
+
+Closing words. The algorithm definitely is not perfect, but it's a good start. It can be improved in many ways, for example, by adding more heuristics. Also, it can be used as a base for a more complex layouting algorithm, that will be able to layout any data structure.
+
+## 🚀 Performance comparisons
 
 1. Standalone benchmarks: [memplusplus-benchmarks](https://github.com/m4drat/memplusplus-benchmarks).
-
 2. Continuous benchmarking results: [continuous-benchmarking](https://m4drat.github.io/memplusplus/dev/bench/)
 
-## Documentation
+## 🧾 Documentation
 
 - Install doxygen, sphinx, breathe
 
@@ -502,7 +543,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
 - Now docs can be found in "./build/docs/doxygen/html" or "./build/docs/sphinx"
 
-## Tests
+## 🧪 Tests
 
 - Configure tests:
 
@@ -536,7 +577,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     cd build && setarch `uname -m` -R ./build/tests/unit_tests --gtest_also_run_disabled_tests
     ```
 
-## clang-format and clang-tidy
+## 🚁 clang-format and clang-tidy
 
 - install clang-tidy and clang-format
 
