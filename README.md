@@ -27,7 +27,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 
 ## 🔢 Current version
 
-Current library version: 2.3.5
+Current library version: 0.3.5
 
 ## 🔬 Features
 
