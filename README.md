@@ -499,7 +499,7 @@ Benchmark results for the algorithm are presented here: [Benchmark results](#ðŸš
 
 We can see that the algorithm is able to improve memory access time by 4-8 times (depending on the size of the list). Of course, it should be noted that the benchmark shows the corner case, when the list is fully randomized in memory. In real life, the list might be layouted in a way that is already cache-friendly, so the algorithm will not be able to improve the performance.
 
-Closing words. The algorithm definitely is not perfect, but it's a good start. It can be improved in many ways, for example, by adding more heuristics. Also, it can be used as a base for a more complex layouting algorithm, that will be able to layout any data structure.
+Closing words. The algorithm is definitely not perfect, but it's a good start. It can be improved in many ways, for example, by adding more heuristics. Also, it can be used as a base for a more complex layouting algorithm, that will be able to layout any data structure.
 
 ## ðŸš€ Performance comparisons
 
