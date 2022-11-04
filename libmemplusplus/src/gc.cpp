@@ -142,8 +142,7 @@ namespace mpp {
 #if MPP_STATS == 1
             godArena->GetArenaStats()->IncreaseTotalAllocated(currSize);
 #endif
-            // Update m_activeGcPtrs
-            // @TODO: GetAllOutgoingGcPtrs can be replace with call to GetNeighbors()?
+            // Update gcPtrsToNewLocations map with new location of a gcptr
             for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(orderedActiveGcPtrs)) {
                 orderedActiveGcPtrs.erase(gcPtr);
                 auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(

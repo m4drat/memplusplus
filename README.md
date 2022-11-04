@@ -104,30 +104,21 @@ Current library version: 2.3.5
 Global options:
 
 - `MPP_ENABLE_COVERAGE` - build with code coverage support
-
 - `MPP_BUILD_FUZZER` - build fuzzer project (will build library with sanitizers)
-
 - `MPP_BUILD_EXAMPLE` - build example project
-
 - `MPP_BUILD_TESTS` - build tests
-
 - `MPP_BUILD_DOCS` - build documentation
 
 Library options:
 
 - `MPP_BUILD_SHARED_LIBS` - build shared or static libraries
-
 - `MPP_FULL_DEBUG` - build in full debug mode (adds extended security checks in debug build)
-
 - `MPP_SECURE` - build in secure mode with additional security features
-
 - `MPP_PROFILE` - enable profiling instrumentation
-
 - `MPP_SANITIZERS` - add sanitizers to the build
-
 - `MPP_COLOUR_DEBUG_OUTPUT` - Add colours to debug output
-
 - `MPP_STATS` - Add statistics instrumentation.
+- `MPP_ENABLE_LOGGING` - Enable logging (even in release mode)
 
 ## 🔳 Environment options
 

@@ -11,6 +11,7 @@
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 using namespace mpp;
@@ -147,6 +148,11 @@ void logic()
 
 int main()
 {
+    MPP_LOG_DBG("Starting main");
+    MPP_LOG_ERROR("Starting main");
+    MPP_LOG_WARN("Starting main");
+    MPP_LOG_INFO("Starting main");
+
     logic();
     return 0;
 }
