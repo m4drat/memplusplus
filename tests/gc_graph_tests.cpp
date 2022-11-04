@@ -24,7 +24,7 @@ TEST(GcGraphTest, SetOrderedCorrectly)
     objectsGraph->AddVertex(v2);
     objectsGraph->AddVertex(v1);
 
-    ASSERT_TRUE(objectsGraph->GetGraphVerticesCount() == 4);
+    ASSERT_TRUE(objectsGraph->GetVerticesCount() == 4);
 
     int32_t idx = 0;
     for (Vertex* v : objectsGraph->GetAdjList()) {
@@ -126,7 +126,7 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
         objectsGraph->AddObjectInfo(gcPtr);
     }
     ASSERT_EQ(objectsGraph->GetAdjList().size(), 6);
-    ASSERT_EQ(objectsGraph->GetGraphVerticesCount(), 6);
+    ASSERT_EQ(objectsGraph->GetVerticesCount(), 6);
     ASSERT_EQ(GC::GetInstance().GetGcPtrs().size(), 5);
 
     auto* nodePtrVtx = objectsGraph->FindVertex((Chunk*)&nodePtr);

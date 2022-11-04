@@ -21,6 +21,7 @@ option(MPP_SECURE "Build mpp in secure mode" OFF)
 option(MPP_PROFILE "Build mpp with support of profiling" ON)
 option(MPP_COLOUR "Build mpp with support of coloured output" ON)
 option(MPP_STATS "Build mpp with support of statistics dumping" ON)
+option(MPP_ENABLE_LOGGING "Build mpp with logging support" OFF)
 
 # ################ DEFAULT BUILD TYPE #################
 if(NOT CMAKE_BUILD_TYPE)
@@ -44,6 +45,10 @@ else()
 	set(MPP_DEBUG OFF)
 	list(APPEND MPP_DEFINES MPP_DEBUG=0)
 	list(APPEND MPP_DEFINES DEBUG=0)
+endif()
+
+if(MPP_ENABLE_LOGGING MATCHES "ON")
+	list(APPEND MPP_DEFINES MPP_ENABLE_LOGGING=1)
 endif()
 
 # ################ SET DEFINES IF BUILDING WITH FUZZER #################
@@ -119,6 +124,7 @@ message(STATUS "MPP_SECURE            : ${MPP_SECURE}")
 message(STATUS "MPP_PROFILE           : ${MPP_PROFILE}")
 message(STATUS "MPP_COLOUR            : ${MPP_COLOUR}")
 message(STATUS "MPP_STATS             : ${MPP_STATS}")
+message(STATUS "MPP_ENABLE_LOGGING    : ${MPP_ENABLE_LOGGING}")
 
 # ################ ADD CONFIG FILE #################
 configure_file(${PROJECT_SOURCE_DIR}/src/config.hpp.in

@@ -18,25 +18,15 @@ namespace mpp {
     class Vertex
     {
     private:
-        /**
-         * @brief Location linked with the current vertex.
-         */
+        //! @brief Location linked with the current vertex.
         std::byte* m_correspondingLocation;
-        /**
-         * @brief Set of vertices that the current vertex points to.
-         */
+        //! @brief Set of vertices that the current vertex points to.
         std::set<Vertex*> m_neighbors;
-        /**
-         * @brief Set of vertices, that are pointing the to current vertex.
-         */
+        //! @brief Set of vertices, that are pointing the to current vertex.
         std::set<Vertex*> m_pointingToVertices;
-        /**
-         * @brief Set of GcPtr's that are pointing to the current chunk.
-         */
+        //! @brief Set of GcPtr's that are pointing to the current chunk.
         std::set<GcPtr*> m_pointingToGcPtrs;
-        /**
-         * @brief Says whether the m_correspondingLocation is a pointer to a valid chunk or not.
-         */
+        //! @brief Says whether the m_correspondingLocation is a pointer to a valid chunk or not.
         bool m_currLocationIsAChunk;
 
     public:
@@ -65,7 +55,6 @@ namespace mpp {
 
         /**
          * @brief Checks whether location is a chunk or not.
-         *
          * @return true if location is a chunk, false otherwise.
          */
         bool IsChunk() const;

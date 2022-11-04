@@ -3,138 +3,156 @@
 #include <iostream>
 #include <memory>
 
+#include <algorithm>
+#include <cstdlib>
+#include <random>
+
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 using namespace mpp;
-class UserData
-{
-private:
-    int m_data{ 0 };
 
+template<bool RandomizedLinkedList, bool DoLayout = false>
+class Worker
+{
 public:
-    UserData(int val)
-        : m_data{ val }
+    Worker(uint32_t t_LinkedListSize, uint64_t t_xorshiftSeed = 0x133796A5FF21B3C1)
+        : m_LinkedListSize(t_LinkedListSize)
+        , m_xorshiftSeed(t_xorshiftSeed)
     {
+        if constexpr (RandomizedLinkedList) {
+            m_LinkedListHead = CreateRandomizedLinkedList(t_LinkedListSize);
+        } else {
+            m_LinkedListHead = CreateLayoutedLinkedList(t_LinkedListSize);
+        }
     }
 
-    int GetData()
+    Worker(const Worker&) = delete;
+    Worker(Worker&&) = delete;
+    Worker& operator=(const Worker&) = delete;
+    Worker& operator=(Worker&&) = delete;
+    ~Worker() = default;
+
+    uint32_t DoBenchmark()
     {
-        return m_data;
+        auto current = m_LinkedListHead;
+
+        while (current->next != nullptr) {
+            current->data = current->data ^ current->next->data ^ 0x1337AF12;
+            current = current->next;
+        }
+
+        return current->data;
+    }
+
+    struct alignas(64) ListNode
+    {
+        uint32_t index;
+        uint32_t data;
+        SharedGcPtr<ListNode> next;
+
+        ListNode(uint32_t t_index, uint32_t t_data)
+            : index(t_index)
+            , data(t_data)
+            , next(nullptr)
+        {
+        }
+    };
+
+    uint64_t m_xorshiftSeed;
+    SharedGcPtr<ListNode> m_LinkedListHead;
+    uint32_t m_LinkedListSize;
+
+    SharedGcPtr<ListNode> CreateLayoutedLinkedList(uint32_t size)
+    {
+        uint32_t data = 0xF7ADF3E1;
+        SharedGcPtr<ListNode> head = MakeShared<ListNode>(0, data);
+        SharedGcPtr<ListNode> current = head;
+
+        for (uint32_t i = 1; i < size; ++i) {
+            data = (data + 0xffffd) % ((2 << 20) + 1);
+            current->next = MakeShared<ListNode>(i, data);
+            current = current->next;
+        }
+
+        return head;
+    }
+
+    SharedGcPtr<ListNode> CreateRandomizedLinkedList(uint32_t size)
+    {
+        std::vector<SharedGcPtr<ListNode>> nodes;
+        nodes.reserve(size);
+        uint32_t data = 0xF7ADF3E1;
+
+        for (uint32_t i = 0; i < size; ++i) {
+            data = (data + 0xffffd) % ((2 << 20) + 1);
+            nodes.emplace_back(MakeShared<ListNode>(i, data));
+        }
+
+        std::shuffle(
+            std::begin(nodes), std::end(nodes), std::default_random_engine(m_xorshiftSeed));
+
+        for (uint32_t i = 0; i < size - 1; ++i) {
+            nodes[i]->next = nodes[i + 1];
+        }
+
+        return nodes[0];
     }
 };
 
 void logic()
 {
     using namespace mpp;
-    using namespace std::literals::chrono_literals;
-    struct Node
-    {
-        uint32_t data;
-        SharedGcPtr<Node> prev;
-        SharedGcPtr<Node> next;
 
-        Node(uint32_t t_data, SharedGcPtr<Node> t_p, SharedGcPtr<Node> t_n)
-            : data{ t_data }
-            , prev{ t_p }
-            , next{ t_n }
-        {
-        }
-    };
-
-    // Create Linked List
-    SharedGcPtr<Node> n1 = MakeShared<Node>(1, nullptr, nullptr);
-    SharedGcPtr<Node> n2 = MakeShared<Node>(2, nullptr, nullptr);
-    SharedGcPtr<Node> n3 = MakeShared<Node>(3, nullptr, nullptr);
-    SharedGcPtr<Node> n4 = MakeShared<Node>(4, nullptr, nullptr);
-
-    n1->prev = nullptr;
-    n1->next = n2;
-
-    n2->prev = n1;
-    n2->next = n3;
-
-    n3->prev = n2;
-    n3->next = n4;
-
-    n4->prev = n3;
-    n4->next = nullptr;
-
-    SharedGcPtr<int8_t> a = MakeShared<int8_t>(1);
-    SharedGcPtr<int8_t> b = MakeShared<int8_t>(1);
-    SharedGcPtr<SharedGcPtr<int8_t>> c = MakeShared<SharedGcPtr<int8_t>>(MakeShared<int8_t>(1));
-    SharedGcPtr<int8_t> d = MakeShared<int8_t>(1);
-    SharedGcPtr<int8_t> e = MakeShared<int8_t>(1);
-
-    b = nullptr;
-    d = nullptr;
-
-    // Tree node
-    struct TreeNode
-    {
-        uint32_t data;
-        SharedGcPtr<TreeNode> left;
-        SharedGcPtr<TreeNode> right;
-        SharedGcPtr<TreeNode> up;
-
-        TreeNode(uint32_t t_data,
-                 SharedGcPtr<TreeNode> t_left,
-                 SharedGcPtr<TreeNode> t_right,
-                 SharedGcPtr<TreeNode> t_up)
-            : data{ t_data }
-            , left{ std::move(t_left) }
-            , right{ std::move(t_right) }
-            , up{ std::move(t_up) }
-        {
-        }
-    };
-
-    // Create a random tree
-    SharedGcPtr<TreeNode> root = MakeShared<TreeNode>(0, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode1 = MakeShared<TreeNode>(1, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode2 = MakeShared<TreeNode>(2, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode3 = MakeShared<TreeNode>(3, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode4 = MakeShared<TreeNode>(4, nullptr, nullptr, nullptr);
-    SharedGcPtr<TreeNode> treeNode5 = MakeShared<TreeNode>(5, nullptr, nullptr, nullptr);
-
-    root->up = nullptr;
-    root->left = treeNode1;
-    root->right = treeNode2;
-
-    treeNode1->up = root;
-    treeNode1->left = nullptr;
-    treeNode1->right = nullptr;
-
-    treeNode2->up = root;
-    treeNode2->left = treeNode3;
-    treeNode2->right = treeNode4;
-
-    treeNode3->up = treeNode2;
-    treeNode3->left = nullptr;
-    treeNode3->right = nullptr;
-
-    treeNode4->up = treeNode2;
-    treeNode4->left = treeNode5;
-    treeNode4->right = nullptr;
-
-    treeNode5->up = treeNode4;
-    treeNode5->left = nullptr;
-    treeNode5->right = nullptr;
+    Worker<true, false> worker(8);
 
     std::cout << "Before GC" << std::endl;
     MM::VisHeapLayout(std::cout, nullptr);
+    // Iterate linked list
+    auto head = worker.m_LinkedListHead;
+    while (head != nullptr) {
+        std::cout << head << head->index << " " << head->data << std::endl;
+        head = head->next;
+    }
 
     GC::GetInstance().Collect();
 
     std::cout << "After GC" << std::endl;
     MM::VisHeapLayout(std::cout, nullptr);
+    // Iterate linked list
+    head = worker.m_LinkedListHead;
+    while (head != nullptr) {
+        std::cout << head << head->index << " " << head->data << std::endl;
+        head = head->next;
+    }
+
+    std::cout << std::endl;
+
+    SharedGcPtr<Worker<true, false>::ListNode>* newHead = &worker.m_LinkedListHead;
+    while (newHead->Get() != nullptr) {
+        std::cout << *newHead << newHead->Get()->index << " " << newHead->Get()->data << std::endl;
+        newHead = &newHead->Get()->next;
+    }
+
+    head = nullptr;
+    worker.m_LinkedListHead = nullptr;
+
+    // MM::VisHeapLayout(std::cout, nullptr);
+    // GC::GetInstance().Collect();
+    // MM::VisHeapLayout(std::cout, nullptr);
 }
 
 int main()
 {
+    MPP_LOG_DBG("Starting main");
+    MPP_LOG_ERROR("Starting main");
+    MPP_LOG_WARN("Starting main");
+    MPP_LOG_INFO("Starting main");
+
     logic();
     return 0;
 }
