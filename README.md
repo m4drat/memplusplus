@@ -34,7 +34,7 @@ Current library version: 0.3.5
 - Garbage Collecting
 - Fast memory allocations (using bump allocators techniques)
 - Fast free algorithms
-- Advanced compacting algorithms, which are used to reduce memory fragmentation and improve cache locality: [heuristic-layouting](#🔥-heuristic-layouting)
+- Advanced compacting algorithms, which are used to reduce memory fragmentation and improve cache locality: [heuristic-layouting](#-heuristic-layouting)
 
 ## ⚠ Supported systems / limitations
 
@@ -49,7 +49,7 @@ Current library version: 0.3.5
 1. Install latest build systems: `apt install cmake g++ clang`
 2. Clone just the library: `git clone https://github.com/m4drat/memplusplus/`
 3. Clone the library (with tests support): `git clone --recurse-submodules=./libraries/googletest https://github.com/m4drat/memplusplus/`
-4. If you want to run benchmarks, take a look at this: [link](#🚀-performance-comparisons)
+4. If you want to run benchmarks, take a look at this: [link](#-performance-comparisons)
 
 ### How to use the library as a dependency (external project)
 
@@ -495,7 +495,7 @@ The next step is to layout objects from components in a way that allows you to a
 
 <img src="./additional_info/images/linked_list_types.png" width=70%>
 
-Benchmark results for the algorithm are presented here: [Benchmark results](#🚀-performance-comparisons).
+Benchmark results for the algorithm are presented here: [Benchmark results](#-performance-comparisons).
 
 We can see that the algorithm is able to improve memory access time by 4-8 times (depending on the size of the list). Of course, it should be noted that the benchmark shows the corner case, when the list is fully randomized in memory. In real life, the list might be layouted in a way that is already cache-friendly, so the algorithm will not be able to improve the performance.
 
