@@ -485,11 +485,11 @@ Right now algorithm consists of 2 parts:
 
 ### 1. Find connected components
 
-Divide graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing graph into components we can solve layouting problem for each component separately, and what is more important, we can do it in parallel. Also this step can be called optimal layouting in some sense, because it is guaranteed that all objects in component will be located in the same arena (contiguous memory block).
+Divide the graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing the graph into components we can solve the layout problem for each component separately, and what is more important, we can do it in parallel. Also, this step can be called optimal layout in some sense, because it is guaranteed that all objects in the component will be located in the same arena (contiguous memory block).
 
 ### 2. Layout each component heuristically
 
-The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layouting algorithm. Currently it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly liked list). The algorithm is based on the following assumptions:
+The next step is to la out objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly liked list). The algorithm is based on the following assumptions:
 
 - If we have a singly linked list, then most likely the next element should be located right after the current one. If it is not (take a look at the image below), then it's a good idea to move it there. By doing so we can reduce cache misses and improve performance.
 
@@ -497,7 +497,7 @@ The next step is to layout objects from components in a way that allows you to a
 
 Benchmark results for the algorithm are presented here: [Benchmark results](#-performance-comparisons).
 
-We can see that the algorithm is able to improve memory access time by 4-8 times (depending on the size of the list). Of course, it should be noted that the benchmark shows the corner case, when the list is fully randomized in memory. In real life, the list might be layouted in a way that is already cache-friendly, so the algorithm will not be able to improve the performance.
+We can see that the algorithm is able to improve memory access time by 4-8 times (depending on the size of the list). Of course, it should be noted that the benchmark shows the corner case when the list is fully randomized in memory. In real life, the list might be layouted in a way that is already cache-friendly, so the algorithm will not be able to improve the performance.
 
 Closing words. The algorithm is definitely not perfect, but it's a good start. It can be improved in many ways, for example, by adding more heuristics. Also, it can be used as a base for a more complex layouting algorithm, that will be able to layout any data structure.
 
