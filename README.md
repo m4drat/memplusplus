@@ -169,19 +169,21 @@ Library options:
 
 ## 💻 Debugging/profiling library
 
-To enable backtrace functionality add these flags to your project's CMakeLists.txt:
-
-```cmake
-# For GCC
-target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -export-dynamic)
-
-# For Clang
-target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
-target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -Wl,--export-dynamic)
-```
-
 Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.
+
+- Backtrace functionality for MPP_ASSERT:
+
+    Add these flags to your project's CMakeLists.txt, if you want to see backtrace, when MPP_ASSERT fails:
+
+    ```cmake
+    # For GCC
+    target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+    target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -export-dynamic)
+
+    # For Clang
+    target_compile_options(${PROJECT_NAME} PRIVATE -g -O0)
+    target_link_libraries(${PROJECT_NAME} PRIVATE mpp::mpp -Wl,--export-dynamic)
+    ```
 
 - Address Sanitizer support (ASAN):
 
@@ -213,7 +215,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
 - Data visualizers:
   
-    In Debug builds, you can dump .dot representation of the ChunkTreap and GcGraph (only using specific environment variable). Later you can "render" this .dot files using dot from graphviz.  
+    In Debug builds, you can dump .dot representation of the ChunkTreap and GcGraph (only using specific environment variable). Later you can render these .dot files using dot from graphviz.
 
     __ChunkTreap visualizer__
 
@@ -485,11 +487,11 @@ Right now algorithm consists of 2 parts:
 
 ### 1. Find connected components
 
-Divide the graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing the graph into components we can solve the layout problem for each component separately, and what is more important, we can do it in parallel. Also, this step can be called optimal layout in some sense, because it is guaranteed that all objects in the component will be located in the same arena (contiguous memory block).
+Divide the graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing the graph into components we can solve the layout problem for each component separately, and what is more important, we can do it in parallel. Also this step can be called optimal layout in some sense, because it is guaranteed that all objects in the component will be located in the same arena (contiguous memory block).
 
 ### 2. Layout each component heuristically
 
-The next step is to la out objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly liked list). The algorithm is based on the following assumptions:
+The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly liked list). The algorithm is based on the following assumptions:
 
 - If we have a singly linked list, then most likely the next element should be located right after the current one. If it is not (take a look at the image below), then it's a good idea to move it there. By doing so we can reduce cache misses and improve performance.
 
