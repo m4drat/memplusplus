@@ -491,7 +491,7 @@ Divide the graph of all objects into connected components. Each component is a s
 
 ### 2. Layout each component heuristically
 
-The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly liked list). The algorithm is based on the following assumptions:
+The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly linked list). The algorithm is based on the following assumptions:
 
 - If we have a singly linked list, then most likely the next element should be located right after the current one. If it is not (take a look at the image below), then it's a good idea to move it there. By doing so we can reduce cache misses and improve performance.
 
