@@ -10,6 +10,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gc.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
@@ -39,7 +40,7 @@ public:
 
     uint32_t DoBenchmark()
     {
-        auto current = m_LinkedListHead;
+        SharedGcPtr<ListNode>& current = m_LinkedListHead;
 
         while (current->next != nullptr) {
             current->data = current->data ^ current->next->data ^ 0x1337AF12;
@@ -109,9 +110,10 @@ void logic()
     using namespace mpp;
 
     Worker<true, false> worker(8);
+    std::cout << worker.DoBenchmark() << std::endl;
 
     std::cout << "Before GC" << std::endl;
-    MM::VisHeapLayout(std::cout, nullptr);
+    g_memoryManager->VisHeapLayout(std::cout, nullptr);
     // Iterate linked list
     auto head = worker.m_LinkedListHead;
     while (head != nullptr) {
@@ -122,7 +124,7 @@ void logic()
     GC::GetInstance().Collect();
 
     std::cout << "After GC" << std::endl;
-    MM::VisHeapLayout(std::cout, nullptr);
+    g_memoryManager->VisHeapLayout(std::cout, nullptr);
     // Iterate linked list
     head = worker.m_LinkedListHead;
     while (head != nullptr) {

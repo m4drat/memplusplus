@@ -39,10 +39,10 @@ Current library version: 0.3.5
 ## ⚠ Supported systems / limitations
 
 - The library is still in development, so it is not recommended to use it in production.
-- All Unix-like systems (where it is possible to use mmap)
+- All Unix-like systems (where it is possible to use `mmap`)
 - g++ or clang++ compilers
-- __currently supports only single-threaded applications__
-- currently you cant use manual memory management and GarbageCollection simultaneously (e.g. you should only use smart pointers, or manually control memory using Allocate and Deallocate)
+- __Currently supports only single-threaded applications__
+- Currently, you can't use manual memory management and GarbageCollection simultaneously (e.g. you should only use smart pointers, or manually control memory using Allocate and Deallocate)
 
 ## ❓ Usage
 
@@ -53,7 +53,7 @@ Current library version: 0.3.5
 
 ### How to use the library as a dependency (external project)
 
-1. run cmake from root directory (memplusplus):
+1. run cmake from the root directory (memplusplus):
 
     ```bash
     cmake \
@@ -78,7 +78,7 @@ Current library version: 0.3.5
     cmake_minimum_required(VERSION 3.13)
     project(<YOUR_PROJECT_NAME>)
 
-    find_package(mpp 2.3.5 REQUIRED)
+    find_package(mpp 0.3.5 REQUIRED)
 
     add_executable(<YOUR_PROJECT_NAME> <YOUR_SOURCES>)
     target_link_libraries(<YOUR_PROJECT_NAME> PRIVATE mpp::mpp)
@@ -88,7 +88,7 @@ Current library version: 0.3.5
 
 ### How to use the library internally
 
-1. just copy whole directory with libmemplusplus to your project root directory.
+1. just copy the whole directory with libmemplusplus to your project root directory.
 
 2. In your project's cmake file add this:
 
@@ -104,7 +104,7 @@ Current library version: 0.3.5
 Global options:
 
 - `MPP_ENABLE_COVERAGE` - build with code coverage support
-- `MPP_BUILD_FUZZER` - build fuzzer project (will build library with sanitizers)
+- `MPP_BUILD_FUZZER` - build fuzzer project (will build the library with sanitizers)
 - `MPP_BUILD_EXAMPLE` - build example project
 - `MPP_BUILD_TESTS` - build tests
 - `MPP_BUILD_DOCS` - build documentation
@@ -116,7 +116,7 @@ Library options:
 - `MPP_SECURE` - build in secure mode with additional security features
 - `MPP_PROFILE` - enable profiling instrumentation
 - `MPP_SANITIZERS` - add sanitizers to the build
-- `MPP_COLOUR_DEBUG_OUTPUT` - Add colours to debug output
+- `MPP_COLOUR_DEBUG_OUTPUT` - Add colors to debug output
 - `MPP_STATS` - Add statistics instrumentation.
 - `MPP_ENABLE_LOGGING` - Enable logging (even in release mode)
 
@@ -155,25 +155,25 @@ Library options:
     ...
 
     // will call constructor automatically, like new
-    Object* obj = mpp::MemoryAllocator::Allocate<Object>(<constructor params>);
+    Object* obj = mpp::Allocate<Object>(<constructor params>);
     // create raw pointer (behaves like malloc)
-    void* ptr = mpp::MemoryAllocator::Allocate(128);
+    void* ptr = mpp::Allocate(128);
 
     ...
 
     // will call destructor automatically, like delete
-    mpp::MemoryAllocator::Deallocate(obj);
+    mpp::Deallocate(obj);
     // only deallocates raw pointer (behaves like free)
-    mpp::MemoryAllocator::Deallocate(ptr);
+    mpp::Deallocate(ptr);
     ```
 
 ## 💻 Debugging/profiling library
 
-Memplusplus provides different debug-like features, such as data visualizers, profilers, statistics collectors.
+Memplusplus provides different debug-like features, such as data visualizers, profilers, and statistics collectors.
 
 - Backtrace functionality for MPP_ASSERT:
 
-    Add these flags to your project's CMakeLists.txt, if you want to see backtrace, when MPP_ASSERT fails:
+    Add these flags to your project's CMakeLists.txt, if you want to see a backtrace when `MPP_ASSERT` fails:
 
     ```cmake
     # For GCC
@@ -187,7 +187,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
 - Address Sanitizer support (ASAN):
 
-    Enable `MPP_SANITIZERS` before building the library. Then compile your project with `-fsanitize=address` flag. As a result wou will get asan-compatible build which will help you to debug any memory management issues.
+    Enable `MPP_SANITIZERS` before building the library. Then compile your project with `-fsanitize=address` flag. As a result, you will get asan-compatible build which will help you to debug any memory management issues.
 
     Example buggy code:
 
@@ -197,7 +197,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     *(uint32_t*)p1 = 0x13371337; // Use-after-free write
     ```
 
-    Example asan report for this code:
+    Example ASAN report for this code:
 
     ```c++
     =================================================================
@@ -230,7 +230,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     tmpArena->freedChunks.GenerateGraphvizLayout(std::cout);
     ```
 
-    How to generage .svg file with dot:
+    How to generate an .svg file with dot:
 
     ```bash
     dot -Tsvg treap.dot -o treap.svg
@@ -242,14 +242,14 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     __GcGraph visualizer__
 
     To visualization the GcGraph you have to:
-    1. Build the library in debug mode, and set `MPP_DUMP_OBJECTS_GRAPH=1` (basic visualization) or `MPP_DUMP_OBJECTS_GRAPH=2` (advanced visualization) before running the target app. On each GC cycle it will dump objects graph to file "objects_cycle\<current cycle number\>.dot".
-    2. Then generate .svg file using dot as follows:
+    1. Build the library in debug mode, and set `MPP_DUMP_OBJECTS_GRAPH=1` (basic visualization) or `MPP_DUMP_OBJECTS_GRAPH=2` (advanced visualization) before running the target app. On each GC cycle, it will dump the objects graph to file "objects_cycle\<current cycle number\>.dot".
+    2. Then generate an .svg file using dot as follows:
 
         ```bash
         dot -Tsvg objects_cycle<N>.dot -o objects_cycle<N>.svg
         ```
 
-    For example, for this code (it creates linked list and tree):
+    For example, for this code (it creates a linked list and tree):
 
     ```c++
     // Linked List node
@@ -338,7 +338,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
 - Profiler
 
-    Using compilation flag `MPP_PROFILE`, you can build the library with profiler enabled. To do so:
+    Using the compilation flag `MPP_PROFILE`, you can build the library with the profiler enabled. To do so:
     1. Set the `MPP_PROFILE` before building the library
     2. Run the application until it exits
     3. In your current directory, find the file called __mpplib-profiling.json__
@@ -487,11 +487,11 @@ Right now algorithm consists of 2 parts:
 
 ### 1. Find connected components
 
-Divide the graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing the graph into components we can solve the layout problem for each component separately, and what is more important, we can do it in parallel. Also this step can be called optimal layout in some sense, because it is guaranteed that all objects in the component will be located in the same arena (contiguous memory block).
+Divide the graph of all objects into connected components. Each component is a set of objects that are reachable from each other. By dividing the graph into components we can solve the layout problem for each component separately, and what is more important, we can do it in parallel. Also, this step can be called optimal layout in some sense, because it is guaranteed that all objects in the component will be located in the same arena (contiguous memory block).
 
 ### 2. Layout each component heuristically
 
-The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly linked list). The algorithm is based on the following assumptions:
+The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly linked list). The algorithm is based on the following assumptions:
 
 - If we have a singly linked list, then most likely the next element should be located right after the current one. If it is not (take a look at the image below), then it's a good idea to move it there. By doing so we can reduce cache misses and improve performance.
 
@@ -564,7 +564,7 @@ Closing words. The algorithm is definitely not perfect, but it's a good start. I
     cd build && ctest
     ```
 
-    Some tests are disabled because they require you to turn off aslr (for example `GcGraphTest.GenerateGraphvizLayout`). This is considered unreliable, but if you still want to run them, you can do it like this:
+    Some tests are disabled because they require you to turn off ASLR (for example `GcGraphTest.GenerateGraphvizLayout`). This is considered unreliable, but if you still want to run them, you can do it like this:
 
     ```bash
     cd build && setarch `uname -m` -R ./build/tests/unit_tests --gtest_also_run_disabled_tests

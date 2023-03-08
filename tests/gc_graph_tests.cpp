@@ -74,7 +74,7 @@ TEST(GcGraphTest, FindVertex)
 TEST(GcGraphTest, GetAllOutgoingGcPtrs)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     // <Second GcPtr
     //         <First GcPtr.........>>
@@ -104,7 +104,7 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs)
 TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {

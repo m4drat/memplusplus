@@ -336,7 +336,7 @@ namespace mpp {
 
 #if MPP_STATS == 1
     std::ostream& Arena::DumpArena(std::ostream& t_out,
-                                   Arena* t_arena,
+                                   std::unique_ptr<Arena>& t_arena,
                                    bool t_dumpFreedChunks,
                                    bool t_dumpInUseChunks)
     {
@@ -344,8 +344,8 @@ namespace mpp {
 
         const std::set<Chunk*>& chunksInUse = t_arena->ConstructChunksInUse();
 
-        t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena) << " --------------"
-              << std::endl;
+        t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena.get())
+              << " --------------" << std::endl;
 
         t_out << "MPP - Total arena size           : "
               << utils::Statistics::FormattedSize(t_arena->m_size) << std::endl;

@@ -316,7 +316,7 @@ namespace mpp {
         } else {
             MM::DestroyObject(this->m_objectPtr);
         }
-        MemoryManager::Deallocate(static_cast<void*>(this->m_objectPtr));
+        Deallocate(static_cast<void*>(this->m_objectPtr));
     }
 
     template<class Type>
@@ -440,7 +440,7 @@ namespace mpp {
     SharedGcPtr<Type> MakeShared(Args&&... t_args)
     {
         PROFILE_FUNCTION();
-        Type* ptr = static_cast<Type*>(MM::Allocate(sizeof(Type)));
+        Type* ptr = static_cast<Type*>(Allocate(sizeof(Type)));
         Type* obj = MM::Construct<Type>(ptr, std::forward<Args>(t_args)...);
         return SharedGcPtr<Type>(obj);
     }
@@ -450,7 +450,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        Type* ptr = static_cast<Type*>(MM::Allocate(sizeof(Type) * t_size));
+        Type* ptr = static_cast<Type*>(Allocate(sizeof(Type) * t_size));
 
         for (uint32_t i = 0; i < t_size; i++) {
             [[maybe_unused]] Type* obj =

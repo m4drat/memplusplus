@@ -7,7 +7,7 @@
 TEST(GcTest, CreateCollectCreate)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1);
     GC::GetInstance().Collect();
@@ -25,7 +25,7 @@ TEST(GcTest, CreateCollectCreate)
 TEST(GcTest, PointerToPointer)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<SharedGcPtr<int32_t>> p =
         MakeShared<SharedGcPtr<int32_t>>(MakeShared<int32_t>(0x95782));
@@ -38,7 +38,7 @@ TEST(GcTest, PointerToPointer)
 TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {
@@ -65,7 +65,7 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
 TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
     SharedGcPtr<int32_t> a2 = MakeShared<int32_t>(1338);
@@ -81,7 +81,7 @@ TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
 TEST(GcTest, CreateCycleOfLength3)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {
@@ -114,7 +114,7 @@ TEST(GcTest, CreateCycleOfLength3)
 TEST(GcTest, TestDanglingCyclesAreDestroyed)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {
@@ -150,7 +150,7 @@ TEST(GcTest, DISABLED_CollectX5)
 TEST(GcTest, GcPtrsAreUpdatedAfterCollect)
 {
     using namespace mpp;
-    MM::ResetAllocatorState();
+    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
     void* rawPtrBeforeGcCollect = a1.GetVoid();

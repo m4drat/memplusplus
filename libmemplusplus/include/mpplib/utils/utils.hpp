@@ -57,40 +57,6 @@ namespace mpp { namespace utils {
     std::string AddrToString(void* t_ptr);
 
     /**
-     * @brief Finds first element, that is greater or equal to key.
-     * @param first iterator to begin of the range
-     * @param last iterator to end of the range
-     * @param value element to find
-     * @param comp comparator
-     * @return iterator to found element
-     */
-    template<class ForwardIt, class T, class Compare>
-    ForwardIt LowerBound(ForwardIt first, ForwardIt last, const T& value, Compare comp)
-    {
-        using difference_type = typename std::iterator_traits<ForwardIt>::difference_type;
-
-        PROFILE_FUNCTION();
-
-        ForwardIt iter;
-        difference_type count;
-        difference_type step;
-        count = std::distance(first, last);
-
-        while (count > 0) {
-            iter = first;
-            step = count / 2;
-            std::advance(iter, step);
-            if (comp(*iter, value)) {
-                first = ++iter;
-                count -= step + 1;
-            } else {
-                count = step;
-            }
-        }
-        return first;
-    }
-
-    /**
      * @brief Performs binary search in container.
      * @param first iterator to begin of the range
      * @param last iterator to end of the range

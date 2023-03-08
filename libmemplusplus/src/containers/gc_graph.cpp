@@ -93,7 +93,7 @@ namespace mpp {
         t_out << "\tnode[ style=filled ];\n";
 
         // Create all chunks
-        for (auto* arena : MemoryManager::GetArenaList()) {
+        for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -135,7 +135,7 @@ namespace mpp {
         t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
         t_out << "\t\t<TR>\n";
 
-        for (auto* arena : MemoryManager::GetArenaList()) {
+        for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -164,7 +164,7 @@ namespace mpp {
         t_out << "\t</table>>];\n";
 
         // Draw connection to the flat heap view
-        for (auto* arena : MemoryManager::GetArenaList()) {
+        for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 std::string chunkAddrStr = utils::AddrToString((void*)pos);
@@ -201,7 +201,7 @@ namespace mpp {
         t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
         t_out << "\t\t<TR>\n";
 
-        for (auto* arena : MemoryManager::GetArenaList()) {
+        for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -237,7 +237,7 @@ namespace mpp {
 
         uint32_t gcptrIndex = 1;
 
-        for (auto* arena : MemoryManager::GetArenaList()) {
+        for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -351,7 +351,7 @@ namespace mpp {
 
         // Draw connection to the flat heap view
         t_out << "\n\t// Draw connections from all chunks to the flat heap view\n";
-        for (auto* arena : MemoryManager::GetArenaList()) {
+        for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);

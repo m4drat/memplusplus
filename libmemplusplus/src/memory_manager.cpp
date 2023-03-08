@@ -6,12 +6,12 @@
 #include "mpplib/utils/utils.hpp"
 
 #include <cstdint>
+#include <functional>
+#include <memory>
 #include <sys/mman.h>
 
 namespace mpp {
-    std::function<void*(std::size_t)> MemoryManager::g_mppAllocateHook{ nullptr };
-    std::function<bool(void*)> MemoryManager::g_mppDeallocateHook{ nullptr };
-    std::vector<Arena*> MemoryManager::s_arenaList;
+    std::unique_ptr<MemoryManager> g_memoryManager{ nullptr };
 
     std::uintptr_t MemoryManager::MmapHint()
     {
@@ -81,20 +81,17 @@ namespace mpp {
         return true;
     }
 
-    Arena* MemoryManager::CreateArena(std::size_t t_arenaSize)
+    std::unique_ptr<Arena>& MemoryManager::CreateArena(std::size_t t_arenaSize)
     {
         PROFILE_FUNCTION();
 
         // Allocate memory for arena
         std::byte* arenaSpace = SysAlloc(t_arenaSize);
 
-        // TODO - smart pointers memory management
-        auto* arena = new Arena(t_arenaSize, arenaSpace);
-
         // Add newly created arena to vector of active arenas
-        s_arenaList.push_back(arena);
+        m_arenaList.emplace_back(std::make_unique<Arena>(t_arenaSize, arenaSpace));
 
-        return arena;
+        return m_arenaList.back();
     }
 
     Chunk* MemoryManager::GetSuitableChunk(std::size_t t_realSize)
@@ -105,7 +102,7 @@ namespace mpp {
 
         // Try iterating through all available arenas to try to
         // find enough space for user-requested chunk in top chunk
-        for (auto* arena : s_arenaList) {
+        for (auto& arena : m_arenaList) {
             // check if arena->topChunk != nullptr, in this case, we still have
             // some space in the "right side" of the arena
             if (arena->TopChunk() && (t_realSize <= arena->TopChunk()->GetSize())) {
@@ -138,7 +135,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // Create new arena with requested size
-        Arena* arena = CreateArena(t_userDataSize);
+        auto& arena = CreateArena(t_userDataSize);
 #if MPP_STATS == 1
         arena->GetArenaStats()->bigArena = true;
 #endif
@@ -153,8 +150,8 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // User placed hook to call before actual Allocate
-        if (g_mppAllocateHook != nullptr) {
-            return g_mppAllocateHook(t_userDataSize);
+        if (m_allocateHook != nullptr) {
+            return m_allocateHook(t_userDataSize);
         }
 
         // Align, because we want to have metadata bits
@@ -171,7 +168,7 @@ namespace mpp {
         }
 
         // If we dont have any active arena yet. Create a new one.
-        if (s_arenaList.empty()) {
+        if (m_arenaList.empty()) {
             CreateArena(g_DEFAULT_ARENA_SIZE);
         }
 
@@ -185,7 +182,7 @@ namespace mpp {
 
         // finally, if there is no available space for chunk
         // create new arena and allocate from it
-        Arena* arena = CreateArena(g_DEFAULT_ARENA_SIZE);
+        auto& arena = CreateArena(g_DEFAULT_ARENA_SIZE);
         Chunk* userChunk = arena->AllocateFromTopChunk(realChunkSize);
         MPP_SECURE_WIPE_CHUNK(userChunk);
         return Chunk::GetUserDataPtr(userChunk);
@@ -196,8 +193,8 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         // User placed hook to call before actual Allocate
-        if (g_mppDeallocateHook != nullptr) {
-            return g_mppDeallocateHook(t_chunkPtr);
+        if (m_deallocateHook != nullptr) {
+            return m_deallocateHook(t_chunkPtr);
         }
 
         // If a given pointer is a nullptr - return false
@@ -207,7 +204,7 @@ namespace mpp {
         }
 
         // Find arena that chunk belongs to
-        for (auto* arena : s_arenaList) {
+        for (auto& arena : m_arenaList) {
             if (t_chunkPtr >= arena->BeginPtr() && t_chunkPtr <= arena->EndPtr()) {
                 // In this case, we still can free invalid pointer, so
                 // add additional checks inside DeallocateChunk
@@ -226,18 +223,20 @@ namespace mpp {
 
     void MemoryManager::SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook)
     {
-        g_mppAllocateHook = t_allocateHook;
+        m_allocateHook = t_allocateHook;
     }
 
     void MemoryManager::SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook)
     {
-        g_mppDeallocateHook = t_deallocateHook;
+        m_deallocateHook = t_deallocateHook;
     }
 
-    void MemoryManager::InitAllocatorState()
+    MemoryManager::MemoryManager()
+        : m_allocateHook{ nullptr }
+        , m_deallocateHook{ nullptr }
     {
 #if MPP_FUZZER_INSECURE == 1 || MPP_DEBUG == 1
-        std::srand(0);
+        std::srand(0); // NOLINT
 #else
         // Random that is used only inside ChunkTreap to balance it
         std::srand(std::time(NULL));
@@ -249,9 +248,9 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        for (auto* arena : s_arenaList) {
-            t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena) << " --------------"
-                  << std::endl;
+        for (auto& arena : m_arenaList) {
+            t_out << "-------------- Arena: " << reinterpret_cast<void*>(arena.get())
+                  << " --------------" << std::endl;
             for (Chunk& chunk : *arena) {
                 Chunk* currChunkPtr = &chunk;
 
@@ -318,32 +317,40 @@ namespace mpp {
     // TODO: make it work better (probably add smart pointers memory management)
     // This is just ugly thing to reset allocator state
     // exists only to supprot unit-tests execution
-    bool MemoryManager::ResetAllocatorState()
+    MemoryManager::~MemoryManager()
     {
         PROFILE_FUNCTION();
 
-        auto currArena = s_arenaList.begin();
-        while (currArena != s_arenaList.end()) {
-            delete *currArena;
-            *currArena = nullptr;
-            currArena = s_arenaList.erase(currArena);
+        auto currArena = m_arenaList.begin();
+        while (currArena != m_arenaList.end()) {
+            currArena->reset();
+            currArena = m_arenaList.erase(currArena);
         }
 
         GC::GetInstance().GetGcPtrs().clear();
-
-        return true;
     }
 
-    Arena* MemoryManager::GetArenaByPtr(void* t_ptr)
+    std::optional<std::reference_wrapper<std::unique_ptr<Arena>>> MemoryManager::GetArenaByPtr(
+        void* t_ptr)
     {
         PROFILE_FUNCTION();
 
-        for (auto* arena : s_arenaList) {
+        for (auto& arena : m_arenaList) {
             if (t_ptr >= arena->BeginPtr() && t_ptr <= arena->EndPtr()) {
                 return arena;
             }
         }
 
-        return nullptr;
+        return std::nullopt;
+    }
+
+    void* Allocate(std::size_t t_userDataSize)
+    {
+        return g_memoryManager->Allocate(t_userDataSize);
+    }
+
+    bool Deallocate(void* t_chunkPtr)
+    {
+        return g_memoryManager->Deallocate(t_chunkPtr);
     }
 }

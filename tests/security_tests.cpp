@@ -7,71 +7,73 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 
-TEST(AllocatorLogicTest, DISABLED_DoubleFree_1)
+#include "gtest_fixtures.hpp"
+
+TEST_F(AllocatorTest, DISABLED_DoubleFree_1)
 {
     using namespace mpp;
 
     std::vector<void*> ptrs;
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(256));
-    ptrs.push_back(MemoryManager::Allocate(512));
-    ptrs.push_back(MemoryManager::Allocate(16));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(256));
-    ptrs.push_back(MemoryManager::Allocate(512));
-    ptrs.push_back(MemoryManager::Allocate(1024));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(2048));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(256));
+    ptrs.push_back(Allocate(512));
+    ptrs.push_back(Allocate(16));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(256));
+    ptrs.push_back(Allocate(512));
+    ptrs.push_back(Allocate(1024));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(2048));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
 
-    MemoryManager::Deallocate(ptrs[0]);
-    MemoryManager::Deallocate(ptrs[2]);
-    MemoryManager::Deallocate(ptrs[4]);
-    MemoryManager::Deallocate(ptrs[6]);
-    MemoryManager::Deallocate(ptrs[8]);
-    MemoryManager::Deallocate(ptrs[7]);
-    MemoryManager::Deallocate(ptrs[10]);
-    MemoryManager::Deallocate(ptrs[12]);
+    Deallocate(ptrs[0]);
+    Deallocate(ptrs[2]);
+    Deallocate(ptrs[4]);
+    Deallocate(ptrs[6]);
+    Deallocate(ptrs[8]);
+    Deallocate(ptrs[7]);
+    Deallocate(ptrs[10]);
+    Deallocate(ptrs[12]);
 
     // DoubleFree
-    EXPECT_EXIT({ MemoryManager::Deallocate((void*)ptrs[8]); },
+    EXPECT_EXIT({ Deallocate((void*)ptrs[8]); },
                 testing::KilledBySignal(SIGABRT),
                 "Double free or corruption detected!");
 }
 
-TEST(AllocatorLogicTest, InvalidFree)
+TEST_F(AllocatorTest, InvalidFree)
 {
     using namespace mpp;
 
     std::vector<void*> ptrs;
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(256));
-    ptrs.push_back(MemoryManager::Allocate(512));
-    ptrs.push_back(MemoryManager::Allocate(16));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(256));
-    ptrs.push_back(MemoryManager::Allocate(512));
-    ptrs.push_back(MemoryManager::Allocate(1024));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(2048));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(128));
-    ptrs.push_back(MemoryManager::Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(256));
+    ptrs.push_back(Allocate(512));
+    ptrs.push_back(Allocate(16));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(256));
+    ptrs.push_back(Allocate(512));
+    ptrs.push_back(Allocate(1024));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(2048));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
 
-    MemoryManager::Deallocate(ptrs[0]);
-    MemoryManager::Deallocate(ptrs[2]);
-    MemoryManager::Deallocate(ptrs[4]);
-    MemoryManager::Deallocate(ptrs[6]);
-    MemoryManager::Deallocate(ptrs[8]);
-    MemoryManager::Deallocate(ptrs[7]);
-    MemoryManager::Deallocate(ptrs[10]);
+    Deallocate(ptrs[0]);
+    Deallocate(ptrs[2]);
+    Deallocate(ptrs[4]);
+    Deallocate(ptrs[6]);
+    Deallocate(ptrs[8]);
+    Deallocate(ptrs[7]);
+    Deallocate(ptrs[10]);
 
     // InvalidFree
-    EXPECT_EXIT({ MemoryManager::Deallocate((void*)0xdeadbeef); },
+    EXPECT_EXIT({ Deallocate((void*)0xdeadbeef); },
                 testing::KilledBySignal(SIGABRT),
                 "Invalid pointer deallocation detected!");
 }

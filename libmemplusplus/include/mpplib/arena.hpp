@@ -329,7 +329,7 @@ namespace mpp {
          * @return std::ostream, that earlier was passed as t_out
          */
         static std::ostream& DumpArena(std::ostream& t_out,
-                                       Arena* t_arena,
+                                       std::unique_ptr<Arena>& t_arena,
                                        bool t_dumpFreedChunks,
                                        bool t_dumpInUseChunks);
 #endif
