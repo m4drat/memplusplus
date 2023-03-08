@@ -2,6 +2,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/macros.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <unordered_map>
 
@@ -24,17 +25,14 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        Arena* arenaPtr = MM::GetArenaByPtr(t_ptr);
+        Arena* arenaPtr = g_memoryManager->GetArenaByPtr(t_ptr);
         if (arenaPtr == nullptr)
             return nullptr;
 
         const std::set<Chunk*>& chunksInUse = arenaPtr->ConstructChunksInUse();
 
         // Find chunk by pointer
-        auto foundChunkIt = utils::LowerBound(
-            chunksInUse.begin(), chunksInUse.end(), t_ptr, [](Chunk* t_ch, void* t_ptr) -> bool {
-                return (t_ptr >= reinterpret_cast<void*>(t_ch));
-            });
+        auto foundChunkIt = chunksInUse.lower_bound(reinterpret_cast<Chunk*>(t_ptr));
         if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
             return *foundChunkIt;
         }
@@ -112,7 +110,7 @@ namespace mpp {
         }
         godArenaSize = MM::Align(godArenaSize, MM::g_PAGE_SIZE);
 
-        Arena* godArena = MM::CreateArena(godArenaSize);
+        Arena* godArena = g_memoryManager->CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
@@ -202,17 +200,17 @@ namespace mpp {
         godArena->SetUsedSpace(layoutedData.layoutedSize);
         godArena->TopChunk() = topChunk;
 
-        MM::s_arenaList.erase(
-            std::remove_if(MM::s_arenaList.begin(), MM::s_arenaList.end(), [&](Arena* t_arena) {
-                if (t_arena == godArena)
-                    return false;
+        std::vector<Arena*>& arenaList = g_memoryManager->GetArenaList();
+        arenaList.erase(std::remove_if(arenaList.begin(), arenaList.end(), [&](Arena* t_arena) {
+            if (t_arena == godArena)
+                return false;
 #if MPP_STATS == 1
-                m_gcStats->memoryCleaned += t_arena->FreeMemoryInsideChunkTreap();
+            m_gcStats->memoryCleaned += t_arena->FreeMemoryInsideChunkTreap();
 #endif
-                delete t_arena;
-                t_arena = nullptr;
-                return true;
-            }));
+            delete t_arena;
+            t_arena = nullptr;
+            return true;
+        }));
 
 #if MPP_STATS == 1
         timer.TimerEnd();

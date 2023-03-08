@@ -4,6 +4,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
+#include <memory>
 
 #if MPP_STATS == 1
 #include "mpplib/utils/statistics.hpp"
@@ -38,16 +39,21 @@ namespace mpp {
         friend class GC;
         friend class Arena;
 
-        /**
-         * @brief Initializes random seed for chunk treap.
-         */
-        static __attribute__((constructor)) void InitAllocatorState();
-
         // TODO: refactor to work with std::unique_ptr
         /**
          * @brief All existing arenas.
          */
-        static std::vector<Arena*> s_arenaList;
+        std::vector<Arena*> m_arenaList;
+
+        /**
+         * @brief User specified hook to call before Allocate
+         */
+        std::function<void*(std::size_t)> m_allocateHook;
+
+        /**
+         * @brief User specified hook to call before Deallocate
+         */
+        std::function<bool(void*)> m_deallocateHook;
 
         /**
          * @brief Generate MMAP hint.
@@ -78,7 +84,7 @@ namespace mpp {
          * @param t_arenaSize is size of arena, that will be created.
          * @return newly created arena.
          */
-        static Arena* CreateArena(std::size_t t_arenaSize);
+        Arena* CreateArena(std::size_t t_arenaSize);
 
         /**
          * @brief Function that allocate chunk with user data bigger than 32MB.
@@ -87,24 +93,14 @@ namespace mpp {
          * @param t_userDataSize is the size of user data, that will be allocated.
          * @return Chunk* pointer to newly allocated chunk.
          */
-        static Chunk* AllocateBigChunk(std::size_t t_userDataSize);
+        Chunk* AllocateBigChunk(std::size_t t_userDataSize);
 
         /**
          * @brief Finds suitable chunk of requested size from somwhere (top/freelist).
          * @param t_realSize already aligned size of request.
          * @return Chunk* allocated chunk, or nullptr
          */
-        static Chunk* GetSuitableChunk(std::size_t t_realSize);
-
-        /**
-         * @brief User specified hook to call before Allocate
-         */
-        static std::function<void*(std::size_t)> g_mppAllocateHook;
-
-        /**
-         * @brief User specified hook to call before Deallocate
-         */
-        static std::function<bool(void*)> g_mppDeallocateHook;
+        Chunk* GetSuitableChunk(std::size_t t_realSize);
 
         /**
          * @brief Construct objects at t_objectPtr using params provided in t_args
@@ -152,7 +148,60 @@ namespace mpp {
         }
 
     public:
-        MemoryManager() = delete;
+        //! @brief Initializes random seed for chunk treap.
+        MemoryManager();
+
+        //! @brief Resets allocator state by destroying all arenas.
+        ~MemoryManager();
+
+        //! @brief Deleted copy constructor.
+        MemoryManager(const MemoryManager&) = delete;
+
+        /**
+         * @brief Ceils number (t_size) to the nearest number such that this number divided by
+         * t_alignment has no remainder.
+         * @param t_size is number to align
+         * @param t_alignment is alignment
+         * @return std::size_t Aligned number
+         */
+        static std::size_t Align(std::size_t t_size, int32_t t_alignment);
+
+        /**
+         * @brief Sets hook for Allocate method
+         * @param t_allocateHook std::function to set as hook
+         */
+        void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook);
+
+        /**
+         * @brief Sets hook for DeAllocate method
+         * @param t_deallocateHook std::function to set as hook
+         */
+        void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook);
+
+#if MPP_STATS == 1 || MPP_DEBUG == 1
+        /**
+         * @brief Visualizes heap layout.
+         * @param t_out output stream to write to.
+         * @return std::ostream& stream reference
+         */
+        std::ostream& VisHeapLayout(std::ostream& t_out, void* t_ptr);
+#endif
+
+        /**
+         * @brief Get reference to vector of arenas.
+         * @return const std::vector<Arena*>& to arenas
+         */
+        std::vector<Arena*>& GetArenaList()
+        {
+            return m_arenaList;
+        }
+
+        /**
+         * @brief Finds inside which arena t_ptr points.
+         * @param t_ptr heap pointer.
+         * @return Arena* if pointer points into arena, nullptr otherwise
+         */
+        Arena* GetArenaByPtr(void* t_ptr);
 
         /**
          * @deprecated instead of using Allocate use @sa MakeShared<T> / @sa MakeSharedN<T>
@@ -161,7 +210,7 @@ namespace mpp {
          * @param t_userDataSize request size.
          * @return void* pointer to user data in allocated chunk
          */
-        static void* Allocate(std::size_t t_userDataSize);
+        void* Allocate(std::size_t t_userDataSize);
 
         /**
          * @deprecated this method is deprecated and will be private in a future version
@@ -171,7 +220,7 @@ namespace mpp {
          * @return true, if chunk was deallocated successfully, false if chunk
          * doesn't belong to any arena
          */
-        static bool Deallocate(void* t_chunkPtr);
+        bool Deallocate(void* t_chunkPtr);
 
         /**
          * @deprecated instead of using Allocate<T> use @sa MakeShared<T> / @sa MakeSharedN<T>
@@ -182,7 +231,7 @@ namespace mpp {
          * @return T* constructed object
          */
         template<class T, class... Args>
-        static T* Allocate(Args&&... t_args)
+        T* Allocate(Args&&... t_args)
         {
             PROFILE_FUNCTION();
 
@@ -199,84 +248,24 @@ namespace mpp {
          * doesn't belong to any arena
          */
         template<class T>
-        static bool Deallocate(T* t_objPtr)
+        bool Deallocate(T* t_objPtr)
         {
             PROFILE_FUNCTION();
 
             return Deallocate(reinterpret_cast<void*>(DestroyObject(t_objPtr)));
         }
 
-        /**
-         * @brief Ceils number (t_size) to the nearest number such that this number divided by
-         * t_alignment has no remainder.
-         * @param t_size is number to align
-         * @param t_alignment is alignment
-         * @return std::size_t Aligned number
-         */
-        static std::size_t Align(std::size_t t_size, int32_t t_alignment);
+        //! @brief Minimum allowed chunk size. Chunk size less than that will be extended.
+        static constexpr std::size_t g_MIN_CHUNK_SIZE = 32;
 
-        /**
-         * @brief Sets hook for Allocate method
-         * @param t_allocateHook std::function to set as hook
-         */
-        static void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook);
+        //! @brief Size of chunk header.
+        static constexpr std::size_t g_CHUNK_HEADER_SIZE = sizeof(Chunk::ChunkHeader_t);
 
-        /**
-         * @brief Sets hook for DeAllocate method
-         * @param t_deallocateHook std::function to set as hook
-         */
-        static void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook);
+        //! @brief Default arena size.
+        static constexpr std::size_t g_DEFAULT_ARENA_SIZE = 32ULL * (1ULL << 20ULL);
 
-#if MPP_STATS == 1 || MPP_DEBUG == 1
-        /**
-         * @brief Visualizes heap layout.
-         * @param t_out output stream to write to.
-         * @return std::ostream& stream reference
-         */
-        static std::ostream& VisHeapLayout(std::ostream& t_out, void* t_ptr);
-#endif
-
-        /**
-         * @brief Get reference to vector of arenas.
-         * @return const std::vector<Arena*>& to arenas
-         */
-        static const std::vector<Arena*>& GetArenaList()
-        {
-            return s_arenaList;
-        }
-
-        /**
-         * @brief Finds inside which arena t_ptr points.
-         * @param t_ptr heap pointer.
-         * @return Arena* if pointer points into arena, nullptr otherwise
-         */
-        static Arena* GetArenaByPtr(void* t_ptr);
-
-        /**
-         * @brief Resets allocator state by destroying all arenas.
-         * @return true if everything is fine, false otherwise
-         */
-        static bool ResetAllocatorState();
-
-        /**
-         * @brief Minimum allowed chunk size. Chunk size less than that will be extended.
-         */
-        static const std::size_t g_MIN_CHUNK_SIZE = 32;
-
-        /**
-         * @brief Size of chunk header.
-         */
-        static const std::size_t g_CHUNK_HEADER_SIZE = sizeof(Chunk::ChunkHeader_t);
-
-        /**
-         * @brief Default arena size.
-         */
-        static const std::size_t g_DEFAULT_ARENA_SIZE = 32ULL * (1ULL << 20ULL);
-
-        /**
-         * @brief Page size for mmap request.
-         */
-        static const std::size_t g_PAGE_SIZE = 4096;
+        //! @brief Page size for mmap request.
+        static constexpr std::size_t g_PAGE_SIZE = 4096;
 
         /**
          * @brief Defines base location of all arenas. Allocator
@@ -284,15 +273,75 @@ namespace mpp {
          * If it isn't possible to allocate memory at desired address, just
          * call mmap(NULL, ...).
          */
-        static const std::uintptr_t g_MMAP_START = 1ULL << 40ULL;
+        static constexpr std::uintptr_t g_MMAP_START = 1ULL << 40ULL;
 
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-        /**
-         * @brief fill char, to fill allocated chunks in debug mode or secure mode.
-         */
-        static const uint8_t g_FILL_CHAR = MPP_FILL_CHAR;
+        //! @brief fill char, to fill allocated chunks in debug mode or secure mode.
+        static constexpr uint8_t g_FILL_CHAR = MPP_FILL_CHAR;
 #endif
     };
 
     using MM = MemoryManager;
+
+    //! @brief MemoryManager pointer (singleton).
+    extern std::unique_ptr<MemoryManager> g_memoryManager; // NOLINT
+
+    //! @brief MemoryManager initializer.
+    class MemoryManagerInitializer
+    {
+        //! @brief Initializes MemoryManager singleton on library load.
+        static void __attribute__((constructor)) InitAllocatorState()
+        {
+            if (!g_memoryManager) {
+                g_memoryManager = std::make_unique<MemoryManager>();
+            }
+        }
+    };
+
+    /**
+     * @deprecated instead of using Allocate use @sa MakeShared<T> / @sa MakeSharedN<T>
+     * @briefWrapper around @sa AllocateInternal.
+     * @param t_userDataSize request size.
+     * @return void* pointer to user data in allocated chunk
+     */
+    void* Allocate(std::size_t t_userDataSize);
+
+    /**
+     * @deprecated this method is deprecated and will be private in a future version
+     * because we don't operate with raw pointers anymore.
+     * @brief Wrapper around @sa DeallocateInternal.
+     * @param t_chunkPtr pointer to start of user data.
+     * @return true, if chunk was deallocated successfully, false if chunk
+     * doesn't belong to any arena
+     */
+    bool Deallocate(void* t_chunkPtr);
+
+    /**
+     * @deprecated instead of using Allocate<T> use @sa MakeShared<T> / @sa MakeSharedN<T>
+     * @brief Template version of Allocate to call object constructor.
+     * @tparam T object to allocate type.
+     * @tparam Args list of arguments to pass to object constructor.
+     * @param t_args actual arguments to object constructor.
+     * @return T* constructed object
+     */
+    template<class T, class... Args>
+    T* Allocate(Args&&... t_args)
+    {
+        return g_memoryManager->Allocate<T>(std::forward<Args>(t_args)...);
+    }
+
+    /**
+     * @deprecated this method is deprecated and will be private in a future version
+     * because we don't operate with raw pointers anymore.
+     * @brief Template version of Deallocate to call object destructor.
+     * @tparam T actual type of the object.
+     * @param t_objPtr pointer to object of type T.
+     * @return true, if chunk was deallocated successfully, false if chunk
+     * doesn't belong to any arena
+     */
+    template<class T>
+    bool Deallocate(T* t_objPtr)
+    {
+        return g_memoryManager->Deallocate(t_objPtr);
+    }
 }

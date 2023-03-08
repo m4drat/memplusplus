@@ -10,6 +10,8 @@ using namespace mpp::fuzzer;
 
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
 {
+    mpp::MemoryManager memMgr = mpp::MemoryManager();
+
     // translate input string into sequence of opcodes
     std::deque<std::pair<Tokenizer::Tokens, std::size_t>> commands =
         Tokenizer::Tokenize(Data, Size);
@@ -21,25 +23,23 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
         switch (cmd.first) {
             case Tokenizer::Tokens::Allocate: {
                 // std::cout << "Allocating chunk of size: " << cmd.second;
-                allocatedChunks.push_back(mpp::MemoryManager::Allocate(cmd.second));
+                allocatedChunks.push_back(memMgr.Allocate(cmd.second));
                 // std::cout << ". Chunk allocated: " << allocatedChunks.back() << std::endl;
                 break;
             }
             case Tokenizer::Tokens::Deallocate: {
-                if (allocatedChunks.empty())
-                {
+                if (allocatedChunks.empty()) {
                     return 0;
                 }
                 uint32_t position = rand() % allocatedChunks.size();
                 void* chunk = allocatedChunks.at(position);
                 // std::cout << "Deallocating chunk: " << chunk << ". Of size: " <<
                 // mpp::Chunk::GetHeaderPtr(chunk)->GetSize() << std::endl;
-                mpp::MemoryManager::Deallocate(chunk);
+                memMgr.Deallocate(chunk);
                 allocatedChunks.erase(allocatedChunks.begin() + position);
                 break;
             }
             case Tokenizer::Tokens::Invalid: {
-                mpp::MemoryManager::ResetAllocatorState();
                 return 0;
                 break;
             }
@@ -48,7 +48,6 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
         commands.pop_front();
     }
 
-    mpp::MemoryManager::ResetAllocatorState();
     return 0;
 }
 

@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <deque>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -27,7 +28,8 @@ namespace mpp { namespace fuzzer {
          * @param t_dataEnd points to the last valid char of the buffer
          * @return std::string parsed number or "-1" if something went wrong
          */
-        static std::string ParseNumber(const uint8_t* t_dataStart, const uint8_t* t_dataEnd);
+        static std::optional<std::string> ParseNumber(const uint8_t* t_dataStart,
+                                                      const uint8_t* t_dataEnd);
 
         /**
          * @brief Parse input string into sequence of opcodes and parameters to them.

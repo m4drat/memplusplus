@@ -1,36 +1,36 @@
 #include "fuzzer/tokenizer.hpp"
 
 namespace mpp { namespace fuzzer {
-    std::string Tokenizer::ParseNumber(const uint8_t* t_dataStart, const uint8_t* t_dataEnd)
+    std::optional<std::string> Tokenizer::ParseNumber(const uint8_t* t_dataStart,
+                                                      const uint8_t* t_dataEnd)
     {
-        std::string number = "";
-        uint8_t* currentDataPtr = (uint8_t*)t_dataStart;
-
-        while (currentDataPtr < t_dataEnd) {
-            switch (*currentDataPtr) {
-                case 0x30 /* Number */:
-                case 0x31:
-                case 0x32:
-                case 0x33:
-                case 0x34:
-                case 0x35:
-                case 0x36:
-                case 0x37:
-                case 0x38:
-                case 0x39:
-                    number.push_back(*currentDataPtr);
-                    ++currentDataPtr;
+        std::string number;
+        while (t_dataStart < t_dataEnd) {
+            switch (*t_dataStart) {
+                case '0' /* Number */:
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                case '8':
+                case '9':
+                    number.push_back(*t_dataStart);
+                    ++t_dataStart;
                     break;
 
                 default:
                     if (number.length() != 0)
                         return number;
-                    return "-1";
+                    return std::nullopt;
             }
         }
 
         if (number.length() == 0)
-            return "-1";
+            return std::nullopt;
+
         return number;
     }
 
@@ -46,21 +46,33 @@ namespace mpp { namespace fuzzer {
             std::pair<Tokens, std::size_t> currentCommand;
 
             switch (*currentDataPtr) {
-                case 0x61 /* Allocate */: {
-                    std::string allocSize = ParseNumber(currentDataPtr + 1, dataEnd);
-                    if (allocSize.length() > 8 || std::stoull(allocSize) == -1 ||
-                        std::stoull(allocSize) > 67109888) {
+                case 'a' /* Allocate */: {
+                    const std::size_t c_maxAllocSize = 0x4000400;
+                    std::string allocSizeStr =
+                        ParseNumber(currentDataPtr + 1, dataEnd).value_or("0");
+                    std::size_t allocSize = 0;
+                    try {
+                        std::size_t allocSize = std::stoull(allocSizeStr);
+                    } catch (const std::invalid_argument& e) {
+                        currentCommand = std::make_pair(Tokens::Invalid, 0);
+                        break;
+                    } catch (const std::out_of_range& e) {
                         currentCommand = std::make_pair(Tokens::Invalid, 0);
                         break;
                     }
 
-                    currentCommand = std::make_pair(Tokens::Allocate, std::stoull(allocSize));
+                    if (allocSize > c_maxAllocSize) {
+                        currentCommand = std::make_pair(Tokens::Invalid, 0);
+                        break;
+                    }
 
-                    current_size -= (allocSize.length() + 1);
-                    currentDataPtr += allocSize.length() + 1;
+                    currentCommand = std::make_pair(Tokens::Allocate, allocSize);
+
+                    current_size -= (allocSizeStr.length() + 1);
+                    currentDataPtr += allocSizeStr.length() + 1;
                     break;
                 }
-                case 0x64 /* Deallocate */: {
+                case 'd' /* Deallocate */: {
                     currentCommand = std::make_pair(Tokens::Deallocate, 0);
                     --current_size;
                     ++currentDataPtr;

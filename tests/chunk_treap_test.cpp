@@ -10,9 +10,11 @@ TEST(ChunkTreapTest, ChunkToDeleteLocatedInBetween)
 
     ChunkTreap* cTreap = new ChunkTreap();
 
-    Chunk* ch1 = (Chunk*)MemoryManager::Allocate(50);
-    Chunk* ch2 = (Chunk*)MemoryManager::Allocate(50);
-    Chunk* ch3 = (Chunk*)MemoryManager::Allocate(50);
+    MM memMgr = MM();
+
+    auto* ch1 = (Chunk*)memMgr.Allocate(50);
+    auto* ch2 = (Chunk*)memMgr.Allocate(50);
+    auto* ch3 = (Chunk*)memMgr.Allocate(50);
 
     ASSERT_TRUE((((std::size_t)ch1 < (std::size_t)ch2) && ((std::size_t)ch2 < (std::size_t)ch3)));
 

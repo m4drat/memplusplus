@@ -158,9 +158,9 @@ namespace mpp {
          * @brief Get pointer to user data, from current chunk.
          * @return void* pointer to start of user data in current chunk
          */
-        void* GetUserData()
+        std::byte* GetUserData()
         {
-            return this + sizeof(Chunk::ChunkHeader);
+            return (std::byte*)this + sizeof(Chunk::ChunkHeader);
         };
 
         /**

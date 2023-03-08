@@ -27,7 +27,7 @@ A clear and concise description of what you expected to happen.
 ### Desktop (please complete the following information)
 
 - OS: [e.g. Linux-18.04]
-- Library Version [e.g. 2.3.5]
+- Library Version [e.g. 0.3.5]
 
 ### Additional context
 
