@@ -491,7 +491,7 @@ Divide the graph of all objects into connected components. Each component is a s
 
 ### 2. Layout each component heuristically
 
-The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly linked list). The algorithm is based on the following assumptions:
+The next step is to layout objects from components in a way that allows you to access them in a cache-friendly way. This is achieved by using a heuristic layout algorithm. Currently, it's a proof of concept that works only for objects that have a single pointer field (to be precise, it should work for any data structure, that can be represented as a singly linked list). The algorithm is based on the following assumptions
 
 - If we have a singly linked list, then most likely the next element should be located right after the current one. If it is not (take a look at the image below), then it's a good idea to move it there. By doing so we can reduce cache misses and improve performance.
 
@@ -501,7 +501,7 @@ Benchmark results for the algorithm are presented here: [Benchmark results](#-pe
 
 We can see that the algorithm is able to improve memory access time by 4-8 times (depending on the size of the list). Of course, it should be noted that the benchmark shows the corner case when the list is fully randomized in memory. In real life, the list might be layouted in a way that is already cache-friendly, so the algorithm will not be able to improve the performance.
 
-Closing words. The algorithm is definitely not perfect, but it's a good start. It can be improved in many ways, for example, by adding more heuristics. Also, it can be used as a base for a more complex layouting algorithm, that will be able to layout any data structure.
+Closing words. The algorithm is definitely not perfect, but it's a good start. It can be improved in many ways, for example, by adding more heuristics. Also, it can be used as a base for a more complex layouting algorithm, that will be able to layout any data structure
 
 ## 🚀 Performance comparisons
 
