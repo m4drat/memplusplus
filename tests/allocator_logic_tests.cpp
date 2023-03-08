@@ -87,7 +87,7 @@ TEST_F(AllocatorTest, FDT_merge_into_top)
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch2)->IsUsed() == 1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch2)->IsPrevInUse() == 1);
 
-    Arena* currentArena = g_memoryManager->GetArenaList().at(0);
+    auto& currentArena = g_memoryManager->GetArenaList().at(0);
 
     ASSERT_TRUE((ch1 != nullptr && ch2 != nullptr));
     ASSERT_TRUE(ch1 < ch2);
@@ -126,7 +126,7 @@ TEST_F(AllocatorTest, ADT_merge_into_top)
     void* ch1 = Allocate(128);
     void* ch2 = Allocate(128);
 
-    Arena* currentArena = g_memoryManager->GetArenaList().at(0);
+    auto& currentArena = g_memoryManager->GetArenaList().at(0);
 
     ASSERT_TRUE((ch1 != nullptr && ch2 != nullptr));
     ASSERT_TRUE(ch1 < ch2);
@@ -147,7 +147,7 @@ TEST_F(AllocatorTest, DT_merge_into_top)
     void* ch1 = Allocate(128);
     ASSERT_TRUE(ch1 != nullptr);
 
-    Arena* currentArena = g_memoryManager->GetArenaList().at(0);
+    auto& currentArena = g_memoryManager->GetArenaList().at(0);
     ASSERT_TRUE(Chunk::GetNextChunk(Chunk::GetHeaderPtr(ch1)) == currentArena->TopChunk());
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsUsed() == 1);
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsPrevInUse() == 1);
@@ -169,7 +169,7 @@ TEST_F(AllocatorTest, T_merge_into_top)
 
     ASSERT_TRUE((ch1 != nullptr && ch2 != nullptr));
 
-    Arena* currentArena = g_memoryManager->GetArenaList().at(0);
+    auto& currentArena = g_memoryManager->GetArenaList().at(0);
     ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->TopChunk())->GetSize() ==
                 currentArena->TopChunk()->GetPrevSize());
     std::size_t topChunkSizeBeforeMerging = currentArena->TopChunk()->GetSize();
@@ -189,7 +189,7 @@ TEST_F(AllocatorTest, ChunkOfArenaSizeMinusMetadata)
 
     void* ch1 = Allocate(MemoryManager::g_DEFAULT_ARENA_SIZE - sizeof(Chunk::ChunkHeader));
 
-    Arena* currentArena = g_memoryManager->GetArenaList().at(0);
+    auto& currentArena = g_memoryManager->GetArenaList().at(0);
 
     ASSERT_TRUE(ch1 != nullptr);
     ASSERT_TRUE(currentArena->TopChunk() == nullptr);
@@ -209,7 +209,7 @@ TEST_F(AllocatorTest, ChunkWithDoubleTheArenaSize)
 
     void* ch1 = Allocate(MemoryManager::g_DEFAULT_ARENA_SIZE * 2);
 
-    Arena* currentArena = g_memoryManager->GetArenaList().at(0);
+    auto& currentArena = g_memoryManager->GetArenaList().at(0);
 
     ASSERT_TRUE(ch1 != nullptr);
     ASSERT_TRUE(currentArena->TopChunk() == nullptr);
@@ -311,7 +311,7 @@ TEST_F(AllocatorTest, LinkedListChecks)
     Deallocate(p2);
     Deallocate(p4);
 
-    Arena* arena = g_memoryManager->GetArenaByPtr(p1);
+    auto arena = g_memoryManager->GetArenaByPtr(p1).value();
 
     ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
                                                            sizeof(Chunk::ChunkHeader) + 160)) ==

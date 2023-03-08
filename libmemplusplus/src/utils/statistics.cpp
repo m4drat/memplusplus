@@ -142,7 +142,7 @@ namespace mpp { namespace utils {
 
         if (t_dumpActiveArenas) {
             t_out << "~~~~~~~~~~~~~~~~ All active arenas ~~~~~~~~~~~~~~~~" << std::endl;
-            for (auto* arena : g_memoryManager->GetArenaList()) {
+            for (auto& arena : g_memoryManager->GetArenaList()) {
                 Arena::DumpArena(t_out, arena, t_dumpFreedChunks, t_dumpInUseChunks) << std::endl;
             }
         }

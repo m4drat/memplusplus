@@ -5,6 +5,7 @@
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include <memory>
+#include <optional>
 
 #if MPP_STATS == 1
 #include "mpplib/utils/statistics.hpp"
@@ -39,11 +40,10 @@ namespace mpp {
         friend class GC;
         friend class Arena;
 
-        // TODO: refactor to work with std::unique_ptr
         /**
          * @brief All existing arenas.
          */
-        std::vector<Arena*> m_arenaList;
+        std::vector<std::unique_ptr<Arena>> m_arenaList;
 
         /**
          * @brief User specified hook to call before Allocate
@@ -84,7 +84,7 @@ namespace mpp {
          * @param t_arenaSize is size of arena, that will be created.
          * @return newly created arena.
          */
-        Arena* CreateArena(std::size_t t_arenaSize);
+        std::unique_ptr<Arena>& CreateArena(std::size_t t_arenaSize);
 
         /**
          * @brief Function that allocate chunk with user data bigger than 32MB.
@@ -191,7 +191,7 @@ namespace mpp {
          * @brief Get reference to vector of arenas.
          * @return const std::vector<Arena*>& to arenas
          */
-        std::vector<Arena*>& GetArenaList()
+        std::vector<std::unique_ptr<Arena>>& GetArenaList()
         {
             return m_arenaList;
         }
@@ -199,9 +199,9 @@ namespace mpp {
         /**
          * @brief Finds inside which arena t_ptr points.
          * @param t_ptr heap pointer.
-         * @return Arena* if pointer points into arena, nullptr otherwise
+         * @return std::unique_ptr<Arena>& if pointer points into arena, nullptr otherwise
          */
-        Arena* GetArenaByPtr(void* t_ptr);
+        std::optional<std::reference_wrapper<std::unique_ptr<Arena>>> GetArenaByPtr(void* t_ptr);
 
         /**
          * @deprecated instead of using Allocate use @sa MakeShared<T> / @sa MakeSharedN<T>

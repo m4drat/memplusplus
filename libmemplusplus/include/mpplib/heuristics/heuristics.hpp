@@ -38,9 +38,6 @@ namespace mpp {
         //! @brief Graph of all objects.
         std::unique_ptr<GcGraph>& m_objectsGraph;
 
-        //! @brief Const reference to all active GcPtr's.
-        const std::set<GcPtr*>& m_gcPtrs;
-
     public:
         //! @brief Layouted heap structure. Represents compacted and layouted memory.
         struct LayoutedHeap
@@ -69,7 +66,6 @@ namespace mpp {
          */
         Heuristics(std::unique_ptr<GcGraph>& t_objectsGraph, const std::set<GcPtr*>& t_gcPtrs)
             : m_objectsGraph(t_objectsGraph)
-            , m_gcPtrs(t_gcPtrs)
         {
         }
 

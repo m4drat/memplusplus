@@ -4,6 +4,7 @@
 #include "mpplib/utils/macros.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <memory>
 #include <unordered_map>
 
 namespace mpp {
@@ -25,11 +26,11 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        Arena* arenaPtr = g_memoryManager->GetArenaByPtr(t_ptr);
-        if (arenaPtr == nullptr)
+        auto arena = g_memoryManager->GetArenaByPtr(t_ptr);
+        if (!arena.has_value())
             return nullptr;
 
-        const std::set<Chunk*>& chunksInUse = arenaPtr->ConstructChunksInUse();
+        const std::set<Chunk*>& chunksInUse = arena.value().get()->ConstructChunksInUse();
 
         // Find chunk by pointer
         auto foundChunkIt = chunksInUse.lower_bound(reinterpret_cast<Chunk*>(t_ptr));
@@ -110,7 +111,7 @@ namespace mpp {
         }
         godArenaSize = MM::Align(godArenaSize, MM::g_PAGE_SIZE);
 
-        Arena* godArena = g_memoryManager->CreateArena(godArenaSize);
+        auto& godArena = g_memoryManager->CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
@@ -200,17 +201,17 @@ namespace mpp {
         godArena->SetUsedSpace(layoutedData.layoutedSize);
         godArena->TopChunk() = topChunk;
 
-        std::vector<Arena*>& arenaList = g_memoryManager->GetArenaList();
-        arenaList.erase(std::remove_if(arenaList.begin(), arenaList.end(), [&](Arena* t_arena) {
-            if (t_arena == godArena)
-                return false;
+        auto& arenaList = g_memoryManager->GetArenaList();
+        arenaList.erase(std::remove_if(
+            arenaList.begin(), arenaList.end(), [&](std::unique_ptr<Arena>& t_arena) {
+                if (t_arena.get() == godArena.get())
+                    return false;
 #if MPP_STATS == 1
-            m_gcStats->memoryCleaned += t_arena->FreeMemoryInsideChunkTreap();
+                m_gcStats->memoryCleaned += t_arena->FreeMemoryInsideChunkTreap();
 #endif
-            delete t_arena;
-            t_arena = nullptr;
-            return true;
-        }));
+                t_arena.reset();
+                return true;
+            }));
 
 #if MPP_STATS == 1
         timer.TimerEnd();
