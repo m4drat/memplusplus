@@ -192,8 +192,8 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     Example buggy code:
 
     ```c++
-    void* p1 = MM::Allocate(128);
-    MM::Deallocate(p1);
+    void* p1 = mpp::Allocate(128);
+    mpp::Deallocate(p1);
     *(uint32_t*)p1 = 0x13371337; // Use-after-free write
     ```
 
@@ -223,11 +223,11 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
     ```c++
     // 1. Get the arena you want to dump the tree for
-    Arena* tmpArena = MemoryAllocator::GetArenaList()[0]
+    std::unique_ptr<Arena>& tmpArena = mpp::GetArenaList()[0];
 
     // 2. Extract ChunkTreap from this arena, and dump it
     // (in this example everything was dumped to std::cout).
-    tmpArena->freedChunks.GenerateGraphvizLayout(std::cout);
+    tmpArena->GetFreedChunks().GenerateGraphvizLayout(std::cout);
     ```
 
     How to generate an .svg file with dot:
@@ -459,26 +459,26 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     ```c++
     // Lambda as an Allocate hook. Important, all hooks should be static!
     static std::function<void*(std::size_t)> allocHook = [&](std::size_t t_AllocSize) {
-        mpp::MemoryManager::SetAllocateHook(nullptr);
-        void* ptr = mpp::MemoryManager::Allocate(t_AllocSize);
-        mpp::MemoryManager::SetAllocateHook(allocHook);
+        mpp::SetAllocateHook(nullptr);
+        void* ptr = mpp::Allocate(t_AllocSize);
+        mpp::SetAllocateHook(allocHook);
         std::cout << "[mpp] Allocate(" << t_AllocSize << ") -> ";
         mpp::Chunk::DumpChunk(std::cout, mpp::Chunk::GetHeaderPtr(ptr)) << std::endl;
         return ptr;
     };
     // Set actual Allocate hook.
-    mpp::MemoryManager::SetAllocateHook(allocHook);
+    mpp::SetAllocateHook(allocHook);
 
     // Lambda as an Deallocate hook. Important, all hooks should be static!
     static std::function<bool(void*)> deallocHook = [&](void* t_Addr) {
-        mpp::MemoryManager::SetDeallocateHook(nullptr);
-        bool res = mpp::MemoryManager::Deallocate(t_Addr);
-        mpp::MemoryManager::SetDeallocateHook(deallocHook);
+        mpp::SetDeallocateHook(nullptr);
+        bool res = mpp::Deallocate(t_Addr);
+        mpp::SetDeallocateHook(deallocHook);
         std::cout << "[mpp] Deallocate(" << t_Addr << ") -> " << res << std::endl;
         return res;
     };
     // Set actual Deallocate hook.
-    mpp::MemoryManager::SetDeallocateHook(deallocHook);
+    mpp::SetDeallocateHook(deallocHook);
     ```
 
 ## 🔥 Heuristic layouting

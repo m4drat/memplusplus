@@ -189,7 +189,7 @@ namespace mpp {
 
         /**
          * @brief Get reference to vector of arenas.
-         * @return const std::vector<Arena*>& to arenas
+         * @return const std::vector<std::unique_ptr<Arena>>& to arenas
          */
         std::vector<std::unique_ptr<Arena>>& GetArenaList()
         {
@@ -344,4 +344,22 @@ namespace mpp {
     {
         return g_memoryManager->Deallocate(t_objPtr);
     }
+
+    /**
+     * @brief Wrapper around @sa MemoryManager::SetAllocateHook.
+     * @param t_allocateHook std::function to set as hook.
+     */
+    void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook);
+
+    /**
+     * @brief Wrapper around @sa MemoryManager::SetDeallocateHook.
+     * @param t_deallocateHook std::function to set as hook.
+     */
+    void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook);
+
+    /**
+     * @brief Wrapper around @sa MemoryManager::GetArenaList.
+     * @return const std::vector<std::unique_ptr<Arena>>& to arenas
+     */
+    std::vector<std::unique_ptr<Arena>>& GetArenaList();
 }

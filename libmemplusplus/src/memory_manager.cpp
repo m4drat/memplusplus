@@ -11,7 +11,7 @@
 #include <sys/mman.h>
 
 namespace mpp {
-    std::unique_ptr<MemoryManager> g_memoryManager{ nullptr };
+    std::unique_ptr<MemoryManager> g_memoryManager{ nullptr }; // NOLINT
 
     std::uintptr_t MemoryManager::MmapHint()
     {
@@ -352,5 +352,20 @@ namespace mpp {
     bool Deallocate(void* t_chunkPtr)
     {
         return g_memoryManager->Deallocate(t_chunkPtr);
+    }
+
+    void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook)
+    {
+        g_memoryManager->SetAllocateHook(t_allocateHook);
+    }
+
+    void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook)
+    {
+        g_memoryManager->SetDeallocateHook(t_deallocateHook);
+    }
+
+    std::vector<std::unique_ptr<Arena>>& GetArenaList()
+    {
+        return g_memoryManager->GetArenaList();
     }
 }
