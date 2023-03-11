@@ -33,7 +33,7 @@ public:
         }
 
         if constexpr (DoLayout) {
-            GC::GetInstance().Collect();
+            CollectGarbage();
         }
     }
 
@@ -59,7 +59,7 @@ public:
 
         // return current->data;
 
-        mpp::utils::ErrorAbort("TEST!\n");
+        // mpp::utils::ErrorAbort("TEST!\n");
 
         SharedGcPtr<ListNode>* current = &m_LinkedListHead;
 

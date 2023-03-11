@@ -57,6 +57,8 @@ TEST_F(AllocatorTest, CtorDtorCalled)
 
     Deallocate<UserData>(uData);
     ASSERT_TRUE(*ptr == 0);
+
+    delete ptr;
 }
 
 TEST_F(AllocatorTest, NoMemoryException)
@@ -311,34 +313,32 @@ TEST_F(AllocatorTest, LinkedListChecks)
     Deallocate(p2);
     Deallocate(p4);
 
-    auto arena = g_memoryManager->GetArenaByPtr(p1).value();
-
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
-                                                           sizeof(Chunk::ChunkHeader) + 160)) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 160)) ==
                 Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
-                                                           sizeof(Chunk::ChunkHeader))) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p5));
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p5) -
-                                                           sizeof(Chunk::ChunkHeader) + 159)) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p5));
 
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p1) -
-                                                           sizeof(Chunk::ChunkHeader))) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p1));
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p1) -
-                                                           sizeof(Chunk::ChunkHeader) + 159)) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p1));
 
-    ASSERT_TRUE(GC::FindChunkInUse(p6) == Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) -
-                                                           sizeof(Chunk::ChunkHeader))) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(p6) == Chunk::GetHeaderPtr(p6));
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) -
-                                                           sizeof(Chunk::ChunkHeader) - 1)) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) - 1)) ==
                 Chunk::GetHeaderPtr(p5));
-    ASSERT_TRUE(GC::FindChunkInUse(reinterpret_cast<void*>(reinterpret_cast<std::uintptr_t>(p6) -
-                                                           sizeof(Chunk::ChunkHeader) + 159)) ==
+    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+                    reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p6));
 }
 

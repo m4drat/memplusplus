@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include <memory>
 
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/chunk_treap.hpp"
@@ -8,7 +9,7 @@ TEST(ChunkTreapTest, ChunkToDeleteLocatedInBetween)
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();
+    ChunkTreap cTreap;
 
     MM memMgr = MM();
 
@@ -22,23 +23,25 @@ TEST(ChunkTreapTest, ChunkToDeleteLocatedInBetween)
     ch2->SetSize(16);
     ch3->SetSize(16);
 
-    cTreap->InsertChunk(ch1);
-    cTreap->InsertChunk(ch2);
-    cTreap->InsertChunk(ch3);
+    cTreap.InsertChunk(ch1);
+    cTreap.InsertChunk(ch2);
+    cTreap.InsertChunk(ch3);
 
-    cTreap->RemoveChunk(ch2);
+    cTreap.RemoveChunk(ch2);
 
-    if (cTreap->GetRootNode()->leftChild != nullptr) {
-        ASSERT_TRUE(
-            ((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
-        ASSERT_TRUE(((cTreap->GetRootNode()->leftChild->chunk == ch1) ||
-                     (cTreap->GetRootNode()->leftChild->chunk == ch3)));
+    if (cTreap.GetRootNode()->leftChild != nullptr) {
+        ASSERT_TRUE(((cTreap.GetRootNode()->chunk == ch1) || (cTreap.GetRootNode()->chunk == ch3)));
+        ASSERT_TRUE(((cTreap.GetRootNode()->leftChild->chunk == ch1) ||
+                     (cTreap.GetRootNode()->leftChild->chunk == ch3)));
     } else {
-        ASSERT_TRUE(
-            ((cTreap->GetRootNode()->chunk == ch1) || (cTreap->GetRootNode()->chunk == ch3)));
-        ASSERT_TRUE(((cTreap->GetRootNode()->rightChild->chunk == ch1) ||
-                     (cTreap->GetRootNode()->rightChild->chunk == ch3)));
+        ASSERT_TRUE(((cTreap.GetRootNode()->chunk == ch1) || (cTreap.GetRootNode()->chunk == ch3)));
+        ASSERT_TRUE(((cTreap.GetRootNode()->rightChild->chunk == ch1) ||
+                     (cTreap.GetRootNode()->rightChild->chunk == ch3)));
     }
+
+    memMgr.Deallocate(ch1);
+    memMgr.Deallocate(ch2);
+    memMgr.Deallocate(ch3);
 }
 
 TEST(ChunkTreapTest, CheckAllConstructorsAndAssignOperators)
@@ -152,32 +155,44 @@ TEST(ChunkTreapTest, CheckAllConstructorsAndAssignOperators)
     ASSERT_TRUE(newTreap4.RemoveChunk(ch4));
     ASSERT_EQ(newTreap4.TotalFreeChunks(), 2);
     ASSERT_EQ(newTreap4.FirstGreaterOrEqualTo(128), nullptr);
+
+    free(ch1);
+    free(ch2);
+    free(ch3);
+    free(ch4);
+    free(ch5);
+    free(ch6);
+    free(ch7);
+    free(ch8);
+    free(ch9);
 }
 
 TEST(ChunkTreapTest, CorrectChunkInsertion)
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();
+    ChunkTreap cTreap;
     Chunk* insertedChunk = (Chunk*)malloc(64);
 
     std::size_t insertedChunkSize = 128;
     insertedChunk->SetSize(insertedChunkSize);
 
-    Chunk* result1 = cTreap->FirstGreaterOrEqualTo(insertedChunkSize);
+    Chunk* result1 = cTreap.FirstGreaterOrEqualTo(insertedChunkSize);
 
-    cTreap->InsertChunk(insertedChunk);
+    cTreap.InsertChunk(insertedChunk);
 
-    Chunk* result2 = cTreap->FirstGreaterOrEqualTo(insertedChunkSize);
+    Chunk* result2 = cTreap.FirstGreaterOrEqualTo(insertedChunkSize);
 
     ASSERT_TRUE((result1 == nullptr && result2 == insertedChunk));
+
+    free(insertedChunk);
 }
 
 TEST(ChunkTreapTest, NonexistingBigChunk)
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();
+    ChunkTreap cTreap;
 
     Chunk* chunk1 = (Chunk*)malloc(64);
     Chunk* chunk2 = (Chunk*)malloc(64);
@@ -187,22 +202,26 @@ TEST(ChunkTreapTest, NonexistingBigChunk)
     chunk2->SetSize(64);
     chunk3->SetSize(96);
 
-    cTreap->InsertChunk(chunk1);
-    cTreap->InsertChunk(chunk2);
-    cTreap->InsertChunk(chunk3);
+    cTreap.InsertChunk(chunk1);
+    cTreap.InsertChunk(chunk2);
+    cTreap.InsertChunk(chunk3);
 
     std::size_t nonexistentSize{ 128 };
 
-    Chunk* result = cTreap->FirstGreaterOrEqualTo(nonexistentSize);
+    Chunk* result = cTreap.FirstGreaterOrEqualTo(nonexistentSize);
 
     ASSERT_TRUE(result == nullptr);
+
+    free(chunk1);
+    free(chunk2);
+    free(chunk3);
 }
 
 TEST(ChunkTreapTest, BasicFunctions)
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();
+    ChunkTreap cTreap;
 
     Chunk* ch1 = (Chunk*)malloc(64);
     Chunk* ch2 = (Chunk*)malloc(64);
@@ -214,20 +233,24 @@ TEST(ChunkTreapTest, BasicFunctions)
     ch3->SetSize(32);
     ch4->SetSize(32);
 
-    cTreap->InsertChunk(ch1);
-    cTreap->InsertChunk(ch2);
-    cTreap->InsertChunk(ch3);
-    cTreap->InsertChunk(ch4);
+    cTreap.InsertChunk(ch1);
+    cTreap.InsertChunk(ch2);
+    cTreap.InsertChunk(ch3);
+    cTreap.InsertChunk(ch4);
 
-    ASSERT_TRUE(
-        (cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
+    ASSERT_TRUE((cTreap.MaxSizeChunk()->GetSize() == 32 && cTreap.MinSizeChunk()->GetSize() == 32));
+
+    free(ch1);
+    free(ch2);
+    free(ch3);
+    free(ch4);
 }
 
 TEST(ChunkTreapTest, CorrectDelete)
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();
+    ChunkTreap cTreap;
 
     Chunk* ch1 = (Chunk*)malloc(128);
     Chunk* ch2 = (Chunk*)malloc(128);
@@ -241,28 +264,34 @@ TEST(ChunkTreapTest, CorrectDelete)
     ch4->SetSize(256);
     ch5->SetSize(512);
 
-    cTreap->InsertChunk(ch1);
-    cTreap->InsertChunk(ch2);
-    cTreap->InsertChunk(ch3);
-    cTreap->InsertChunk(ch4);
+    cTreap.InsertChunk(ch1);
+    cTreap.InsertChunk(ch2);
+    cTreap.InsertChunk(ch3);
+    cTreap.InsertChunk(ch4);
 
-    ASSERT_EQ(cTreap->MaxSizeChunk()->GetSize(), 256);
-    ASSERT_EQ(cTreap->MinSizeChunk()->GetSize(), 32);
-    ASSERT_EQ(cTreap->TotalFreeChunks(), 4);
+    ASSERT_EQ(cTreap.MaxSizeChunk()->GetSize(), 256);
+    ASSERT_EQ(cTreap.MinSizeChunk()->GetSize(), 32);
+    ASSERT_EQ(cTreap.TotalFreeChunks(), 4);
 
-    ASSERT_TRUE(cTreap->RemoveChunk(ch1));
-    ASSERT_TRUE(cTreap->RemoveChunk(ch4));
+    ASSERT_TRUE(cTreap.RemoveChunk(ch1));
+    ASSERT_TRUE(cTreap.RemoveChunk(ch4));
 
-    ASSERT_EQ(cTreap->MaxSizeChunk()->GetSize(), 128);
-    ASSERT_EQ(cTreap->MinSizeChunk()->GetSize(), 64);
-    ASSERT_EQ(cTreap->TotalFreeChunks(), 2);
+    ASSERT_EQ(cTreap.MaxSizeChunk()->GetSize(), 128);
+    ASSERT_EQ(cTreap.MinSizeChunk()->GetSize(), 64);
+    ASSERT_EQ(cTreap.TotalFreeChunks(), 2);
+
+    free(ch1);
+    free(ch2);
+    free(ch3);
+    free(ch4);
+    free(ch5);
 }
 
 TEST(ChunkTreapTest, DeleteMany)
 {
     using namespace mpp;
 
-    ChunkTreap* cTreap = new ChunkTreap();
+    ChunkTreap cTreap;
 
     Chunk* ch1 = (Chunk*)malloc(128);
     Chunk* ch2 = (Chunk*)malloc(128);
@@ -274,14 +303,18 @@ TEST(ChunkTreapTest, DeleteMany)
     ch3->SetSize(32);
     ch4->SetSize(32);
 
-    cTreap->InsertChunk(ch1);
-    cTreap->InsertChunk(ch2);
-    cTreap->InsertChunk(ch3);
-    cTreap->InsertChunk(ch4);
+    cTreap.InsertChunk(ch1);
+    cTreap.InsertChunk(ch2);
+    cTreap.InsertChunk(ch3);
+    cTreap.InsertChunk(ch4);
 
-    cTreap->RemoveChunk(ch2);
-    cTreap->RemoveChunk(ch3);
+    cTreap.RemoveChunk(ch2);
+    cTreap.RemoveChunk(ch3);
 
-    ASSERT_TRUE(
-        (cTreap->MaxSizeChunk()->GetSize() == 32 && cTreap->MinSizeChunk()->GetSize() == 32));
+    ASSERT_TRUE((cTreap.MaxSizeChunk()->GetSize() == 32 && cTreap.MinSizeChunk()->GetSize() == 32));
+
+    free(ch1);
+    free(ch2);
+    free(ch3);
+    free(ch4);
 }

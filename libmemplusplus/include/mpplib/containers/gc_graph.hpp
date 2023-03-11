@@ -10,7 +10,6 @@
 #include <vector>
 
 #include "mpplib/containers/vertex.hpp"
-#include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 namespace mpp {

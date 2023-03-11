@@ -28,6 +28,7 @@ C++ memory allocator with smart features, such as garbage collection, and heap c
 ## 🔢 Current version
 
 Current library version: 0.3.5
+Warning: the API is not stable!
 
 ## 🔬 Features
 
@@ -42,7 +43,6 @@ Current library version: 0.3.5
 - All Unix-like systems (where it is possible to use `mmap`)
 - g++ or clang++ compilers
 - __Currently supports only single-threaded applications__
-- Currently, you can't use manual memory management and GarbageCollection simultaneously (e.g. you should only use smart pointers, or manually control memory using Allocate and Deallocate)
 
 ## ❓ Usage
 
@@ -122,7 +122,7 @@ Library options:
 
 ## 🔳 Environment options
 
-- `MPP_DUMP_OBJECTS_GRAPH=1` / `MPP_DUMP_OBJECTS_GRAPH=2` - dump objects graph to file `objects.dot`, while performing `GC::Collect()` (only possible in debug mode)
+- `MPP_DUMP_OBJECTS_GRAPH=1` / `MPP_DUMP_OBJECTS_GRAPH=2` - dump objects graph to file `objects.dot`, while performing `CollectGarbage()` (only possible in debug mode)
 
 - `MPP_SHOW_STATISTICS=1` - display statistics after program termination (should be built with `MPP_STATS` set to ON)
 
@@ -144,7 +144,7 @@ Library options:
     ...
 
     // collect all garbage + compact memory (should be called manually)
-    GC::GetInstance().Collect();
+    mpp::CollectGarbage();
     ```
 
 - ~~Manual memory management~~ - deprecated
@@ -327,7 +327,7 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     treeNode5->left = nullptr;
     treeNode5->right = nullptr;
 
-    GC::GetInstance().Collect();
+    CollectGarbage();
     ```
 
     Executing this code with `MPP_DUMP_OBJECTS_GRAPH=1` will generate this graph:

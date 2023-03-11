@@ -265,7 +265,8 @@ namespace mpp {
     template<class Type>
     bool SharedGcPtr<Type>::AddToGcList()
     {
-        GC::GetInstance().AddGcPtr(this);
+        g_memoryManager->GetGC().AddGcPtr(this);
+
         return true;
     }
 
@@ -278,7 +279,7 @@ namespace mpp {
         if (this->m_objectPtr == nullptr)
             return false;
 
-        auto& gcPtrs = GC::GetInstance().GetGcPtrs();
+        auto& gcPtrs = g_memoryManager->GetGC().GetGcPtrs();
 
         // Delete shared ptr from list of all active gc ptrs
         auto toErase = std::find(gcPtrs.begin(), gcPtrs.end(), this);
@@ -430,7 +431,7 @@ namespace mpp {
     void SharedGcPtr<Type>::CheckInvalidInitialization(ElementType* t_obj)
     {
         // Iterate through all GcPtrs, and check where they point.
-        for (auto* gcPtr : GC::GetInstance().GetGcPtrs()) {
+        for (auto* gcPtr : g_memoryManager->GetGC().GetGcPtrs()) {
             if (gcPtr->GetVoid() == t_obj)
                 utils::ErrorAbort("SharedGcPtr<Type>: Invalid initialization!\n");
         }

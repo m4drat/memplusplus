@@ -12,7 +12,7 @@ TEST_F(SharedGcPtrTest, EmptyConstructor)
 
     SharedGcPtr<char> ptr;
     ASSERT_TRUE(ptr.UseCount() == 1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 
 TEST_F(SharedGcPtrTest, NullptrConstructor)
@@ -22,7 +22,7 @@ TEST_F(SharedGcPtrTest, NullptrConstructor)
     SharedGcPtr<char> ptr(nullptr);
 
     ASSERT_TRUE(ptr.UseCount() == 1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 
 TEST_F(SharedGcPtrTest, ExplicitConstructor)
@@ -32,7 +32,7 @@ TEST_F(SharedGcPtrTest, ExplicitConstructor)
     SharedGcPtr<char> ptr((char*)Allocate(40));
 
     ASSERT_TRUE(ptr.UseCount() == 1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 }
 
 TEST_F(SharedGcPtrTest, AssignToRValueRef)
@@ -44,7 +44,7 @@ TEST_F(SharedGcPtrTest, AssignToRValueRef)
 
     ASSERT_TRUE(ptr.UseCount() == 1);
     ASSERT_TRUE(ptr.Get() == data1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 }
 
 TEST_F(SharedGcPtrTest, AssignToConstReference)
@@ -61,7 +61,7 @@ TEST_F(SharedGcPtrTest, AssignToConstReference)
     ASSERT_TRUE(ptr1.Get() == data1);
     ASSERT_TRUE(ptr2.UseCount() == 1);
     ASSERT_TRUE(ptr2.Get() == data2);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 2);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
 
     ptr1 = ptr2;
 
@@ -69,7 +69,7 @@ TEST_F(SharedGcPtrTest, AssignToConstReference)
     ASSERT_TRUE(ptr1.Get() == data2);
     ASSERT_TRUE(ptr2.UseCount() == 2);
     ASSERT_TRUE(ptr2.Get() == data2);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 2);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
 }
 
 TEST_F(SharedGcPtrTest, AssignToTypePtr)
@@ -78,15 +78,15 @@ TEST_F(SharedGcPtrTest, AssignToTypePtr)
 
     char* data1 = (char*)Allocate(40);
     SharedGcPtr<char> ptr1 = nullptr;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
     ASSERT_TRUE(ptr1.UseCount() == 1);
     ASSERT_TRUE(ptr1.Get() == nullptr);
 
     ptr1 = data1;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
     ASSERT_TRUE(ptr1.UseCount() == 1);
     ASSERT_TRUE(ptr1.Get() == data1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 }
 
 TEST_F(SharedGcPtrTest, AssignToNullptr)
@@ -97,7 +97,7 @@ TEST_F(SharedGcPtrTest, AssignToNullptr)
 
     ASSERT_TRUE(ptr1.UseCount() == 1);
     ASSERT_TRUE(ptr1.Get() == nullptr);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 
 TEST_F(SharedGcPtrTest, FunctionCallWithSharedPtr)
@@ -129,7 +129,7 @@ TEST_F(SharedGcPtrTest, MultiplePointersToTheSameObject)
     SharedGcPtr<char> ptr4(ptr3);
 
     ASSERT_TRUE(ptr1.UseCount() == 4);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 
 TEST_F(SharedGcPtrTest, CreateNewPtrAssignment)
@@ -140,14 +140,14 @@ TEST_F(SharedGcPtrTest, CreateNewPtrAssignment)
     SharedGcPtr<char> ptr2(ptr1);
     SharedGcPtr<char> ptr3(ptr2);
     SharedGcPtr<char> ptr4(ptr3);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 
     ptr1 = (char*)Allocate(64);
 
     ASSERT_TRUE((ptr1.UseCount() == 1 && ptr2.UseCount() == 3 && ptr3.UseCount() == 3 &&
                  ptr4.UseCount() == 3));
     ASSERT_TRUE((ptr2 == nullptr && ptr3 == nullptr && ptr4 == nullptr));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 }
 
 TEST_F(SharedGcArrayTests, MakeSharedNCallsCtorsDtors)
@@ -305,34 +305,34 @@ TEST_F(SharedGcPtrTest, IntegrationTest_1)
     SharedGcPtr<char> ptr2((char*)Allocate(64));
     SharedGcPtr<char> ptr3((char*)Allocate(64));
     SharedGcPtr<char> ptr4((char*)Allocate(64));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 4);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 4);
     ASSERT_TRUE((ptr1.UseCount() == 1 && ptr2.UseCount() == 1 && ptr3.UseCount() == 1 &&
                  ptr4.UseCount() == 1));
 
     ptr1 = nullptr;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 3);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
 
     ptr1 = ptr4;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 4);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 4);
     ASSERT_TRUE(ptr1.UseCount() == 2);
     ASSERT_TRUE(ptr4.UseCount() == 2);
 
     ptr2 = SharedGcPtr<char>(nullptr);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 3);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
     ASSERT_TRUE(ptr2.UseCount() == 1);
 
     ptr1 = ptr2;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 2);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
     ASSERT_TRUE(ptr1.UseCount() == 2);
     ASSERT_TRUE(ptr2.UseCount() == 2);
 
     ptr3 = ptr2;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
     ASSERT_TRUE(ptr3.UseCount() == 3);
     ASSERT_TRUE(ptr2.UseCount() == 3);
 
     ptr4 = ptr2;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
     ASSERT_TRUE(ptr2.UseCount() == 4);
     ASSERT_TRUE(ptr4.UseCount() == 4);
 }
@@ -348,26 +348,26 @@ TEST_F(SharedGcPtrTest, IntegrationTest_2)
     ASSERT_TRUE(ptr1.UseCount() == 3);
     ASSERT_TRUE(ptr2.UseCount() == 3);
     ASSERT_TRUE(ptr3.UseCount() == 3);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 3);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
 
     ptr1.Reset();
     ASSERT_TRUE(ptr1.UseCount() == 1);
     ASSERT_TRUE(ptr2.UseCount() == 2);
     ASSERT_TRUE(ptr3.UseCount() == 2);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 2);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
 
     ptr2.Reset();
     ASSERT_TRUE(ptr2.UseCount() == 1);
     ASSERT_TRUE(ptr3.UseCount() == 1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
     ptr3 = (char*)Allocate(64);
     ASSERT_TRUE(ptr3.UseCount() == 1);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
     ptr3 = ptr1;
     ASSERT_TRUE(ptr3.UseCount() == 2);
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 
 TEST_F(SharedGcPtrTest, IntegrationTest_3)
@@ -375,23 +375,23 @@ TEST_F(SharedGcPtrTest, IntegrationTest_3)
     using namespace mpp;
 
     SharedGcPtr<char> ptr1 = nullptr;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 
     ptr1 = SharedGcPtr<char>((char*)Allocate(64));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
     ptr1 = SharedGcPtr<char>((char*)Allocate(64));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
     ptr1 = nullptr;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 
     SharedGcPtr<char> ptr2(SharedGcPtr<char>((char*)Allocate(64)));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
     ASSERT_TRUE(ptr2.GetVoid() != nullptr);
 
     SharedGcPtr<char> ptr3(SharedGcPtr<char>(nullptr));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 }
 
 TEST_F(SharedGcPtrTest, IntegrationTest_4)
@@ -399,13 +399,13 @@ TEST_F(SharedGcPtrTest, IntegrationTest_4)
     using namespace mpp;
 
     SharedGcPtr<char> ptr1 = nullptr;
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 
     ptr1 = SharedGcPtr<char>((char*)Allocate(64));
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().size() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
     ptr1.Reset();
-    ASSERT_TRUE(GC::GetInstance().GetGcPtrs().empty());
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 
     SharedGcPtr<char> ptr2 = ptr1;
 }

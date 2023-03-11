@@ -221,6 +221,11 @@ namespace mpp {
         return false;
     }
 
+    bool MemoryManager::CollectGarbage()
+    {
+        return m_gc.Collect();
+    }
+
     void MemoryManager::SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook)
     {
         m_allocateHook = t_allocateHook;
@@ -321,7 +326,7 @@ namespace mpp {
         m_arenaList.clear();
 
         // FIXME: It's time to completely revamp this method!
-        GC::GetInstance().GetGcPtrs().clear();
+        // GC::GetInstance().GetGcPtrs().clear();
     }
 
     std::optional<std::reference_wrapper<std::unique_ptr<Arena>>> MemoryManager::GetArenaByPtr(
@@ -361,5 +366,10 @@ namespace mpp {
     std::vector<std::unique_ptr<Arena>>& GetArenaList()
     {
         return g_memoryManager->GetArenaList();
+    }
+
+    bool CollectGarbage()
+    {
+        return g_memoryManager->CollectGarbage();
     }
 }

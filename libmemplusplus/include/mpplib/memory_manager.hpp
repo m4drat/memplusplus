@@ -2,6 +2,7 @@
 
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/gc.hpp"
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include <memory>
@@ -18,6 +19,7 @@
 #include <type_traits>
 
 namespace mpp {
+    // Forward declarations
     class Arena;
 
     template<class T>
@@ -37,23 +39,20 @@ namespace mpp {
         template<class Type, class... Args>
         friend SharedGcPtr<Type[]> MakeSharedN(uint32_t t_size, Args&&... t_args);
 
-        friend class GC;
+        friend class GarbageCollector;
         friend class Arena;
 
-        /**
-         * @brief All existing arenas.
-         */
+        //! @brief All existing arenas.
         std::vector<std::unique_ptr<Arena>> m_arenaList;
 
-        /**
-         * @brief User specified hook to call before Allocate
-         */
+        //! @brief User specified hook to call before Allocate.
         std::function<void*(std::size_t)> m_allocateHook;
 
-        /**
-         * @brief User specified hook to call before Deallocate
-         */
+        //! @brief User specified hook to call before Deallocate.
         std::function<bool(void*)> m_deallocateHook;
+
+        //! @brief Garbage collector for this memory manager.
+        GarbageCollector m_gc;
 
         /**
          * @brief Generate MMAP hint.
@@ -65,7 +64,7 @@ namespace mpp {
          * @brief mmap(2) wrapper, that maps readble and writable, not shared
          * memory page of given size.
          * @throw NoMemoryException, if system cannot map new memory.
-         * @param t_size Size of mapped memory
+         * @param t_size Size of mapped memory.
          * @return void* pointer to mapped memory.
          */
         static std::byte* SysAlloc(std::size_t t_size);
@@ -75,7 +74,7 @@ namespace mpp {
          * @param ptr is pointer to memory, that will be unmapped.
          * @param pageSize size of memory, that will be unmapped.
          * @throw UnmapMemoryException, if cannot unmap memory.
-         * @return true if everything is fine, otherwise it will throw exception
+         * @return true if everything is fine, otherwise it will throw exception.
          */
         static bool SysDealloc(void* t_ptr, std::size_t t_pageSize);
 
@@ -98,15 +97,15 @@ namespace mpp {
         /**
          * @brief Finds suitable chunk of requested size from somwhere (top/freelist).
          * @param t_realSize already aligned size of request.
-         * @return Chunk* allocated chunk, or nullptr
+         * @return Chunk* allocated chunk, or nullptr.
          */
         Chunk* GetSuitableChunk(std::size_t t_realSize);
 
         /**
-         * @brief Construct objects at t_objectPtr using params provided in t_args
-         * @param t_objectPtr pointer to memory location where to construct the object
-         * @param t_args arguments to T's constructor
-         * @return T* memory location where constructed object is stored
+         * @brief Construct objects at t_objectPtr using params provided in t_args.
+         * @param t_objectPtr pointer to memory location where to construct the object.
+         * @param t_args arguments to T's constructor.
+         * @return T* memory location where constructed object is stored.
          */
         template<class T, class... Args>
         static T* Construct(T* t_objectPtr, Args&&... t_args)
@@ -115,10 +114,10 @@ namespace mpp {
         }
 
         /**
-         * @brief Destroys single object
-         * @tparam T user parameter type
-         * @param t_objectPtr pointer to object
-         * @return T* pointer to the destroyed object
+         * @brief Destroys single object.
+         * @tparam T user parameter type.
+         * @param t_objectPtr pointer to object.
+         * @return T* pointer to the destroyed object.
          */
         template<class T>
         static inline T* DestroyObject(T* t_objectPtr)
@@ -131,11 +130,11 @@ namespace mpp {
         }
 
         /**
-         * @brief Destroys all objects inside array
-         * @tparam T user parameter type
-         * @param t_objectPtr pointer to the array start
-         * @param t_arraySize array size
-         * @return T* pointer to the array beginning
+         * @brief Destroys all objects inside array.
+         * @tparam T user parameter type.
+         * @param t_objectPtr pointer to the array start.
+         * @param t_arraySize array size.
+         * @return T* pointer to the array beginning.
          */
         template<class T>
         static T* DestroyArray(T* t_objectPtr, std::size_t t_arraySize)
@@ -169,21 +168,21 @@ namespace mpp {
         /**
          * @brief Ceils number (t_size) to the nearest number such that this number divided by
          * t_alignment has no remainder.
-         * @param t_size is number to align
-         * @param t_alignment is alignment
-         * @return std::size_t Aligned number
+         * @param t_size is number to align.
+         * @param t_alignment is alignment.
+         * @return std::size_t Aligned number.
          */
         static std::size_t Align(std::size_t t_size, int32_t t_alignment);
 
         /**
-         * @brief Sets hook for Allocate method
-         * @param t_allocateHook std::function to set as hook
+         * @brief Sets on-allocate hook.
+         * @param t_allocateHook std::function to set as a hook.
          */
         void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook);
 
         /**
-         * @brief Sets hook for DeAllocate method
-         * @param t_deallocateHook std::function to set as hook
+         * @brief Sets on-deallocate hook.
+         * @param t_deallocateHook std::function to set as a hook.
          */
         void SetDeallocateHook(const std::function<bool(void*)>& t_deallocateHook);
 
@@ -191,14 +190,14 @@ namespace mpp {
         /**
          * @brief Visualizes heap layout.
          * @param t_out output stream to write to.
-         * @return std::ostream& stream reference
+         * @return std::ostream& stream reference.
          */
         std::ostream& VisHeapLayout(std::ostream& t_out, void* t_ptr);
 #endif
 
         /**
          * @brief Get reference to vector of arenas.
-         * @return const std::vector<std::unique_ptr<Arena>>& to arenas
+         * @return const std::vector<std::unique_ptr<Arena>>& to arenas.
          */
         std::vector<std::unique_ptr<Arena>>& GetArenaList()
         {
@@ -206,9 +205,18 @@ namespace mpp {
         }
 
         /**
+         * @brief Get reference to garbage collector.
+         * @return GarbageCollector& reference to garbage collector.
+         */
+        GarbageCollector& GetGC() noexcept
+        {
+            return m_gc;
+        }
+
+        /**
          * @brief Finds inside which arena t_ptr points.
          * @param t_ptr heap pointer.
-         * @return std::unique_ptr<Arena>& if pointer points into arena, nullptr otherwise
+         * @return std::unique_ptr<Arena>& if pointer points into arena, nullptr otherwise.
          */
         std::optional<std::reference_wrapper<std::unique_ptr<Arena>>> GetArenaByPtr(void* t_ptr);
 
@@ -217,7 +225,7 @@ namespace mpp {
          * @brief Default Allocate method. Allocates chunk with size at least
          * t_userDataSize.
          * @param t_userDataSize request size.
-         * @return void* pointer to user data in allocated chunk
+         * @return void* pointer to user data in allocated chunk.
          */
         void* Allocate(std::size_t t_userDataSize);
 
@@ -227,9 +235,15 @@ namespace mpp {
          * @brief Deallocates chunk of memory.
          * @param t_chunkPtr pointer to start of user data.
          * @return true, if chunk was deallocated successfully, false if chunk
-         * doesn't belong to any arena
+         * doesn't belong to any arena.
          */
         bool Deallocate(void* t_chunkPtr);
+
+        /**
+         * @brief Collects garbage from all arenas, by invoking GarbageCollector.Collect().
+         * @return true if garbage collection was successful, false otherwise.
+         */
+        bool CollectGarbage();
 
         /**
          * @deprecated instead of using Allocate<T> use @sa MakeShared<T> / @sa MakeSharedN<T>
@@ -237,7 +251,7 @@ namespace mpp {
          * @tparam T object to allocate type.
          * @tparam Args list of arguments to pass to object constructor.
          * @param t_args actual arguments to object constructor.
-         * @return T* constructed object
+         * @return T* constructed object.
          */
         template<class T, class... Args>
         T* Allocate(Args&&... t_args)
@@ -254,7 +268,7 @@ namespace mpp {
          * @tparam T actual type of the object.
          * @param t_objPtr pointer to object of type T.
          * @return true, if chunk was deallocated successfully, false if chunk
-         * doesn't belong to any arena
+         * doesn't belong to any arena.
          */
         template<class T>
         bool Deallocate(T* t_objPtr)
@@ -371,4 +385,11 @@ namespace mpp {
      * @return const std::vector<std::unique_ptr<Arena>>& to arenas
      */
     std::vector<std::unique_ptr<Arena>>& GetArenaList();
+
+    /**
+     * @brief Wrapper around @sa MemoryManager::CollectGarbage. Essentially invokes garbage
+     * collection for all arenas.
+     * @return true if garbage collection was successful, false otherwise
+     */
+    bool CollectGarbage();
 }

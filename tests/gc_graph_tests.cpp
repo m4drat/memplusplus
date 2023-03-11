@@ -82,11 +82,11 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs)
         MakeShared<SharedGcPtr<int32_t>>(MakeShared<int32_t>(1337));
 
     std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>();
-    for (auto* gcPtr : GC::GetInstance().GetGcPtrs()) {
+    for (auto* gcPtr : g_memoryManager->GetGC().GetGcPtrs()) {
         objectsGraph->AddObjectInfo(gcPtr);
     }
     ASSERT_EQ(objectsGraph->GetAdjList().size(), 3);
-    ASSERT_EQ(GC::GetInstance().GetGcPtrs().size(), 2);
+    ASSERT_EQ(g_memoryManager->GetGC().GetGcPtrs().size(), 2);
 
     void* firstGcPtrLocation = Chunk::GetHeaderPtr(a->GetVoid());
     void* secondGcPtrLocation = &a;
@@ -97,8 +97,10 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs)
     ASSERT_NE(firstVertex, nullptr);
     ASSERT_NE(secondVertex, nullptr);
     ASSERT_NE(firstVertex, secondVertex);
-    ASSERT_EQ(firstVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
-    ASSERT_EQ(secondVertex->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 1);
+    ASSERT_EQ(firstVertex->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(),
+              0);
+    ASSERT_EQ(
+        secondVertex->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 1);
 }
 
 TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
@@ -122,12 +124,12 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     nodePtr = nullptr;
 
     std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>();
-    for (auto* gcPtr : GC::GetInstance().GetGcPtrs()) {
+    for (auto* gcPtr : g_memoryManager->GetGC().GetGcPtrs()) {
         objectsGraph->AddObjectInfo(gcPtr);
     }
     ASSERT_EQ(objectsGraph->GetAdjList().size(), 6);
     ASSERT_EQ(objectsGraph->GetVerticesCount(), 6);
-    ASSERT_EQ(GC::GetInstance().GetGcPtrs().size(), 5);
+    ASSERT_EQ(g_memoryManager->GetGC().GetGcPtrs().size(), 5);
 
     auto* nodePtrVtx = objectsGraph->FindVertex((Chunk*)&nodePtr);
     ASSERT_EQ(nodePtrVtx, nullptr);
@@ -135,49 +137,56 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     auto* ptrToNodePtrVtx = objectsGraph->FindVertex((Chunk*)&ptrToNodePtr);
     ASSERT_NE(ptrToNodePtrVtx, nullptr);
 
-    auto* nodePtrVtxValid = objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.GetVoid()));
+    auto* nodePtrVtxValid =
+        objectsGraph->FindVertex(GarbageCollector::FindChunkInUse(ptrToNodePtr.GetVoid()));
     ASSERT_NE(nodePtrVtxValid, nullptr);
 
     ASSERT_EQ(objectsGraph->HasEdge(ptrToNodePtrVtx, nodePtrVtxValid), true);
     ASSERT_EQ(objectsGraph->HasEdge(nodePtrVtxValid, ptrToNodePtrVtx), false);
 
-    ASSERT_EQ(ptrToNodePtrVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(),
-              1);
-    ASSERT_EQ(nodePtrVtxValid->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(),
-              1);
+    ASSERT_EQ(
+        ptrToNodePtrVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(),
+        1);
+    ASSERT_EQ(
+        nodePtrVtxValid->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(),
+        1);
 
-    auto* nodeVtx = objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->GetVoid()));
+    auto* nodeVtx =
+        objectsGraph->FindVertex(GarbageCollector::FindChunkInUse(ptrToNodePtr.Get()->GetVoid()));
     ASSERT_NE(nodeVtx, nullptr);
-    ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 3);
+    ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 3);
 
-    auto* aVtxTmp = objectsGraph->FindVertex(GC::FindChunkInUse(&ptrToNodePtr.Get()->Get()->a));
+    auto* aVtxTmp =
+        objectsGraph->FindVertex(GarbageCollector::FindChunkInUse(&ptrToNodePtr.Get()->Get()->a));
     ASSERT_EQ(aVtxTmp, nodeVtx);
-    auto* bVtxTmp = objectsGraph->FindVertex(GC::FindChunkInUse(&ptrToNodePtr.Get()->Get()->b));
+    auto* bVtxTmp =
+        objectsGraph->FindVertex(GarbageCollector::FindChunkInUse(&ptrToNodePtr.Get()->Get()->b));
     ASSERT_EQ(bVtxTmp, nodeVtx);
-    auto* cVtxTmp = objectsGraph->FindVertex(GC::FindChunkInUse(&ptrToNodePtr.Get()->Get()->c));
+    auto* cVtxTmp =
+        objectsGraph->FindVertex(GarbageCollector::FindChunkInUse(&ptrToNodePtr.Get()->Get()->c));
     ASSERT_EQ(cVtxTmp, nodeVtx);
 
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, aVtxTmp), false);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, bVtxTmp), false);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, cVtxTmp), false);
 
-    auto* aVtx =
-        objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->Get()->a.GetVoid()));
+    auto* aVtx = objectsGraph->FindVertex(
+        GarbageCollector::FindChunkInUse(ptrToNodePtr.Get()->Get()->a.GetVoid()));
     ASSERT_NE(aVtx, nullptr);
-    auto* bVtx =
-        objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->Get()->b.GetVoid()));
+    auto* bVtx = objectsGraph->FindVertex(
+        GarbageCollector::FindChunkInUse(ptrToNodePtr.Get()->Get()->b.GetVoid()));
     ASSERT_NE(bVtx, nullptr);
-    auto* cVtx =
-        objectsGraph->FindVertex(GC::FindChunkInUse(ptrToNodePtr.Get()->Get()->c.GetVoid()));
+    auto* cVtx = objectsGraph->FindVertex(
+        GarbageCollector::FindChunkInUse(ptrToNodePtr.Get()->Get()->c.GetVoid()));
     ASSERT_NE(cVtx, nullptr);
 
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, aVtx), true);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, bVtx), true);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, cVtx), true);
 
-    ASSERT_EQ(aVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
-    ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
-    ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(GC::GetInstance().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(aVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 0);
 
     // Generate graphviz layout just to check that at least it doesn't segfault 🤷
     std::stringstream ss;
@@ -208,7 +217,7 @@ TEST(GcGraphTest, DISABLED_GenerateGraphvizLayout)
     nodePtr = nullptr;
 
     std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>();
-    for (auto* gcPtr : GC::GetInstance().GetGcPtrs()) {
+    for (auto* gcPtr : g_memoryManager->GetGC().GetGcPtrs()) {
         objectsGraph->AddObjectInfo(gcPtr);
     }
 

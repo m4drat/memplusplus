@@ -4,8 +4,8 @@
 #include <type_traits>
 #include <utility>
 
-#include "mpplib/gc.hpp"
 #include "mpplib/gcptr.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 namespace mpp {
@@ -45,7 +45,7 @@ namespace mpp {
         , public SharedGcPtrArray<std::is_array<Type>::value>
         , public GcPtr
     {
-        friend class GC;
+        friend class GarbageCollector;
 
     protected:
         using ElementType = typename std::remove_extent<Type>::type;

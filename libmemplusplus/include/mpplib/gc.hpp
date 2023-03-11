@@ -5,7 +5,6 @@
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gcptr.hpp"
 #include "mpplib/heuristics/heuristics.hpp"
-#include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_STATS == 1
@@ -28,7 +27,7 @@ namespace mpp {
     /**
      * @brief GarbageCollector class.
      */
-    class GC
+    class GarbageCollector
     {
     private:
         /**
@@ -54,11 +53,11 @@ namespace mpp {
 #endif
 
         //! @brief Current cycle to dump objects graph
-        static uint32_t m_currentCycle;
+        uint32_t m_totalInvocations;
 
     public:
         //! @brief Construct a new GC object
-        GC();
+        GarbageCollector();
 
         /**
          * @brief Collect garbage.
@@ -104,16 +103,6 @@ namespace mpp {
         void AddGcPtr(GcPtr* t_ptr)
         {
             m_activeGcPtrs.insert(t_ptr);
-        }
-
-        /**
-         * @brief Get the Instance of GC object
-         * @return GC& Global Garbage Collector
-         */
-        static GC& GetInstance()
-        {
-            static GC gcInstance;
-            return gcInstance;
         }
     };
 }

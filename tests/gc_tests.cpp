@@ -10,7 +10,7 @@ TEST(GcTest, CreateCollectCreate)
     g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1);
-    GC::GetInstance().Collect();
+    CollectGarbage();
 
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(2);
     SharedGcPtr<int32_t> b2 = MakeShared<int32_t>(3);
@@ -30,7 +30,7 @@ TEST(GcTest, PointerToPointer)
     SharedGcPtr<SharedGcPtr<int32_t>> p =
         MakeShared<SharedGcPtr<int32_t>>(MakeShared<int32_t>(0x95782));
     EXPECT_TRUE(*p->Get() == 0x95782);
-    GC::GetInstance().Collect();
+    CollectGarbage();
 
     EXPECT_TRUE(*p->Get() == 0x95782);
 }
@@ -55,7 +55,7 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
     void* rawPtrBeforeGc1 = a1.GetVoid();
     void* rawPtrBeforeGc2 = a1->ptr.GetVoid();
 
-    GC::GetInstance().Collect();
+    CollectGarbage();
 
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1338);
     EXPECT_TRUE(*a1->ptr == 1337);
@@ -71,7 +71,7 @@ TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
     SharedGcPtr<int32_t> a2 = MakeShared<int32_t>(1338);
     a1 = nullptr;
 
-    GC::GetInstance().Collect();
+    CollectGarbage();
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1339);
 
     EXPECT_TRUE(*a2 == 1338);
@@ -103,7 +103,7 @@ TEST(GcTest, CreateCycleOfLength3)
     a2->ptr = a3;
     a3->ptr = a1;
 
-    GC::GetInstance().Collect();
+    CollectGarbage();
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1339);
 
     EXPECT_TRUE(a1->data == 1);
@@ -138,7 +138,7 @@ TEST(GcTest, TestDanglingCyclesAreDestroyed)
         a3->ptr = a1;
     }
 
-    GC::GetInstance().Collect();
+    CollectGarbage();
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1339);
 }
 
@@ -154,7 +154,7 @@ TEST(GcTest, GcPtrsAreUpdatedAfterCollect)
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
     void* rawPtrBeforeGcCollect = a1.GetVoid();
-    GC::GetInstance().Collect();
+    CollectGarbage();
 
     EXPECT_TRUE(rawPtrBeforeGcCollect != a1.GetVoid());
 }

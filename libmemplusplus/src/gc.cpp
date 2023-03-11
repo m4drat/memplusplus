@@ -8,21 +8,16 @@
 #include <unordered_map>
 
 namespace mpp {
-#if MPP_DEBUG == 1
-    uint32_t GC::m_currentCycle;
-#endif
-
-    GC::GC()
+    GarbageCollector::GarbageCollector()
+        : m_totalInvocations(1)
     {
-#if MPP_DEBUG == 1
-        m_currentCycle = 1;
-#endif
 #if MPP_STATS == 1
         m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
     }
 
-    Chunk* GC::FindChunkInUse(void* t_ptr)
+    // @FIXME: This method should be defined inside MemoryManager?
+    Chunk* GarbageCollector::FindChunkInUse(void* t_ptr)
     {
         PROFILE_FUNCTION();
 
@@ -40,7 +35,7 @@ namespace mpp {
         return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
     }
 
-    bool GC::Collect()
+    bool GarbageCollector::Collect()
     {
 #if MPP_STATS == 1
         utils::profile::Timer timer("GC::Collect()");
@@ -73,7 +68,7 @@ namespace mpp {
 #if MPP_DEBUG == 1
         if (utils::EnvOptions::Get().GetMppDumpObjectsGraph() !=
             utils::ObjectsGraphDumpType::DISABLED) {
-            std::ofstream objectsDot("objects_cycle" + std::to_string(m_currentCycle) + ".dot");
+            std::ofstream objectsDot("objects_cycle" + std::to_string(m_totalInvocations) + ".dot");
 
             switch (utils::EnvOptions::Get().GetMppDumpObjectsGraph()) {
                 case utils::ObjectsGraphDumpType::SIMPLE:
@@ -87,7 +82,6 @@ namespace mpp {
             }
 
             objectsDot.close();
-            m_currentCycle++;
         }
 #endif
 
@@ -219,6 +213,9 @@ namespace mpp {
         utils::Statistics::GetInstance().AddGcCycleStats(std::move(m_gcStats));
         m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
+
+        // GC completed successfully, increase number of successful GCs
+        m_totalInvocations++;
 
         return true;
     }
