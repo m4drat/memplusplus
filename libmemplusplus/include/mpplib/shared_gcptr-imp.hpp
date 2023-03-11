@@ -263,11 +263,9 @@ namespace mpp {
     }
 
     template<class Type>
-    bool SharedGcPtr<Type>::AddToGcList()
+    void SharedGcPtr<Type>::AddToGcList()
     {
         g_memoryManager->GetGC().AddGcPtr(this);
-
-        return true;
     }
 
     template<class Type>

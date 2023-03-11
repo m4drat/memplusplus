@@ -233,11 +233,11 @@ namespace mpp {
          * @deprecated this method is deprecated and will be private in a future version
          * because we don't operate with raw pointers anymore.
          * @brief Deallocates chunk of memory.
-         * @param t_chunkPtr pointer to start of user data.
+         * @param t_userPtr pointer to the beginning of user data.
          * @return true, if chunk was deallocated successfully, false if chunk
          * doesn't belong to any arena.
          */
-        bool Deallocate(void* t_chunkPtr);
+        bool Deallocate(void* t_userPtr);
 
         /**
          * @brief Collects garbage from all arenas, by invoking GarbageCollector.Collect().
@@ -333,11 +333,11 @@ namespace mpp {
      * @deprecated this method is deprecated and will be private in a future version
      * because we don't operate with raw pointers anymore.
      * @brief Wrapper around @sa DeallocateInternal.
-     * @param t_chunkPtr pointer to start of user data.
+     * @param t_userPtr pointer to the beginning of user data.
      * @return true, if chunk was deallocated successfully, false if chunk
      * doesn't belong to any arena
      */
-    bool Deallocate(void* t_chunkPtr);
+    bool Deallocate(void* t_userPtr);
 
     /**
      * @deprecated instead of using Allocate<T> use @sa MakeShared<T> / @sa MakeSharedN<T>

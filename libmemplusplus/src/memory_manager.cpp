@@ -191,29 +191,29 @@ namespace mpp {
         return Chunk::GetUserDataPtr(userChunk);
     }
 
-    bool MemoryManager::Deallocate(void* t_chunkPtr)
+    bool MemoryManager::Deallocate(void* t_userPtr)
     {
         PROFILE_FUNCTION();
 
         // User placed hook to call before actual Allocate
         if (m_deallocateHook != nullptr) {
-            return m_deallocateHook(t_chunkPtr);
+            return m_deallocateHook(t_userPtr);
         }
 
         // If a given pointer is a nullptr - return false
         // We dont want to waste time, searching for the arena
-        if (t_chunkPtr == nullptr) {
+        if (t_userPtr == nullptr) {
             return false;
         }
 
         // Find arena that chunk belongs to
         for (auto& arena : m_arenaList) {
-            if (t_chunkPtr >= arena->BeginPtr() && t_chunkPtr <= arena->EndPtr()) {
+            if (t_userPtr >= arena->BeginPtr() && t_userPtr <= arena->EndPtr()) {
                 // In this case, we still can free invalid pointer, so
                 // add additional checks inside DeallocateChunk
-                arena->DeallocateChunk(Chunk::GetHeaderPtr(t_chunkPtr));
-                MPP_POISON_USER_DATA_INSIDE_CHUNK(Chunk::GetHeaderPtr(t_chunkPtr));
-                MPP_VALGRIND_UNDEFINE_CHUNK(Chunk::GetHeaderPtr(t_chunkPtr));
+                arena->DeallocateChunk(Chunk::GetHeaderPtr(t_userPtr));
+                MPP_POISON_USER_DATA_INSIDE_CHUNK(Chunk::GetHeaderPtr(t_userPtr));
+                MPP_VALGRIND_UNDEFINE_CHUNK(Chunk::GetHeaderPtr(t_userPtr));
                 return true;
             }
         }
@@ -352,9 +352,9 @@ namespace mpp {
         return g_memoryManager->Allocate(t_userDataSize);
     }
 
-    bool Deallocate(void* t_chunkPtr)
+    bool Deallocate(void* t_userPtr)
     {
-        return g_memoryManager->Deallocate(t_chunkPtr);
+        return g_memoryManager->Deallocate(t_userPtr);
     }
 
     void SetAllocateHook(const std::function<void*(std::size_t)>& t_allocateHook)
