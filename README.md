@@ -116,6 +116,7 @@ Library options:
 - `MPP_SECURE` - build in secure mode with additional security features
 - `MPP_PROFILE` - enable profiling instrumentation
 - `MPP_SANITIZERS` - add sanitizers to the build
+- `MPP_VALGRIND` - adds support for valgrind
 - `MPP_COLOUR_DEBUG_OUTPUT` - Add colors to debug output
 - `MPP_STATS` - Add statistics instrumentation.
 - `MPP_ENABLE_LOGGING` - Enable logging (even in release mode)
@@ -211,6 +212,45 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
     SUMMARY: AddressSanitizer: use-after-poison /home/madrat/memplusplus/build/../example_project/src/main.cpp:137:20 in main
     
     ......
+    ```
+
+- Valgrind support:
+
+    Enable `MPP_VALGRIND` before building the library. Then compile your project with `-g` flag. As a result, you will get valgrind-compatible build which will help you to track-down any memory leaks. You also might want to disable `MPP_SANITIZERS/MPP_BUILD_FUZZER` and build using `g++`.
+
+    Example buggy code:
+
+    ```c++
+    void leak() {
+        void* p1 = mpp::Allocate(128);
+        // mpp::Deallocate(p1);
+    }
+    ```
+
+    Example valgrind report for this code:
+
+    ```log
+    ==21304== HEAP SUMMARY:
+    ==21304==     in use at exit: 160 bytes in 1 blocks
+    ==21304==   total heap usage: 24 allocs, 23 frees, 82,582 bytes allocated
+    ==21304==
+    ==21304== Searching for pointers to 1 not-freed blocks
+    ==21304== Checked 150,048 bytes
+    ==21304==
+    ==21304== 160 bytes in 1 blocks are definitely lost in loss record 1 of 1
+    ==21304==    at 0x151812: mpp::MemoryManager::Allocate(unsigned long) (memory_manager.cpp:181)
+    ==21304==    by 0x152A33: mpp::Allocate(unsigned long) (memory_manager.cpp:352)
+    ==21304==    by 0x150238: leak() (main.cpp:131)
+    ==21304==    by 0x15024C: main (main.cpp:144)
+    ==21304==
+    ==21304== LEAK SUMMARY:
+    ==21304==    definitely lost: 160 bytes in 1 blocks
+    ==21304==    indirectly lost: 0 bytes in 0 blocks
+    ==21304==      possibly lost: 0 bytes in 0 blocks
+    ==21304==    still reachable: 0 bytes in 0 blocks
+    ==21304==         suppressed: 0 bytes in 0 blocks
+    ==21304==
+    ==21304== ERROR SUMMARY: 1 errors from 1 contexts (suppressed: 0 from 0)
     ```
 
 - Data visualizers:

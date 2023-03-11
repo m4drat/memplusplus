@@ -126,15 +126,23 @@ private:
     }
 };
 
+void leak()
+{
+    void* p1 = mpp::Allocate(128);
+    // mpp::Deallocate(p1);
+}
+
 int main()
 {
-    MPP_LOG_DBG("Starting main");
-    MPP_LOG_ERROR("Starting main");
-    MPP_LOG_WARN("Starting main");
-    MPP_LOG_INFO("Starting main");
+    // MPP_LOG_DBG("Starting main");
+    // MPP_LOG_ERROR("Starting main");
+    // MPP_LOG_WARN("Starting main");
+    // MPP_LOG_INFO("Starting main");
 
-    Worker<false, true> worker(2048);
-    worker.DoBenchmark();
+    // Worker<false, true> worker(2048);
+    // worker.DoBenchmark();
+
+    leak();
 
     return 0;
 }

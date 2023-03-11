@@ -3,7 +3,15 @@
 #include "mpplib/utils/utils.hpp"
 
 #include <iostream>
+
+#if defined MPP_SANITIZERS
 #include <sanitizer/asan_interface.h>
+#endif
+
+#if defined MPP_VALGRIND
+#include <memcheck.h>
+#include <valgrind.h>
+#endif
 
 namespace mpp {
 #define MPP_STRINGIFY(x) #x
@@ -67,5 +75,31 @@ namespace mpp {
 #define MPP_POISON_MEM(ptr, size)
 #define MPP_UNPOISON_USER_DATA_INSIDE_CHUNK(chunk)
 #define MPP_POISON_USER_DATA_INSIDE_CHUNK(chunk)
+#endif
+
+#if defined MPP_VALGRIND
+#define MPP_RUNNING_ON_VALGRIND (RUNNING_ON_VALGRIND)
+#define MPP_VALGRIND_MALLOCLIKE_BLOCK(ptr, size) VALGRIND_MALLOCLIKE_BLOCK((ptr), (size), 0, 0);
+#define MPP_VALGRIND_FREELIKE_BLOCK(ptr) VALGRIND_FREELIKE_BLOCK((ptr), 0);
+#define MPP_VALGRIND_MAKE_MEM_DEFINED(ptr, size) VALGRIND_MAKE_MEM_DEFINED((ptr), (size));
+#define MPP_VALGRIND_MAKE_MEM_UNDEFINED(ptr, size) VALGRIND_MAKE_MEM_UNDEFINED((ptr), (size));
+#define MPP_VALGRIND_DEFINE_CHUNK(chunk)                                                           \
+    do {                                                                                           \
+        MPP_VALGRIND_MALLOCLIKE_BLOCK((chunk), (chunk)->GetSize());                                \
+        MPP_VALGRIND_MAKE_MEM_DEFINED((chunk), sizeof(Chunk::ChunkHeader));                        \
+    } while (0)
+#define MPP_VALGRIND_UNDEFINE_CHUNK(chunk)                                                         \
+    do {                                                                                           \
+        MPP_VALGRIND_FREELIKE_BLOCK((chunk));                                                      \
+        MPP_VALGRIND_MAKE_MEM_DEFINED((chunk), sizeof(Chunk::ChunkHeader));                        \
+    } while (0)
+#else
+#define MPP_RUNNING_ON_VALGRIND (0)
+#define MPP_VALGRIND_MALLOCLIKE_BLOCK(ptr, size)
+#define MPP_VALGRIND_FREELIKE_BLOCK(ptr)
+#define MPP_VALGRIND_MAKE_MEM_DEFINED(ptr, size)
+#define MPP_VALGRIND_MAKE_MEM_UNDEFINED(ptr, size)
+#define MPP_VALGRIND_DEFINE_CHUNK(chunk)
+#define MPP_VALGRIND_UNDEFINE_CHUNK(chunk)
 #endif
 }

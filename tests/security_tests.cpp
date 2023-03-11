@@ -74,6 +74,10 @@ TEST_F(AllocatorTest, InvalidFree)
 
     // InvalidFree
     EXPECT_EXIT({ Deallocate((void*)0xdeadbeef); },
-                testing::KilledBySignal(SIGABRT),
+                [](int status) {
+                    // With Valgrind, the exit status is 1, without it is SIGABRT
+                    return (WIFSIGNALED(status) && WTERMSIG(status) == SIGABRT) ||
+                           WEXITSTATUS(status) == 1;
+                },
                 "Invalid pointer deallocation detected!");
 }
