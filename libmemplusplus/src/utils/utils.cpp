@@ -1,10 +1,10 @@
 #include "mpplib/utils/utils.hpp"
 
-#include <cstdio>
 #if MPP_DEBUG == 1
 #include <cxxabi.h> // for __cxa_demangle
 #include <dlfcn.h>  // for dladdr
 #endif
+#include <array>
 #include <exception>
 #include <execinfo.h>
 #include <iostream>
@@ -13,6 +13,7 @@
 #include <unistd.h>
 
 #define __STDC_WANT_LIB_EXT1__ 1
+#include <cstdio>
 #include <cstdlib>
 #include <string.h> // for memset_s
 

@@ -192,11 +192,8 @@ namespace mpp {
          */
         ElementType& operator[](std::ptrdiff_t t_index) const noexcept;
 
-        /**
-         * @brief Tries to add SharedGcPtr to list of all active GcPtr's.
-         * @return true if succeed, false otherwise
-         */
-        bool AddToGcList();
+        //! @brief Tries to add SharedGcPtr to list of all active GcPtr's.
+        void AddToGcList();
 
         /**
          * @brief Tries to delete SharedGcPtr from list of all active GcPtr's.
