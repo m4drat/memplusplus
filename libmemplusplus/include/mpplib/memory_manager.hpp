@@ -157,6 +157,15 @@ namespace mpp {
         //! @brief Deleted copy constructor.
         MemoryManager(const MemoryManager&) = delete;
 
+        //! @brief Deleted copy assignment operator.
+        MemoryManager& operator=(const MemoryManager&) = delete;
+
+        //! @brief Deleted move constructor.
+        MemoryManager(MemoryManager&&) = delete;
+
+        //! @brief Deleted move assignment operator.
+        MemoryManager& operator=(MemoryManager&&) = delete;
+
         /**
          * @brief Ceils number (t_size) to the nearest number such that this number divided by
          * t_alignment has no remainder.

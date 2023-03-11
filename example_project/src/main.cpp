@@ -14,6 +14,7 @@
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
+#include "mpplib/utils/utils.hpp"
 
 using namespace mpp;
 
@@ -22,13 +23,17 @@ class Worker
 {
 public:
     Worker(uint32_t t_LinkedListSize, uint64_t t_xorshiftSeed = 0x133796A5FF21B3C1)
-        : m_LinkedListSize(t_LinkedListSize)
-        , m_xorshiftSeed(t_xorshiftSeed)
+        : m_xorshiftSeed(t_xorshiftSeed)
+        , m_LinkedListSize(t_LinkedListSize)
     {
         if constexpr (RandomizedLinkedList) {
             m_LinkedListHead = CreateRandomizedLinkedList(t_LinkedListSize);
         } else {
             m_LinkedListHead = CreateLayoutedLinkedList(t_LinkedListSize);
+        }
+
+        if constexpr (DoLayout) {
+            GC::GetInstance().Collect();
         }
     }
 
@@ -38,18 +43,35 @@ public:
     Worker& operator=(Worker&&) = delete;
     ~Worker() = default;
 
-    uint32_t DoBenchmark()
+    void DoCleanup()
     {
-        SharedGcPtr<ListNode>& current = m_LinkedListHead;
-
-        while (current->next != nullptr) {
-            current->data = current->data ^ current->next->data ^ 0x1337AF12;
-            current = current->next;
-        }
-
-        return current->data;
+        m_LinkedListHead = nullptr;
     }
 
+    uint32_t DoBenchmark()
+    {
+        // SharedGcPtr<ListNode> current = m_LinkedListHead;
+
+        // while (current->next != nullptr) {
+        //     current->data = current->data ^ 0x1337AF12 ^ current->next->data;
+        //     current = current->next;
+        // }
+
+        // return current->data;
+
+        mpp::utils::ErrorAbort("TEST!\n");
+
+        SharedGcPtr<ListNode>* current = &m_LinkedListHead;
+
+        while (current->Get()->next.Get() != nullptr) {
+            current->Get()->data = current->Get()->data ^ 0x1337AF12 ^ current->Get()->next->data;
+            current = &current->Get()->next;
+        }
+
+        return current->Get()->data;
+    }
+
+private:
     struct alignas(64) ListNode
     {
         uint32_t index;
@@ -94,8 +116,7 @@ public:
             nodes.emplace_back(MakeShared<ListNode>(i, data));
         }
 
-        std::shuffle(
-            std::begin(nodes), std::end(nodes), std::default_random_engine(m_xorshiftSeed));
+        std::shuffle(std::begin(nodes), std::end(nodes), std::minstd_rand(m_xorshiftSeed));
 
         for (uint32_t i = 0; i < size - 1; ++i) {
             nodes[i]->next = nodes[i + 1];
@@ -105,49 +126,6 @@ public:
     }
 };
 
-void logic()
-{
-    using namespace mpp;
-
-    Worker<true, false> worker(8);
-    std::cout << worker.DoBenchmark() << std::endl;
-
-    std::cout << "Before GC" << std::endl;
-    g_memoryManager->VisHeapLayout(std::cout, nullptr);
-    // Iterate linked list
-    auto head = worker.m_LinkedListHead;
-    while (head != nullptr) {
-        std::cout << head << head->index << " " << head->data << std::endl;
-        head = head->next;
-    }
-
-    GC::GetInstance().Collect();
-
-    std::cout << "After GC" << std::endl;
-    g_memoryManager->VisHeapLayout(std::cout, nullptr);
-    // Iterate linked list
-    head = worker.m_LinkedListHead;
-    while (head != nullptr) {
-        std::cout << head << head->index << " " << head->data << std::endl;
-        head = head->next;
-    }
-
-    std::cout << std::endl;
-
-    SharedGcPtr<Worker<true, false>::ListNode>* newHead = &worker.m_LinkedListHead;
-    while (newHead->Get() != nullptr) {
-        std::cout << *newHead << newHead->Get()->index << " " << newHead->Get()->data << std::endl;
-        newHead = &newHead->Get()->next;
-    }
-
-    head = nullptr;
-    worker.m_LinkedListHead = nullptr;
-
-    // MM::VisHeapLayout(std::cout, nullptr);
-    // GC::GetInstance().Collect();
-    // MM::VisHeapLayout(std::cout, nullptr);
-}
-
 int main()
 {
     MPP_LOG_DBG("Starting main");
@@ -155,6 +133,8 @@ int main()
     MPP_LOG_WARN("Starting main");
     MPP_LOG_INFO("Starting main");
 
-    logic();
+    Worker<false, true> worker(2048);
+    worker.DoBenchmark();
+
     return 0;
 }

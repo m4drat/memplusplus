@@ -71,6 +71,18 @@ namespace mpp {
 
         ~Heuristics() = default;
 
+        //! @brief Deleted copy constructor.
+        Heuristics(const Heuristics&) = delete;
+
+        //! @brief Deleted copy assignment operator.
+        Heuristics& operator=(const Heuristics&) = delete;
+
+        //! @brief Deleted move constructor.
+        Heuristics(Heuristics&&) = delete;
+
+        //! @brief Deleted move assignment operator.
+        Heuristics& operator=(Heuristics&&) = delete;
+
         /**
          * @brief Layouts heap.
          *
@@ -86,7 +98,7 @@ namespace mpp {
          * @param t_llGraph Graph that should (but not necessarily) represent LinkedList.
          * @return LayoutedHeap Successfully layouted t_llGraph or its part.
          */
-        LayoutedHeap LayoutLinkedList(
+        static LayoutedHeap LayoutLinkedList(
             std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_llGraph);
 
         /**
@@ -94,7 +106,7 @@ namespace mpp {
          * @param t_graph Graph with chunks that should be layouted.
          * @return LayoutedHeap Successfully layouted t_graph.
          */
-        LayoutedHeap LayoutGeneralGraph(
+        static LayoutedHeap LayoutGeneralGraph(
             std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_graph);
     };
 }

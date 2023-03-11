@@ -11,8 +11,7 @@ namespace mpp { namespace utils { namespace profile {
 
     ProfilerTimer::~ProfilerTimer()
     {
-        if (!m_stopped)
-        {
+        if (!m_stopped) {
             Stop();
         }
     }

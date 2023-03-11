@@ -17,6 +17,21 @@ namespace mpp {
          */
         virtual ~GcPtr() = default;
 
+        //! @brief Default constructor
+        GcPtr() = default;
+
+        //! @brief Default copy constructor
+        GcPtr(const GcPtr&) = default;
+
+        //! @brief Default move constructor
+        GcPtr(GcPtr&&) = default;
+
+        //! @brief Default copy assignment operator
+        GcPtr& operator=(const GcPtr&) = default;
+
+        //! @brief Default move assignment operator
+        GcPtr& operator=(GcPtr&&) = default;
+
         /**
          * @brief Get pointer to controlled object as void.
          * @return void* pointer to controlled object

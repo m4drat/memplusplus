@@ -207,11 +207,9 @@ namespace mpp {
 #endif
     }
 
-    // Remember to check if topChunk is nullptr
-    // if it is, then we must check that chunk
-    // is top, and after merging everything, we should update topChunk
-    // to point to new chunk
-    // TODO: Add more sanity checks for this function
+    // Remember to check if topChunk is nullptr. If it is then we must check that the chunk is top
+    // chunk, and after merging everything, we should update topChunk to point to the new chunk.
+    // TODO: Add more sanity checks to this function
     Chunk* Arena::MergeNeighborsChunks(Chunk* t_chunk)
     {
         PROFILE_FUNCTION();
@@ -260,7 +258,7 @@ namespace mpp {
         }
 
         // Magic rule, well to know: chunk->GetPrevSize() == 0 <=> chunk == this->begin
-        // Set size of previous chunk
+        // Set size of the previous chunk
         if (static_cast<void*>(newChunk) != m_Begin) {
             newChunk->SetPrevSize(Chunk::GetPrevChunk(newChunk)->GetSize());
         } else {
@@ -289,13 +287,13 @@ namespace mpp {
             newChunk = MergeTwoSequenceChunks(Chunk::GetPrevChunk(t_chunk), t_chunk);
         }
 
-        // If top chunk is null, we need to create new one
+        // If top chunk is null, we need to create a new one
         if (m_topChunk == nullptr) {
             m_topChunk = newChunk;
-            // Check, if top chunk isn't the first chunk in arena:
+            // Check, if top chunk isn't the first chunk in the arena
             if (static_cast<void*>(m_topChunk) != m_Begin) {
                 m_topChunk->SetPrevSize(Chunk::GetPrevChunk(m_topChunk)->GetSize());
-                // Check, if top chunk is the first chunk in arena:
+                // Check, if top chunk is the first chunk in the arena:
             } else {
                 // ChunkSize is already set by MergeTwoSequenceChunks function
                 m_topChunk->SetPrevSize(0);
@@ -303,9 +301,8 @@ namespace mpp {
             m_topChunk->SetIsPrevInUse(1);
             m_topChunk->SetIsUsed(1);
             return m_topChunk;
-            // Merging with topChunk if it isn't nullptr
-            // Merge forward
         }
+        // Merging with the topChunk if it isn't nullptr (merge forward)
         m_topChunk = MergeTwoSequenceChunks(newChunk, m_topChunk);
         m_topChunk->SetIsPrevInUse(1);
         m_topChunk->SetIsUsed(1);
@@ -342,7 +339,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        const std::set<Chunk*>& chunksInUse = t_arena->ConstructChunksInUse();
+        const std::set<Chunk*>& chunksInUse = t_arena->ConstructChunksInUse(true);
 
         t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena.get())
               << " --------------" << std::endl;

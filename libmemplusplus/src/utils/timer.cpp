@@ -3,7 +3,8 @@
 namespace mpp { namespace utils { namespace profile {
     Timer::Timer(const char* t_name)
         : m_name(t_name)
-    {}
+    {
+    }
 
     Timer& Timer::TimerStart()
     {

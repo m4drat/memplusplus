@@ -5,16 +5,12 @@ namespace mpp { namespace utils { namespace profile {
     Profiler::Profiler()
         : m_profileCount(0)
     {
-#if MPP_PROFILE == 1
         BeginSession("Mpplib profiling", "mpplib-profiling.json");
-#endif
     }
 
     Profiler::~Profiler()
     {
-#if MPP_PROFILE == 1
         Profiler::Get().EndSession();
-#endif
     }
 
     void Profiler::BeginSession(const std::string& t_name, const std::string& t_filepath)
@@ -35,8 +31,7 @@ namespace mpp { namespace utils { namespace profile {
                                 int64_t t_end,
                                 uint32_t t_threadId)
     {
-        if (m_profileCount++ > 0)
-        {
+        if (m_profileCount++ > 0) {
             m_outputStream << ",";
         }
 

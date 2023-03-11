@@ -99,6 +99,7 @@
 			"**/memplusplus-benchmarks/benchmarks/mempp/memplusplus/": true
 		},
 		"clangd.path": "/usr/bin/clangd-15",
-		"editor.formatOnSave": true
+		"editor.formatOnSave": true,
+		"sarif-viewer.connectToGithubCodeScanning": "off"
 	}
 }

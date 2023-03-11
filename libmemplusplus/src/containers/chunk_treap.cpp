@@ -9,7 +9,7 @@ namespace mpp {
     {
     }
 
-    // TODO - smart pointers memory management
+    // @TODO: smart pointers memory management
     ChunkTreap::ChunkTreap(const ChunkTreap& t_treap)
         : m_root(new Node(*t_treap.m_root))
         , m_freedChunks{ t_treap.m_freedChunks }

@@ -14,10 +14,8 @@ namespace mpp {
     public:
         /**
          * @brief Constructor (C strings).
-         * @param message C-style string error message.
-         *                The string contents are copied upon construction.
-         *                Hence, responsibility for deleting the char* lies
-         *                with the caller.
+         * @param message C-style string error message. The string contents are copied upon
+         * construction. Hence, responsibility for deleting the char* lies with the caller.
          */
         explicit Exception(const char* message)
             : m_errorMsg(message)
@@ -33,18 +31,25 @@ namespace mpp {
         {
         }
 
-        /**
-         * @brief Destructor.
-         *
-         * Virtual to allow for subclassing.
-         */
+        //! @brief Copy constructor.
+        Exception(const Exception&) = default;
+
+        //! @brief Move constructor.
+        Exception(Exception&&) = default;
+
+        //! @brief Copy assignment operator.
+        Exception& operator=(const Exception&) = default;
+
+        //! @brief Move assignment operator.
+        Exception& operator=(Exception&&) = default;
+
+        //! @brief Virtual destructor.
         ~Exception() override = default;
 
         /**
          * @brief Returns a pointer to the (constant) error description.
-         * @return A pointer to a const char*. The underlying memory
-         *         is in posession of the Exception object. Callers must
-         *         not attempt to free the memory.
+         * @return A pointer to a const char*. The underlying memory is in posession of the
+         * Exception object. Callers must not attempt to free the memory.
          */
         const char* what() const noexcept override
         {

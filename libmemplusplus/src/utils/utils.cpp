@@ -13,7 +13,7 @@
 #include <unistd.h>
 
 #define __STDC_WANT_LIB_EXT1__ 1
-#include <stdlib.h>
+#include <cstdlib>
 #include <string.h> // for memset_s
 
 namespace mpp { namespace utils {
@@ -39,40 +39,48 @@ namespace mpp { namespace utils {
 #if MPP_DEBUG == 1
     void DumpStackTrace(std::ostream& t_out, int32_t t_skip)
     {
-        void* callstack[s_MAX_STACK_LEVELS];
-        char buf[1024];
-        int32_t frames = backtrace(callstack, s_MAX_STACK_LEVELS);
-        char** symbols = backtrace_symbols(callstack, frames);
+        std::array<void*, s_MAX_STACK_LEVELS> callstack{};
+        std::array<char, 2048> buf{}; // NOLINT
+        int32_t frames = backtrace(callstack.data(), s_MAX_STACK_LEVELS);
+        char** symbols = backtrace_symbols(callstack.data(), frames);
 
         for (int32_t i = t_skip; i < frames; ++i) {
             Dl_info info;
-            if (dladdr(callstack[i], &info)) {
+            if (dladdr(callstack.at(i), &info)) {
                 char* demangled = NULL;
-                int32_t status;
-                demangled = abi::__cxa_demangle(info.dli_sname, NULL, 0, &status);
-                std::snprintf(buf,
+                int32_t status = 0;
+                demangled = abi::__cxa_demangle(info.dli_sname, NULL, nullptr, &status);
+                // NOLINTNEXTLINE
+                std::snprintf(buf.data(),
                               sizeof(buf),
-                              "%-3d %*p %s + %zd\n",
+                              "%3d: %p - %s + %zd\n",
                               i,
-                              (int)(2 + sizeof(void*) * 2),
-                              callstack[i],
+                              callstack.at(i),
                               status == 0 ? demangled : info.dli_sname,
-                              (char*)callstack[i] - (char*)info.dli_saddr);
-                free(demangled);
+                              reinterpret_cast<char*>(callstack.at(i)) -
+                                  reinterpret_cast<char*>(info.dli_saddr));
+                free(demangled); // NOLINT
             } else {
-                std::snprintf(
-                    buf, sizeof(buf), "%-3d %*p\n", i, (int)(2 + sizeof(void*) * 2), callstack[i]);
+                // NOLINTNEXTLINE
+                std::snprintf(buf.data(), sizeof(buf), "%-3d %p\n", i,
+                              callstack.at(i)); // NOLINT
             }
-            t_out << buf;
-            std::snprintf(buf, sizeof(buf), "%s\n", symbols[i]);
-            t_out << buf;
+            t_out << buf.data();
+            // NOLINTNEXTLINE
+            std::snprintf(buf.data(),
+                          sizeof(buf),
+                          "%*sat %s\n",
+                          static_cast<int>((2 + sizeof(void*)) + 9), // NOLINT
+                          "",
+                          symbols[i]);
+            t_out << buf.data();
         }
 
         if (frames == s_MAX_STACK_LEVELS) {
             t_out << "[truncated]\n";
         }
 
-        free(symbols);
+        free(symbols); // NOLINT
     }
 #endif
 

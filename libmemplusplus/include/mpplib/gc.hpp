@@ -36,6 +36,7 @@ namespace mpp {
          * than required, new arena is created with size of old_size * @sa m_newAllocExpandFactor.
          */
         static constexpr float m_newAllocExtendThreshold = 0.25f;
+
         //! @brief Newly created arena expansion factor.
         static constexpr float m_newAllocExpandFactor = 1.25f;
 

@@ -435,28 +435,4 @@ namespace mpp {
                 utils::ErrorAbort("SharedGcPtr<Type>: Invalid initialization!\n");
         }
     }
-
-    template<class Type, class... Args>
-    SharedGcPtr<Type> MakeShared(Args&&... t_args)
-    {
-        PROFILE_FUNCTION();
-        Type* ptr = static_cast<Type*>(Allocate(sizeof(Type)));
-        Type* obj = MM::Construct<Type>(ptr, std::forward<Args>(t_args)...);
-        return SharedGcPtr<Type>(obj);
-    }
-
-    template<class Type, class... Args>
-    SharedGcPtr<Type[]> MakeSharedN(uint32_t t_size, Args&&... t_args)
-    {
-        PROFILE_FUNCTION();
-
-        Type* ptr = static_cast<Type*>(Allocate(sizeof(Type) * t_size));
-
-        for (uint32_t i = 0; i < t_size; i++) {
-            [[maybe_unused]] Type* obj =
-                MM::Construct<Type>(ptr + i, std::forward<Args>(t_args)...);
-        }
-
-        return SharedGcPtr<Type[]>(ptr, t_size);
-    }
 }

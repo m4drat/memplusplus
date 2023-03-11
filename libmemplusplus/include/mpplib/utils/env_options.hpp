@@ -14,7 +14,7 @@ namespace mpp { namespace utils {
     /**
      * @brief Class that wraps all environment options.
      */
-    class EnvOptions
+    class EnvOptions final
     {
     private:
         /**

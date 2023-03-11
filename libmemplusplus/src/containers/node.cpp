@@ -12,10 +12,10 @@ namespace mpp {
     Node::Node(const Node& t_node)
         : priority(t_node.priority)
         , chunk(t_node.chunk)
+        , leftChild(t_node.leftChild ? new Node(*t_node.leftChild) : nullptr)
+        , rightChild(t_node.rightChild ? new Node(*t_node.rightChild) : nullptr)
     {
-        // TODO - smart pointers memory management
-        leftChild = t_node.leftChild ? new Node(*t_node.leftChild) : nullptr;
-        rightChild = t_node.rightChild ? new Node(*t_node.rightChild) : nullptr;
+        // @TODO: - smart pointers memory management
     }
 
     Node& Node::operator=(const Node& t_node)

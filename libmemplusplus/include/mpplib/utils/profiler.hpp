@@ -12,25 +12,17 @@ namespace mpp { namespace utils { namespace profile {
     class Profiler
     {
     private:
-        /**
-         * @brief Stream to write to
-         */
+        //! @brief Stream to write to
         std::ofstream m_outputStream;
 
-        /**
-         * @brief profile counts
-         */
+        //! @brief profile counts
         int32_t m_profileCount;
 
     public:
-        /**
-         * @brief Construct a new Profiler object
-         */
+        //! @brief Construct a new Profiler object
         Profiler();
 
-        /**
-         * @brief Destroy the Profiler object, and write to mpplib-profile if needed
-         */
+        //! @brief Destroy the Profiler object, and write to mpplib-profile if needed
         ~Profiler();
 
         /**
@@ -41,9 +33,7 @@ namespace mpp { namespace utils { namespace profile {
         void BeginSession(const std::string& t_name,
                           const std::string& t_filepath = "profile.json");
 
-        /**
-         * @brief Stop profiling session
-         */
+        //! @brief Stop profiling session
         void EndSession();
 
         /**
@@ -55,14 +45,10 @@ namespace mpp { namespace utils { namespace profile {
          */
         void WriteProfile(const char* t_name, int64_t t_start, int64_t t_end, uint32_t t_threadId);
 
-        /**
-         * @brief Write header to profile file
-         */
+        //! @brief Write header to profile file
         void WriteHeader();
 
-        /**
-         * @brief Write footer to profile file
-         */
+        //! @brief Write footer to profile file
         void WriteFooter();
 
         /**

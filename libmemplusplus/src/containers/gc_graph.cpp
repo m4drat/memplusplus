@@ -71,9 +71,9 @@ namespace mpp {
 
             // We don't really care about the location of the GcPtr,
             // thus it is okay to cast t_gcPtr to Chunk*
-            Vertex* origin = FindVertex((Chunk*)t_gcPtr);
+            Vertex* origin = FindVertex(reinterpret_cast<Chunk*>(t_gcPtr));
             if (origin == nullptr) {
-                origin = new Vertex((std::byte*)t_gcPtr);
+                origin = new Vertex(reinterpret_cast<std::byte*>(t_gcPtr));
             }
             AddEdge(origin, destination);
         }
@@ -151,8 +151,10 @@ namespace mpp {
                     t_out << colorRed;
                 }
 
+                constexpr uint32_t c_lsbNibbles = 5;
+
                 t_out << "\" PORT=\"" << chunkAddrStr << "\">"
-                      << chunkAddrStr.substr(chunkAddrStr.length() - 5) << "</TD>"
+                      << chunkAddrStr.substr(chunkAddrStr.length() - c_lsbNibbles) << "</TD>"
                       << "\n";
             }
             t_out << "\t\t\t"
@@ -178,7 +180,7 @@ namespace mpp {
         return t_out;
     }
 
-    std::ostream& GcGraph::GenerateGraphvizLayoutAdvanced(std::ostream& t_out) const
+    std::ostream& GcGraph::GenerateGraphvizLayoutAdvanced(std::ostream& t_out) const // NOLINT
     {
         PROFILE_FUNCTION();
 
@@ -204,7 +206,7 @@ namespace mpp {
         for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 t_out << "\t\t\t"
                       << "<TD bgcolor=\"";
@@ -217,8 +219,10 @@ namespace mpp {
                     t_out << colorRed;
                 }
 
+                constexpr uint32_t c_lsbNibbles = 5;
+
                 t_out << "\" PORT=\"" << chunkAddrStr << "\">"
-                      << chunkAddrStr.substr(chunkAddrStr.length() - 5) << "</TD>"
+                      << chunkAddrStr.substr(chunkAddrStr.length() - c_lsbNibbles) << "</TD>"
                       << "\n";
             }
             t_out << "\t\t\t"
@@ -240,7 +244,7 @@ namespace mpp {
         for (auto& arena : g_memoryManager->GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
-                Chunk* currChunk = reinterpret_cast<Chunk*>(pos);
+                auto* currChunk = reinterpret_cast<Chunk*>(pos);
                 std::string chunkAddrStr = utils::AddrToString((void*)currChunk);
                 std::string chunkLabel = "label=\"chunk\\n" + chunkAddrStr + "\\n" +
                                          "size = " + std::to_string(currChunk->GetSize()) + "\"";
@@ -254,7 +258,7 @@ namespace mpp {
                     chunkColor = colorRed;
                 }
 
-                auto chunkAsVertex = FindVertex(currChunk);
+                auto* chunkAsVertex = FindVertex(currChunk);
                 if (!chunkAsVertex || chunkAsVertex->GetAllOutgoingGcPtrs(orderedGcPtrs).empty()) {
                     // Current chunk doesn't have GC-pointers inside
                     t_out << "\t\"" << chunkAddrStr << "\" [fillcolor=\"" << chunkColor << "\", "

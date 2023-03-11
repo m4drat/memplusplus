@@ -160,7 +160,7 @@ namespace mpp {
          */
         std::byte* GetUserData()
         {
-            return (std::byte*)this + sizeof(Chunk::ChunkHeader);
+            return reinterpret_cast<std::byte*>(this) + sizeof(Chunk::ChunkHeader);
         };
 
         /**

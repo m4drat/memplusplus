@@ -95,7 +95,8 @@ namespace mpp {
 
             Iterator& operator++()
             {
-                m_ptr = reinterpret_cast<Chunk*>((std::byte*)m_ptr + m_ptr->GetSize());
+                m_ptr = reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(m_ptr) +
+                                                 m_ptr->GetSize());
                 return *this;
             }
 
@@ -176,6 +177,18 @@ namespace mpp {
          * @param t_begin allocated arena begin.
          */
         Arena(std::size_t t_size, std::byte* t_begin);
+
+        //! @brief Arena copy constructor.
+        Arena(const Arena&) = delete;
+
+        //! @brief Arena move constructor.
+        Arena(Arena&&) = delete;
+
+        //! @brief Arena copy assignment operator.
+        Arena& operator=(const Arena&) = delete;
+
+        //! @brief Arena move assignment operator.
+        Arena& operator=(Arena&&) = delete;
 
         /**
          * @brief Arena destructor.
@@ -308,7 +321,7 @@ namespace mpp {
          * @param t_chunk2 second chunk to merge with.
          * @return start of merged chunk (t_chunk1)
          */
-        Chunk* MergeTwoSequenceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
+        static Chunk* MergeTwoSequenceChunks(Chunk* t_chunk1, Chunk* t_chunk2);
 
         /**
          * @brief Merge freed chunk with top. Updates corresponding pointers.

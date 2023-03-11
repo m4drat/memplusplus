@@ -56,6 +56,15 @@ namespace mpp {
          */
         explicit GcGraph(const std::vector<Vertex*>& t_other);
 
+        //! @brief Deleted copy constructor.
+        GcGraph& operator=(const GcGraph& t_other) = delete;
+
+        //! @brief Deleted move constructor.
+        GcGraph(GcGraph&& t_other) noexcept = delete;
+
+        //! @brief Deleted move assignment operator.
+        GcGraph& operator=(GcGraph&& t_other) noexcept = delete;
+
         /**
          * @brief Graph destructor. Iterates through each Vertex in adjList, deletes it,
          * and calls Destructor.
@@ -118,7 +127,7 @@ namespace mpp {
          * @param t_from vertex, to create edge from.
          * @param t_to vertex, to create edge to
          */
-        void RemoveEdge(Vertex* t_from, Vertex* t_to);
+        static void RemoveEdge(Vertex* t_from, Vertex* t_to);
 
         /**
          * @brief Adds vertex to the graph adjacency list.
@@ -195,8 +204,5 @@ namespace mpp {
          * @return set of vertices (adjacency list)
          */
         std::set<Vertex*, VertexComparator>& GetAdjList();
-
-        // GcGraph* GetUndirected();
-        // std::vector<std::vector<>> GetAdjMatrix();
     };
 }

@@ -314,19 +314,13 @@ namespace mpp {
     }
 #endif
 
-    // TODO: make it work better (probably add smart pointers memory management)
-    // This is just ugly thing to reset allocator state
-    // exists only to supprot unit-tests execution
     MemoryManager::~MemoryManager()
     {
         PROFILE_FUNCTION();
 
-        auto currArena = m_arenaList.begin();
-        while (currArena != m_arenaList.end()) {
-            currArena->reset();
-            currArena = m_arenaList.erase(currArena);
-        }
+        m_arenaList.clear();
 
+        // FIXME: It's time to completely revamp this method!
         GC::GetInstance().GetGcPtrs().clear();
     }
 
