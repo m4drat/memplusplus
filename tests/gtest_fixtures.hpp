@@ -4,44 +4,28 @@
 
 #include "mpplib/memory_manager.hpp"
 
+class MppTestBase : public ::testing::Test
+{
+protected:
+    void SetUp() override
+    {
+        mpp::g_memoryManager = std::make_unique<mpp::MemoryManager>();
+    }
+
+    void TearDown() override
+    {
+        mpp::g_memoryManager.reset();
+    }
+};
+
 class AllocatorTest : public ::testing::Test
-{
-protected:
-    void SetUp() override
-    {
-        mpp::g_memoryManager = std::make_unique<mpp::MemoryManager>();
-    }
+{};
 
-    void TearDown() override
-    {
-        mpp::g_memoryManager.reset();
-    }
-};
+class SharedGcPtrTest : public MppTestBase
+{};
 
-class SharedGcPtrTest : public ::testing::Test
-{
-protected:
-    void SetUp() override
-    {
-        mpp::g_memoryManager = std::make_unique<mpp::MemoryManager>();
-    }
+class SharedGcArrayTests : public MppTestBase
+{};
 
-    void TearDown() override
-    {
-        mpp::g_memoryManager.reset();
-    }
-};
-
-class SharedGcArrayTests : public ::testing::Test
-{
-protected:
-    void SetUp() override
-    {
-        mpp::g_memoryManager = std::make_unique<mpp::MemoryManager>();
-    }
-
-    void TearDown() override
-    {
-        mpp::g_memoryManager.reset();
-    }
-};
+class GcTest : public MppTestBase
+{};

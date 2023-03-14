@@ -83,15 +83,19 @@ namespace mpp {
 #define MPP_VALGRIND_FREELIKE_BLOCK(ptr) VALGRIND_FREELIKE_BLOCK((ptr), 0);
 #define MPP_VALGRIND_MAKE_MEM_DEFINED(ptr, size) VALGRIND_MAKE_MEM_DEFINED((ptr), (size));
 #define MPP_VALGRIND_MAKE_MEM_UNDEFINED(ptr, size) VALGRIND_MAKE_MEM_UNDEFINED((ptr), (size));
+#define MPP_VALGRIND_DEFINE_CHUNK_HEADER(chunk)                                                    \
+    MPP_VALGRIND_MAKE_MEM_DEFINED((chunk), sizeof(Chunk::ChunkHeader));
 #define MPP_VALGRIND_DEFINE_CHUNK(chunk)                                                           \
     do {                                                                                           \
-        MPP_VALGRIND_MALLOCLIKE_BLOCK((chunk), (chunk)->GetSize());                                \
-        MPP_VALGRIND_MAKE_MEM_DEFINED((chunk), sizeof(Chunk::ChunkHeader));                        \
+        MPP_VALGRIND_MALLOCLIKE_BLOCK(chunk, (chunk)->GetSize());                                  \
+        MPP_VALGRIND_DEFINE_CHUNK_HEADER(chunk);                                                   \
+        MPP_VALGRIND_MAKE_MEM_UNDEFINED(Chunk::GetUserDataPtr(chunk),                              \
+                                        (chunk)->GetSize() - sizeof(Chunk::ChunkHeader));          \
     } while (0)
 #define MPP_VALGRIND_UNDEFINE_CHUNK(chunk)                                                         \
     do {                                                                                           \
-        MPP_VALGRIND_FREELIKE_BLOCK((chunk));                                                      \
-        MPP_VALGRIND_MAKE_MEM_DEFINED((chunk), sizeof(Chunk::ChunkHeader));                        \
+        MPP_VALGRIND_FREELIKE_BLOCK(chunk);                                                        \
+        MPP_VALGRIND_DEFINE_CHUNK_HEADER(chunk);                                                   \
     } while (0)
 #else
 #define MPP_RUNNING_ON_VALGRIND (0)
@@ -99,6 +103,7 @@ namespace mpp {
 #define MPP_VALGRIND_FREELIKE_BLOCK(ptr)
 #define MPP_VALGRIND_MAKE_MEM_DEFINED(ptr, size)
 #define MPP_VALGRIND_MAKE_MEM_UNDEFINED(ptr, size)
+#define MPP_VALGRIND_DEFINE_CHUNK_HEADER(chunk)
 #define MPP_VALGRIND_DEFINE_CHUNK(chunk)
 #define MPP_VALGRIND_UNDEFINE_CHUNK(chunk)
 #endif
