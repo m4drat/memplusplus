@@ -61,6 +61,7 @@ namespace mpp {
         {
             auto* newChunk = static_cast<Chunk*>(t_newChunkPtr);
 
+            MPP_VALGRIND_DEFINE_CHUNK_HEADER(newChunk);
             MPP_UNPOISON_MEM(newChunk, t_chunkSize);
 
             newChunk->SetPrevSize(t_prevSize);

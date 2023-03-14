@@ -1,13 +1,13 @@
 #include "gtest/gtest.h"
 
+#include "gtest_fixtures.hpp"
 #include "mpplib/chunk.hpp"
 #include "mpplib/mpp.hpp"
 #include <memory>
 
-TEST(GcTest, CreateCollectCreate)
+TEST_F(GcTest, CreateCollectCreate)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1);
     CollectGarbage();
@@ -22,10 +22,9 @@ TEST(GcTest, CreateCollectCreate)
     EXPECT_TRUE(*b3 == 4);
 }
 
-TEST(GcTest, PointerToPointer)
+TEST_F(GcTest, PointerToPointer)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<SharedGcPtr<int32_t>> p =
         MakeShared<SharedGcPtr<int32_t>>(MakeShared<int32_t>(0x95782));
@@ -35,10 +34,9 @@ TEST(GcTest, PointerToPointer)
     EXPECT_TRUE(*p->Get() == 0x95782);
 }
 
-TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
+TEST_F(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {
@@ -62,10 +60,9 @@ TEST(GcTest, CreatePointerOnHeapCollectGarbageAllocate)
     EXPECT_TRUE(*b1 == 1338);
 }
 
-TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
+TEST_F(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
     SharedGcPtr<int32_t> a2 = MakeShared<int32_t>(1338);
@@ -78,10 +75,9 @@ TEST(GcTest, CreateTwoObjectsDestroyCollectAndCreate)
     EXPECT_TRUE(*b1 == 1339);
 }
 
-TEST(GcTest, CreateCycleOfLength3)
+TEST_F(GcTest, CreateCycleOfLength3)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {
@@ -111,10 +107,9 @@ TEST(GcTest, CreateCycleOfLength3)
     EXPECT_TRUE(a3->data == 3);
 }
 
-TEST(GcTest, TestDanglingCyclesAreDestroyed)
+TEST_F(GcTest, TestDanglingCyclesAreDestroyed)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     struct Node
     {
@@ -142,15 +137,14 @@ TEST(GcTest, TestDanglingCyclesAreDestroyed)
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1339);
 }
 
-TEST(GcTest, DISABLED_CollectX5)
+TEST_F(GcTest, DISABLED_CollectX5)
 {
     using namespace mpp;
 }
 
-TEST(GcTest, GcPtrsAreUpdatedAfterCollect)
+TEST_F(GcTest, GcPtrsAreUpdatedAfterCollect)
 {
     using namespace mpp;
-    g_memoryManager = std::make_unique<MemoryManager>();
 
     SharedGcPtr<int32_t> a1 = MakeShared<int32_t>(1337);
     void* rawPtrBeforeGcCollect = a1.GetVoid();

@@ -6,6 +6,42 @@
 
 #include "gtest_fixtures.hpp"
 
+TEST_F(SharedGcPtrTest, DISABLED_ReferenceToItself)
+{
+    using namespace mpp;
+
+    struct alignas(64) ListNode
+    {
+        uint32_t index;
+        uint32_t data;
+        SharedGcPtr<ListNode> next;
+
+        ListNode(uint32_t t_index, uint32_t t_data)
+            : index(t_index)
+            , data(t_data)
+            , next(nullptr)
+        {
+        }
+    };
+
+    SharedGcPtr<ListNode> ptr = MakeShared<ListNode>(0, 0x1337);
+    ptr->next = MakeShared<ListNode>(1, 0xdead);
+
+    ASSERT_TRUE(ptr.UseCount() == 1);
+    ASSERT_TRUE(ptr->next.UseCount() == 1);
+
+    ptr = ptr->next;
+
+    // SharedGcPtr<ListNode> ptr1 = MakeShared<ListNode>(0, 0x1337);
+    // SharedGcPtr<ListNode> ptr2 = MakeShared<ListNode>(1, 0xdead);
+    // ptr1->next = ptr2;
+
+    // ASSERT_TRUE(ptr1.UseCount() == 1);
+    // ASSERT_TRUE(ptr1->next.UseCount() == 2);
+
+    // ptr1 = ptr1->next;
+}
+
 TEST_F(SharedGcPtrTest, EmptyConstructor)
 {
     using namespace mpp;

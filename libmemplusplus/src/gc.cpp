@@ -162,7 +162,7 @@ namespace mpp {
                 gcPtr->UpdatePtr(newUserDataPtr);
 
                 // Or we already copied it to another chunk and we need to update it again
-                if (gcPtrsToNewLocations.find(gcPtr) != gcPtrsToNewLocations.end()) {
+                if (gcPtrsToNewLocations.contains(gcPtr)) {
                     auto* gcPtrNewLoc = gcPtrsToNewLocations[gcPtr];
                     // Update GcPtr's internal pointer
                     // FIXME: this is an awful way to do it, but it works for now (might break
@@ -183,24 +183,28 @@ namespace mpp {
                 }
             }
 
-            // Copy chunk data to the new location
+            // Copy chunk data to the new location.
             std::memcpy(newChunkLocation, vertex->GetLoc(), currSize);
 
-            // Update required fields
-            newChunk = reinterpret_cast<Chunk*>(newChunkLocation);
-            newChunk->SetPrevSize(prevSize);
-            newChunk->SetIsUsed(1);
-            newChunk->SetIsPrevInUse(1);
+            // Construct a chunk at the new location.
+            newChunk = Chunk::ConstructChunk(newChunkLocation, prevSize, currSize, 1, 1);
+
+            // @FIXME: This is a hacky solution that kinda works.
+            MPP_VALGRIND_DEFINE_CHUNK(newChunk);
+            MPP_VALGRIND_MAKE_MEM_DEFINED(newChunk, newChunk->GetSize());
+            MPP_VALGRIND_UNDEFINE_CHUNK(vertex->GetLocationAsAChunk());
+            MPP_VALGRIND_MAKE_MEM_DEFINED(vertex->GetLocationAsAChunk(),
+                                          vertex->GetLocationAsAChunk()->GetSize());
 
             prevSize = currSize;
             newChunkLocation = newChunkLocation + currSize;
         }
 
-        // Update activeGcPtrs after all GcPtrs are updated
+        // Update activeGcPtrs after all GcPtrs are updated.
         m_activeGcPtrs =
             std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());
 
-        // We always have some free space in the arena, so we have to construct a top chunk
+        // We always have some free space in the arena, so we have to construct a top chunk.
         Chunk* topChunk = Chunk::ConstructChunk(
             newChunkLocation, prevSize, godArenaSize - layoutedData.layoutedSize, 1, 1);
         godArena->SetUsedSpace(layoutedData.layoutedSize);
@@ -225,7 +229,7 @@ namespace mpp {
         m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
 
-        // GC completed successfully, increase number of successful GCs
+        // GC completed successfully, increase number of successful GCs.
         m_totalInvocations++;
 
         return true;

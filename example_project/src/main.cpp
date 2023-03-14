@@ -3,7 +3,6 @@
 #include <iostream>
 #include <memory>
 
-#include <algorithm>
 #include <cstdlib>
 #include <random>
 
@@ -21,6 +20,24 @@ template<bool RandomizedLinkedList, bool DoLayout = false>
 class Worker
 {
 public:
+    struct alignas(64) ListNode
+    {
+        uint32_t index;
+        uint32_t data;
+        SharedGcPtr<ListNode> next;
+
+        ListNode(uint32_t t_index, uint32_t t_data)
+            : index(t_index)
+            , data(t_data)
+            , next(nullptr)
+        {
+        }
+    };
+
+    SharedGcPtr<ListNode> m_LinkedListHead;
+    uint32_t m_LinkedListSize;
+    uint64_t m_xorshiftSeed;
+
     Worker(uint32_t t_LinkedListSize, uint64_t t_xorshiftSeed = 0x133796A5FF21B3C1)
         : m_LinkedListSize(t_LinkedListSize)
         , m_xorshiftSeed(t_xorshiftSeed)
@@ -49,24 +66,6 @@ public:
 
         return current->data;
     }
-
-    struct alignas(64) ListNode
-    {
-        uint32_t index;
-        uint32_t data;
-        SharedGcPtr<ListNode> next;
-
-        ListNode(uint32_t t_index, uint32_t t_data)
-            : index(t_index)
-            , data(t_data)
-            , next(nullptr)
-        {
-        }
-    };
-
-    uint64_t m_xorshiftSeed;
-    SharedGcPtr<ListNode> m_LinkedListHead;
-    uint32_t m_LinkedListSize;
 
     SharedGcPtr<ListNode> CreateLayoutedLinkedList(uint32_t size)
     {
@@ -150,11 +149,31 @@ void logic()
 
 int main()
 {
-    MPP_LOG_DBG("Starting main");
-    MPP_LOG_ERROR("Starting main");
-    MPP_LOG_WARN("Starting main");
-    MPP_LOG_INFO("Starting main");
+    struct alignas(64) ListNode
+    {
+        uint32_t index;
+        uint32_t data;
+        SharedGcPtr<ListNode> next;
 
-    logic();
+        ListNode(uint32_t t_index, uint32_t t_data)
+            : index(t_index)
+            , data(t_data)
+            , next(nullptr)
+        {
+        }
+    };
+
+    SharedGcPtr<ListNode> ptr = MakeShared<ListNode>(0, 0x1337);
+    ptr->next = MakeShared<ListNode>(1, 0xdead);
+
+    std::cout << ptr << '\n';
+    std::cout << ptr->next << '\n';
+
+    g_memoryManager->VisHeapLayout(std::cout, ptr.Get());
+
+    CollectGarbage();
+
+    ptr = ptr->next;
+
     return 0;
 }

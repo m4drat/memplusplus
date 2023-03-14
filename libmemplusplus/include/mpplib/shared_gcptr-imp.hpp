@@ -336,8 +336,8 @@ namespace mpp {
                 delete m_references;
                 m_references = nullptr;
 
-                // TODO: should we really deallocate data, or we just need to delete it
-                // from chunksInUse + call object destructor
+                // If we have a pointer to an object, while m_references is 0 or less, we should
+                // deallocate this object as no one is pointing to it, so it's not used anymore.
                 if (this->m_objectPtr) {
                     Destroy();
                 }
