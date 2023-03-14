@@ -26,13 +26,6 @@ namespace mpp {
         //! @brief Currently used space in arena.
         std::size_t m_currentlyAllocatedSpace{ 0 };
 
-        /**
-         * @brief All chunks in use. Invalid before call to @sa ConstructChunksInUse.
-         * @warning call to ConstructChunksInUse by default doesn't rebuild this set if it's already
-         * built. So it might be outdated.
-         */
-        std::set<Chunk*> m_chunksInUse;
-
 #if MPP_STATS == 1
         /**
          * @brief Arena statistics.
@@ -199,17 +192,10 @@ namespace mpp {
 
         /**
          * @brief Constructs set of chunks, that are in use.
-         * @warning This function traverses all chunks in arena, and is very slow O(n).
-         * @warning By default this method doesn't rebuild chunksInUse if it was built earlier.
-         * So it might be outdated.
-         * @return std::set<Chunk*>& set of chunks
+         * @warning This function traverses all chunks in arena, and is quite slow O(n).
+         * @return std::set<Chunk*> set of chunks
          */
-        const std::set<Chunk*>& ConstructChunksInUse(bool t_rebuild = false);
-
-        /**
-         * @brief Clears m_chunksInUse set.
-         */
-        void ClearChunksInUse();
+        std::set<Chunk*> BuildChunksInUse();
 
         /**
          * @brief Returns amount of freed memory inside chunk treap

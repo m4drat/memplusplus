@@ -94,8 +94,8 @@ TEST_F(AllocatorTest, FDT_merge_into_top)
     ASSERT_TRUE((ch1 != nullptr && ch2 != nullptr));
     ASSERT_TRUE(ch1 < ch2);
 
-    EXPECT_TRUE(currentArena->ConstructChunksInUse().size() == 2);
-    for (Chunk* chunk : currentArena->ConstructChunksInUse())
+    EXPECT_TRUE(currentArena->BuildChunksInUse().size() == 2);
+    for (Chunk* chunk : currentArena->BuildChunksInUse())
         ASSERT_TRUE(chunk->GetSize() == alignedAllocationSize);
 
     // "Test double-linked list"
@@ -118,7 +118,7 @@ TEST_F(AllocatorTest, FDT_merge_into_top)
     ASSERT_TRUE(beforeMergeTopSize + alignedAllocationSize * 2 ==
                 currentArena->TopChunk()->GetSize());
 
-    EXPECT_TRUE(currentArena->ConstructChunksInUse(true).empty());
+    EXPECT_TRUE(currentArena->BuildChunksInUse().empty());
 }
 
 TEST_F(AllocatorTest, ADT_merge_into_top)
@@ -139,7 +139,7 @@ TEST_F(AllocatorTest, ADT_merge_into_top)
     ASSERT_TRUE(Chunk::GetHeaderPtr(ch1)->IsUsed() == 1);
     ASSERT_TRUE(Chunk::GetPrevChunk(currentArena->TopChunk()) == Chunk::GetHeaderPtr(ch1));
 
-    ASSERT_TRUE(currentArena->ConstructChunksInUse().size() == 1);
+    ASSERT_TRUE(currentArena->BuildChunksInUse().size() == 1);
 }
 
 TEST_F(AllocatorTest, DT_merge_into_top)
@@ -159,7 +159,7 @@ TEST_F(AllocatorTest, DT_merge_into_top)
     ASSERT_TRUE(currentArena->TopChunk()->IsUsed() == 1);
     ASSERT_TRUE(currentArena->TopChunk()->IsPrevInUse() == 1);
 
-    ASSERT_TRUE(currentArena->ConstructChunksInUse().empty());
+    ASSERT_TRUE(currentArena->BuildChunksInUse().empty());
 }
 
 TEST_F(AllocatorTest, T_merge_into_top)
@@ -179,7 +179,7 @@ TEST_F(AllocatorTest, T_merge_into_top)
     Deallocate(ch1);
     Deallocate(ch2);
 
-    ASSERT_TRUE(currentArena->ConstructChunksInUse().empty());
+    ASSERT_TRUE(currentArena->BuildChunksInUse().empty());
     ASSERT_TRUE(currentArena->TopChunk()->GetSize() == topChunkSizeBeforeMerging + 160 * 2);
 }
 
@@ -313,31 +313,31 @@ TEST_F(AllocatorTest, LinkedListChecks)
     Deallocate(p2);
     Deallocate(p4);
 
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 160)) ==
                 Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p5));
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p5) - sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p5));
 
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p1));
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p1) - sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p1));
 
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(p6) == Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(p6) == Chunk::GetHeaderPtr(p6));
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader))) ==
                 Chunk::GetHeaderPtr(p6));
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) - 1)) ==
                 Chunk::GetHeaderPtr(p5));
-    ASSERT_TRUE(GarbageCollector::FindChunkInUse(reinterpret_cast<void*>(
+    ASSERT_TRUE(g_memoryManager->GetGC().FindChunkInUse(reinterpret_cast<void*>(
                     reinterpret_cast<std::uintptr_t>(p6) - sizeof(Chunk::ChunkHeader) + 159)) ==
                 Chunk::GetHeaderPtr(p6));
 }

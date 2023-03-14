@@ -23,9 +23,9 @@ namespace mpp {
                                      ":" MPP_TO_STRING(__LINE__) "\n"))
 
 #ifdef MPP_DEBUG
-#define MPP_ASSERT(expr, msg) PRIVATE_MPP_ASSERT((expr), (msg))
+#define MPP_DEBUG_ASSERT(expr, msg) PRIVATE_MPP_ASSERT((expr), (msg))
 #else
-#define MPP_ASSERT(expr, msg)
+#define MPP_DEBUG_ASSERT(expr, msg)
 #endif
 
 #define MPP_RELEASE_ASSERT(expr, msg) PRIVATE_MPP_ASSERT((expr), (msg))
@@ -44,8 +44,8 @@ namespace mpp {
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
 #define MPP_SECURE_MEMSET(ptr, value, size)                                                        \
     do {                                                                                           \
-        MPP_ASSERT(ptr != nullptr, "Null pointer");                                                \
-        MPP_ASSERT(size > 0, "Size must be greater than 0");                                       \
+        MPP_DEBUG_ASSERT(ptr != nullptr, "Null pointer");                                          \
+        MPP_DEBUG_ASSERT(size > 0, "Size must be greater than 0");                                 \
         utils::SecureMemset(ptr, size, value, size);                                               \
     } while (0)
 #else

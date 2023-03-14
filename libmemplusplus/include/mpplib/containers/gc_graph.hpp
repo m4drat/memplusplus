@@ -13,6 +13,9 @@
 #include "mpplib/utils/profiler_definitions.hpp"
 
 namespace mpp {
+    class GarbageCollector;
+    class MemoryManager;
+
     /**
      * @brief Implements Graph structure to use specifically with chunks and gcPtr objects.
      */
@@ -35,11 +38,19 @@ namespace mpp {
          */
         std::set<Vertex*, VertexComparator> m_adjList;
 
+        //! @brief Reference to parent GarbageCollector object.
+        GarbageCollector& m_gc;
+
+        //! @brief Reference to parent MemoryManager object.
+        MemoryManager& m_memoryManager;
+
     public:
         /**
-         * @brief Default constructor for graph object.
+         * @brief Constructor to initialize graph with parent GarbageCollector and MemoryManager.
+         * @param t_gc - reference to parent GarbageCollector object.
+         * @param t_memoryManager - reference to parent MemoryManager object.
          */
-        GcGraph() = default;
+        GcGraph(GarbageCollector& t_gc, MemoryManager& t_memoryManager);
 
         /**
          * @brief Constructor to initialize from reference to another graph.
@@ -53,7 +64,9 @@ namespace mpp {
          * @param t_other vector of vertexes, to copy from.
          * @warning This copy constructor performs only shallow copy!
          */
-        explicit GcGraph(const std::vector<Vertex*>& t_other);
+        explicit GcGraph(const std::vector<Vertex*>& t_other,
+                         GarbageCollector& t_gc,
+                         MemoryManager& t_memoryManager);
 
         //! @brief Deleted copy constructor.
         GcGraph& operator=(const GcGraph& t_other) = delete;

@@ -3,7 +3,6 @@
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
 #include "mpplib/gc.hpp"
-#include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include <memory>
 #include <optional>

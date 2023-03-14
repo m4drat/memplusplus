@@ -243,6 +243,7 @@ namespace mpp {
     MemoryManager::MemoryManager()
         : m_allocateHook{ nullptr }
         , m_deallocateHook{ nullptr }
+        , m_gc{ *this }
     {
 #if MPP_FUZZER_INSECURE == 1 || MPP_DEBUG == 1
         std::srand(0); // NOLINT
@@ -339,6 +340,7 @@ namespace mpp {
         PROFILE_FUNCTION();
 
         for (auto& arena : m_arenaList) {
+            MPP_DEBUG_ASSERT(arena.get(), "Arena is a nullptr!");
             if (t_ptr >= arena->BeginPtr() && t_ptr <= arena->EndPtr()) {
                 return arena;
             }

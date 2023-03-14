@@ -6,8 +6,16 @@
 #include "mpplib/utils/utils.hpp"
 
 namespace mpp {
+    GcGraph::GcGraph(GarbageCollector& t_gc, MemoryManager& t_memoryManager)
+        : m_gc(t_gc)
+        , m_memoryManager(t_memoryManager)
+    {
+    }
+
     // WARNING: creates SHALLOW copy
     GcGraph::GcGraph(GcGraph& t_other)
+        : m_gc(t_other.m_gc)
+        , m_memoryManager(t_other.m_memoryManager)
     {
         for (auto* vertex : t_other.GetAdjList()) {
             m_adjList.insert(vertex);
@@ -15,7 +23,11 @@ namespace mpp {
     }
 
     // WARNING: creates SHALLOW copy
-    GcGraph::GcGraph(const std::vector<Vertex*>& t_other)
+    GcGraph::GcGraph(const std::vector<Vertex*>& t_other,
+                     GarbageCollector& t_gc,
+                     MemoryManager& t_memoryManager)
+        : m_gc(t_gc)
+        , m_memoryManager(t_memoryManager)
     {
         for (auto* vertex : t_other) {
             m_adjList.insert(vertex);
@@ -44,9 +56,8 @@ namespace mpp {
     void GcGraph::AddObjectInfo(GcPtr* t_gcPtr)
     {
         PROFILE_FUNCTION();
-
-        Chunk* gcPtrObjectChunk = GarbageCollector::FindChunkInUse(t_gcPtr->GetVoid());
-        Chunk* gcPtrLocationChunk = GarbageCollector::FindChunkInUse(t_gcPtr);
+        Chunk* gcPtrObjectChunk = m_gc.FindChunkInUse(t_gcPtr->GetVoid());
+        Chunk* gcPtrLocationChunk = m_gc.FindChunkInUse(t_gcPtr);
 
         // Check that "to" vertex already exists in graph
         Vertex* destination = FindVertex(gcPtrObjectChunk);
@@ -93,7 +104,7 @@ namespace mpp {
         t_out << "\tnode[ style=filled ];\n";
 
         // Create all chunks
-        for (auto& arena : g_memoryManager->GetArenaList()) {
+        for (auto& arena : m_memoryManager.GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -135,7 +146,7 @@ namespace mpp {
         t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
         t_out << "\t\t<TR>\n";
 
-        for (auto& arena : g_memoryManager->GetArenaList()) {
+        for (auto& arena : m_memoryManager.GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -166,7 +177,7 @@ namespace mpp {
         t_out << "\t</table>>];\n";
 
         // Draw connection to the flat heap view
-        for (auto& arena : g_memoryManager->GetArenaList()) {
+        for (auto& arena : m_memoryManager.GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 std::string chunkAddrStr = utils::AddrToString((void*)pos);
@@ -203,7 +214,7 @@ namespace mpp {
         t_out << "\t<table BORDER=\"0\" CELLBORDER=\"1\" CELLSPACING=\"0\" CELLPADDING=\"4\">\n";
         t_out << "\t\t<TR>\n";
 
-        for (auto& arena : g_memoryManager->GetArenaList()) {
+        for (auto& arena : m_memoryManager.GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -236,12 +247,12 @@ namespace mpp {
         t_out << "\t// Draw all chunks (begin)\n";
         t_out << "\tnode[ style=\"filled\" ];\n";
 
-        std::set<GcPtr*> nonHeapGcPtrs = g_memoryManager->GetGC().GetOrderedGcPtrs();
+        std::set<GcPtr*> nonHeapGcPtrs = m_memoryManager.GetGC().GetOrderedGcPtrs();
         std::set<GcPtr*> orderedGcPtrs = nonHeapGcPtrs;
 
         uint32_t gcptrIndex = 1;
 
-        for (auto& arena : g_memoryManager->GetArenaList()) {
+        for (auto& arena : m_memoryManager.GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -298,7 +309,7 @@ namespace mpp {
                       << chunkAddrStr << " and chunks\n";
                 for (auto* gcPtr : chunkAsVertex->GetAllOutgoingGcPtrs(orderedGcPtrs)) {
                     std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
-                    Chunk* pointsToChunk = GarbageCollector::FindChunkInUse(gcPtr->GetVoid());
+                    Chunk* pointsToChunk = m_gc.FindChunkInUse(gcPtr->GetVoid());
                     Vertex* pointsToVertex = FindVertex(pointsToChunk);
                     bool pointsToCluster =
                         (pointsToVertex)
@@ -329,7 +340,7 @@ namespace mpp {
         t_out << "\n\t// Draw connections between non-heap GC-pointers and chunks\n";
         for (auto* gcPtr : nonHeapGcPtrs) {
             std::string gcPtrAddrStr = utils::AddrToString((void*)gcPtr);
-            Chunk* pointsToChunk = GarbageCollector::FindChunkInUse(gcPtr->GetVoid());
+            Chunk* pointsToChunk = m_gc.FindChunkInUse(gcPtr->GetVoid());
             Vertex* pointsToVertex = FindVertex(pointsToChunk);
             bool pointsToCluster =
                 (pointsToVertex) ? !pointsToVertex->GetAllOutgoingGcPtrs(orderedGcPtrs).empty()
@@ -355,7 +366,7 @@ namespace mpp {
 
         // Draw connection to the flat heap view
         t_out << "\n\t// Draw connections from all chunks to the flat heap view\n";
-        for (auto& arena : g_memoryManager->GetArenaList()) {
+        for (auto& arena : m_memoryManager.GetArenaList()) {
             for (std::byte* pos = arena->BeginPtr(); pos < arena->EndPtr();
                  pos += reinterpret_cast<Chunk*>(pos)->GetSize()) {
                 auto* currChunk = reinterpret_cast<Chunk*>(pos);
@@ -456,7 +467,8 @@ namespace mpp {
         while (!adjListCopy.empty()) {
             // Find connected component inside graph
             std::unique_ptr<GcGraph, std::function<void(GcGraph*)>> connectedComponent(
-                new GcGraph(UndirectedDFS(*(adjListCopy.begin()))), [](GcGraph* t_graph) {
+                new GcGraph(UndirectedDFS(*(adjListCopy.begin())), m_gc, m_memoryManager),
+                [](GcGraph* t_graph) {
                     t_graph->GetAdjList().clear();
                     operator delete(t_graph);
                 });
