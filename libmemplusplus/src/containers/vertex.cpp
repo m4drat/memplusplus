@@ -84,7 +84,7 @@ namespace mpp {
 
     Chunk* Vertex::GetLocationAsAChunk() const
     {
-        MPP_ASSERT(m_currLocationIsAChunk, "Current location is not a chunk!");
+        MPP_DEBUG_ASSERT(m_currLocationIsAChunk, "Current location is not a chunk!");
         return reinterpret_cast<Chunk*>(m_correspondingLocation);
     }
 

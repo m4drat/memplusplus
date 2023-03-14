@@ -2,9 +2,7 @@
 
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
-#include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gcptr.hpp"
-#include "mpplib/heuristics/heuristics.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_STATS == 1
@@ -24,6 +22,9 @@
 #include <vector>
 
 namespace mpp {
+    // Forward declaration
+    class MemoryManager;
+
     /**
      * @brief GarbageCollector class.
      */
@@ -47,17 +48,26 @@ namespace mpp {
          */
         std::unordered_set<GcPtr*> m_activeGcPtrs;
 
+        //! @brief Cache of chunks in use for each arena.
+        std::unordered_map<Arena*, std::set<Chunk*>> m_chunksInUseCache;
+
 #if MPP_STATS == 1
-        //! @brief Used to keep track of garbage collector stats
+        //! @brief Used to keep track of garbage collector stats.
         std::unique_ptr<utils::Statistics::GcStats> m_gcStats;
 #endif
 
-        //! @brief Current cycle to dump objects graph
+        //! @brief Total number of garbage collector invocations.
         uint32_t m_totalInvocations;
 
+        //! @brief Reference to parent MemoryManager object.
+        MemoryManager& m_memoryManager;
+
     public:
-        //! @brief Construct a new GC object
-        GarbageCollector();
+        /**
+         * @brief Construct a new Garbage Collector object
+         * @param t_memoryManager Reference to parent MemoryManager object.
+         */
+        explicit GarbageCollector(MemoryManager& t_memoryManager);
 
         /**
          * @brief Collect garbage.
@@ -72,10 +82,10 @@ namespace mpp {
 
         /**
          * @brief Returns in-use chunk if t_ptr points inside it, nullptr otherwise.
-         * @param t_ptr Pointer to find chunk for
-         * @return Chunk* Pointer to chunk if t_ptr points inside it, nullptr otherwise
+         * @param t_ptr Pointer to find chunk for.
+         * @return Chunk* Pointer to chunk if t_ptr points inside it, nullptr otherwise.
          */
-        static Chunk* FindChunkInUse(void* t_ptr);
+        Chunk* FindChunkInUse(void* t_ptr);
 
         /**
          * @brief Get reference to unordered set of currently active GcPtr's

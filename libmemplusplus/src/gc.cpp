@@ -1,5 +1,7 @@
 #include "mpplib/gc.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/containers/gc_graph.hpp"
+#include "mpplib/heuristics/heuristics.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/macros.hpp"
 #include <algorithm>
@@ -8,26 +10,34 @@
 #include <unordered_map>
 
 namespace mpp {
-    GarbageCollector::GarbageCollector()
-        : m_totalInvocations(1)
+    GarbageCollector::GarbageCollector(MemoryManager& t_memoryManager)
+        : m_totalInvocations(0)
+        , m_memoryManager(t_memoryManager)
     {
 #if MPP_STATS == 1
         m_gcStats = std::make_unique<utils::Statistics::GcStats>();
 #endif
     }
 
-    // @FIXME: This method should be defined inside MemoryManager?
     Chunk* GarbageCollector::FindChunkInUse(void* t_ptr)
     {
         PROFILE_FUNCTION();
 
-        auto arena = g_memoryManager->GetArenaByPtr(t_ptr);
-        if (!arena.has_value())
+        // Find arena by pointer
+        auto arenaOpt = m_memoryManager.GetArenaByPtr(t_ptr);
+        if (!arenaOpt.has_value())
             return nullptr;
 
-        const std::set<Chunk*>& chunksInUse = arena.value().get()->ConstructChunksInUse();
+        std::unique_ptr<Arena>& arena = arenaOpt.value().get();
 
-        // Find chunk by pointer
+        // Build chunks in use cache if not present
+        if (!m_chunksInUseCache.contains(arena.get())) {
+            m_chunksInUseCache[arena.get()] = arena->BuildChunksInUse();
+        }
+
+        const std::set<Chunk*>& chunksInUse = m_chunksInUseCache[arena.get()];
+
+        // Find a chunk by pointer
         auto foundChunkIt = chunksInUse.lower_bound(reinterpret_cast<Chunk*>(t_ptr));
         if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
             return *foundChunkIt;
@@ -58,7 +68,7 @@ namespace mpp {
             2.3 Delete unused arenas (including chunkTreap, etc)
             2.4 reset GC state
         */
-        std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>();
+        std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>(*this, m_memoryManager);
 
         // Construct chunks graph
         for (auto* gcPtr : m_activeGcPtrs) {
@@ -105,7 +115,7 @@ namespace mpp {
         }
         godArenaSize = MM::Align(godArenaSize, MM::g_PAGE_SIZE);
 
-        auto& godArena = g_memoryManager->CreateArena(godArenaSize);
+        auto& godArena = m_memoryManager.CreateArena(godArenaSize);
 
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
@@ -160,10 +170,11 @@ namespace mpp {
                     // with different layout is added). It even might break because compiler
                     // decides to reorder members of SharedGcPtr between different
                     // instantiations
+                    // TODO: Maybe use pointer to member with the dynamic_cast?
                     auto* gcPtrInternalPointer = reinterpret_cast<std::size_t*>(
                         gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
 
-                    MPP_ASSERT(
+                    MPP_DEBUG_ASSERT(
                         reinterpret_cast<std::byte*>(gcPtrInternalPointer + sizeof(std::size_t)) <=
                             godArena->EndPtr(),
                         "GcPtr's internal pointer is out of newly created arena's bounds");
@@ -195,7 +206,7 @@ namespace mpp {
         godArena->SetUsedSpace(layoutedData.layoutedSize);
         godArena->TopChunk() = topChunk;
 
-        auto& arenaList = g_memoryManager->GetArenaList();
+        auto& arenaList = m_memoryManager.GetArenaList();
         arenaList.erase(std::remove_if(
             arenaList.begin(), arenaList.end(), [&](std::unique_ptr<Arena>& t_arena) {
                 if (t_arena.get() == godArena.get())

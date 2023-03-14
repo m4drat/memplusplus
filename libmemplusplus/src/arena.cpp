@@ -1,4 +1,5 @@
 #include "mpplib/arena.hpp"
+#include "mpplib/chunk.hpp"
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/utils/macros.hpp"
 
@@ -32,24 +33,17 @@ namespace mpp {
         MemoryManager::SysDealloc(this->m_Begin, m_size);
     }
 
-    const std::set<Chunk*>& Arena::ConstructChunksInUse(bool t_rebuild)
+    std::set<Chunk*> Arena::BuildChunksInUse()
     {
-        if (t_rebuild || m_chunksInUse.empty()) {
-            m_chunksInUse.clear();
+        std::set<Chunk*> chunksInUse;
 
-            for (Chunk& chunk : *this) {
-                if (chunk.IsUsed() && (&chunk != m_topChunk)) {
-                    m_chunksInUse.insert(&chunk);
-                }
+        for (Chunk& chunk : *this) {
+            if (chunk.IsUsed() && (&chunk != m_topChunk)) {
+                chunksInUse.insert(&chunk);
             }
         }
 
-        return m_chunksInUse;
-    }
-
-    void Arena::ClearChunksInUse()
-    {
-        m_chunksInUse.clear();
+        return chunksInUse;
     }
 
     std::size_t Arena::FreeMemoryInsideChunkTreap() const
@@ -339,7 +333,7 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        const std::set<Chunk*>& chunksInUse = t_arena->ConstructChunksInUse(true);
+        const std::set<Chunk*> chunksInUse = t_arena->BuildChunksInUse();
 
         t_out << "-------------- Arena: " << reinterpret_cast<void*>(t_arena.get())
               << " --------------" << std::endl;
