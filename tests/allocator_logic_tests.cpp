@@ -398,8 +398,10 @@ TEST_F(AllocatorTest, FreeListAllocationWithSplit)
     Deallocate(p2);
     Deallocate(p3);
 
+#if MPP_STATS == 1 || MPP_DEBUG == 1
     // Visualize heap layout just to check that at least it doesn't segfault 🤷
     g_memoryManager->VisHeapLayout(ss, nullptr);
+#endif
 
     ASSERT_EQ(g_memoryManager->GetArenaList().size(), 1);
     ASSERT_EQ((*g_memoryManager->GetArenaList().begin())->GetFreedChunks().TotalFreeChunks(), 1);
@@ -420,8 +422,10 @@ TEST_F(AllocatorTest, FreeListAllocationWithSplit)
     void* p7 = Allocate(520);
     ASSERT_EQ(Chunk::GetHeaderPtr(p7), chunkToReturn);
 
+#if MPP_STATS == 1 || MPP_DEBUG == 1
     // Dump arena just to check that at least it doesn't segfault 🤷
     Arena::DumpArena(ss, *g_memoryManager->GetArenaList().begin(), true, true);
+#endif
 }
 
 /* For ctrl+c, ctrl-V
