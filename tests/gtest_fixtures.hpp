@@ -18,7 +18,7 @@ protected:
     }
 };
 
-class AllocatorTest : public ::testing::Test
+class AllocatorTest : public MppTestBase
 {};
 
 class SharedGcPtrTest : public MppTestBase
@@ -28,4 +28,7 @@ class SharedGcArrayTests : public MppTestBase
 {};
 
 class GcTest : public MppTestBase
+{};
+
+class AsanTest : public MppTestBase
 {};

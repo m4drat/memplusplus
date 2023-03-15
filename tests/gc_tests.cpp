@@ -137,6 +137,42 @@ TEST_F(GcTest, TestDanglingCyclesAreDestroyed)
     SharedGcPtr<int32_t> b1 = MakeShared<int32_t>(1339);
 }
 
+TEST_F(GcTest, ReferenceToItself1)
+{
+    using namespace mpp;
+
+    struct alignas(64) ListNode
+    {
+        uint32_t index;
+        uint32_t data;
+        SharedGcPtr<ListNode> next;
+
+        ListNode(uint32_t t_index, uint32_t t_data)
+            : index(t_index)
+            , data(t_data)
+            , next(nullptr)
+        {
+        }
+    };
+
+    SharedGcPtr<ListNode> ptr = MakeShared<ListNode>(0, 0x1337);
+    ptr->next = MakeShared<ListNode>(1, 0xdead);
+
+    ASSERT_TRUE(ptr.UseCount() == 1);
+    ASSERT_TRUE(ptr->data == 0x1337);
+    ASSERT_TRUE(ptr->next.UseCount() == 1);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
+    ptr = ptr->next;
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
+
+    CollectGarbage();
+
+    ASSERT_TRUE(ptr.UseCount() == 1);
+    ASSERT_TRUE(ptr->data == 0xdead);
+    ASSERT_TRUE(ptr->next == nullptr);
+    ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
+}
+
 TEST_F(GcTest, DISABLED_CollectX5)
 {
     using namespace mpp;
