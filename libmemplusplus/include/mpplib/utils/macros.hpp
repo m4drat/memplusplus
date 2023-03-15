@@ -22,7 +22,7 @@ namespace mpp {
             : mpp::utils::ErrorAbort("Assertation " #expr " failed in: " __FILE__                  \
                                      ":" MPP_TO_STRING(__LINE__) "\n"))
 
-#ifdef MPP_DEBUG
+#if MPP_DEBUG == 1
 #define MPP_DEBUG_ASSERT(expr, msg) PRIVATE_MPP_ASSERT((expr), (msg))
 #else
 #define MPP_DEBUG_ASSERT(expr, msg)
@@ -32,13 +32,17 @@ namespace mpp {
 
 #if MPP_DEBUG == 1 || MPP_ENABLE_LOGGING == 1
 #define MPP_LOG(level, msg)                                                                        \
-    std::cout << level << " " << __FILE__ << ":" << __LINE__ << " > " << msg << std::endl
+    std::cout << level << " " << __FILE__ << ":" << __LINE__ << " > " << msg << std::endl;
 #define MPP_LOG_DBG(msg) MPP_LOG("❓  DBG:", msg)
 #define MPP_LOG_WARN(msg) MPP_LOG("🚧 WARN:", msg)
 #define MPP_LOG_INFO(msg) MPP_LOG("📘 INFO:", msg)
 #define MPP_LOG_ERROR(msg) MPP_LOG("❌  ERR:", msg)
 #else
 #define MPP_LOG(level, msg)
+#define MPP_LOG_DBG(msg)
+#define MPP_LOG_WARN(msg)
+#define MPP_LOG_INFO(msg)
+#define MPP_LOG_ERROR(msg)
 #endif
 
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1

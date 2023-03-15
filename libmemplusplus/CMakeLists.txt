@@ -104,7 +104,7 @@ else()
 endif()
 
 if(MPP_STATS MATCHES "ON" AND MPP_DEBUG MATCHES "OFF")
-	message(FATAL "Statistics cannot be enabled in non-debug mode!")
+	message(FATAL_ERROR "Statistics cannot be enabled in non-debug mode!")
 elseif(MPP_STATS MATCHES "ON" AND MPP_DEBUG MATCHES "ON")
 	message(STATUS "Building with support of statistics dumping: MPP_STATS=1")
 	list(APPEND MPP_DEFINES MPP_STATS=1)
