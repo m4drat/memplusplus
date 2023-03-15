@@ -79,10 +79,12 @@ namespace mpp {
 
 #if defined MPP_VALGRIND
 #define MPP_RUNNING_ON_VALGRIND (RUNNING_ON_VALGRIND)
-#define MPP_VALGRIND_MALLOCLIKE_BLOCK(ptr, size) VALGRIND_MALLOCLIKE_BLOCK((ptr), (size), 0, 0);
-#define MPP_VALGRIND_FREELIKE_BLOCK(ptr) VALGRIND_FREELIKE_BLOCK((ptr), 0);
-#define MPP_VALGRIND_MAKE_MEM_DEFINED(ptr, size) VALGRIND_MAKE_MEM_DEFINED((ptr), (size));
-#define MPP_VALGRIND_MAKE_MEM_UNDEFINED(ptr, size) VALGRIND_MAKE_MEM_UNDEFINED((ptr), (size));
+#define MPP_VALGRIND_MALLOCLIKE_BLOCK(ptr, size)                                                   \
+    VALGRIND_MALLOCLIKE_BLOCK((ptr), (size), 0, 0);                                        // NOLINT
+#define MPP_VALGRIND_FREELIKE_BLOCK(ptr) VALGRIND_FREELIKE_BLOCK((ptr), 0);                // NOLINT
+#define MPP_VALGRIND_MAKE_MEM_DEFINED(ptr, size) VALGRIND_MAKE_MEM_DEFINED((ptr), (size)); // NOLINT
+#define MPP_VALGRIND_MAKE_MEM_UNDEFINED(ptr, size)                                                 \
+    VALGRIND_MAKE_MEM_UNDEFINED((ptr), (size)); // NOLINT
 #define MPP_VALGRIND_DEFINE_CHUNK_HEADER(chunk)                                                    \
     MPP_VALGRIND_MAKE_MEM_DEFINED((chunk), sizeof(Chunk::ChunkHeader));
 #define MPP_VALGRIND_DEFINE_CHUNK(chunk)                                                           \

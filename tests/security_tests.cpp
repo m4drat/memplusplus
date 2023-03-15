@@ -9,41 +9,6 @@
 
 #include "gtest_fixtures.hpp"
 
-TEST_F(AllocatorTest, DISABLED_DoubleFree_1)
-{
-    using namespace mpp;
-
-    std::vector<void*> ptrs;
-    ptrs.push_back(Allocate(128));
-    ptrs.push_back(Allocate(256));
-    ptrs.push_back(Allocate(512));
-    ptrs.push_back(Allocate(16));
-    ptrs.push_back(Allocate(128));
-    ptrs.push_back(Allocate(256));
-    ptrs.push_back(Allocate(512));
-    ptrs.push_back(Allocate(1024));
-    ptrs.push_back(Allocate(128));
-    ptrs.push_back(Allocate(128));
-    ptrs.push_back(Allocate(2048));
-    ptrs.push_back(Allocate(128));
-    ptrs.push_back(Allocate(128));
-    ptrs.push_back(Allocate(128));
-
-    Deallocate(ptrs[0]);
-    Deallocate(ptrs[2]);
-    Deallocate(ptrs[4]);
-    Deallocate(ptrs[6]);
-    Deallocate(ptrs[8]);
-    Deallocate(ptrs[7]);
-    Deallocate(ptrs[10]);
-    Deallocate(ptrs[12]);
-
-    // DoubleFree
-    EXPECT_EXIT({ Deallocate((void*)ptrs[8]); },
-                testing::KilledBySignal(SIGABRT),
-                "Double free or corruption detected!");
-}
-
 TEST_F(AllocatorTest, InvalidFree)
 {
     using namespace mpp;

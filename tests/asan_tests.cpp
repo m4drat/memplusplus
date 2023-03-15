@@ -9,7 +9,42 @@
 
 #include "gtest_fixtures.hpp"
 
-TEST_F(AllocatorTest, UseAfterFreeRead)
+TEST_F(AsanTest, DoubleFree)
+{
+    using namespace mpp;
+
+    std::vector<void*> ptrs;
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(256));
+    ptrs.push_back(Allocate(512));
+    ptrs.push_back(Allocate(16));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(256));
+    ptrs.push_back(Allocate(512));
+    ptrs.push_back(Allocate(1024));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(2048));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+    ptrs.push_back(Allocate(128));
+
+    Deallocate(ptrs[0]);
+    Deallocate(ptrs[2]);
+    Deallocate(ptrs[4]);
+    Deallocate(ptrs[6]);
+    Deallocate(ptrs[8]);
+    Deallocate(ptrs[7]);
+    Deallocate(ptrs[10]);
+    Deallocate(ptrs[12]);
+
+    // DoubleFree
+    EXPECT_EXIT({ Deallocate((void*)ptrs[8]); },
+                testing::ExitedWithCode(SIGHUP),
+                "AddressSanitizer: use-after-poison on address");
+}
+
+TEST_F(AsanTest, UseAfterFreeRead)
 {
     using namespace mpp;
 
@@ -24,7 +59,7 @@ TEST_F(AllocatorTest, UseAfterFreeRead)
                 "READ of size 8");
 }
 
-TEST_F(AllocatorTest, UseAfterFreeWrite)
+TEST_F(AsanTest, UseAfterFreeWrite)
 {
     using namespace mpp;
 

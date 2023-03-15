@@ -171,7 +171,7 @@ int main()
 
     g_memoryManager->VisHeapLayout(std::cout, ptr.Get());
 
-    CollectGarbage();
+    // CollectGarbage();
 
     ptr = ptr->next;
 

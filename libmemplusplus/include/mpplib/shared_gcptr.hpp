@@ -14,9 +14,7 @@ namespace mpp {
     {
     protected:
         using ElementType = typename std::remove_extent<Type>::type;
-        /**
-         * @brief pointer to object.
-         */
+        //! @brief pointer to the object.
         ElementType* m_objectPtr{ nullptr };
     };
 
@@ -24,16 +22,13 @@ namespace mpp {
     class SharedGcPtrArray
     {
     protected:
-        /**
-         * @brief Size of the created array
-         */
+        //! @brief Size of the created array
         uint32_t m_arraySize = 0;
     };
 
     template<>
     class SharedGcPtrArray<false>
-    {
-    };
+    {};
 
     /**
      * @brief SharedGcPtr class. Behaves like normal shared ptr.
@@ -50,20 +45,18 @@ namespace mpp {
     protected:
         using ElementType = typename std::remove_extent<Type>::type;
 
-        /**
-         * @brief Number of references to the object.
-         */
+        //! @brief Number of references to the object.
         uint32_t* m_references{ nullptr };
 
-        /**
-         * @brief Releases the object, decrementing m_references.
-         */
+        //! @brief Releases the object, decrementing m_references.
         void DeleteReference();
 
+        //! @brief Decrements the reference counter and deletes the object if number of references
+        //! is 0.
+        void DecrementRefCounter();
+
     public:
-        /**
-         * @brief Default constructor.
-         */
+        //! @brief Default constructor.
         SharedGcPtr();
 
         /**
@@ -97,9 +90,7 @@ namespace mpp {
          */
         SharedGcPtr(Type t_obj, uint32_t t_arraySize);
 
-        /**
-         * @brief Destroy SharedGcPtr.
-         */
+        //! @brief Destroys SharedGcPtr.
         ~SharedGcPtr() override;
 
         // SharedGcPtr<Type>& operator=(SharedGcPtr t_other);
@@ -134,34 +125,22 @@ namespace mpp {
          */
         SharedGcPtr<Type>& operator=(std::nullptr_t t_newData);
 
-        /**
-         * @brief check, if two SharedGcPtr's are equal.
-         */
+        //! @brief check, if two SharedGcPtr's are equal.
         bool operator==(const SharedGcPtr& t_other) noexcept;
 
-        /**
-         * @brief check, if two SharedGcPtr's are not equal.
-         */
+        //! @brief check, if two SharedGcPtr's are not equal.
         bool operator!=(const SharedGcPtr& t_other) noexcept;
 
-        /**
-         * @brief check, that lhs is less than or equal to rhs.
-         */
+        //! @brief check, that lhs is less than or equal to rhs.
         bool operator<=(const SharedGcPtr& t_other) noexcept;
 
-        /**
-         * @brief check, that lhs is less than rhs.
-         */
+        //! @brief check, that lhs is less than rhs.
         bool operator<(const SharedGcPtr& t_other) noexcept;
 
-        /**
-         * @brief check, that lhs is greater than or equal to rhs.
-         */
+        //! @brief check, that lhs is greater than or equal to rhs.
         bool operator>=(const SharedGcPtr& t_other) noexcept;
 
-        /**
-         * @brief check, that lhs is greater than rhs.
-         */
+        //! @brief check, that lhs is greater than rhs.
         bool operator>(const SharedGcPtr& t_other) noexcept;
 
         /**
@@ -176,14 +155,10 @@ namespace mpp {
          */
         ElementType& operator*() const noexcept;
 
-        /**
-         * @brief Allows automatic conversions to bool.
-         */
+        //! @brief Allows automatic conversions to bool.
         explicit operator bool() const;
 
-        /**
-         * @brief Calculates distance between two pointers
-         */
+        //! @brief Calculates distance between two pointers
         std::ptrdiff_t operator-(const SharedGcPtr<Type>& t_other) const noexcept;
 
         /**
@@ -207,14 +182,10 @@ namespace mpp {
          */
         void Reset();
 
-        /**
-         * @brief Resets smart pointer. Decrements references counter.
-         */
+        //! @brief Resets smart pointer. Decrements references counter.
         void Reset(std::nullptr_t);
 
-        /**
-         * @brief Calls object destructor and deallocates memory
-         */
+        //! @brief Calls object destructor and deallocates memory
         void Destroy();
 
         /**
@@ -224,7 +195,7 @@ namespace mpp {
         void Swap(SharedGcPtr& t_other);
 
         /**
-         * @brief Returns raw pointer to user data.
+         * @brief Returns a raw pointer to user data.
          * @return Type* raw pointer to user data
          */
         ElementType* Get() const noexcept;
@@ -269,9 +240,9 @@ namespace mpp {
     };
 
     /**
-     * @brief Method to construct new SharedGcPtr. It will allocate enough space, create
+     * @brief Method that constructs a new SharedGcPtr. It will allocate enough space, create the
      * object and construct it.
-     * @tparam T type of user object.
+     * @tparam T type of the user object.
      * @tparam Args type of variadic arguments to pass to user object constructor.
      * @param t_args variadic arguments to pass to user object constructor.
      * @return SharedGcPtr<T> constructed SharedGcPtr.
@@ -286,10 +257,10 @@ namespace mpp {
     }
 
     /**
-     * @brief Method to construct new SharedGcPtr that holds an array.
-     * It will allocate enough space, create object and construct it.
+     * @brief Method that constructs a new SharedGcPtr that holds an array.
+     * It will allocate enough space, create the object and construct it.
      *
-     * @tparam T type of user object.
+     * @tparam T type of the user object.
      * @tparam Args type of variadic arguments to pass to user object constructor.
      * @param t_size array length
      * @param t_args variadic arguments to pass to user object constructor.

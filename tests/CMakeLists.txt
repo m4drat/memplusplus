@@ -11,7 +11,8 @@ list(APPEND MPP_TESTS_SOURCES
 )
 
 if(MPP_SANITIZERS MATCHES "ON")
-    list(APPEND MPP_TEST_SOURCES asan_tests.cpp)
+    message(STATUS "Sanitizers are enabled, adding asan tests")
+    list(APPEND MPP_TESTS_SOURCES asan_tests.cpp)
 endif()
 
 # Add a testing executable

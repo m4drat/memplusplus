@@ -3,6 +3,7 @@
 #include "mpplib/gc.hpp"
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 #include "mpplib/utils/utils.hpp"
 
@@ -27,8 +28,7 @@ namespace mpp {
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(std::nullptr_t t_newData)
         : SharedGcPtr()
-    {
-    }
+    {}
 
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(ElementType* obj)
@@ -70,13 +70,12 @@ namespace mpp {
             ++(*m_references);
         }
 
-        // Insert newly created shared ptr to list of all
-        // active gc ptrs
+        // Insert newly created shared ptr to the list of all active gc ptrs.
         if (this->m_objectPtr != nullptr) {
             AddToGcList();
         }
 
-        // Update size if array
+        // Update size if array.
         if constexpr (std::is_array<Type>::value) {
             this->m_arraySize = t_other.m_arraySize;
         }
@@ -132,25 +131,54 @@ namespace mpp {
             return *this;
         }
 
-        // Delete reference
-        DeleteReference();
+        bool isActiveGcPtr = this->m_objectPtr != nullptr;
+        bool otherIsActiveGcPtr = t_other.m_objectPtr != nullptr;
 
-        // Update fields of assigned object
-        this->m_objectPtr = t_other.m_objectPtr;
-        m_references = t_other.m_references;
+        // Copy t_other fields, so that if DecrementRefCounter is going to delete the object, the
+        // fields will still be valid.
+        auto* newObjectPtr = t_other.m_objectPtr;
+        auto* newReferences = t_other.m_references;
 
-        // If needed add to list of all active gc ptr
+        // Copy array size if we are working with an array.
+        uint32_t arraySize = 0;
+        if constexpr (std::is_array<Type>::value) {
+            arraySize = t_other.m_arraySize;
+        }
+
+        // Increase t_other references count.
+        if (t_other.m_references)
+            ++(*t_other.m_references);
+
+        // Decrement current shared pointer references count.
+        // WARNING: This must be done after increasing t_other references count, and after copying
+        // t_other fields!
+        DecrementRefCounter();
+
+        // Update fields of the assigned object.
+        this->m_objectPtr = newObjectPtr;
+        m_references = newReferences;
+
+        // Update size if array.
+        if constexpr (std::is_array<Type>::value) {
+            this->m_arraySize = arraySize;
+        }
+
+        // Fast path: If both are active gc ptrs, or both are not active gc ptrs, then just
+        // return a pointer with updated fields. No need to remove from/insert to the gc list.
+        bool skipGcListUpdates =
+            (isActiveGcPtr && otherIsActiveGcPtr) || (!isActiveGcPtr && !otherIsActiveGcPtr);
+        if (skipGcListUpdates) {
+            return *this;
+        }
+
+        // Slow path: If current pointer was an active gc ptr, but the other is not, or vice versa,
+        // remove it from the gc list.
+        if (isActiveGcPtr)
+            DeleteFromGcList();
+
+        // If required add to list of all active gc ptrs.
         if (this->m_objectPtr != nullptr)
             AddToGcList();
-
-        // Increase references count
-        if (m_references)
-            ++(*m_references);
-
-        // Update size if array
-        if constexpr (std::is_array<Type>::value) {
-            this->m_arraySize = t_other.m_arraySize;
-        }
 
         return *this;
     }
@@ -273,10 +301,6 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        // If current object points to nullptr do nothing
-        if (this->m_objectPtr == nullptr)
-            return false;
-
         auto& gcPtrs = g_memoryManager->GetGC().GetGcPtrs();
 
         // Delete shared ptr from list of all active gc ptrs
@@ -323,14 +347,27 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
 
-        DeleteFromGcList();
+        // Remove current object from list of all active gc ptrs.
+        // If current object pointer is nullptr - do nothing.
+        if (this->m_objectPtr)
+            DeleteFromGcList();
 
+        // Decrement reference counter.
+        DecrementRefCounter();
+
+        m_references = nullptr;
+        this->m_objectPtr = nullptr;
+    }
+
+    template<class Type>
+    void SharedGcPtr<Type>::DecrementRefCounter()
+    {
         // If m_references isn't nullptr
         if (m_references) {
-            // Decrease references count
+            // De
             --(*m_references);
 
-            // Destroy shared ptr and object
+            // Destroy shared ptr and the object
             if (*m_references <= 0) {
                 // Delete references variable
                 delete m_references;
@@ -343,9 +380,6 @@ namespace mpp {
                 }
             }
         }
-
-        m_references = nullptr;
-        this->m_objectPtr = nullptr;
     }
 
     template<class Type>
