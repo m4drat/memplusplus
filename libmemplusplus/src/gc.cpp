@@ -175,7 +175,7 @@ namespace mpp {
                         gcPtrNewLoc + offsetof(SharedGcPtr<int>, m_objectPtr));
 
                     MPP_DEBUG_ASSERT(
-                        reinterpret_cast<std::byte*>(gcPtrInternalPointer + sizeof(std::size_t)) <=
+                        reinterpret_cast<std::byte*>(gcPtrInternalPointer) + sizeof(void*) <=
                             godArena->EndPtr(),
                         "GcPtr's internal pointer is out of newly created arena's bounds");
 
