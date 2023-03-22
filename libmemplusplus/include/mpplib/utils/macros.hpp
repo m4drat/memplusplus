@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#if defined MPP_SANITIZERS
+#if __has_include(<sanitizer/asan_interface.h>) && defined (MPP_SANITIZERS)
 #include <sanitizer/asan_interface.h>
 #endif
 

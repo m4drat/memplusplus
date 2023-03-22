@@ -5,8 +5,49 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <variant>
+#include <vector>
 
 namespace mpp { namespace fuzzer {
+#define CHECK_MORE_DATA()                                                                          \
+    if (currentDataPtr >= dataEnd) {                                                               \
+        currentCommand = Command(Operation::Invalid, {});                                          \
+        break;                                                                                     \
+    }
+
+#define CHECK_HAS_AT_LEAST_N(length)                                                               \
+    if (currentDataPtr + length > dataEnd) {                                                       \
+        currentCommand = Command(Operation::Invalid, {});                                          \
+        break;                                                                                     \
+    }
+
+#define CONSUME_SINGLE()                                                                           \
+    CHECK_HAS_AT_LEAST_N(sizeof(uint8_t));                                                         \
+    currentDataPtr++;
+
+#define GET_PRIMITIVE_CHECKED(type, var_name, cond)                                                \
+    CHECK_HAS_AT_LEAST_N(sizeof(type));                                                            \
+    type var_name = *reinterpret_cast<const type*>(currentDataPtr);                                \
+                                                                                                   \
+    if ((cond)) {                                                                                  \
+        currentCommand = Command(Operation::Invalid, {});                                          \
+        break;                                                                                     \
+    }                                                                                              \
+                                                                                                   \
+    currentDataPtr += sizeof(type);
+
+#define GET_UINT8(var_name, cond) GET_PRIMITIVE_CHECKED(uint8_t, var_name, cond)
+#define GET_UINT16(var_name, cond) GET_PRIMITIVE_CHECKED(uint16_t, var_name, cond)
+#define GET_UINT32(var_name, cond) GET_PRIMITIVE_CHECKED(uint32_t, var_name, cond)
+
+#define CHECK_DELIMETER()                                                                          \
+    CHECK_HAS_AT_LEAST_N(sizeof(uint8_t));                                                         \
+    if (*currentDataPtr != ',') {                                                                  \
+        currentCommand = Command(Operation::Invalid, {});                                          \
+        break;                                                                                     \
+    }                                                                                              \
+    currentDataPtr++;
+
     class Tokenizer
     {
     public:
@@ -14,22 +55,52 @@ namespace mpp { namespace fuzzer {
          * @brief Specifies all available tokens (aka opcodes)
          * that can be used to fuzz allocator logic
          */
-        enum class Tokens
+        enum class Operation
         {
+            /* Allocate/Deallocate APIs */
             Allocate,
             Deallocate,
+
+            /* GC/GcPtr's APis */
+            CreateVertex,
+            RemoveVertex,
+            CreateEdge,
+            RemoveEdge,
+            ReadSharedData,
+            CollectGarbage,
+
+            /* Generic error command */
             Invalid
         };
 
-        /**
-         * @brief Extract number as std::string starting from t_dataStart. (This function doesn't
-         * work with negative numbers).
-         * @param t_dataStart points to the first char to start parsing number from
-         * @param t_dataEnd points to the last valid char of the buffer
-         * @return std::string parsed number or "-1" if something went wrong
-         */
-        static std::optional<std::string> ParseNumber(const uint8_t* t_dataStart,
-                                                      const uint8_t* t_dataEnd);
+        class Command
+        {
+        private:
+            Operation m_op;
+            std::vector<uint32_t> m_arguments;
+
+        public:
+            Command()
+                : m_op(Operation::Invalid)
+            {
+            }
+
+            Command(Operation t_op, std::vector<uint32_t>&& t_args)
+                : m_op{ t_op }
+                , m_arguments{ t_args }
+            {
+            }
+
+            Operation GetOp()
+            {
+                return m_op;
+            }
+
+            std::vector<uint32_t>& GetArgs()
+            {
+                return m_arguments;
+            }
+        };
 
         /**
          * @brief Parse input string into sequence of opcodes and parameters to them.
@@ -37,7 +108,6 @@ namespace mpp { namespace fuzzer {
          * @param t_size size of fuzzer-generated data
          * @return std::deque<std::pair<Tokens, std::size_t>> of opcodes and their parameters
          */
-        static std::deque<std::pair<Tokens, std::size_t>> Tokenize(const uint8_t* t_data,
-                                                                   std::size_t t_size);
+        static std::deque<Command> Tokenize(const uint8_t* t_data, std::size_t t_size);
     };
 }}

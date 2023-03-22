@@ -38,6 +38,6 @@ CXX=clang++ cmake -S . -B build \
 	-DMPP_SECURE=ON \
 	-DMPP_PROFILE=ON \
 	-DMPP_COLOUR=ON \
-	-DMPP_STATS=ON
+	-DMPP_STATS=OFF
 
 CXX=clang++ cmake --build build --config Debug --target all -- -j 16

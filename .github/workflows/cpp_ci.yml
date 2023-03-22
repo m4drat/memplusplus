@@ -61,8 +61,7 @@ jobs:
       - name: configure_clang
         run: |
           CXX=clang++ cmake -S . -B build \
-          -DCMAKE_BUILD_TYPE=Debug \
-          -DMPP_BUILD_SHARED_LIBS=OFF \
+          -DCMAKE_BUILD_TYPE=Release \
           -DMPP_ENABLE_COVERAGE=OFF \
           -DMPP_BUILD_FUZZER=ON \
           -DMPP_BUILD_EXAMPLE=OFF \
@@ -70,19 +69,24 @@ jobs:
           -DMPP_BUILD_DOCS=OFF \
           -DCMAKE_EXPORT_COMPILE_COMMANDS=OFF \
           -DMPP_SANITIZERS=ON \
+          -DMPP_VALGRIND=OFF \
           -DMPP_BUILD_SHARED_LIBS=OFF \
           -DMPP_FULL_DEBUG=ON \
-          -DMPP_SECURE=OFF \
-          -DMPP_PROFILE=OFF \
+          -DMPP_SECURE=ON \
+          -DMPP_PROFILE=ON \
           -DMPP_COLOUR=ON \
-          -DMPP_STATS=ON
+          -DMPP_STATS=OFF
 
       - name: build_clang
         run: |
-          CXX=clang++ cmake --build build --config Debug --target all
+          CXX=clang++ cmake --build build --config Release --target all
+
+      - name: prepare_corpus
+        run: |
+          7z x fuzzer/corpus.zip
 
       - name: test_fuzzer
         run: |
           cd build
           mkdir corpus && echo -ne "a1024a1024a128a0a10ddda1024a1024ddd" > ./corpus/testcase_1
-          ASAN_OPTIONS=detect_leaks=0 ctest --build-config Debug
+          FUZZ_MODE=gc ASAN_OPTIONS=detect_leaks=0 ctest --build-config Release

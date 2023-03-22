@@ -44,6 +44,7 @@ Warning: the API is not stable!
 - All Unix-like systems (where it is possible to use `mmap`)
 - g++ or clang++ compilers
 - __Currently supports only single-threaded applications__
+- References/Pointers to GcPtr's are __always__ invalidated after `GarbageCollect()`
 
 ## ❓ Usage
 

@@ -59,6 +59,7 @@ namespace mpp {
                                      uint8_t t_isInUse,
                                      uint8_t t_isPrevInUse)
         {
+            MPP_DEBUG_ASSERT(t_newChunkPtr, "Chunk pointer is nullptr!");
             auto* newChunk = static_cast<Chunk*>(t_newChunkPtr);
 
             MPP_VALGRIND_DEFINE_CHUNK_HEADER(newChunk);
@@ -79,6 +80,7 @@ namespace mpp {
          */
         static void* GetUserDataPtr(Chunk* t_chunk)
         {
+            MPP_DEBUG_ASSERT(t_chunk, "Chunk pointer is nullptr!");
             return reinterpret_cast<void*>(reinterpret_cast<std::byte*>(t_chunk) +
                                            sizeof(Chunk::ChunkHeader));
         }
@@ -90,6 +92,7 @@ namespace mpp {
          */
         static Chunk* GetHeaderPtr(void* t_userData)
         {
+            MPP_DEBUG_ASSERT(t_userData, "t_userData pointer is nullptr!");
             return reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(t_userData) -
                                             sizeof(Chunk::ChunkHeader));
         }
@@ -101,6 +104,7 @@ namespace mpp {
          */
         static Chunk* GetPrevChunk(Chunk* t_chunk)
         {
+            MPP_DEBUG_ASSERT(t_chunk, "Chunk pointer is nullptr!");
             return reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(t_chunk) -
                                             t_chunk->GetPrevSize());
         }
@@ -112,6 +116,7 @@ namespace mpp {
          */
         static Chunk* GetNextChunk(Chunk* t_chunk)
         {
+            MPP_DEBUG_ASSERT(t_chunk, "Chunk pointer is nullptr!");
             return reinterpret_cast<Chunk*>(reinterpret_cast<std::byte*>(t_chunk) +
                                             t_chunk->GetSize());
         }

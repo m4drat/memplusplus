@@ -1,33 +1,52 @@
 #include "fuzzer/crc_calculator.hpp"
+#include "fuzzer/fuzzer.h"
 #include "fuzzer/tokenizer.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/shared_gcptr.hpp"
+#include "mpplib/utils/macros.hpp"
 
+#include <cstdlib>
+#include <cstring>
 #include <deque>
+#include <functional>
 #include <iostream>
+#include <string>
 #include <vector>
 
 using namespace mpp::fuzzer;
 
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
+std::function<int(const uint8_t* Data, std::size_t Size)> g_MppFuzzOneInput;
+
+void HelpAndExit(char* executable)
+{
+    std::cout << "Usage: FUZZ_MODE=<fuzz_mode> " << executable << "\n";
+    std::cout << "Available fuzz targets: \n";
+    std::cout << "    - alloc_api\n";
+    std::cout << "    - gc\n";
+
+    exit(1);
+}
+
+int MppFuzzAllocApi(const uint8_t* Data, std::size_t Size)
 {
     mpp::MemoryManager memMgr = mpp::MemoryManager();
 
     // translate input string into sequence of opcodes
-    std::deque<std::pair<Tokenizer::Tokens, std::size_t>> commands =
-        Tokenizer::Tokenize(Data, Size);
+    auto commands = Tokenizer::Tokenize(Data, Size);
+
     std::vector<void*> allocatedChunks;
 
     while (!commands.empty()) {
-        std::pair<Tokenizer::Tokens, std::size_t> cmd = commands.front();
+        Tokenizer::Command cmd = commands.front();
 
-        switch (cmd.first) {
-            case Tokenizer::Tokens::Allocate: {
+        switch (cmd.GetOp()) {
+            case Tokenizer::Operation::Allocate: {
                 // std::cout << "Allocating chunk of size: " << cmd.second;
-                allocatedChunks.push_back(memMgr.Allocate(cmd.second));
+                allocatedChunks.push_back(memMgr.Allocate(cmd.GetArgs()[0]));
                 // std::cout << ". Chunk allocated: " << allocatedChunks.back() << std::endl;
                 break;
             }
-            case Tokenizer::Tokens::Deallocate: {
+            case Tokenizer::Operation::Deallocate: {
                 if (allocatedChunks.empty()) {
                     return 0;
                 }
@@ -39,10 +58,9 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
                 allocatedChunks.erase(allocatedChunks.begin() + position);
                 break;
             }
-            case Tokenizer::Tokens::Invalid: {
+            case Tokenizer::Operation::Invalid:
+            default:
                 return 0;
-                break;
-            }
         }
 
         commands.pop_front();
@@ -51,43 +69,88 @@ extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
     return 0;
 }
 
-/*
-int main()
+int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
 {
-    std::string data;
-
-    std::cin >> data;
+    mpp::g_memoryManager = std::make_unique<mpp::MemoryManager>();
 
     // translate input string into sequence of opcodes
-    std::deque <std::pair<Tokenizer::Tokens, std::size_t>> commands = Tokenizer::Tokenize((const
-uint8_t*)data.c_str(), data.length()); std::vector <void*> allocatedChunks;
+    auto commands = Tokenizer::Tokenize(Data, Size);
+    std::array<mpp::SharedGcPtr<Vertex>, c_maxPointers> pointers;
 
-    while (!commands.empty())
-    {
-        std::pair<Tokenizer::Tokens, std::size_t> cmd = commands.front();
+    while (!commands.empty()) {
+        Tokenizer::Command cmd = commands.front();
 
-        switch (cmd.first)
-        {
-        case Tokenizer::Tokens::Allocate: {
-            // std::cout << "Allocating chunk of size: " << cmd.second;
-            allocatedChunks.push_back(mpp::MemoryManager::Allocate(cmd.second));
-            // std::cout << ". Chunk allocated: " << allocatedChunks.back() << std::endl;
-            break;
-        }
-        case Tokenizer::Tokens::Deallocate: {
-            if (allocatedChunks.size() == 0)
+        switch (cmd.GetOp()) {
+            case Tokenizer::Operation::CreateVertex: {
+                MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 1,
+                                 "Got incorrect number of arguments for CreateVertex operation!");
+                MPP_LOG_DBG("CreateVertex(" + std::to_string(cmd.GetArgs()[0]) + ")");
+
+                auto vtx = mpp::MakeShared<Vertex>();
+                pointers.at(cmd.GetArgs()[0]) = std::move(vtx);
+                break;
+            }
+            case Tokenizer::Operation::RemoveVertex: {
+                MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 1,
+                                 "Got incorrect number of arguments for RemoveVertex operation!");
+                MPP_LOG_DBG("RemoveVertex(" + std::to_string(cmd.GetArgs()[0]) + ")");
+
+                pointers.at(cmd.GetArgs()[0]) = nullptr;
+                break;
+            }
+            case Tokenizer::Operation::CreateEdge: {
+                MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 3,
+                                 "Got incorrect number of arguments for CreateEdge operation!");
+                MPP_LOG_DBG("CreateEdge(" + std::to_string(cmd.GetArgs()[0]) + ", " +
+                            std::to_string(cmd.GetArgs()[1]) + ", " +
+                            std::to_string(cmd.GetArgs()[2]) + ")");
+
+                auto [vtxIdx1, vtxIdx2, ptrIdx] =
+                    std::tie(cmd.GetArgs()[0], cmd.GetArgs()[1], cmd.GetArgs()[2]);
+                mpp::SharedGcPtr<Vertex>& vtx_to_add = pointers.at(vtxIdx1);
+                mpp::SharedGcPtr<Vertex>& vtx_add_to = pointers.at(vtxIdx2);
+
+                if (vtx_to_add != nullptr && vtx_add_to != nullptr) {
+                    vtx_add_to->AddPointerAtIndex(ptrIdx, vtx_to_add);
+                }
+                break;
+            }
+            case Tokenizer::Operation::RemoveEdge: {
+                MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 2,
+                                 "Got incorrect number of arguments for RemoveEdge operation!");
+                MPP_LOG_DBG("RemoveEdge(" + std::to_string(cmd.GetArgs()[0]) + ", " +
+                            std::to_string(cmd.GetArgs()[1]) + ")");
+
+                auto [vtxIdx, ptrIdx] = std::tie(cmd.GetArgs()[0], cmd.GetArgs()[1]);
+                mpp::SharedGcPtr<Vertex>& vertex = pointers.at(vtxIdx);
+
+                if (vertex != nullptr)
+                    vertex->AddPointerAtIndex(ptrIdx, nullptr);
+                break;
+            }
+            case Tokenizer::Operation::ReadSharedData: {
+                MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 1,
+                                 "Got incorrect number of arguments for ReadSharedData operation!");
+                MPP_LOG_DBG("ReadSharedData(" + std::to_string(cmd.GetArgs()[0]) + ")");
+
+                auto vtxIdx = cmd.GetArgs()[0];
+                mpp::SharedGcPtr<Vertex>& vertex = pointers.at(vtxIdx);
+                if (vertex != nullptr) {
+                    volatile uint64_t& data = vertex->GetData();
+                }
+
+                break;
+            }
+            case Tokenizer::Operation::CollectGarbage: {
+                MPP_LOG_DBG("CollectGarbage()");
+                mpp::CollectGarbage();
+                break;
+            }
+            case Tokenizer::Operation::Allocate:
+            case Tokenizer::Operation::Deallocate:
+            case Tokenizer::Operation::Invalid:
+            default:
                 return 0;
-            uint32_t position = rand() % allocatedChunks.size();
-            void* chunk = allocatedChunks.at(position);
-            // std::cout << "Deallocating chunk: " << chunk << ". Of size: " <<
-mpp::Chunk::GetHeaderPtr(chunk)->GetSize() << std::endl; mpp::MemoryManager::Deallocate(chunk);
-            allocatedChunks.erase(allocatedChunks.begin() + position);
-            break;
-        }
-        case Tokenizer::Tokens::Invalid: {
-            return 0;
-            break;
-        }
         }
 
         commands.pop_front();
@@ -95,4 +158,33 @@ mpp::Chunk::GetHeaderPtr(chunk)->GetSize() << std::endl; mpp::MemoryManager::Dea
 
     return 0;
 }
-*/
+
+extern "C" int LLVMFuzzerInitialize(int* argc, char*** argv)
+{
+    auto* fuzz_mode = std::getenv("FUZZ_MODE");
+    if (!fuzz_mode) {
+        std::cout << "Environment variable FUZZ_MODE is not set! Fuzzing default target: "
+                     "MppFuzzAllocApi\n";
+        g_MppFuzzOneInput = MppFuzzAllocApi;
+        return 0;
+    }
+
+    if (!std::strcmp(fuzz_mode, "alloc_api")) {
+        std::cout << "Environment variable FUZZ_MODE is set to \"alloc_api\"! Fuzzing "
+                     "\"MppFuzzAllocApi\" target\n";
+        g_MppFuzzOneInput = MppFuzzAllocApi;
+    } else if (!std::strcmp(fuzz_mode, "gc")) {
+        std::cout << "Environment variable FUZZ_MODE is set to \"gc\"! Fuzzing "
+                     "\"MppFuzzGcApi\" target\n";
+        g_MppFuzzOneInput = MppFuzzGcApi;
+    } else {
+        HelpAndExit(*argv[0]);
+    }
+
+    return 0;
+}
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* Data, std::size_t Size)
+{
+    return g_MppFuzzOneInput(Data, Size);
+}

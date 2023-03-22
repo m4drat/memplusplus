@@ -30,8 +30,7 @@ public:
             : index(t_index)
             , data(t_data)
             , next(nullptr)
-        {
-        }
+        {}
     };
 
     SharedGcPtr<ListNode> m_LinkedListHead;
@@ -112,7 +111,7 @@ void logic()
     std::cout << worker.DoBenchmark() << std::endl;
 
     std::cout << "Before GC" << std::endl;
-    g_memoryManager->VisHeapLayout(std::cout, nullptr);
+    // g_memoryManager->VisHeapLayout(std::cout, nullptr);
     // Iterate linked list
     auto head = worker.m_LinkedListHead;
     while (head != nullptr) {
@@ -123,7 +122,7 @@ void logic()
     // CollectGarbage();
 
     std::cout << "After GC" << std::endl;
-    g_memoryManager->VisHeapLayout(std::cout, nullptr);
+    // g_memoryManager->VisHeapLayout(std::cout, nullptr);
     // Iterate linked list
     head = worker.m_LinkedListHead;
     while (head != nullptr) {
@@ -159,8 +158,7 @@ int main()
             : index(t_index)
             , data(t_data)
             , next(nullptr)
-        {
-        }
+        {}
     };
 
     SharedGcPtr<ListNode> ptr = MakeShared<ListNode>(0, 0x1337);
@@ -169,7 +167,7 @@ int main()
     std::cout << ptr << '\n';
     std::cout << ptr->next << '\n';
 
-    g_memoryManager->VisHeapLayout(std::cout, ptr.Get());
+    // g_memoryManager->VisHeapLayout(std::cout, ptr.Get());
 
     // CollectGarbage();
 

@@ -20,4 +20,4 @@ set(FUZZ_RUNTIME
 	30
 	CACHE STRING "Number of seconds to run fuzz tests during ctest run")
 
-add_test(NAME fuzz_tester COMMAND ${PROJECT_NAME} -max_total_time=${FUZZ_RUNTIME})
+add_test(NAME fuzz_tester COMMAND ${PROJECT_NAME} -max_total_time=${FUZZ_RUNTIME} ../corpus)

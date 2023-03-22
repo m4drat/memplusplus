@@ -422,7 +422,7 @@ TEST_F(AllocatorTest, FreeListAllocationWithSplit)
     void* p7 = Allocate(520);
     ASSERT_EQ(Chunk::GetHeaderPtr(p7), chunkToReturn);
 
-#if MPP_STATS == 1 || MPP_DEBUG == 1
+#if MPP_STATS == 1
     // Dump arena just to check that at least it doesn't segfault 🤷
     Arena::DumpArena(ss, *g_memoryManager->GetArenaList().begin(), true, true);
 #endif

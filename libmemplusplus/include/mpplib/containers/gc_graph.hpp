@@ -16,15 +16,11 @@ namespace mpp {
     class GarbageCollector;
     class MemoryManager;
 
-    /**
-     * @brief Implements Graph structure to use specifically with chunks and gcPtr objects.
-     */
+    //! @brief Implements Graph structure to use specifically with chunks and gcPtr objects.
     class GcGraph
     {
     private:
-        /**
-         * @brief Defines comparison/uniqueness logic to use in adjList.
-         */
+        //! @brief Defines comparison/uniqueness logic to use in adjList.
         struct VertexComparator
         {
             bool operator()(const Vertex* lhs, const Vertex* rhs) const
@@ -33,9 +29,7 @@ namespace mpp {
             }
         };
 
-        /**
-         * @brief adjacency list to store graph.
-         */
+        //! @brief adjacency list to store the graph.
         std::set<Vertex*, VertexComparator> m_adjList;
 
         //! @brief Reference to parent GarbageCollector object.
