@@ -66,7 +66,7 @@ TEST_F(SharedGcPtrTest, EmptyConstructor)
     using namespace mpp;
 
     SharedGcPtr<char> ptr;
-    ASSERT_TRUE(ptr.UseCount() == 1);
+    ASSERT_TRUE(ptr.UseCount() == 0);
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 
@@ -198,11 +198,6 @@ TEST_F(SharedGcPtrTest, CreateNewPtrAssignment)
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 
     ptr1 = (char*)Allocate(64);
-
-    std::cout << ptr1.UseCount() << std::endl;
-    std::cout << ptr2.UseCount() << std::endl;
-    std::cout << ptr3.UseCount() << std::endl;
-    std::cout << ptr4.UseCount() << std::endl;
 
     ASSERT_TRUE((ptr1.UseCount() == 1 && ptr2.UseCount() == 0 && ptr3.UseCount() == 0 &&
                  ptr4.UseCount() == 0));

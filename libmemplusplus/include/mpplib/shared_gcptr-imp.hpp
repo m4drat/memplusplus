@@ -17,20 +17,17 @@ namespace mpp {
     // Constructors
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr()
-    try : m_references{ new uint32_t(1) } {
+        : m_references{ nullptr }
+    {
         this->m_objectPtr = nullptr;
         static_assert(offsetof(SharedGcPtr<Type>, m_objectPtr) == 8,
                       "this->m_objectPtr must be at offset 8");
-    } catch (...) {
-        // exception occurred (e.g. new throwed std::bad_alloc)
-        throw;
     }
 
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(std::nullptr_t t_newData)
-        : m_references{ nullptr }
+        : SharedGcPtr()
     {
-        this->m_objectPtr = nullptr;
     }
 
     template<class Type>
