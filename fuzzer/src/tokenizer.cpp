@@ -4,13 +4,15 @@
 #include <optional>
 
 namespace mpp { namespace fuzzer {
-    std::deque<Tokenizer::Command> Tokenizer::Tokenize(const uint8_t* t_data, std::size_t t_size)
+    std::vector<Tokenizer::Command> Tokenizer::Tokenize(const uint8_t* t_data, std::size_t t_size)
     {
-        std::deque<Command> commands;
         const uint8_t* dataStart = t_data;
         const uint8_t* dataEnd = (t_data + t_size);
         const uint8_t* currentDataPtr = dataStart;
         const std::size_t c_maxCommands = 128;
+
+        std::vector<Command> commands;
+        commands.reserve(c_maxCommands);
 
         while (currentDataPtr < dataEnd) {
             Command currentCommand;

@@ -36,8 +36,8 @@ int MppFuzzAllocApi(const uint8_t* Data, std::size_t Size)
 
     std::vector<void*> allocatedChunks;
 
-    while (!commands.empty()) {
-        Tokenizer::Command cmd = commands.front();
+    for (auto cmdIter = commands.begin(); cmdIter != commands.end(); cmdIter++) {
+        Tokenizer::Command& cmd = *cmdIter;
 
         switch (cmd.GetOp()) {
             case Tokenizer::Operation::Allocate: {
@@ -62,8 +62,6 @@ int MppFuzzAllocApi(const uint8_t* Data, std::size_t Size)
             default:
                 return 0;
         }
-
-        commands.pop_front();
     }
 
     return 0;
@@ -77,8 +75,8 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
     auto commands = Tokenizer::Tokenize(Data, Size);
     std::array<mpp::SharedGcPtr<Vertex>, c_maxPointers> pointers;
 
-    while (!commands.empty()) {
-        Tokenizer::Command cmd = commands.front();
+    for (auto cmdIter = commands.begin(); cmdIter != commands.end(); cmdIter++) {
+        Tokenizer::Command& cmd = *cmdIter;
 
         switch (cmd.GetOp()) {
             case Tokenizer::Operation::CreateVertex: {
@@ -152,8 +150,6 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
             default:
                 return 0;
         }
-
-        commands.pop_front();
     }
 
     return 0;

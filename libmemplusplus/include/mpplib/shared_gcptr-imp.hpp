@@ -9,6 +9,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <memory>
 #include <string>
 #include <type_traits>
 
@@ -27,8 +28,10 @@ namespace mpp {
 
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(std::nullptr_t t_newData)
-        : SharedGcPtr()
-    {}
+        : m_references{ nullptr }
+    {
+        this->m_objectPtr = nullptr;
+    }
 
     template<class Type>
     SharedGcPtr<Type>::SharedGcPtr(ElementType* obj)
@@ -429,6 +432,9 @@ namespace mpp {
     template<class Type>
     uint32_t SharedGcPtr<Type>::UseCount()
     {
+        if (!m_references)
+            return 0;
+
         return *m_references;
     }
 

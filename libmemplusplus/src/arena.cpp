@@ -303,9 +303,8 @@ namespace mpp {
         return m_topChunk;
     }
 
-    // Note that MergeTwoSequenceChunks doesn't check order of the
-    // chunks. Also it doesn't update any flags, and/or any chunk fields
-    // excluding chunk size
+    // Note that MergeTwoSequenceChunks doesn't check order of the chunks. Also it doesn't update
+    // any flags, and/or any chunk fields excluding chunk size.
     Chunk* Arena::MergeTwoSequenceChunks(Chunk* t_chunk1, Chunk* t_chunk2)
     {
         PROFILE_FUNCTION();

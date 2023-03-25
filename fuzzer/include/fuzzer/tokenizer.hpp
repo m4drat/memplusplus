@@ -106,8 +106,8 @@ namespace mpp { namespace fuzzer {
          * @brief Parse input string into sequence of opcodes and parameters to them.
          * @param t_data fuzzer-generated data
          * @param t_size size of fuzzer-generated data
-         * @return std::deque<std::pair<Tokens, std::size_t>> of opcodes and their parameters
+         * @return std::vector<std::pair<Tokens, std::size_t>> of opcodes and their parameters
          */
-        static std::deque<Command> Tokenize(const uint8_t* t_data, std::size_t t_size);
+        static std::vector<Command> Tokenize(const uint8_t* t_data, std::size_t t_size);
     };
 }}

@@ -102,10 +102,11 @@ namespace mpp {
         // Layout heap in the most efficient way
         Heuristics::LayoutedHeap layoutedData = heuristics->LayoutHeap();
 
-        // Create a new rena with enough memory to fit all objects
-        std::size_t godArenaSize = (layoutedData.layoutedSize < MM::g_DEFAULT_ARENA_SIZE)
-                                       ? MM::g_DEFAULT_ARENA_SIZE
-                                       : layoutedData.layoutedSize;
+        // Create a new arena with enough memory to fit all objects
+        const std::size_t minArenaSize = (layoutedData.layoutedSize < MM::g_DEFAULT_ARENA_SIZE)
+                                             ? MM::g_DEFAULT_ARENA_SIZE
+                                             : layoutedData.layoutedSize;
+        std::size_t godArenaSize = minArenaSize;
 
         // If newly created arena is really small (we have less than 25% of free space)
         // Enlarge it by specified expandFactor
@@ -120,6 +121,8 @@ namespace mpp {
 #if MPP_STATS == 1
         m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
         godArena->GetArenaStats()->gcCreatedArena = true;
+        godArena->GetArenaStats()->totalAllocated = layoutedData.layoutedSize;
+        godArena->SetUsedSpace(layoutedData.layoutedSize);
 #endif
 
         std::byte* newChunkLocation{ godArena->BeginPtr() };
@@ -200,7 +203,7 @@ namespace mpp {
             newChunkLocation = newChunkLocation + currSize;
         }
 
-        // Update activeGcPtrs after all GcPtrs are updated.
+        // Update m_activeGcPtrs after all GcPtrs are updated.
         m_activeGcPtrs =
             std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());
 
