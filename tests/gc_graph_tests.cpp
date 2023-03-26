@@ -10,6 +10,101 @@
 #include <memory>
 #include <sstream>
 
+TEST(GcGraphTest, AddObjectInfo_Issue88)
+{
+    using namespace mpp;
+
+    mpp::g_memoryManager = std::make_unique<mpp::MemoryManager>();
+
+    class Vertex
+    {
+    private:
+        SharedGcPtr<Vertex> m_gc;
+        uint64_t m_data;
+
+    public:
+        explicit Vertex(uint64_t t_data)
+            : m_data(t_data)
+        {
+        }
+
+        Vertex()
+            : m_data(0x13371337deadbeef)
+        {
+        }
+
+        void AddPointer(const SharedGcPtr<Vertex>& t_ptr)
+        {
+            m_gc = t_ptr;
+        }
+
+        SharedGcPtr<Vertex>& GetInternalPointer()
+        {
+            return m_gc;
+        }
+
+        uint64_t& GetData()
+        {
+            return m_data;
+        }
+    };
+
+    std::unique_ptr<GcGraph> objectsGraph =
+        std::make_unique<GcGraph>(g_memoryManager->GetGC(), *g_memoryManager);
+
+    mpp::SharedGcPtr<Vertex> ptr1 = mpp::MakeShared<Vertex>(0x1337);
+    EXPECT_TRUE(ptr1->GetData() == 0x1337);
+
+    ptr1->AddPointer(ptr1);
+    objectsGraph->AddObjectInfo(&ptr1->GetInternalPointer());
+    objectsGraph->AddObjectInfo(&ptr1);
+    EXPECT_TRUE(objectsGraph->GetVerticesCount() == 2);
+    EXPECT_TRUE(objectsGraph->GetAdjList().size() == 2);
+    EXPECT_TRUE((*objectsGraph->GetAdjList().begin())->GetPointingVertices().size() == 2);
+    EXPECT_TRUE((*objectsGraph->GetAdjList().begin())->GetPointingToGcPtrs().size() == 2);
+}
+
+TEST(GcGraphTest, WeaklyConnectedComponents)
+{
+    using namespace mpp;
+    std::unique_ptr<GcGraph> objectsGraph =
+        std::make_unique<GcGraph>(g_memoryManager->GetGC(), *g_memoryManager);
+    auto* v1 = new Vertex((Chunk*)0x1000);
+    auto* v2 = new Vertex((Chunk*)0x1100);
+    auto* v3 = new Vertex((Chunk*)0x1200);
+    auto* v4 = new Vertex((Chunk*)0x1300);
+    auto* v5 = new Vertex((Chunk*)0x1400);
+
+    // First weakly-connected component: { v1, v2, v3 }
+    objectsGraph->AddEdge(v1, v2);
+    objectsGraph->AddEdge(v2, v3);
+
+    // Second weakly-connected component: { v4, v5 }
+    objectsGraph->AddEdge(v4, v5);
+    objectsGraph->AddEdge(v5, v4);
+
+    ASSERT_TRUE(objectsGraph->GetVerticesCount() == 5);
+
+    auto components = objectsGraph->WeaklyConnectedComponents();
+    ASSERT_TRUE(components.size() == 2);
+
+    // Test first weakly-connected component
+    auto& firstComponent = components[0];
+    ASSERT_TRUE(firstComponent->GetAdjList().size() == 3);
+    ASSERT_TRUE(firstComponent->GetVerticesCount() == 3);
+    for (auto* vtx : { v1, v2, v3 }) {
+        ASSERT_TRUE(firstComponent->GetAdjList().contains(vtx));
+    }
+
+    // Test second weakly-connected component
+    auto& secondComponent = components[1];
+    ASSERT_TRUE(secondComponent->GetAdjList().size() == 2);
+    ASSERT_TRUE(secondComponent->GetVerticesCount() == 2);
+    for (auto* vtx : { v4, v5 }) {
+        ASSERT_TRUE(secondComponent->GetAdjList().contains(vtx));
+    }
+}
+
 TEST(GcGraphTest, SetOrderedCorrectly)
 {
     using namespace mpp;

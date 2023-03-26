@@ -5,8 +5,8 @@
 #include <functional>
 #include <memory>
 #include <ostream>
-#include <set>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "mpplib/containers/vertex.hpp"
@@ -49,18 +49,24 @@ namespace mpp {
         /**
          * @brief Constructor to initialize from reference to another graph.
          * @param t_other GcGraph, to copy from.
-         * @warning This copy constructor performs only shallow copy!
+         * @warning This copy constructor creates only shallow copy!
          */
         GcGraph(GcGraph& t_other);
 
         /**
          * @brief Constructor to initialize from vector of vertices.
          * @param t_other vector of vertexes, to copy from.
-         * @warning This copy constructor performs only shallow copy!
+         * @warning This copy constructor creates only shallow copy!
          */
-        explicit GcGraph(const std::vector<Vertex*>& t_other,
-                         GarbageCollector& t_gc,
-                         MemoryManager& t_memoryManager);
+        template<class T>
+        GcGraph(const T& t_other, GarbageCollector& t_gc, MemoryManager& t_memoryManager)
+            : m_gc(t_gc)
+            , m_memoryManager(t_memoryManager)
+        {
+            for (auto* vertex : t_other) {
+                m_adjList.insert(vertex);
+            }
+        }
 
         //! @brief Deleted copy constructor.
         GcGraph& operator=(const GcGraph& t_other) = delete;
@@ -180,7 +186,7 @@ namespace mpp {
          * @brief Helper method to use with DirectedDFS.
          * @sa UndirectedDFS
          */
-        void UDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited);
+        void UDFS(Vertex* t_vertex, std::unordered_set<Vertex*>& t_visited);
 
         /**
          * @brief Perform Depth-First-Search in the undirected version of the graph.
@@ -190,7 +196,7 @@ namespace mpp {
          * @param t_vertex vertex, from which we want to start undirected DFS.
          * @return vector of vertices, that can be accessed from specified vertex
          */
-        std::vector<Vertex*> UndirectedDFS(Vertex* t_vertex);
+        std::unordered_set<Vertex*> UndirectedDFS(Vertex* t_vertex);
 
         /**
          * @brief Search for specified chunk in adjacency list of current graph.

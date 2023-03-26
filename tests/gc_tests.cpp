@@ -5,6 +5,146 @@
 #include "mpplib/mpp.hpp"
 #include <memory>
 
+TEST_F(GcTest, DoubleCollectSelfReference1_Issue88)
+{
+    using namespace mpp;
+
+    class Vertex
+    {
+    private:
+        SharedGcPtr<Vertex> m_gc;
+        uint64_t m_data;
+
+    public:
+        explicit Vertex(uint64_t t_data)
+            : m_data(t_data)
+        {
+        }
+
+        Vertex()
+            : m_data(0x13371337deadbeef)
+        {
+        }
+
+        void AddPointer(const SharedGcPtr<Vertex>& t_ptr)
+        {
+            m_gc = t_ptr;
+        }
+
+        const SharedGcPtr<Vertex>& GetInternalPointer()
+        {
+            return m_gc;
+        }
+
+        uint64_t& GetData()
+        {
+            return m_data;
+        }
+    };
+
+    mpp::SharedGcPtr<Vertex> ptr1 = mpp::MakeShared<Vertex>(0x1337);
+    mpp::SharedGcPtr<Vertex> ptr2 = mpp::MakeShared<Vertex>(0xdead);
+
+    EXPECT_TRUE(ptr1->GetData() == 0x1337);
+    EXPECT_TRUE(ptr2->GetData() == 0xdead);
+    EXPECT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
+
+    mpp::SharedGcPtr<Vertex>& vtx_to_add = ptr1;
+    mpp::SharedGcPtr<Vertex>& vtx_add_to = ptr2;
+    vtx_add_to->AddPointer(vtx_to_add);
+    EXPECT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
+    EXPECT_TRUE(ptr1->GetData() == 0x1337);
+
+    // Overwrite ptr1 with ptr2
+    vtx_to_add = ptr2;
+    vtx_add_to = ptr2;
+    vtx_add_to->AddPointer(vtx_to_add);
+    EXPECT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
+
+    EXPECT_TRUE(ptr1->GetData() == 0xdead);
+    EXPECT_TRUE(ptr2->GetData() == 0xdead);
+    EXPECT_TRUE(ptr1->GetInternalPointer()->GetData() == 0xdead);
+    EXPECT_TRUE(ptr2->GetInternalPointer()->GetData() == 0xdead);
+
+    mpp::CollectGarbage();
+    mpp::CollectGarbage();
+
+    EXPECT_TRUE(ptr1->GetData() == 0xdead);
+    EXPECT_TRUE(ptr2->GetData() == 0xdead);
+    EXPECT_TRUE(ptr1->GetInternalPointer()->GetData() == 0xdead);
+    EXPECT_TRUE(ptr2->GetInternalPointer()->GetData() == 0xdead);
+    EXPECT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
+}
+
+TEST_F(GcTest, DoubleCollectSelfReference2_Issue88)
+{
+    using namespace mpp;
+
+    class Vertex
+    {
+    private:
+        std::array<SharedGcPtr<Vertex>, 16> m_gcs;
+        uint64_t m_data;
+
+    public:
+        explicit Vertex(uint64_t t_data)
+            : m_data(t_data)
+        {
+        }
+
+        Vertex()
+            : m_data(0x13371337deadbeef)
+        {
+        }
+
+        void AddPointerAtIndex(uint32_t t_idx, const SharedGcPtr<Vertex>& t_ptr)
+        {
+            m_gcs.at(t_idx) = t_ptr;
+        }
+
+        const SharedGcPtr<Vertex>& GetPointerAtIndex(uint32_t t_idx)
+        {
+            return m_gcs.at(t_idx);
+        }
+
+        uint64_t& GetData()
+        {
+            return m_data;
+        }
+    };
+
+    std::array<mpp::SharedGcPtr<Vertex>, 32> pointers;
+    pointers.at(0) = mpp::MakeShared<Vertex>(0x1337);
+    pointers.at(1) = mpp::MakeShared<Vertex>(0xdead);
+
+    EXPECT_TRUE(pointers.at(0)->GetData() == 0x1337);
+    EXPECT_TRUE(pointers.at(1)->GetData() == 0xdead);
+    EXPECT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
+
+    mpp::SharedGcPtr<Vertex>& vtx_to_add = pointers.at(0);
+    mpp::SharedGcPtr<Vertex>& vtx_add_to = pointers.at(0);
+    vtx_add_to->AddPointerAtIndex(1, vtx_to_add);
+    EXPECT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
+
+    EXPECT_TRUE(pointers.at(0)->GetData() == 0x1337);
+    EXPECT_TRUE(pointers.at(1)->GetData() == 0xdead);
+    EXPECT_TRUE(pointers.at(0)->GetPointerAtIndex(1)->GetData() == 0x1337);
+
+    // Crashes sometimes
+    mpp::SharedGcPtr<Vertex>& vtx_to_add2 = pointers.at(1);
+    mpp::SharedGcPtr<Vertex>& vtx_add_to2 = pointers.at(0);
+    vtx_add_to2->AddPointerAtIndex(0, vtx_to_add2);
+    EXPECT_TRUE(pointers.at(0)->GetPointerAtIndex(0)->GetData() == 0xdead);
+
+    mpp::CollectGarbage();
+    mpp::CollectGarbage();
+
+    EXPECT_TRUE(pointers.at(0)->GetData() == 0x1337);
+    EXPECT_TRUE(pointers.at(1)->GetData() == 0xdead);
+    EXPECT_TRUE(pointers.at(0)->GetPointerAtIndex(1)->GetData() == 0x1337);
+    EXPECT_TRUE(pointers.at(0)->GetPointerAtIndex(0)->GetData() == 0xdead);
+}
+
 TEST_F(GcTest, CreateCollectCreate)
 {
     using namespace mpp;

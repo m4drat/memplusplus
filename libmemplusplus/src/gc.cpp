@@ -203,6 +203,9 @@ namespace mpp {
             newChunkLocation = newChunkLocation + currSize;
         }
 
+        // Clear chunksInUse cache.
+        m_chunksInUseCache.clear();
+
         // Update m_activeGcPtrs after all GcPtrs are updated.
         m_activeGcPtrs =
             std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());

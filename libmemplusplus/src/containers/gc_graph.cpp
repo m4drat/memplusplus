@@ -3,7 +3,9 @@
 #include "mpplib/gc.hpp"
 #include "mpplib/gcptr.hpp"
 #include "mpplib/memory_manager.hpp"
+#include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/utils.hpp"
+#include <cstdint>
 
 namespace mpp {
     GcGraph::GcGraph(GarbageCollector& t_gc, MemoryManager& t_memoryManager)
@@ -18,18 +20,6 @@ namespace mpp {
         , m_memoryManager(t_other.m_memoryManager)
     {
         for (auto* vertex : t_other.GetAdjList()) {
-            m_adjList.insert(vertex);
-        }
-    }
-
-    // WARNING: creates SHALLOW copy
-    GcGraph::GcGraph(const std::vector<Vertex*>& t_other,
-                     GarbageCollector& t_gc,
-                     MemoryManager& t_memoryManager)
-        : m_gc(t_gc)
-        , m_memoryManager(t_memoryManager)
-    {
-        for (auto* vertex : t_other) {
             m_adjList.insert(vertex);
         }
     }
@@ -66,6 +56,13 @@ namespace mpp {
         } else {
             destination = new Vertex(gcPtrObjectChunk);
             destination->AddGcPtr(t_gcPtr);
+
+            // Added to support reference cycles (gcPtrLocationChunk == gcPtrLocationChunk).
+            // If gcptr from inside the chunk points to the chunk it is located inside, we want to
+            // create only one vertex as it is the beginning and the end. Otherwise we might create
+            // 2 separate vertices which will point to the same location, which in turn will result
+            // in an incorrectly functioning GC.
+            AddVertex(destination);
         }
 
         // GcPtr is on the heap
@@ -312,7 +309,7 @@ namespace mpp {
                     Chunk* pointsToChunk = m_gc.FindChunkInUse(gcPtr->GetVoid());
                     Vertex* pointsToVertex = FindVertex(pointsToChunk);
                     bool pointsToCluster =
-                        (pointsToVertex)
+                        (pointsToVertex && pointsToVertex->GetLocationAsAChunk())
                             ? !pointsToVertex->GetAllOutgoingGcPtrs(orderedGcPtrs).empty()
                             : false;
 
@@ -343,8 +340,9 @@ namespace mpp {
             Chunk* pointsToChunk = m_gc.FindChunkInUse(gcPtr->GetVoid());
             Vertex* pointsToVertex = FindVertex(pointsToChunk);
             bool pointsToCluster =
-                (pointsToVertex) ? !pointsToVertex->GetAllOutgoingGcPtrs(orderedGcPtrs).empty()
-                                 : false;
+                (pointsToVertex && pointsToVertex->GetLoc())
+                    ? !pointsToVertex->GetAllOutgoingGcPtrs(orderedGcPtrs).empty()
+                    : false;
 
             t_out << "\t\"" << gcPtrAddrStr << "\" [style=filled, fillcolor=\"" << colorGray
                   << "\", shape=rect, label=\"gcptr-" << gcptrIndex++ << "\"];\n";
@@ -404,12 +402,12 @@ namespace mpp {
     {
         PROFILE_FUNCTION();
         // Check if we already have starting vertex
-        if (m_adjList.find(t_from) == m_adjList.end()) {
+        if (!m_adjList.contains(t_from)) {
             AddVertex(t_from);
         }
 
         // Check if we already have ending vertex
-        if (m_adjList.find(t_to) == m_adjList.end()) {
+        if (!m_adjList.contains(t_to)) {
             AddVertex(t_to);
         }
 
@@ -422,10 +420,10 @@ namespace mpp {
 
     bool GcGraph::HasEdge(Vertex* t_from, Vertex* t_to) const
     {
-        if (m_adjList.find(t_from) == m_adjList.end() || m_adjList.find(t_to) == m_adjList.end())
+        if (!m_adjList.contains(t_from) || !m_adjList.contains(t_to))
             return false;
 
-        if (t_from->GetNeighbors().find(t_to) == t_from->GetNeighbors().end())
+        if (!t_from->GetNeighbors().contains(t_to))
             return false;
 
         return true;
@@ -478,7 +476,7 @@ namespace mpp {
                 adjListCopy.erase(vtx);
             }
 
-            // Add found component to vector
+            // Add found component to the vector
             weaklyConnectedComponents.push_back(std::move(connectedComponent));
         }
 
@@ -509,11 +507,11 @@ namespace mpp {
         }
     }
 
-    std::vector<Vertex*> GcGraph::UndirectedDFS(Vertex* t_vertex)
+    std::unordered_set<Vertex*> GcGraph::UndirectedDFS(Vertex* t_vertex)
     {
         PROFILE_FUNCTION();
         // Vector of visited vertices using undirected DFS
-        std::vector<Vertex*> visited;
+        std::unordered_set<Vertex*> visited;
 
         // Perform undirected DFS, starting from t_vertex
         UDFS(t_vertex, visited);
@@ -521,16 +519,16 @@ namespace mpp {
         return visited;
     }
 
-    void GcGraph::UDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
+    void GcGraph::UDFS(Vertex* t_vertex, std::unordered_set<Vertex*>& t_visited)
     {
         std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
                                        t_vertex->GetNeighbors().end());
         neighbors.insert(neighbors.end(),
                          t_vertex->GetPointingVertices().begin(),
                          t_vertex->GetPointingVertices().end());
-        t_visited.push_back(t_vertex);
+        t_visited.insert(t_vertex);
         for (auto* neighbor : neighbors) {
-            if (std::find(t_visited.begin(), t_visited.end(), neighbor) == t_visited.end()) {
+            if (!t_visited.contains(neighbor)) {
                 GcGraph::UDFS(neighbor, t_visited);
             }
         }

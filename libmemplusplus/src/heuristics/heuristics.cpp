@@ -63,9 +63,9 @@ namespace mpp {
     Heuristics::LayoutedHeap Heuristics::LayoutHeap()
     {
         PROFILE_FUNCTION();
-        auto m_subgraphs = m_objectsGraph->WeaklyConnectedComponents();
+        auto subgraphs = m_objectsGraph->WeaklyConnectedComponents();
 
-        for (auto& graph : m_subgraphs) {
+        for (auto& graph : subgraphs) {
             // Try to layout subgraph as a linked list
             LayoutedHeap layoutedLL = LayoutLinkedList(graph);
             m_layoutedHeap.insert(
