@@ -28,7 +28,8 @@ namespace mpp {
 
     template<>
     class SharedGcPtrArray<false>
-    {};
+    {
+    };
 
     /**
      * @brief SharedGcPtr class. Behaves like normal shared ptr.
@@ -126,22 +127,22 @@ namespace mpp {
         SharedGcPtr<Type>& operator=(std::nullptr_t t_newData);
 
         //! @brief check, if two SharedGcPtr's are equal.
-        bool operator==(const SharedGcPtr& t_other) noexcept;
+        bool operator==(const SharedGcPtr& t_other) const noexcept;
 
         //! @brief check, if two SharedGcPtr's are not equal.
-        bool operator!=(const SharedGcPtr& t_other) noexcept;
+        bool operator!=(const SharedGcPtr& t_other) const noexcept;
 
         //! @brief check, that lhs is less than or equal to rhs.
-        bool operator<=(const SharedGcPtr& t_other) noexcept;
+        bool operator<=(const SharedGcPtr& t_other) const noexcept;
 
         //! @brief check, that lhs is less than rhs.
-        bool operator<(const SharedGcPtr& t_other) noexcept;
+        bool operator<(const SharedGcPtr& t_other) const noexcept;
 
         //! @brief check, that lhs is greater than or equal to rhs.
-        bool operator>=(const SharedGcPtr& t_other) noexcept;
+        bool operator>=(const SharedGcPtr& t_other) const noexcept;
 
         //! @brief check, that lhs is greater than rhs.
-        bool operator>(const SharedGcPtr& t_other) noexcept;
+        bool operator>(const SharedGcPtr& t_other) const noexcept;
 
         /**
          * @brief Allows to use smart pointers as usual pointers.
