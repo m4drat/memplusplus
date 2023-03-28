@@ -406,13 +406,13 @@ TEST_F(SharedGcPtrTest, IntegrationTest_2)
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 3);
 
     ptr1.Reset();
-    ASSERT_TRUE(ptr1.UseCount() == 1);
+    ASSERT_TRUE(ptr1.UseCount() == 0);
     ASSERT_TRUE(ptr2.UseCount() == 2);
     ASSERT_TRUE(ptr3.UseCount() == 2);
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 2);
 
     ptr2.Reset();
-    ASSERT_TRUE(ptr2.UseCount() == 1);
+    ASSERT_TRUE(ptr2.UseCount() == 0);
     ASSERT_TRUE(ptr3.UseCount() == 1);
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
@@ -421,7 +421,7 @@ TEST_F(SharedGcPtrTest, IntegrationTest_2)
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().size() == 1);
 
     ptr3 = ptr1;
-    ASSERT_TRUE(ptr3.UseCount() == 2);
+    ASSERT_TRUE(ptr3.UseCount() == 0);
     ASSERT_TRUE(g_memoryManager->GetGC().GetGcPtrs().empty());
 }
 

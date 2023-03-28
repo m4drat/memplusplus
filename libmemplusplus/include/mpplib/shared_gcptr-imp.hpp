@@ -327,7 +327,7 @@ namespace mpp {
 
         DeleteReference();
 
-        m_references = new uint32_t(1);
+        m_references = nullptr;
         this->m_objectPtr = nullptr;
     }
 
