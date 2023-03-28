@@ -302,7 +302,7 @@ namespace mpp {
                     t_out << col::BLUE << "]" << col::RESET;
                 }
 #else
-                if (t_ptr != nullptr && currentChunkPtr) {
+                if (t_ptr != nullptr && currChunkPtr) {
                     t_out << "<(";
                 } else {
                     t_out << "[";
@@ -311,7 +311,7 @@ namespace mpp {
                       << "/PS:" << currChunk->GetPrevSize() << "/CS:" << currChunk->GetSize()
                       << "/P:" << currChunk->IsPrevInUse() << "/U:" << currChunk->IsUsed();
 
-                if (t_ptr != nullptr && currentChunkPtr) {
+                if (t_ptr != nullptr && currChunkPtr) {
                     t_out << ")>";
                 } else {
                     t_out << "]";
