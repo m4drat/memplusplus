@@ -99,10 +99,12 @@ namespace mpp {
         /**
          * @brief Generates graph representation in form, that can be used in dot
          * (graphviz), to visualize graph structure.
-         *
+         * @param t_out output stream.
+         * @param t_doNotDrawHeapConnections skip drawing flat heap view.
          * @return std::ostream
          */
-        std::ostream& GenerateGraphvizLayoutSimple(std::ostream& t_out) const;
+        std::ostream& GenerateGraphvizLayoutSimple(std::ostream& t_out,
+                                                   bool t_doNotDrawHeapConnections = true) const;
 
         /**
          * @brief Generates graph representation in form, that can be used in dot

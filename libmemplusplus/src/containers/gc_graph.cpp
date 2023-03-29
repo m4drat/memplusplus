@@ -87,7 +87,8 @@ namespace mpp {
         }
     }
 
-    std::ostream& GcGraph::GenerateGraphvizLayoutSimple(std::ostream& t_out) const
+    std::ostream& GcGraph::GenerateGraphvizLayoutSimple(std::ostream& t_out,
+                                                        bool t_doNotDrawHeapConnections) const
     {
         PROFILE_FUNCTION();
 
@@ -135,6 +136,11 @@ namespace mpp {
                       << " -> "
                       << "\"" + (*it)->ToString() + "\";\n";
             }
+        }
+
+        if (t_doNotDrawHeapConnections) {
+            t_out << "}";
+            return t_out;
         }
 
         // Generate flat heap view
