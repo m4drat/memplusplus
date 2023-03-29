@@ -151,13 +151,10 @@ list(APPEND MPP_SOURCES
 	src/memory_manager.cpp
 	src/gc.cpp
 	src/utils/utils.cpp
+	src/utils/env_options.cpp
 )
 
 # ################ ADD SPECIFIC SOURCES #################
-if(MPP_DEBUG MATCHES "ON" OR MPP_STATS MATCHES "ON")
-	list(APPEND MPP_SOURCES src/utils/env_options.cpp)
-endif()
-
 if(MPP_STATS MATCHES "ON")
 	list(APPEND MPP_SOURCES src/utils/statistics.cpp)
 endif()

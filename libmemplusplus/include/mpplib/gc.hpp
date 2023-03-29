@@ -4,6 +4,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gcptr.hpp"
+#include "mpplib/utils/env_options.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
 #if MPP_STATS == 1
@@ -11,12 +12,8 @@
 #include "mpplib/utils/timer.hpp"
 #endif
 
-#if MPP_DEBUG == 1
-#include "mpplib/utils/env_options.hpp"
-#include <fstream>
-#endif
-
 #include <cstring>
+#include <fstream>
 #include <memory>
 #include <set>
 #include <unordered_set>
