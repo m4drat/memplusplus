@@ -25,7 +25,7 @@ namespace mpp {
     class SharedGcPtr;
 
     /**
-     * @brief Memory allocator class. Performs raw memoty allocation/deallocation as well as objects
+     * @brief Memory allocator class. Performs raw memory allocation/deallocation as well as objects
      * construction/destruction.
      */
     class MemoryManager

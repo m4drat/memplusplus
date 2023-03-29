@@ -66,19 +66,10 @@ namespace mpp {
         auto subgraphs = m_objectsGraph->WeaklyConnectedComponents();
 
         for (auto& graph : subgraphs) {
-            // Try to layout subgraph as a linked list
-            LayoutedHeap layoutedLL = LayoutLinkedList(graph);
+            LayoutedHeap layoutedHeap = LayoutGeneralGraph(graph);
             m_layoutedHeap.insert(
-                m_layoutedHeap.end(), layoutedLL.vertices.begin(), layoutedLL.vertices.end());
-            m_neededSpace += layoutedLL.layoutedSize;
-
-            if (graph->GetVerticesCount() != 0) {
-                LayoutedHeap layoutedHeap = LayoutGeneralGraph(graph);
-                m_layoutedHeap.insert(m_layoutedHeap.end(),
-                                      layoutedHeap.vertices.begin(),
-                                      layoutedHeap.vertices.end());
-                m_neededSpace += layoutedHeap.layoutedSize;
-            }
+                m_layoutedHeap.end(), layoutedHeap.vertices.begin(), layoutedHeap.vertices.end());
+            m_neededSpace += layoutedHeap.layoutedSize;
         }
 
         return LayoutedHeap{ m_layoutedHeap, m_neededSpace };

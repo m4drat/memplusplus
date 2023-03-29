@@ -1,12 +1,15 @@
 #include "mpplib/gc.hpp"
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/gc_graph.hpp"
+#include "mpplib/exception.hpp"
 #include "mpplib/heuristics/heuristics.hpp"
 #include "mpplib/shared_gcptr.hpp"
 #include "mpplib/utils/macros.hpp"
+#include "mpplib/utils/utils.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <memory>
+#include <sstream>
 #include <unordered_map>
 
 namespace mpp {
@@ -45,6 +48,44 @@ namespace mpp {
         return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
     }
 
+    void GarbageCollector::DumpCurrentObjectsGraph(utils::ObjectsGraphDumpType t_dumpType,
+                                                   const std::string& t_filename)
+    {
+        m_chunksInUseCache.clear();
+
+        std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>(*this, m_memoryManager);
+
+        // Construct chunks graph
+        for (auto* gcPtr : m_activeGcPtrs) {
+            objectsGraph->AddObjectInfo(gcPtr);
+        }
+
+        SaveObjectsGraph(objectsGraph, t_filename, t_dumpType);
+
+        m_chunksInUseCache.clear();
+    }
+
+    void GarbageCollector::SaveObjectsGraph(std::unique_ptr<GcGraph>& t_graph,
+                                            const std::string& t_filename,
+                                            utils::ObjectsGraphDumpType t_dumpType)
+    {
+        std::ofstream objectsDot(t_filename);
+
+        switch (t_dumpType) {
+            case utils::ObjectsGraphDumpType::SIMPLE:
+                t_graph->GenerateGraphvizLayoutSimple(objectsDot) << std::endl;
+                break;
+            case utils::ObjectsGraphDumpType::ADVANCED:
+                t_graph->GenerateGraphvizLayoutAdvanced(objectsDot) << std::endl;
+                break;
+            default:
+                throw Exception("Invalid gc-graph dump type specified!");
+                break;
+        }
+
+        objectsDot.close();
+    }
+
     bool GarbageCollector::Collect()
     {
 #if MPP_STATS == 1
@@ -78,20 +119,9 @@ namespace mpp {
 #if MPP_DEBUG == 1
         if (utils::EnvOptions::Get().GetMppDumpObjectsGraph() !=
             utils::ObjectsGraphDumpType::DISABLED) {
-            std::ofstream objectsDot("objects_cycle" + std::to_string(m_totalInvocations) + ".dot");
-
-            switch (utils::EnvOptions::Get().GetMppDumpObjectsGraph()) {
-                case utils::ObjectsGraphDumpType::SIMPLE:
-                    objectsGraph->GenerateGraphvizLayoutSimple(objectsDot) << std::endl;
-                    break;
-                case utils::ObjectsGraphDumpType::ADVANCED:
-                    objectsGraph->GenerateGraphvizLayoutAdvanced(objectsDot) << std::endl;
-                    break;
-                default:
-                    break;
-            }
-
-            objectsDot.close();
+            std::string filename = "objects_cycle" + std::to_string(m_totalInvocations) + ".dot";
+            auto dumpMode = utils::EnvOptions::Get().GetMppDumpObjectsGraph();
+            SaveObjectsGraph(objectsGraph, filename, dumpMode);
         }
 #endif
 

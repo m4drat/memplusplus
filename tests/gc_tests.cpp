@@ -2,8 +2,90 @@
 
 #include "gtest_fixtures.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/memory_manager.hpp"
 #include "mpplib/mpp.hpp"
 #include <memory>
+
+TEST_F(GcTest, CrashInvalidWriteSharedGcPtr_Issue90)
+{
+    using namespace mpp;
+
+    class Vertex
+    {
+    private:
+        std::array<SharedGcPtr<Vertex>, 16> m_gcs;
+        uint64_t m_data;
+
+    public:
+        explicit Vertex(uint64_t t_data)
+            : m_data(t_data)
+        {
+        }
+
+        Vertex()
+            : m_data(0x13371337deadbeef)
+        {
+        }
+
+        void AddPointerAtIndex(uint32_t t_idx, const SharedGcPtr<Vertex>& t_ptr)
+        {
+            m_gcs.at(t_idx) = t_ptr;
+        }
+
+        const SharedGcPtr<Vertex>& GetPointerAtIndex(uint32_t t_idx)
+        {
+            return m_gcs.at(t_idx);
+        }
+
+        std::array<SharedGcPtr<Vertex>, 16>& GetArray()
+        {
+            return m_gcs;
+        }
+
+        uint64_t& GetData()
+        {
+            return m_data;
+        }
+    };
+
+    for (uint32_t i = 0; i < 16; i++) {
+        std::array<mpp::SharedGcPtr<Vertex>, 32> pointers;
+
+        pointers.at(0) = mpp::MakeShared<Vertex>();
+        pointers.at(1) = mpp::MakeShared<Vertex>();
+        pointers.at(2) = mpp::MakeShared<Vertex>();
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        mpp::SharedGcPtr<Vertex>& vtx_to_add1 = pointers.at(0);
+        mpp::SharedGcPtr<Vertex>& vtx_add_to1 = pointers.at(1);
+        vtx_add_to1->AddPointerAtIndex(1, vtx_to_add1);
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        mpp::SharedGcPtr<Vertex>& vtx_to_add2 = pointers.at(0);
+        mpp::SharedGcPtr<Vertex>& vtx_add_to2 = pointers.at(0);
+        vtx_add_to2->AddPointerAtIndex(2, vtx_to_add2);
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        mpp::SharedGcPtr<Vertex>& vtx_to_add3 = pointers.at(2);
+        mpp::SharedGcPtr<Vertex>& vtx_add_to3 = pointers.at(0);
+        vtx_add_to3->AddPointerAtIndex(8, vtx_to_add3);
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        CollectGarbage();
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        pointers.at(2) = mpp::MakeShared<Vertex>(0xbeef);
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        mpp::SharedGcPtr<Vertex>& vtx_to_add4 = pointers.at(2);
+        mpp::SharedGcPtr<Vertex>& vtx_add_to4 = pointers.at(0);
+        vtx_add_to4->AddPointerAtIndex(8, vtx_to_add4);
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+
+        CollectGarbage();
+        mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+    }
+}
 
 TEST_F(GcTest, DoubleCollectSelfReference1_Issue88)
 {

@@ -543,8 +543,8 @@ namespace mpp {
     Vertex* GcGraph::FindVertex(Chunk* t_chunk) const
     {
         PROFILE_FUNCTION();
-        std::unique_ptr<Vertex> vertex = std::make_unique<Vertex>(t_chunk);
-        auto foundVertexIt = m_adjList.find(vertex.get());
+        Vertex vertex{ t_chunk };
+        auto foundVertexIt = m_adjList.find(&vertex);
         if (foundVertexIt != m_adjList.end()) {
             return *foundVertexIt;
         }

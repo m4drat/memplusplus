@@ -2,6 +2,7 @@
 
 #include "mpplib/arena.hpp"
 #include "mpplib/chunk.hpp"
+#include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gcptr.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
@@ -62,9 +63,22 @@ namespace mpp {
         //! @brief Reference to parent MemoryManager object.
         MemoryManager& m_memoryManager;
 
+        /**
+         * @brief Given objects graph builds a SIMPLE or ADVANCED graphviz representation and saves
+         * it to the disk.
+         *
+         * @param t_graph Graph to render.
+         * @param t_filename Filename to save as.
+         * @param t_dumpType Graph dump type.
+         */
+        static void SaveObjectsGraph(
+            std::unique_ptr<GcGraph>& t_graph,
+            const std::string& t_filename = "objects-graph.dot",
+            utils::ObjectsGraphDumpType t_dumpType = utils::ObjectsGraphDumpType::SIMPLE);
+
     public:
         /**
-         * @brief Construct a new Garbage Collector object
+         * @brief Construct a new Garbage Collector object.
          * @param t_memoryManager Reference to parent MemoryManager object.
          */
         explicit GarbageCollector(MemoryManager& t_memoryManager);
@@ -74,9 +88,9 @@ namespace mpp {
          *
          * This method will construct graph of all in use chunks.
          * Then it will create Heuristics object to relayout data in the most efficient way.
-         * After that, it will move all data to newly created arena, updating
+         * After that, it will move all data to newly created arena, updating.
          * corresponding gcptr's. And in the end it will destroy unused arenas.
-         * @return true if everything is good, false - otherwise
+         * @return true if everything is good, false - otherwise.
          */
         bool Collect();
 
@@ -88,8 +102,8 @@ namespace mpp {
         Chunk* FindChunkInUse(void* t_ptr);
 
         /**
-         * @brief Get reference to unordered set of currently active GcPtr's
-         * @return std::unordered_set<GcPtr*>& of currently used GcPtr's
+         * @brief Get reference to unordered set of currently active GcPtr's.
+         * @return std::unordered_set<GcPtr*>& of currently used GcPtr's.
          */
         std::unordered_set<GcPtr*>& GetGcPtrs()
         {
@@ -99,7 +113,7 @@ namespace mpp {
         /**
          * @brief Transforms an unordered set of GcPtr's to a set of GcPtr's
          * and returns it as a copy.
-         * @return std::set<GcPtr*> of currently used GcPtr's
+         * @return std::set<GcPtr*> of currently used GcPtr's.
          */
         std::set<GcPtr*> GetOrderedGcPtrs()
         {
@@ -107,12 +121,22 @@ namespace mpp {
         }
 
         /**
-         * @brief Adds new gcptr to the list of active gcptr's
-         * @param t_ptr pointer to GcPtr to add
+         * @brief Adds new gcptr to the list of active gcptr's.
+         * @param t_ptr pointer to GcPtr to add.
          */
         void AddGcPtr(GcPtr* t_ptr)
         {
             m_activeGcPtrs.insert(t_ptr);
         }
+
+        /**
+         * @brief Dumps current objects state.
+         *
+         * @param t_filename output file to save the graph to.
+         * @param t_dumpType dump type (SIMPLE/ADVANCED).
+         */
+        void DumpCurrentObjectsGraph(
+            utils::ObjectsGraphDumpType t_dumpType = utils::ObjectsGraphDumpType::ADVANCED,
+            const std::string& t_filename = "objects-graph.dot");
     };
 }
