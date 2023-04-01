@@ -201,11 +201,14 @@ namespace mpp {
 
         /**
          * @brief Perform directed Depth-First-Search starting from t_vertex.
-         * @param t_vertex vertex, from which we want to start directed DFS.
-         * @return GcGraphView - view of the original graph that is built from the vertices found
-         * using UDFS.
+         * @param t_vertex Vertex, from which we want to start directed DFS.
+         * @param t_externalVisited Optional parameter that allows to skip specific vertices.
+         * @return GcGraphView - view of the original graph that is built from the vertices
+         * found using UDFS.
          */
-        std::unique_ptr<GcGraphView> DirectedDFS(Vertex* t_vertex);
+        std::unique_ptr<GcGraphView> DirectedDFS(
+            Vertex* t_vertex,
+            const std::unordered_set<Vertex*>& t_externalVisited = {});
 
         /**
          * @brief Perform undirected Depth-First-Search starting from t_vertex.

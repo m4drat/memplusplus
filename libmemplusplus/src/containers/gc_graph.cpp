@@ -498,7 +498,7 @@ namespace mpp {
 
             // Collect all directly-reachable vertices
             for (auto* rootVtx : component->GetRoots()) {
-                auto rootReachable = DirectedDFS(rootVtx);
+                auto rootReachable = DirectedDFS(rootVtx, reachable);
                 reachable.insert(rootReachable->GetAdjList().begin(),
                                  rootReachable->GetAdjList().end());
             }
@@ -534,7 +534,9 @@ namespace mpp {
         return reachableComponents;
     }
 
-    std::unique_ptr<GcGraphView> GcGraph::DirectedDFS(Vertex* t_vertex)
+    std::unique_ptr<GcGraphView> GcGraph::DirectedDFS(
+        Vertex* t_vertex,
+        const std::unordered_set<Vertex*>& t_externalVisited)
     {
         PROFILE_FUNCTION();
         // Vector of visited vertices using directed DFS
@@ -550,6 +552,10 @@ namespace mpp {
         while (!stack.empty()) {
             Vertex* vtx = stack.top();
             stack.pop();
+
+            if (t_externalVisited.contains(vtx)) {
+                continue;
+            }
 
             if (visited.contains(vtx)) {
                 continue;
