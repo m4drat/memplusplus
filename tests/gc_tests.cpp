@@ -73,6 +73,7 @@ TEST_F(GcTest, CrashInvalidWriteSharedGcPtr_Issue90)
 
         CollectGarbage();
         mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+        EXPECT_TRUE(mpp::g_memoryManager->GetGC().GetGcPtrs().size() == 6);
 
         pointers.at(2) = mpp::MakeShared<Vertex>(0xbeef);
         mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
@@ -84,6 +85,7 @@ TEST_F(GcTest, CrashInvalidWriteSharedGcPtr_Issue90)
 
         CollectGarbage();
         mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+        EXPECT_TRUE(mpp::g_memoryManager->GetGC().GetGcPtrs().size() == 6);
     }
 }
 

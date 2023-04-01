@@ -64,6 +64,127 @@ TEST(GcGraphTest, AddObjectInfo_Issue88)
     EXPECT_TRUE((*objectsGraph->GetAdjList().begin())->GetPointingToGcPtrs().size() == 2);
 }
 
+TEST(GcGraphTest, UndirectedDFS)
+{
+    using namespace mpp;
+    std::unique_ptr<GcGraph> objectsGraph =
+        std::make_unique<GcGraph>(g_memoryManager->GetGC(), *g_memoryManager);
+    auto* v1 = new Vertex((std::byte*)0x1000, true);
+    auto* v2 = new Vertex((std::byte*)0x1100, true);
+    auto* v3 = new Vertex((std::byte*)0x1200, false);
+    auto* v4 = new Vertex((std::byte*)0x1300, true);
+    auto* v5 = new Vertex((std::byte*)0x1400, false);
+
+    // First weakly-connected component: { v1, v2, v3 }
+    objectsGraph->AddEdge(v1, v2);
+    objectsGraph->AddEdge(v2, v3);
+
+    // Second weakly-connected component: { v4, v5 }
+    objectsGraph->AddEdge(v4, v5);
+    objectsGraph->AddEdge(v5, v4);
+
+    ASSERT_TRUE(objectsGraph->GetVerticesCount() == 5);
+
+    auto visited1 = objectsGraph->UndirectedDFS(v1);
+    ASSERT_TRUE(visited1->GetAdjList().size() == 3);
+    ASSERT_TRUE(visited1->GetRoots().size() == 1);
+    ASSERT_TRUE(visited1->GetRoots().contains(v3));
+
+    auto visited2 = objectsGraph->UndirectedDFS(v2);
+    ASSERT_TRUE(visited2->GetAdjList().size() == 3);
+    ASSERT_TRUE(visited2->GetRoots().size() == 1);
+    ASSERT_TRUE(visited2->GetRoots().contains(v3));
+
+    auto visited3 = objectsGraph->UndirectedDFS(v3);
+    ASSERT_TRUE(visited3->GetAdjList().size() == 3);
+    ASSERT_TRUE(visited3->GetRoots().size() == 1);
+    ASSERT_TRUE(visited3->GetRoots().contains(v3));
+
+    for (auto* vtx : { v1, v2, v3 }) {
+        ASSERT_TRUE(visited1->GetAdjList().contains(vtx));
+        ASSERT_TRUE(visited2->GetAdjList().contains(vtx));
+        ASSERT_TRUE(visited3->GetAdjList().contains(vtx));
+    }
+
+    auto visited4 = objectsGraph->UndirectedDFS(v4);
+    ASSERT_TRUE(visited4->GetAdjList().size() == 2);
+    ASSERT_TRUE(visited4->GetRoots().size() == 1);
+    ASSERT_TRUE(visited4->GetRoots().contains(v5));
+
+    auto visited5 = objectsGraph->UndirectedDFS(v5);
+    ASSERT_TRUE(visited5->GetAdjList().size() == 2);
+    ASSERT_TRUE(visited5->GetRoots().size() == 1);
+    ASSERT_TRUE(visited5->GetRoots().contains(v5));
+
+    for (auto* vtx : { v4, v5 }) {
+        ASSERT_TRUE(visited4->GetAdjList().contains(vtx));
+        ASSERT_TRUE(visited5->GetAdjList().contains(vtx));
+    }
+}
+
+TEST(GcGraphTest, DirectedDFS)
+{
+    using namespace mpp;
+    std::unique_ptr<GcGraph> objectsGraph =
+        std::make_unique<GcGraph>(g_memoryManager->GetGC(), *g_memoryManager);
+    auto* v1 = new Vertex((std::byte*)0x1000, false);
+    auto* v2 = new Vertex((std::byte*)0x1100, true);
+    auto* v3 = new Vertex((std::byte*)0x1200, false);
+    auto* v4 = new Vertex((std::byte*)0x1300, true);
+    auto* v5 = new Vertex((std::byte*)0x1400, false);
+
+    // First component
+    objectsGraph->AddEdge(v1, v2);
+    objectsGraph->AddEdge(v2, v3);
+
+    // Second component
+    objectsGraph->AddEdge(v4, v5);
+    objectsGraph->AddEdge(v5, v4);
+
+    ASSERT_TRUE(objectsGraph->GetVerticesCount() == 5);
+
+    auto visited1 = objectsGraph->DirectedDFS(v1);
+    ASSERT_TRUE(visited1->GetAdjList().size() == 3);
+    ASSERT_TRUE(visited1->GetRoots().size() == 2);
+    ASSERT_TRUE(visited1->GetRoots().contains(v3));
+    ASSERT_TRUE(visited1->GetRoots().contains(v1));
+
+    auto visited2 = objectsGraph->DirectedDFS(v2);
+    ASSERT_TRUE(visited2->GetAdjList().size() == 2);
+    ASSERT_TRUE(visited2->GetRoots().size() == 1);
+    ASSERT_TRUE(visited2->GetRoots().contains(v3));
+
+    auto visited3 = objectsGraph->DirectedDFS(v3);
+    ASSERT_TRUE(visited3->GetAdjList().size() == 1);
+    ASSERT_TRUE(visited3->GetRoots().size() == 1);
+    ASSERT_TRUE(visited3->GetRoots().contains(v3));
+
+    for (auto* vtx : { v1, v2, v3 }) {
+        ASSERT_TRUE(visited1->GetAdjList().contains(vtx));
+    }
+
+    for (auto* vtx : { v2, v3 }) {
+        ASSERT_TRUE(visited2->GetAdjList().contains(vtx));
+    }
+
+    ASSERT_TRUE(visited2->GetAdjList().contains(v3));
+
+    auto visited4 = objectsGraph->DirectedDFS(v4);
+    ASSERT_TRUE(visited4->GetAdjList().size() == 2);
+    ASSERT_TRUE(visited4->GetRoots().size() == 1);
+    ASSERT_TRUE(visited4->GetRoots().contains(v5));
+
+    auto visited5 = objectsGraph->DirectedDFS(v5);
+    ASSERT_TRUE(visited5->GetAdjList().size() == 2);
+    ASSERT_TRUE(visited5->GetRoots().size() == 1);
+    ASSERT_TRUE(visited5->GetRoots().contains(v5));
+
+    for (auto* vtx : { v4, v5 }) {
+        ASSERT_TRUE(visited4->GetAdjList().contains(vtx));
+        ASSERT_TRUE(visited5->GetAdjList().contains(vtx));
+    }
+}
+
 TEST(GcGraphTest, WeaklyConnectedComponents)
 {
     using namespace mpp;
@@ -86,6 +207,52 @@ TEST(GcGraphTest, WeaklyConnectedComponents)
     ASSERT_TRUE(objectsGraph->GetVerticesCount() == 5);
 
     auto components = objectsGraph->WeaklyConnectedComponents();
+    ASSERT_TRUE(components.size() == 2);
+
+    // Test first weakly-connected component
+    auto& firstComponent = components[0];
+    ASSERT_TRUE(firstComponent->GetAdjList().size() == 3);
+    ASSERT_TRUE(firstComponent->GetVerticesCount() == 3);
+    for (auto* vtx : { v1, v2, v3 }) {
+        ASSERT_TRUE(firstComponent->GetAdjList().contains(vtx));
+    }
+
+    // Test second weakly-connected component
+    auto& secondComponent = components[1];
+    ASSERT_TRUE(secondComponent->GetAdjList().size() == 2);
+    ASSERT_TRUE(secondComponent->GetVerticesCount() == 2);
+    for (auto* vtx : { v4, v5 }) {
+        ASSERT_TRUE(secondComponent->GetAdjList().contains(vtx));
+    }
+}
+
+TEST(GcGraphTest, ReachableWeaklyConnectedComponents)
+{
+    using namespace mpp;
+    std::unique_ptr<GcGraph> objectsGraph =
+        std::make_unique<GcGraph>(g_memoryManager->GetGC(), *g_memoryManager);
+
+    auto* v1 = new Vertex((std::byte*)0x1000, false);
+    auto* v2 = new Vertex((std::byte*)0x1100, true);
+    auto* v3 = new Vertex((std::byte*)0x1200, true);
+    auto* cycle = new Vertex((std::byte*)Chunk::GetHeaderPtr(Allocate(1024)), true);
+
+    auto* v4 = new Vertex((std::byte*)0x1300, true);
+    auto* v5 = new Vertex((std::byte*)0x1400, false);
+
+    // First weakly-connected component: { v1, v2, v3 }
+    objectsGraph->AddEdge(v1, v2);
+    objectsGraph->AddEdge(v2, v3);
+    objectsGraph->AddEdge(cycle, cycle);
+    objectsGraph->AddEdge(cycle, v3);
+
+    // Second weakly-connected component: { v4, v5 }
+    objectsGraph->AddEdge(v4, v5);
+    objectsGraph->AddEdge(v5, v4);
+
+    ASSERT_TRUE(objectsGraph->GetVerticesCount() == 6);
+
+    auto components = objectsGraph->ReachableWeaklyConnectedComponents();
     ASSERT_TRUE(components.size() == 2);
 
     // Test first weakly-connected component
@@ -196,10 +363,11 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs)
     ASSERT_NE(firstVertex, nullptr);
     ASSERT_NE(secondVertex, nullptr);
     ASSERT_NE(firstVertex, secondVertex);
-    ASSERT_EQ(firstVertex->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(),
-              0);
     ASSERT_EQ(
-        secondVertex->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 1);
+        firstVertex->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(
+        secondVertex->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(),
+        1);
 }
 
 TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
@@ -227,6 +395,7 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     for (auto* gcPtr : g_memoryManager->GetGC().GetGcPtrs()) {
         objectsGraph->AddObjectInfo(gcPtr);
     }
+    ASSERT_EQ(objectsGraph->GetRoots().size(), 1);
     ASSERT_EQ(objectsGraph->GetAdjList().size(), 6);
     ASSERT_EQ(objectsGraph->GetVerticesCount(), 6);
     ASSERT_EQ(g_memoryManager->GetGC().GetGcPtrs().size(), 5);
@@ -245,16 +414,17 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(objectsGraph->HasEdge(nodePtrVtxValid, ptrToNodePtrVtx), false);
 
     ASSERT_EQ(
-        ptrToNodePtrVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(),
+        ptrToNodePtrVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(),
         1);
     ASSERT_EQ(
-        nodePtrVtxValid->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(),
+        nodePtrVtxValid->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(),
         1);
 
     auto* nodeVtx = objectsGraph->FindVertex(
         g_memoryManager->GetGC().FindChunkInUse(ptrToNodePtr.Get()->GetVoid()));
     ASSERT_NE(nodeVtx, nullptr);
-    ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 3);
+    ASSERT_EQ(nodeVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(),
+              3);
 
     auto* aVtxTmp = objectsGraph->FindVertex(
         g_memoryManager->GetGC().FindChunkInUse(&ptrToNodePtr.Get()->Get()->a));
@@ -284,9 +454,9 @@ TEST(GcGraphTest, GetAllOutgoingGcPtrs3)
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, bVtx), true);
     ASSERT_EQ(objectsGraph->HasEdge(nodeVtx, cVtx), true);
 
-    ASSERT_EQ(aVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 0);
-    ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 0);
-    ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().GetOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(aVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(bVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(), 0);
+    ASSERT_EQ(cVtx->GetAllOutgoingGcPtrs(g_memoryManager->GetGC().BuildOrderedGcPtrs()).size(), 0);
 
     // Generate graphviz layout just to check that at least it doesn't segfault 🤷
     std::stringstream ss;

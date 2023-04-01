@@ -9,6 +9,11 @@ namespace mpp {
         return m_currLocationIsAChunk;
     }
 
+    bool Vertex::IsRoot() const
+    {
+        return !m_currLocationIsAChunk;
+    }
+
     void Vertex::UpdateLocationPtr(std::byte* t_location)
     {
         m_correspondingLocation = t_location;

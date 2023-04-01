@@ -62,9 +62,8 @@ namespace mpp {
         /**
          * @brief Construct a new Heuristics object
          * @param t_objectsGraph Graph of all objects.
-         * @param t_gcPtrs Const reference to all active GcPtr's.
          */
-        Heuristics(std::unique_ptr<GcGraph>& t_objectsGraph, const std::set<GcPtr*>& t_gcPtrs)
+        explicit Heuristics(std::unique_ptr<GcGraph>& t_objectsGraph)
             : m_objectsGraph(t_objectsGraph)
         {
         }
@@ -98,15 +97,13 @@ namespace mpp {
          * @param t_llGraph Graph that should (but not necessarily) represent LinkedList.
          * @return LayoutedHeap Successfully layouted t_llGraph or its part.
          */
-        static LayoutedHeap LayoutLinkedList(
-            std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_llGraph);
+        static LayoutedHeap LayoutLinkedList(std::unique_ptr<GcGraphView>& t_llGraph);
 
         /**
          * @brief Layouts unknown data structure in the most efficient way.
          * @param t_graph Graph with chunks that should be layouted.
          * @return LayoutedHeap Successfully layouted t_graph.
          */
-        static LayoutedHeap LayoutGeneralGraph(
-            std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_graph);
+        static LayoutedHeap LayoutGeneralGraph(std::unique_ptr<GcGraphView>& t_graph);
     };
 }

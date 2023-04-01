@@ -24,7 +24,7 @@ namespace mpp {
         //! @brief Set of vertices that the current vertex points to.
         std::set<Vertex*> m_neighbors;
 
-        //! @brief Set of vertices, that are pointing the to current vertex.
+        //! @brief Set of vertices, that are pointing to the current vertex.
         std::set<Vertex*> m_pointingToVertices;
 
         //! @brief Set of GcPtr's that are pointing to the current chunk.
@@ -62,6 +62,12 @@ namespace mpp {
          * @return true if location is a chunk, false otherwise.
          */
         bool IsChunk() const;
+
+        /**
+         * @brief Checks whether location is a root node or not.
+         * @return true if location is a root, false otherwise.
+         */
+        bool IsRoot() const;
 
         /**
          * @brief Set new value for m_correspondingLocation.

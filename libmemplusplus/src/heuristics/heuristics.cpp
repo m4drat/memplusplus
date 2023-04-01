@@ -4,8 +4,7 @@
 #include <algorithm>
 
 namespace mpp {
-    Heuristics::LayoutedHeap Heuristics::LayoutGeneralGraph(
-        std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_graph)
+    Heuristics::LayoutedHeap Heuristics::LayoutGeneralGraph(std::unique_ptr<GcGraphView>& t_graph)
     {
         PROFILE_FUNCTION();
 
@@ -22,8 +21,7 @@ namespace mpp {
         return LayoutedHeap{ layoutedHeap, neededSpace };
     }
 
-    Heuristics::LayoutedHeap Heuristics::LayoutLinkedList(
-        std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>& t_llGraph)
+    Heuristics::LayoutedHeap Heuristics::LayoutLinkedList(std::unique_ptr<GcGraphView>& t_llGraph)
     {
         PROFILE_FUNCTION();
 
@@ -63,7 +61,9 @@ namespace mpp {
     Heuristics::LayoutedHeap Heuristics::LayoutHeap()
     {
         PROFILE_FUNCTION();
-        auto subgraphs = m_objectsGraph->WeaklyConnectedComponents();
+
+        // Divide the graph into weakly connected components, but remove all unreachable vertices.
+        auto subgraphs = m_objectsGraph->ReachableWeaklyConnectedComponents();
 
         for (auto& graph : subgraphs) {
             LayoutedHeap layoutedHeap = LayoutGeneralGraph(graph);

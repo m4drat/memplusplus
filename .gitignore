@@ -9,6 +9,7 @@
 !/fuzzer/corpus/testcase1.txt
 
 /fuzzer/fuzzer_utils/**
+/corpus/
 
 mpplib-profiling.json
 /crash-**

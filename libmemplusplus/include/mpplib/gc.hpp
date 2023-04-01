@@ -4,6 +4,7 @@
 #include "mpplib/chunk.hpp"
 #include "mpplib/containers/gc_graph.hpp"
 #include "mpplib/gcptr.hpp"
+#include "mpplib/heuristics/heuristics.hpp"
 #include "mpplib/utils/env_options.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
 
@@ -46,6 +47,12 @@ namespace mpp {
          */
         std::unordered_set<GcPtr*> m_activeGcPtrs;
 
+        /**
+         * @brief Ordered set of all active GcPtr's, used only while performing Garbage-collection.
+         * @warning Only valid in the context of GC::Collect().
+         */
+        std::set<GcPtr*> m_orderedActiveGcPtrs;
+
         //! @brief Cache of chunks in use for each arena.
         std::unordered_map<Arena*, std::set<Chunk*>> m_chunksInUseCache;
 
@@ -81,6 +88,39 @@ namespace mpp {
         explicit GarbageCollector(MemoryManager& t_memoryManager);
 
         /**
+         * @brief Dumps current objects state.
+         *
+         * @param t_filename output file to save the graph to.
+         * @param t_dumpType dump type (SIMPLE/ADVANCED).
+         */
+        void DumpCurrentObjectsGraph(
+            utils::ObjectsGraphDumpType t_dumpType = utils::ObjectsGraphDumpType::ADVANCED,
+            const std::string& t_filename = "objects-graph.dot");
+
+        /**
+         * @brief Returns in-use chunk if t_ptr points inside it, nullptr otherwise.
+         * @param t_ptr Pointer to find chunk for.
+         * @return Chunk* Pointer to chunk if t_ptr points inside it, nullptr otherwise.
+         */
+        Chunk* FindChunkInUse(void* t_ptr);
+
+        /**
+         * @brief Creates an Arena that has enough space to fit all the objects.
+         * @param t_requestedSize size of all objects that should be placed inside.
+         * @return std::unique_ptr<Arena>& newly created arena.
+         */
+        std::unique_ptr<Arena>& CreateGodArena(uint64_t t_requestedSize);
+
+        /**
+         * @brief Relocates all smart pointers from old arenas to newly created one, updating all
+         * pointing to/from pointers.
+         * @param t_godArena Arena to move all the pointers to.
+         * @param t_layoutedData optimally-layouted heap.
+         */
+        void RelocatePointers(std::unique_ptr<Arena>& t_godArena,
+                              Heuristics::LayoutedHeap& t_layoutedData);
+
+        /**
          * @brief Collect garbage.
          *
          * This method will construct graph of all in use chunks.
@@ -90,13 +130,6 @@ namespace mpp {
          * @return true if everything is good, false - otherwise.
          */
         bool Collect();
-
-        /**
-         * @brief Returns in-use chunk if t_ptr points inside it, nullptr otherwise.
-         * @param t_ptr Pointer to find chunk for.
-         * @return Chunk* Pointer to chunk if t_ptr points inside it, nullptr otherwise.
-         */
-        Chunk* FindChunkInUse(void* t_ptr);
 
         /**
          * @brief Get reference to unordered set of currently active GcPtr's.
@@ -112,7 +145,12 @@ namespace mpp {
          * and returns it as a copy.
          * @return std::set<GcPtr*> of currently used GcPtr's.
          */
-        std::set<GcPtr*> GetOrderedGcPtrs()
+        std::set<GcPtr*>& GetOrderedGcPtrs()
+        {
+            return m_orderedActiveGcPtrs;
+        }
+
+        std::set<GcPtr*> BuildOrderedGcPtrs()
         {
             return std::set(m_activeGcPtrs.begin(), m_activeGcPtrs.end());
         }
@@ -125,15 +163,5 @@ namespace mpp {
         {
             m_activeGcPtrs.insert(t_ptr);
         }
-
-        /**
-         * @brief Dumps current objects state.
-         *
-         * @param t_filename output file to save the graph to.
-         * @param t_dumpType dump type (SIMPLE/ADVANCED).
-         */
-        void DumpCurrentObjectsGraph(
-            utils::ObjectsGraphDumpType t_dumpType = utils::ObjectsGraphDumpType::ADVANCED,
-            const std::string& t_filename = "objects-graph.dot");
     };
 }

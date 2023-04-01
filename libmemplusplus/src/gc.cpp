@@ -17,35 +17,6 @@ namespace mpp {
         : m_totalInvocations(0)
         , m_memoryManager(t_memoryManager)
     {
-#if MPP_STATS == 1
-        m_gcStats = std::make_unique<utils::Statistics::GcStats>();
-#endif
-    }
-
-    Chunk* GarbageCollector::FindChunkInUse(void* t_ptr)
-    {
-        PROFILE_FUNCTION();
-
-        // Find arena by pointer
-        auto arenaOpt = m_memoryManager.GetArenaByPtr(t_ptr);
-        if (!arenaOpt.has_value())
-            return nullptr;
-
-        std::unique_ptr<Arena>& arena = arenaOpt.value().get();
-
-        // Build chunks in use cache if not present
-        if (!m_chunksInUseCache.contains(arena.get())) {
-            m_chunksInUseCache[arena.get()] = arena->BuildChunksInUse();
-        }
-
-        const std::set<Chunk*>& chunksInUse = m_chunksInUseCache[arena.get()];
-
-        // Find a chunk by pointer
-        auto foundChunkIt = chunksInUse.lower_bound(reinterpret_cast<Chunk*>(t_ptr));
-        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
-            return *foundChunkIt;
-        }
-        return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
     }
 
     void GarbageCollector::DumpCurrentObjectsGraph(utils::ObjectsGraphDumpType t_dumpType,
@@ -86,87 +57,65 @@ namespace mpp {
         objectsDot.close();
     }
 
-    bool GarbageCollector::Collect()
+    Chunk* GarbageCollector::FindChunkInUse(void* t_ptr)
     {
-#if MPP_STATS == 1
-        utils::profile::Timer timer("GC::Collect()");
-        timer.TimerStart();
-#endif
         PROFILE_FUNCTION();
 
-        // Ordered copy of m_activeGcPtrs
-        std::set<GcPtr*> orderedActiveGcPtrs = GetOrderedGcPtrs();
+        // Find arena by pointer
+        auto arenaOpt = m_memoryManager.GetArenaByPtr(t_ptr);
+        if (!arenaOpt.has_value())
+            return nullptr;
 
-        /*
-        1.
-            1.1 Divide graph into subgraphs (by connected components)
-            1.2 for each component find structures, rearranges them
-                unite all of the components
-            1.3 Heuristics returns pair<neededSpace, vector<Vertex*>>
-        2.
-            2.1 iterate through all arenas
-            2.2 reallocate chunks + update pointers
-            2.3 Delete unused arenas (including chunkTreap, etc)
-            2.4 reset GC state
-        */
-        std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>(*this, m_memoryManager);
+        std::unique_ptr<Arena>& arena = arenaOpt.value().get();
 
-        // Construct chunks graph
-        for (auto* gcPtr : m_activeGcPtrs) {
-            objectsGraph->AddObjectInfo(gcPtr);
+        // Build chunks in use cache if not present
+        if (!m_chunksInUseCache.contains(arena.get())) {
+            m_chunksInUseCache[arena.get()] = arena->BuildChunksInUse();
         }
 
-#if MPP_DEBUG == 1
-        if (utils::EnvOptions::Get().GetMppDumpObjectsGraph() !=
-            utils::ObjectsGraphDumpType::DISABLED) {
-            std::string filename = "objects_cycle" + std::to_string(m_totalInvocations) + ".dot";
-            auto dumpMode = utils::EnvOptions::Get().GetMppDumpObjectsGraph();
-            SaveObjectsGraph(objectsGraph, filename, dumpMode);
+        const std::set<Chunk*>& chunksInUse = m_chunksInUseCache[arena.get()];
+
+        // Find a chunk by pointer
+        auto foundChunkIt = chunksInUse.lower_bound(reinterpret_cast<Chunk*>(t_ptr));
+        if (foundChunkIt != chunksInUse.end() && *foundChunkIt == t_ptr) {
+            return *foundChunkIt;
         }
-#endif
+        return (foundChunkIt != chunksInUse.begin()) ? *(--foundChunkIt) : nullptr;
+    }
 
-        // Create heuristics object
-        std::unique_ptr<Heuristics> heuristics =
-            std::make_unique<Heuristics>(objectsGraph, orderedActiveGcPtrs);
-
-        // Layout heap in the most efficient way
-        Heuristics::LayoutedHeap layoutedData = heuristics->LayoutHeap();
-
-        // Create a new arena with enough memory to fit all objects
-        const std::size_t minArenaSize = (layoutedData.layoutedSize < MM::g_DEFAULT_ARENA_SIZE)
+    std::unique_ptr<Arena>& GarbageCollector::CreateGodArena(uint64_t t_requestedSize)
+    {
+        const std::size_t minArenaSize = (t_requestedSize < MM::g_DEFAULT_ARENA_SIZE)
                                              ? MM::g_DEFAULT_ARENA_SIZE
-                                             : layoutedData.layoutedSize;
+                                             : t_requestedSize;
         std::size_t godArenaSize = minArenaSize;
 
         // If newly created arena is really small (we have less than 25% of free space)
         // Enlarge it by specified expandFactor
-        if (static_cast<double>(godArenaSize - layoutedData.layoutedSize) / (double)godArenaSize <
+        if (static_cast<double>(godArenaSize - t_requestedSize) / (double)godArenaSize <
             m_newAllocExtendThreshold) {
             godArenaSize = (std::size_t)((double)godArenaSize * m_newAllocExpandFactor);
         }
         godArenaSize = MM::Align(godArenaSize, MM::g_PAGE_SIZE);
 
-        auto& godArena = m_memoryManager.CreateArena(godArenaSize);
+        return m_memoryManager.CreateArena(godArenaSize);
+    }
 
-#if MPP_STATS == 1
-        m_gcStats->activeObjectsTotalSize = layoutedData.layoutedSize;
-        godArena->GetArenaStats()->gcCreatedArena = true;
-        godArena->GetArenaStats()->totalAllocated = layoutedData.layoutedSize;
-        godArena->SetUsedSpace(layoutedData.layoutedSize);
-#endif
-
-        std::byte* newChunkLocation{ godArena->BeginPtr() };
-        Chunk* newChunk{ nullptr };
+    void GarbageCollector::RelocatePointers(std::unique_ptr<Arena>& t_godArena,
+                                            Heuristics::LayoutedHeap& t_layoutedData)
+    {
+        std::byte* newChunkLocation{ t_godArena->BeginPtr() };
+        [[maybe_unused]] Chunk* newChunk{ nullptr };
         std::size_t prevSize{ 0 };
         std::size_t currSize{ 0 };
 
         // Map that stores old gcptr location -> new gcptr location
         // Used to be able to update all data pointers inside gcptrs
         std::unordered_map<GcPtr*, std::byte*> gcPtrsToNewLocations;
-        gcPtrsToNewLocations.reserve(orderedActiveGcPtrs.size());
+        gcPtrsToNewLocations.reserve(m_orderedActiveGcPtrs.size());
 
         // Iterate through all vertices (aka chunks) in layouted vector
-        for (auto* vertex : layoutedData.vertices) {
+        for (auto* vertex : t_layoutedData.vertices) {
             // We don't care about non-heap gcptrs (it may be a local GcPtr, etc)
             if (!vertex->IsChunk()) {
                 continue;
@@ -175,15 +124,12 @@ namespace mpp {
             // Extract size of a chunk
             currSize = vertex->GetLocationAsAChunk()->GetSize();
 
-#if MPP_STATS == 1
-            godArena->GetArenaStats()->IncreaseTotalAllocated(currSize);
-#endif
             // Update gcPtrsToNewLocations map with new location of a gcptr
-            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(orderedActiveGcPtrs)) {
-                orderedActiveGcPtrs.erase(gcPtr);
+            for (auto* gcPtr : vertex->GetAllOutgoingGcPtrs(m_orderedActiveGcPtrs)) {
+                m_orderedActiveGcPtrs.erase(gcPtr);
                 auto* updatedGcPtrLocation = reinterpret_cast<GcPtr*>(
                     newChunkLocation + (reinterpret_cast<std::byte*>(gcPtr) - vertex->GetLoc()));
-                orderedActiveGcPtrs.insert(orderedActiveGcPtrs.end(), updatedGcPtrLocation);
+                m_orderedActiveGcPtrs.insert(m_orderedActiveGcPtrs.end(), updatedGcPtrLocation);
                 gcPtrsToNewLocations[gcPtr] = reinterpret_cast<std::byte*>(updatedGcPtrLocation);
             }
 
@@ -209,7 +155,7 @@ namespace mpp {
 
                     MPP_DEBUG_ASSERT(
                         reinterpret_cast<std::byte*>(gcPtrInternalPointer) + sizeof(void*) <=
-                            godArena->EndPtr(),
+                            t_godArena->EndPtr(),
                         "GcPtr's internal pointer is out of newly created arena's bounds");
 
                     *gcPtrInternalPointer = reinterpret_cast<std::size_t>(newUserDataPtr);
@@ -233,37 +179,65 @@ namespace mpp {
             newChunkLocation = newChunkLocation + currSize;
         }
 
-        // Clear chunksInUse cache.
-        m_chunksInUseCache.clear();
-
-        // Update m_activeGcPtrs after all GcPtrs are updated.
-        m_activeGcPtrs =
-            std::unordered_set<GcPtr*>(orderedActiveGcPtrs.begin(), orderedActiveGcPtrs.end());
-
         // We always have some free space in the arena, so we have to construct a top chunk.
         Chunk* topChunk = Chunk::ConstructChunk(
-            newChunkLocation, prevSize, godArenaSize - layoutedData.layoutedSize, 1, 1);
-        godArena->SetUsedSpace(layoutedData.layoutedSize);
-        godArena->TopChunk() = topChunk;
+            newChunkLocation, prevSize, t_godArena->GetSize() - t_layoutedData.layoutedSize, 1, 1);
+        t_godArena->SetUsedSpace(t_layoutedData.layoutedSize);
+        t_godArena->TopChunk() = topChunk;
+    }
 
+    bool GarbageCollector::Collect()
+    {
+        PROFILE_FUNCTION();
+
+        // Ordered copy of m_activeGcPtrs.
+        m_orderedActiveGcPtrs = BuildOrderedGcPtrs();
+
+        // Construct objects graph.
+        std::unique_ptr<GcGraph> objectsGraph = std::make_unique<GcGraph>(*this, m_memoryManager);
+        for (auto* gcPtr : m_activeGcPtrs) {
+            objectsGraph->AddObjectInfo(gcPtr);
+        }
+
+#if MPP_DEBUG == 1
+        if (utils::EnvOptions::Get().GetMppDumpObjectsGraph() !=
+            utils::ObjectsGraphDumpType::DISABLED) {
+            std::string filename = "objects_cycle" + std::to_string(m_totalInvocations) + ".dot";
+            auto dumpMode = utils::EnvOptions::Get().GetMppDumpObjectsGraph();
+            SaveObjectsGraph(objectsGraph, filename, dumpMode);
+        }
+#endif
+
+        // Create heuristics object
+        std::unique_ptr<Heuristics> heuristics = std::make_unique<Heuristics>(objectsGraph);
+
+        // Layout heap in the most efficient way
+        Heuristics::LayoutedHeap layoutedData = heuristics->LayoutHeap();
+
+        // Create new arena with enough memory to fit all objects.
+        auto& godArena = CreateGodArena(layoutedData.layoutedSize);
+
+        // Move all the data to newly-allocated heap space.
+        RelocatePointers(godArena, layoutedData);
+
+        // Clear chunksInUse cache and update m_activeGcPtrs after all GcPtrs are updated.
+        m_chunksInUseCache.clear();
+        m_activeGcPtrs =
+            std::unordered_set<GcPtr*>(m_orderedActiveGcPtrs.begin(), m_orderedActiveGcPtrs.end());
+
+        // Clear orderedActiveGcPtrs
+        m_orderedActiveGcPtrs.clear();
+
+        // Remove old arenas.
         auto& arenaList = m_memoryManager.GetArenaList();
-        arenaList.erase(std::remove_if(
-            arenaList.begin(), arenaList.end(), [&](std::unique_ptr<Arena>& t_arena) {
-                if (t_arena.get() == godArena.get())
-                    return false;
-#if MPP_STATS == 1
-                m_gcStats->memoryCleaned += t_arena->FreeMemoryInsideChunkTreap();
-#endif
-                t_arena.reset();
-                return true;
-            }));
-
-#if MPP_STATS == 1
-        timer.TimerEnd();
-        m_gcStats->timeWasted = timer.GetElapsed<std::chrono::milliseconds>();
-        utils::Statistics::GetInstance().AddGcCycleStats(std::move(m_gcStats));
-        m_gcStats = std::make_unique<utils::Statistics::GcStats>();
-#endif
+        arenaList.erase(std::remove_if(arenaList.begin(),
+                                       arenaList.end(),
+                                       [&godArena = godArena](std::unique_ptr<Arena>& t_arena) {
+                                           if (t_arena.get() == godArena.get())
+                                               return false;
+                                           t_arena.reset();
+                                           return true;
+                                       }));
 
         // GC completed successfully, increase number of successful GCs.
         m_totalInvocations++;

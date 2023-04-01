@@ -6,24 +6,10 @@
 #include "mpplib/utils/macros.hpp"
 #include "mpplib/utils/utils.hpp"
 #include <cstdint>
+#include <memory>
+#include <stack>
 
 namespace mpp {
-    GcGraph::GcGraph(GarbageCollector& t_gc, MemoryManager& t_memoryManager)
-        : m_gc(t_gc)
-        , m_memoryManager(t_memoryManager)
-    {
-    }
-
-    // WARNING: creates SHALLOW copy
-    GcGraph::GcGraph(GcGraph& t_other)
-        : m_gc(t_other.m_gc)
-        , m_memoryManager(t_other.m_memoryManager)
-    {
-        for (auto* vertex : t_other.GetAdjList()) {
-            m_adjList.insert(vertex);
-        }
-    }
-
     GcGraph::~GcGraph()
     {
         Clear();
@@ -84,6 +70,10 @@ namespace mpp {
                 origin = new Vertex(reinterpret_cast<std::byte*>(t_gcPtr));
             }
             AddEdge(origin, destination);
+
+            // This is the root vertex (non-heap located). Add it to the list of all root vertices
+            // to later filter-out non-reachable vertices.
+            AddRootVertex(origin);
         }
     }
 
@@ -445,6 +435,11 @@ namespace mpp {
         return m_adjList.insert(t_vertex);
     }
 
+    std::pair<std::set<mpp::Vertex*>::iterator, bool> GcGraph::AddRootVertex(Vertex* t_vertex)
+    {
+        return m_roots.insert(t_vertex);
+    }
+
     bool GcGraph::RemoveVertex(Vertex* t_vertex)
     {
         // Remove all edges that are pointing to this vertex
@@ -455,89 +450,173 @@ namespace mpp {
         return m_adjList.erase(t_vertex);
     }
 
-    std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>> GcGraph::
-        WeaklyConnectedComponents()
+    std::vector<std::unique_ptr<GcGraphView>> GcGraph::WeaklyConnectedComponents()
     {
         PROFILE_FUNCTION();
-        // initialize weakly connected components
-        // Each element in this vector contains isolated subgraph
-        std::vector<std::unique_ptr<GcGraph, std::function<void(GcGraph*)>>>
-            weaklyConnectedComponents;
 
-        // Copy of adjacency list to use with DFS
+        // Each element in this vector contains isolated subgraph.
+        std::vector<std::unique_ptr<GcGraphView>> weaklyConnectedComponents;
+
+        // Copy of adjacency list to use with DFS.
         std::set<Vertex*, VertexComparator> adjListCopy(m_adjList.begin(), m_adjList.end());
 
-        // iterate through all vertices
+        // Iterate through all vertices.
         while (!adjListCopy.empty()) {
-            // Find connected component inside graph
-            std::unique_ptr<GcGraph, std::function<void(GcGraph*)>> connectedComponent(
-                new GcGraph(UndirectedDFS(*(adjListCopy.begin())), m_gc, m_memoryManager),
-                [](GcGraph* t_graph) {
-                    t_graph->GetAdjList().clear();
-                    operator delete(t_graph);
-                });
+            // Find connected component inside the graph.
+            auto connectedComponent = UndirectedDFS(*(adjListCopy.begin()));
 
-            // delete each visited vertex from adjListCopy
+            // Delete each visited vertex from adjListCopy.
             for (auto* vtx : connectedComponent->GetAdjList()) {
                 adjListCopy.erase(vtx);
             }
 
-            // Add found component to the vector
+            // Add found component to the vector.
             weaklyConnectedComponents.push_back(std::move(connectedComponent));
         }
 
         return weaklyConnectedComponents;
     }
 
-    std::vector<Vertex*> GcGraph::DirectedDFS(Vertex* t_vertex)
+    std::vector<std::unique_ptr<GcGraphView>> GcGraph::ReachableWeaklyConnectedComponents()
+    {
+        PROFILE_FUNCTION();
+
+        auto& orderedActiveGcPtrs = m_gc.GetOrderedGcPtrs();
+
+        // Each element in this vector contains isolated subgraph.
+        auto weaklyConnectedComponents = WeaklyConnectedComponents();
+
+        // List of all weakly-connected components, but with the guarantee that each vertex is
+        // reachable from the root.
+        std::vector<std::unique_ptr<GcGraphView>> reachableComponents;
+        reachableComponents.reserve(weaklyConnectedComponents.size());
+
+        // For each subgraph we want to perform DFS starting from the root nodes to find only
+        // reachable vertices.
+        for (auto& component : weaklyConnectedComponents) {
+            std::unordered_set<Vertex*> reachable;
+
+            // Collect all directly-reachable vertices
+            for (auto* rootVtx : component->GetRoots()) {
+                auto rootReachable = DirectedDFS(rootVtx);
+                reachable.insert(rootReachable->GetAdjList().begin(),
+                                 rootReachable->GetAdjList().end());
+            }
+
+            // Remove all non-reachable GcPtr's from the set of active gcptr's.
+            for (auto* unreachableVtx : component->GetAdjList()) {
+                // Check if the vertex is not in the reachable graph.
+                if (reachable.contains(unreachableVtx)) {
+                    continue;
+                }
+
+                // Remove all GcPtr's that reference the current vertex.
+                for (auto* unreachableGcPtr : unreachableVtx->GetPointingToGcPtrs()) {
+                    orderedActiveGcPtrs.erase(unreachableGcPtr);
+                }
+
+                // Remove all GcPtr's that are referenced by the current vertex.
+                auto curVtxReferences = unreachableVtx->GetAllOutgoingGcPtrs(orderedActiveGcPtrs);
+                for (auto* unreachableGcPtr : curVtxReferences) {
+                    orderedActiveGcPtrs.erase(unreachableGcPtr);
+                }
+            }
+
+            // Do not process this component any further if we don't have any vertices.
+            if (reachable.empty()) {
+                continue;
+            }
+
+            reachableComponents.emplace_back(std::make_unique<GcGraphView>(
+                reachable, component->GetRoots(), m_gc, m_memoryManager));
+        }
+
+        return reachableComponents;
+    }
+
+    std::unique_ptr<GcGraphView> GcGraph::DirectedDFS(Vertex* t_vertex)
     {
         PROFILE_FUNCTION();
         // Vector of visited vertices using directed DFS
-        std::vector<Vertex*> visited;
-
-        // Perform directed DFS, starting from t_vertex
-        DDFS(t_vertex, visited);
-
-        return visited;
-    }
-
-    void GcGraph::DDFS(Vertex* t_vertex, std::vector<Vertex*>& t_visited)
-    {
-        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
-                                       t_vertex->GetNeighbors().end());
-        t_visited.push_back(t_vertex);
-        for (auto* neighbor : neighbors) {
-            if (std::find(t_visited.begin(), t_visited.end(), neighbor) == t_visited.end()) {
-                GcGraph::DDFS(neighbor, t_visited);
-            }
-        }
-    }
-
-    std::unordered_set<Vertex*> GcGraph::UndirectedDFS(Vertex* t_vertex)
-    {
-        PROFILE_FUNCTION();
-        // Vector of visited vertices using undirected DFS
         std::unordered_set<Vertex*> visited;
 
-        // Perform undirected DFS, starting from t_vertex
-        UDFS(t_vertex, visited);
+        // Vector of visited root-vertices.
+        std::unordered_set<Vertex*> roots;
 
-        return visited;
-    }
+        // Perform directed DFS, starting from t_vertex
+        std::stack<Vertex*> stack;
+        stack.push(t_vertex);
 
-    void GcGraph::UDFS(Vertex* t_vertex, std::unordered_set<Vertex*>& t_visited)
-    {
-        std::vector<Vertex*> neighbors(t_vertex->GetNeighbors().begin(),
-                                       t_vertex->GetNeighbors().end());
-        neighbors.insert(neighbors.end(),
-                         t_vertex->GetPointingVertices().begin(),
-                         t_vertex->GetPointingVertices().end());
-        t_visited.insert(t_vertex);
-        for (auto* neighbor : neighbors) {
-            if (!t_visited.contains(neighbor)) {
-                GcGraph::UDFS(neighbor, t_visited);
+        while (!stack.empty()) {
+            Vertex* vtx = stack.top();
+            stack.pop();
+
+            if (visited.contains(vtx)) {
+                continue;
+            }
+
+            visited.insert(vtx);
+
+            // Update roots set, if current vertex is the root.
+            if (vtx->IsRoot()) {
+                roots.insert(vtx);
+            }
+
+            // Visit all directly-reachable neighbors.
+            for (auto* neighbor : vtx->GetNeighbors()) {
+                if (!visited.contains(neighbor)) {
+                    stack.push(neighbor);
+                }
             }
         }
+
+        return std::make_unique<GcGraphView>(visited, roots, m_gc, m_memoryManager);
+    }
+
+    std::unique_ptr<GcGraphView> GcGraph::UndirectedDFS(Vertex* t_vertex)
+    {
+        PROFILE_FUNCTION();
+        // Vector of visited vertices.
+        std::unordered_set<Vertex*> visited;
+
+        // Vector of visited root-vertices.
+        std::unordered_set<Vertex*> roots;
+
+        // Perform undirected DFS, starting from t_vertex
+        std::stack<Vertex*> stack;
+        stack.push(t_vertex);
+
+        while (!stack.empty()) {
+            Vertex* vtx = stack.top();
+            stack.pop();
+
+            if (visited.contains(vtx)) {
+                continue;
+            }
+
+            visited.insert(vtx);
+
+            // Update roots set, if current vertex is the root.
+            if (vtx->IsRoot()) {
+                roots.insert(vtx);
+            }
+
+            // Visit all directly-reachable neighbors.
+            for (auto* neighbor : vtx->GetNeighbors()) {
+                if (!visited.contains(neighbor)) {
+                    stack.push(neighbor);
+                }
+            }
+
+            // Visit all neighbors that can't be visited by going through the neighbors set.
+            for (auto* neighbor : vtx->GetPointingVertices()) {
+                if (!visited.contains(neighbor)) {
+                    stack.push(neighbor);
+                }
+            }
+        }
+
+        return std::make_unique<GcGraphView>(visited, roots, m_gc, m_memoryManager);
     }
 
     Vertex* GcGraph::FindVertex(Chunk* t_chunk) const
@@ -560,5 +639,10 @@ namespace mpp {
     std::set<Vertex*, GcGraph::VertexComparator>& GcGraph::GetAdjList()
     {
         return m_adjList;
+    }
+
+    std::set<Vertex*, GcGraph::VertexComparator>& GcGraph::GetRoots()
+    {
+        return m_roots;
     }
 }
