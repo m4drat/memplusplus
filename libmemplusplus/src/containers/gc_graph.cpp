@@ -520,6 +520,14 @@ namespace mpp {
                 for (auto* unreachableGcPtr : curVtxReferences) {
                     orderedActiveGcPtrs.erase(unreachableGcPtr);
                 }
+
+                // Update set of pointing-to vertices for each neighbor of the unreachable vertex.
+                for (auto* neighbor : unreachableVtx->GetNeighbors()) {
+                    std::erase_if(neighbor->GetPointingVertices(),
+                                  [unreachableVtx](const Vertex* t_vertex) {
+                                      return t_vertex == unreachableVtx;
+                                  });
+                }
             }
 
             // Do not process this component any further if we don't have any vertices.
