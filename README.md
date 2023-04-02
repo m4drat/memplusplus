@@ -33,14 +33,14 @@ Warning: the API is not stable!
 
 ## 🔬 Features
 
-- Garbage Collecting
+- Garbage Collection
 - Fast memory allocations (using bump allocators techniques)
 - Fast free algorithms
 - Advanced compacting algorithms, which are used to reduce memory fragmentation and improve cache locality: [heuristic-layouting](#-heuristic-layouting)
 
 ## ⚠ Supported systems / limitations
 
-- The library is still in development, so it is not recommended to use it in production.
+- The library is still in the development. It's definitely not recommended to use in production!
 - All Unix-like systems (where it is possible to use `mmap`)
 - g++ or clang++ compilers
 - __Currently supports only single-threaded applications__
@@ -377,6 +377,16 @@ Memplusplus provides different debug-like features, such as data visualizers, pr
 
     Executing this code with `MPP_DUMP_OBJECTS_GRAPH=2` will generate this graph:
     ![objects-advanced](./additional_info/images/objects_advanced.svg)
+
+- On-demand objects graph visualizer
+
+    To create object graph at the arbitrary point in your program, add this code:
+
+    ```cpp
+    mpp::g_memoryManager->GetGC().DumpCurrentObjectsGraph();
+    ```
+
+    You might want to specify dump type (by default it's `ADVANCED`) and the filename to save `.dot` graph to (default: "objects-graph.dot").
 
 - Profiler
 
