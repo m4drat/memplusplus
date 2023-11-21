@@ -196,10 +196,10 @@ namespace mpp {
         CheckInvalidInitialization(t_newData);
 #endif
 
-        // Create temp object
+        // Create temp object.
         SharedGcPtr tmp(t_newData);
 
-        // Swap with temp object
+        // Swap with temp object.
         tmp.Swap(*this);
         return *this;
     }
@@ -208,12 +208,11 @@ namespace mpp {
     SharedGcPtr<Type>& SharedGcPtr<Type>::operator=(std::nullptr_t t_newData)
     {
         PROFILE_FUNCTION();
-        // Just delete reference
         this->DeleteReference();
         return *this;
     }
 
-    // comparisons operators
+    // comparisons operators.
     template<class Type>
     bool SharedGcPtr<Type>::operator==(const SharedGcPtr& t_other) const noexcept
     {
@@ -303,7 +302,7 @@ namespace mpp {
 
         auto& gcPtrs = g_memoryManager->GetGC().GetGcPtrs();
 
-        // Delete shared ptr from list of all active gc ptrs
+        // Delete shared ptr from list of all active gc ptrs.
         auto toErase = std::find(gcPtrs.begin(), gcPtrs.end(), this);
         if (toErase != gcPtrs.end()) {
             gcPtrs.erase(toErase);
@@ -362,14 +361,14 @@ namespace mpp {
     template<class Type>
     void SharedGcPtr<Type>::DecrementRefCounter()
     {
-        // If m_references isn't nullptr
+        // If m_references isn't nullptr.
         if (m_references) {
-            // De
+            // Decrement references count.
             --(*m_references);
 
-            // Destroy shared ptr and the object
+            // Destroy shared ptr and the object.
             if (*m_references <= 0) {
-                // Delete references variable
+                // Delete references variable.
                 delete m_references;
                 m_references = nullptr;
 
@@ -386,15 +385,13 @@ namespace mpp {
     void SharedGcPtr<Type>::Swap(SharedGcPtr& t_other)
     {
         PROFILE_FUNCTION();
-        // Current object ptr is nullptr
-        // t_other's object ptr isn't nullptr
+        // Current object ptr is nullptr, t_other's object ptr isn't nullptr.
         if (this->m_objectPtr == nullptr && t_other.m_objectPtr != nullptr) {
             t_other.DeleteFromGcList();
             AddToGcList();
         }
 
-        // Current object ptr isn't nullptr
-        // t_other's object ptr is nullptr
+        // Current object ptr isn't nullptr, t_other's object ptr is nullptr.
         if (this->m_objectPtr != nullptr && t_other.m_objectPtr == nullptr) {
             DeleteFromGcList();
             t_other.AddToGcList();

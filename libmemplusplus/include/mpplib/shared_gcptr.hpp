@@ -36,7 +36,7 @@ namespace mpp {
      * @tparam Type of user object.
      */
     template<class Type>
-    class SharedGcPtr
+    class SharedGcPtr final
         : public SharedGcPtrBase<Type>
         , public SharedGcPtrArray<std::is_array<Type>::value>
         , public GcPtr

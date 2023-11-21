@@ -144,6 +144,8 @@ list(APPEND MPP_SOURCES
 	src/heuristics/heuristics.cpp
 	src/containers/chunk_treap.cpp
 	src/containers/gc_graph.cpp
+	src/containers/visualizers/gc_graph_visualizer.cpp
+	src/containers/visualizers/chunk_treap_visualizer.cpp
 	src/containers/node.cpp
 	src/containers/vertex.cpp
 	src/shared_gcptr.cpp
