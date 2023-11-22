@@ -7,7 +7,7 @@
 namespace mpp {
 
     /**
-     * @brief Base class to all types of smart pointers (shared, unique, ...)
+     * @brief Base class for all GcPtr types.
      */
     class GcPtr
     {

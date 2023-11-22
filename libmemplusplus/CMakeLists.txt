@@ -39,13 +39,11 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES ".*(D|d)ebug$")
 	# standart debug defines
 	set(MPP_DEBUG ON)
-	list(APPEND MPP_DEFINES DEBUG=1)
 	list(APPEND MPP_DEFINES MPP_DEBUG=1)
 	list(APPEND MPP_DEFINES MPP_FILL_CHAR='\\x99')
 else()
 	set(MPP_DEBUG OFF)
 	list(APPEND MPP_DEFINES MPP_DEBUG=0)
-	list(APPEND MPP_DEFINES DEBUG=0)
 endif()
 
 if(MPP_ENABLE_LOGGING MATCHES "ON")
@@ -154,6 +152,7 @@ list(APPEND MPP_SOURCES
 	src/gc.cpp
 	src/utils/utils.cpp
 	src/utils/env_options.cpp
+	src/utils/log.cpp
 )
 
 # ################ ADD SPECIFIC SOURCES #################

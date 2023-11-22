@@ -3,7 +3,7 @@
 #include "fuzzer/tokenizer.hpp"
 #include "mpplib/memory_manager.hpp"
 #include "mpplib/shared_gcptr.hpp"
-#include "mpplib/utils/macros.hpp"
+#include "mpplib/utils/log.hpp"
 
 #include <cstdlib>
 #include <cstring>
@@ -82,7 +82,7 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
             case Tokenizer::Operation::CreateVertex: {
                 MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 1,
                                  "Got incorrect number of arguments for CreateVertex operation!");
-                MPP_LOG_DBG("CreateVertex(" + std::to_string(cmd.GetArgs()[0]) + ")");
+                MPP_LOG_DEBUG("CreateVertex(%d)\n", cmd.GetArgs()[0]);
 
                 auto vtx = mpp::MakeShared<Vertex>();
                 pointers.at(cmd.GetArgs()[0]) = std::move(vtx);
@@ -91,7 +91,7 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
             case Tokenizer::Operation::RemoveVertex: {
                 MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 1,
                                  "Got incorrect number of arguments for RemoveVertex operation!");
-                MPP_LOG_DBG("RemoveVertex(" + std::to_string(cmd.GetArgs()[0]) + ")");
+                MPP_LOG_DEBUG("RemoveVertex(%d)\n", cmd.GetArgs()[0]);
 
                 pointers.at(cmd.GetArgs()[0]) = nullptr;
                 break;
@@ -99,9 +99,10 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
             case Tokenizer::Operation::CreateEdge: {
                 MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 3,
                                  "Got incorrect number of arguments for CreateEdge operation!");
-                MPP_LOG_DBG("CreateEdge(" + std::to_string(cmd.GetArgs()[0]) + ", " +
-                            std::to_string(cmd.GetArgs()[1]) + ", " +
-                            std::to_string(cmd.GetArgs()[2]) + ")");
+                MPP_LOG_DEBUG("CreateEdge(%d, %d, %d)\n",
+                              cmd.GetArgs()[0],
+                              cmd.GetArgs()[1],
+                              cmd.GetArgs()[2]);
 
                 auto [vtxIdx1, vtxIdx2, ptrIdx] =
                     std::tie(cmd.GetArgs()[0], cmd.GetArgs()[1], cmd.GetArgs()[2]);
@@ -116,8 +117,7 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
             case Tokenizer::Operation::RemoveEdge: {
                 MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 2,
                                  "Got incorrect number of arguments for RemoveEdge operation!");
-                MPP_LOG_DBG("RemoveEdge(" + std::to_string(cmd.GetArgs()[0]) + ", " +
-                            std::to_string(cmd.GetArgs()[1]) + ")");
+                MPP_LOG_DEBUG("RemoveEdge(%d, %d)\n", cmd.GetArgs()[0], cmd.GetArgs()[1]);
 
                 auto [vtxIdx, ptrIdx] = std::tie(cmd.GetArgs()[0], cmd.GetArgs()[1]);
                 mpp::SharedGcPtr<Vertex>& vertex = pointers.at(vtxIdx);
@@ -129,7 +129,7 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
             case Tokenizer::Operation::ReadSharedData: {
                 MPP_DEBUG_ASSERT(cmd.GetArgs().size() == 1,
                                  "Got incorrect number of arguments for ReadSharedData operation!");
-                MPP_LOG_DBG("ReadSharedData(" + std::to_string(cmd.GetArgs()[0]) + ")");
+                MPP_LOG_DEBUG("ReadSharedData(%d)\n", cmd.GetArgs()[0]);
 
                 auto vtxIdx = cmd.GetArgs()[0];
                 mpp::SharedGcPtr<Vertex>& vertex = pointers.at(vtxIdx);
@@ -140,7 +140,7 @@ int MppFuzzGcApi(const uint8_t* Data, std::size_t Size)
                 break;
             }
             case Tokenizer::Operation::CollectGarbage: {
-                MPP_LOG_DBG("CollectGarbage()");
+                MPP_LOG_DEBUG("CollectGarbage()\n");
                 mpp::CollectGarbage();
                 break;
             }

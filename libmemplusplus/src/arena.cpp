@@ -187,7 +187,7 @@ namespace mpp {
         // Update currently used space variable
         m_currentlyAllocatedSpace -= t_chunk->GetSize();
 
-        MPP_SECURE_WIPE_CHUNK(t_chunk);
+        MPP_WIPE_CHUNK_SECURE_ONLY(t_chunk);
 
         // try to merge deallocated chunk forward and backwards
         Chunk* newChunk = MergeNeighborsChunks(t_chunk);

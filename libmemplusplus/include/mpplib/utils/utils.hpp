@@ -12,7 +12,7 @@ namespace mpp { namespace utils {
     static const uint32_t s_MAX_STACK_LEVELS = 50;
 
     /**
-     * @brief Secure implementation of memset.
+     * @brief Secure implementation of memset, that ensures that compiler will not optimize it out.
      * @param t_pointer Pointer to memory to be set.
      * @param t_targetBufferSize Destination buffer size.
      * @param t_fillChar Character to fill memory with.

@@ -2,8 +2,6 @@
 
 #include "mpplib/utils/utils.hpp"
 
-#include <iostream>
-
 #if __has_include(<sanitizer/asan_interface.h>) && defined (MPP_SANITIZERS)
 #include <sanitizer/asan_interface.h>
 #endif
@@ -30,41 +28,26 @@ namespace mpp {
 
 #define MPP_RELEASE_ASSERT(expr, msg) PRIVATE_MPP_ASSERT((expr), (msg))
 
-#if MPP_DEBUG == 1 || MPP_ENABLE_LOGGING == 1
-#define MPP_LOG(level, msg)                                                                        \
-    std::cout << level << " " << __FILE__ << ":" << __LINE__ << " > " << msg << std::endl;
-#define MPP_LOG_DBG(msg) MPP_LOG("❓  DBG:", msg)
-#define MPP_LOG_WARN(msg) MPP_LOG("🚧 WARN:", msg)
-#define MPP_LOG_INFO(msg) MPP_LOG("📘 INFO:", msg)
-#define MPP_LOG_ERROR(msg) MPP_LOG("❌  ERR:", msg)
-#else
-#define MPP_LOG(level, msg)
-#define MPP_LOG_DBG(msg)
-#define MPP_LOG_WARN(msg)
-#define MPP_LOG_INFO(msg)
-#define MPP_LOG_ERROR(msg)
-#endif
-
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-#define MPP_SECURE_MEMSET(ptr, value, size)                                                        \
+#define MPP_MEMSET_SECURE_ONLY(ptr, value, size)                                                   \
     do {                                                                                           \
         MPP_DEBUG_ASSERT(ptr != nullptr, "Null pointer");                                          \
         MPP_DEBUG_ASSERT(size > 0, "Size must be greater than 0");                                 \
         utils::SecureMemset(ptr, size, value, size);                                               \
     } while (0)
 #else
-#define MPP_SECURE_MEMSET(ptr, value, size)
+#define MPP_MEMSET_SECURE_ONLY(ptr, value, size)
 #endif
 
 #if MPP_FULL_DEBUG == 1 || MPP_SECURE == 1
-#define MPP_SECURE_WIPE_CHUNK(chunk)                                                               \
+#define MPP_WIPE_CHUNK_SECURE_ONLY(chunk)                                                          \
     do {                                                                                           \
-        MPP_SECURE_MEMSET(Chunk::GetUserDataPtr(chunk),                                            \
-                          MPP_FILL_CHAR,                                                           \
-                          chunk->GetSize() - sizeof(Chunk::ChunkHeader));                          \
+        MPP_MEMSET_SECURE_ONLY(Chunk::GetUserDataPtr(chunk),                                       \
+                               MPP_FILL_CHAR,                                                      \
+                               chunk->GetSize() - sizeof(Chunk::ChunkHeader));                     \
     } while (0)
 #else
-#define MPP_SECURE_WIPE_CHUNK(chunk)
+#define MPP_WIPE_CHUNK_SECURE_ONLY(chunk)
 #endif
 
 #if defined MPP_SANITIZERS

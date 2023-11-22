@@ -4,6 +4,7 @@
 
 namespace mpp { namespace utils { namespace colours {
     constexpr std::string_view RESET = "\u001b[0m";
+    constexpr std::string_view GREY = "\u001b[90m";
     constexpr std::string_view BLACK = "\u001b[30m";
     constexpr std::string_view RED = "\u001b[31m";
     constexpr std::string_view GREEN = "\u001b[32m";

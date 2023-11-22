@@ -164,7 +164,7 @@ namespace mpp {
         if (realChunkSize > g_DEFAULT_ARENA_SIZE) {
             Chunk* bigChunk = AllocateBigChunk(Align(realChunkSize, g_PAGE_SIZE));
             MPP_VALGRIND_DEFINE_CHUNK(bigChunk);
-            MPP_SECURE_WIPE_CHUNK(bigChunk);
+            MPP_WIPE_CHUNK_SECURE_ONLY(bigChunk);
             return Chunk::GetUserDataPtr(bigChunk);
         }
 
@@ -178,7 +178,7 @@ namespace mpp {
         Chunk* chunk = GetSuitableChunk(realChunkSize);
         if (chunk != nullptr) {
             MPP_VALGRIND_DEFINE_CHUNK(chunk);
-            MPP_SECURE_WIPE_CHUNK(chunk);
+            MPP_WIPE_CHUNK_SECURE_ONLY(chunk);
             return Chunk::GetUserDataPtr(chunk);
         }
 
@@ -187,7 +187,7 @@ namespace mpp {
         auto& arena = CreateArena(g_DEFAULT_ARENA_SIZE);
         Chunk* userChunk = arena->AllocateFromTopChunk(realChunkSize);
         MPP_VALGRIND_DEFINE_CHUNK(userChunk);
-        MPP_SECURE_WIPE_CHUNK(userChunk);
+        MPP_WIPE_CHUNK_SECURE_ONLY(userChunk);
         return Chunk::GetUserDataPtr(userChunk);
     }
 

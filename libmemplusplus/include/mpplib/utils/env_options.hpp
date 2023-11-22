@@ -1,6 +1,8 @@
 #pragma once
 
+#include "mpplib/utils/log.hpp"
 #include "mpplib/utils/profiler_definitions.hpp"
+
 #include <cstdlib>
 
 namespace mpp { namespace utils {
@@ -29,6 +31,11 @@ namespace mpp { namespace utils {
         bool m_showStatistics;
 
         /**
+         * @brief Environment variable MPP_LOG_LEVEL.
+         */
+        logging::LogLevel m_logLevel;
+
+        /**
          * @brief Constructor, that gets called before program start, to setup all
          * environment variables.
          */
@@ -51,6 +58,12 @@ namespace mpp { namespace utils {
          * @return true, if variable is set, false - otherwise.
          */
         bool GetMppShowStatistics() const;
+
+        /**
+         * @brief Get the MppLogLevel variable.
+         * @return LogLevel
+         */
+        logging::LogLevel GetMppLogLevel() const;
 
         /**
          * @brief Get static instance

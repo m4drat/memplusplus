@@ -12,7 +12,7 @@
     - [How to use the library as a dependency (external project)](#how-to-use-the-library-as-a-dependency-external-project)
     - [How to use the library internally](#how-to-use-the-library-internally)
   - [📀 Build options](#-build-options)
-  - [🔳 Environment options](#-environment-options)
+  - [🔳 Environment variables](#-environment-variables)
   - [📚 Examples](#-examples)
   - [💻 Debugging/profiling library](#-debuggingprofiling-library)
   - [🔥 Heuristic layouting](#-heuristic-layouting)
@@ -123,11 +123,13 @@ Library options:
 - `MPP_STATS` - Add statistics instrumentation.
 - `MPP_ENABLE_LOGGING` - Enable logging (even in release mode)
 
-## 🔳 Environment options
+## 🔳 Environment variables
 
 - `MPP_DUMP_OBJECTS_GRAPH=1` / `MPP_DUMP_OBJECTS_GRAPH=2` - dump objects graph to file `objects.dot`, while performing `CollectGarbage()` (only possible in debug mode)
 
 - `MPP_SHOW_STATISTICS=1` - display statistics after program termination (should be built with `MPP_STATS` set to ON)
+
+- `MPP_LOG_LEVEL` - set log level (default: `FATAL`). Supported values: `TRACE`, `DEBUG`, `INFO`, `WARNING`, `ERROR`, `FATAL`, `DISABLED`
 
 ## 📚 Examples
 
